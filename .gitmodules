@@ -1,0 +1,4 @@
+[submodule "Source/ThirdParty/NativeSDK"]
+	path = Source/ThirdParty/NativeSDK
+	url = ../modio-sdk.git
+	branch = main
