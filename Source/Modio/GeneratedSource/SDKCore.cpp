@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io SDK.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+ *  
+ */
+
 #pragma once
 
 #ifdef MODIO_SEPARATE_COMPILATION
@@ -7,6 +17,7 @@
 #include "modio/cache/ModioCacheService.h"
 #include "modio/detail/ModioSDKSessionData.h"
 #include "modio/detail/ops/ServiceInitializationOp.h"
+#include "modio/detail/ops/ReportContentOp.h"
 #include "modio/detail/ops/Shutdown.h"
 #include "modio/file/ModioFileService.h"
 #include "modio/http/ModioHttpService.h"
@@ -115,5 +126,16 @@ namespace Modio
 	std::vector<Modio::FieldError> GetLastValidationError()
 	{
 		return Modio::Detail::SDKSessionData::GetLastValidationError();
+	}
+
+	void ReportContentAsync(Modio::ReportParams Report, std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback))
+		{
+			
+			asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::ReportContentOp(Report), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
 	}
 } // namespace Modio

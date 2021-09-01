@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io UE4 Plugin.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 
 #include "ModioSubsystem.h"
@@ -12,9 +22,9 @@ public:
 	virtual void Start() override
 	{
 		FModioInitializeOptions Opts;
-		Opts.APIKey = FModioApiKey("8d561adc585f3292356a20ef6502ae64");
+		Opts.ApiKey = FModioApiKey("8d561adc585f3292356a20ef6502ae64");
 		Opts.GameEnvironment = EModioEnvironment::Test;
-		Opts.GameID = FModioGameID(788);
+		Opts.GameId = FModioGameID(788);
 
 		Modio->InitializeAsync(Opts, FOnErrorOnlyDelegateFast::CreateSP(this, &FModioInitializeBadResponseAsyncCommand::Callback));
 	}

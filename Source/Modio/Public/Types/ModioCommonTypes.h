@@ -1,0 +1,376 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io UE4 Plugin.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   
+ */
+
+#pragma once
+#include "Misc/Crc.h"
+
+// clang-format off
+#include "ModioCommonTypes.generated.h"
+// clang-format on
+
+//Forward decls
+namespace Modio
+{
+	struct ModID;
+	struct GameID;
+	struct FileMetadataID;
+	struct UserID;
+}
+
+
+/** @brief Enum representing what environment your game is deployed in */
+UENUM(BlueprintType)
+enum class EModioEnvironment : uint8
+{	
+	// Test/Private environment
+	Test,
+	// Live/Public environment
+	Live
+};
+
+/** @brief Enum representing the store or service your game is being distributed through */
+UENUM(BlueprintType)
+enum class EModioPortal : uint8
+{
+	None,
+	Apple,
+	EpicGamesStore,
+	GOG,
+	Google,
+	Itchio,
+	Nintendo,
+	PSN,
+	Steam,
+	XboxLive
+};
+
+/** @brief Enum representing mod logo sizes */
+UENUM(BlueprintType)
+enum class EModioLogoSize : uint8
+{
+	// Original Size
+	Original,
+	// 320x180px
+	Thumb320, 
+	// 640x360px
+	Thumb640, 
+	// 1280x720px
+	Thumb1280 
+};
+
+/** @brief Enum representing avatar image sizes */
+UENUM(BlueprintType)
+enum class EModioAvatarSize : uint8
+{
+	// Original Size
+	Original,
+	// 50x50px Thumbnail
+	Thumb50, 
+	// 100x100px Thumbnail
+	Thumb100 
+};
+
+/** */
+UENUM(BlueprintType)
+enum class EModioGallerySize : uint8
+{
+	// Original Size
+	Original,
+	// 320x180px Thumbnail
+	Thumb320 
+};
+
+/** @brief Degree of severity for the log output */
+UENUM()
+enum class EModioLogLevel : uint8
+{
+	// Detailed low-level debugging output. Not intended for general use
+	Trace = 0, 
+	// Informational output containing status messages
+	Info = 1, 
+	// Warnings about incorrect plugin usage, timeouts
+	Warning = 2, 
+	// Only errors
+	Error = 3
+};
+
+/** @brief Enum representing the languages mod.io support responses in */
+UENUM(BlueprintType)
+enum class EModioLanguage : uint8
+{
+	English,
+	Bulgarian,
+	French,
+	German,
+	Italian,
+	Polish,
+	Portuguese,
+	Hungarian,
+	Japanese,
+	Korean,
+	Russian,
+	Spanish,
+	Thai,
+	ChineseSimplified,
+	ChineseTraditional
+};
+
+/** @brief Strong type for Mod IDs */
+USTRUCT(BlueprintType)
+struct MODIO_API FModioModID
+{
+	GENERATED_BODY()
+
+	FModioModID();
+	constexpr explicit FModioModID(int64 InModId) : ModID(InModId) {}
+
+	friend uint32 GetTypeHash(FModioModID ModioModId);
+
+	friend bool operator==(FModioModID A, FModioModID B)
+	{
+		return A.ModID == B.ModID;
+	}
+
+	friend bool operator!=(FModioModID A, FModioModID B)
+	{
+		return A.ModID != B.ModID;
+	}
+
+	friend bool operator<(FModioModID A, FModioModID B)
+	{
+		return A.ModID < B.ModID;
+	}
+
+	friend bool operator>(FModioModID A, FModioModID B)
+	{
+		return A.ModID > B.ModID;
+	}
+
+	FString ToString() const
+	{
+		if (ModID < 0)
+		{
+			return TEXT("InvalidModID");
+		}
+		return FString::Printf(TEXT("%lld"), ModID);
+	}
+	
+private:
+	friend struct Modio::ModID ToModio(const FModioModID& In);
+	int64 ModID;
+};
+
+template<>
+struct TStructOpsTypeTraits<FModioModID> : public TStructOpsTypeTraitsBase2<FModioModID>
+{
+	enum
+	{
+		WithIdenticalViaEquality = true
+	};
+};
+
+/** @brief Strong type for Game IDs */
+USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeGameId"))
+struct MODIO_API FModioGameID
+{
+	GENERATED_BODY()
+
+	FModioGameID();
+	constexpr explicit FModioGameID(int64 InGameId) : GameID(InGameId) {}
+
+	friend uint32 GetTypeHash(FModioGameID ModioGameId);
+
+	friend bool operator==(FModioGameID A, FModioGameID B)
+	{
+		return A.GameID == B.GameID;
+	}
+
+	FString ToString() const
+	{
+		if (GameID < 0)
+		{
+			return TEXT("InvalidGameID");
+		}
+		return FString::Printf(TEXT("%lld"), GameID);
+	}
+
+	static FModioGameID InvalidGameID();
+
+private:
+	friend struct Modio::GameID ToModio(const FModioGameID& In);
+	int64 GameID;
+};
+
+template<>
+struct TStructOpsTypeTraits<FModioGameID> : public TStructOpsTypeTraitsBase2<FModioGameID>
+{
+	enum
+	{
+		WithIdenticalViaEquality = true
+	};
+};
+
+/** @brief Strong type for File Metadata IDs */
+USTRUCT(BlueprintType)
+struct MODIO_API FModioFileMetadataID
+{
+	GENERATED_BODY()
+
+	FModioFileMetadataID();
+	constexpr explicit FModioFileMetadataID(int64 InFileMetadataId) : FileMetadataID(InFileMetadataId) {}
+
+	friend uint32 GetTypeHash(FModioFileMetadataID FileMetadataID);
+
+	friend bool operator==(FModioFileMetadataID A, FModioFileMetadataID B)
+	{
+		return A.FileMetadataID == B.FileMetadataID;
+	}
+
+	FString ToString() const
+	{
+		if (FileMetadataID < 0)
+		{
+			return TEXT("InvalidFileMetadataID");
+		}
+		return FString::Printf(TEXT("%lld"), FileMetadataID);
+	}
+
+private:
+	friend struct Modio::FileMetadataID ToModio(const FModioFileMetadataID& In);
+	int64 FileMetadataID;
+};
+
+template<>
+struct TStructOpsTypeTraits<FModioFileMetadataID> : public TStructOpsTypeTraitsBase2<FModioFileMetadataID>
+{
+	enum
+	{
+		WithIdenticalViaEquality = true
+	};
+};
+
+/** @brief Strong type for User IDs */
+USTRUCT(BlueprintType)
+struct MODIO_API FModioUserID
+{
+	GENERATED_BODY()
+
+	FModioUserID();
+
+	constexpr explicit FModioUserID(int64 InUserID) : UserID(InUserID) {}
+
+	friend uint32 GetTypeHash(FModioUserID UserID);
+
+	friend bool operator==(FModioUserID A, FModioUserID B)
+	{
+		return A.UserID == B.UserID;
+	}
+
+	FString ToString() const
+	{
+		if (UserID < 0)
+		{
+			return TEXT("InvalidUserID");
+		}
+		return FString::Printf(TEXT("%lld"), UserID);
+	}
+
+private:
+	friend struct Modio::UserID ToModio(const FModioUserID& In);
+	int64 UserID;
+};
+
+template<>
+struct TStructOpsTypeTraits<FModioUserID> : public TStructOpsTypeTraitsBase2<FModioUserID>
+{
+	enum
+	{
+		WithIdenticalViaEquality = true
+	};
+};
+
+/** @brief Strong type for Api Keys */
+USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeApiKey"))
+struct MODIO_API FModioApiKey
+{
+	GENERATED_BODY()
+
+	FModioApiKey() = default;
+	explicit FModioApiKey(const FString& InApiKey);
+
+	const FString& ToString() const
+	{
+		// Put in the function instead of default constructor to avoid having to allocate memory for
+		// each empty instance
+		if (ApiKey.Len() == 0)
+		{
+			static FString Invalid(TEXT("InvalidApiKey"));
+			return Invalid;
+		}
+		return ApiKey;
+	}
+
+	static FModioApiKey InvalidAPIKey();
+
+private:
+	FString ApiKey;
+};
+
+/** @brief Strong type for email address */
+USTRUCT(BlueprintType)
+struct MODIO_API FModioEmailAddress
+{
+	GENERATED_BODY()
+
+	FModioEmailAddress() = default;
+	FModioEmailAddress(const FString& InEmailAddress);
+
+	const FString& ToString() const
+	{
+		// Put in the function instead of default constructor to avoid having to allocate memory for
+		// each empty instance
+		if (EmailAddress.Len() == 0)
+		{
+			static FString Invalid(TEXT("InvalidEmailAddress"));
+			return Invalid;
+		}
+		return EmailAddress;
+	}
+
+private:
+	FString EmailAddress;
+};
+
+/** @brief Strong type for email auth code */
+USTRUCT(BlueprintType)
+struct MODIO_API FModioEmailAuthCode
+{
+	GENERATED_BODY()
+
+	FModioEmailAuthCode() = default;
+	FModioEmailAuthCode(const FString& InEmailAuthCode);
+
+	const FString& ToString() const
+	{
+		// Put in the function instead of default constructor to avoid having to allocate memory for
+		// each empty instance
+		if (EmailAuthCode.Len() == 0)
+		{
+			static FString Invalid(TEXT("InvalidEmailAuthCode"));
+			return Invalid;
+		}
+		return EmailAuthCode;
+	}
+
+private:
+	FString EmailAuthCode;
+};
+
+#pragma endregion

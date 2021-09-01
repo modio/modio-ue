@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io UE4 Plugin.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   
+ */
+
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 using System.IO;
 using System.Collections.Generic;
@@ -12,7 +22,7 @@ public class Modio : ModuleRules
 
         bEnableUndefinedIdentifierWarnings = false;
         bEnforceIWYU = true;
-
+        //bUseUnity = false;
         //Add stub generated header
         {
             string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "GeneratedHeader");
@@ -25,32 +35,32 @@ public class Modio : ModuleRules
             { };
 
             // Silly hack/workaround until 4.26 adds ConditionalAddModuleDirectory - we may change where this lives in the native SDK later
-            string ErrorConditionLibraryPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio/modio/core/ModioErrorConditionLibrary.h");
+            string ErrorConditionLibraryPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio/modio/core/ModioErrorCondition.h");
             // Add dependency on the upstream file so if it is modified we re-run and copy it again
             ExternalDependencies.Add(ErrorConditionLibraryPath);
-            File.Copy(ErrorConditionLibraryPath, Path.Combine(GeneratedHeaderPath, "ModioErrorConditionLibrary.h"), true);
+            File.Copy(ErrorConditionLibraryPath, Path.Combine(GeneratedHeaderPath, "ModioErrorCondition.h"), true);
 
 
             PublicIncludePaths.AddRange(new string[] {
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/modio"),
-                    GeneratedHeaderPath
                 });
 
             PublicSystemIncludePaths.AddRange(new string[] {
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/json/single_include"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/filesystem/include"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/fmt/include"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/optional/include"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/interface"),
                 });
 
             PrivateIncludePaths.AddRange(new string[]
             {
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/asio/asio/include"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/utfcpp/source"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/httpparser/src"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/ms-common/include"),
-                    Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/win32/win32"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/json/single_include"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/filesystem/include"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/fmt/include"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/optional/include"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/asio/asio/include"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/utfcpp/source"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/httpparser/src"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/interface"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/ms-common/include"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/win32/win32"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/modio"),
+                GeneratedHeaderPath
             });
         }
         // Add native SDK implementation to this module so we don't have to create an extraneous module

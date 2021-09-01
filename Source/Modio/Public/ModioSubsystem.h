@@ -1,7 +1,16 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io UE4 Plugin.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 
 #include "ModioImageCache.h"
-#include "ModioSDK.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "Types/ModioAuthenticationParams.h"
 #include "Types/ModioCommonTypes.h"
@@ -15,6 +24,8 @@
 #include "Types/ModioModManagementEvent.h"
 #include "Types/ModioModProgressInfo.h"
 #include "Types/ModioModTagOptions.h"
+#include "Types/ModioRating.h"
+#include "Types/ModioReportParams.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioUser.h"
 #include "Types/ModioValidationError.h"
@@ -386,6 +397,36 @@ public:
 	 **/
 	MODIO_API void GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
 
+
+	/**
+	 * @brief Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a
+	 * rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this
+	 * user.
+	 * @param Mod The mod the user is rating
+	 * @param Rating The rating the user wishes to submit
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod could not be found
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	MODIO_API void SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide
+	 * their contact name or details in the Report parameter, that those may be shared with the person responsible for
+	 * the content being reported. For more information on what data in a report will be shared with whom, please see
+	 * link:https://mod.io/report/widget[our website's report form] for more information.
+	 * @param Report Information about the content being reported and a description of the report.
+	 * @param Callback Callback providing a status code to indicate successful submission of the report.
+	 * @requires initialized-sdk
+	 * @errorcategory NetworkError|Couldn't Connect to mod.io servers
+	 * @errorcategory InvalidArgsError|Required information in the report did not pass validation
+	 */
+	MODIO_API void ReportContentAsync(FModioReportParams Report, FOnErrorOnlyDelegateFast Callback);
+
 	/** Get our image cache */
 	struct FModioImageCache& GetImageCache() const;
 
@@ -680,5 +721,37 @@ public:
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetUserMediaAsync (Avatar)", Category = "mod.io|User")
 	MODIO_API void K2_GetUserMediaAvatarAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegate Callback);
+
+	/**
+	 * @brief Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a
+	 * rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this
+	 * user.
+	 * @param Mod The mod the user is rating
+	 * @param Rating The rating the user wishes to submit
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod could not be found
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModRatingAsync", Category = "mod.io|Mods")
+	MODIO_API void K2_SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide
+	 * their contact name or details in the Report parameter, that those may be shared with the person responsible for
+	 * the content being reported. For more information on what data in a report will be shared with whom, please see
+	 * link:https://mod.io/report/widget[our website's report form] for more information.
+	 * @param Report Information about the content being reported and a description of the report.
+	 * @param Callback Callback providing a status code to indicate successful submission of the report.
+	 * @requires initialized-sdk
+	 * @errorcategory NetworkError|Couldn't Connect to mod.io servers
+	 * @errorcategory InvalidArgsError|Required information in the report did not pass validation
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "ReportContentAsync", Category = "mod.io")
+	MODIO_API void K2_ReportContentAsync(FModioReportParams Report, FOnErrorOnlyDelegate Callback);
+
 #pragma endregion
 };

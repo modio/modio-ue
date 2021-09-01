@@ -822,8 +822,10 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#QuerySystemInstallations">Query System Installations</a></li>
 <li><a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a></li>
 <li><a href="#K2_SubscribeToModAsync">SubscribeToModAsync</a></li>
+<li><a href="#K2_SubmitModRatingAsync">SubmitModRatingAsync</a></li>
 <li><a href="#K2_ShutdownAsync">ShutdownAsync</a></li>
 <li><a href="#K2_RequestEmailAuthCodeAsync">RequestEmailAuthCodeAsync</a></li>
+<li><a href="#K2_ReportContentAsync">ReportContentAsync</a></li>
 <li><a href="#K2_QueryUserProfile">QueryUserProfile</a></li>
 <li><a href="#K2_QueryCurrentModUpdate">QueryCurrentModUpdate</a></li>
 <li><a href="#K2_ListAllModsAsync">ListAllModsAsync</a></li>
@@ -883,6 +885,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiomodcollectionentry">ModioModCollectionEntry</a></li>
 <li><a href="#_modiooptionalmodprogressinfo">ModioOptionalModProgressInfo</a></li>
 <li><a href="#_modiomodprogressinfo">ModioModProgressInfo</a></li>
+<li><a href="#_modioreportparams">ModioReportParams</a></li>
 <li><a href="#_modioterms">ModioTerms</a></li>
 <li><a href="#_modiolink">ModioLink</a></li>
 <li><a href="#_modiotestfilterparamdata">ModioTestFilterParamData</a></li>
@@ -942,6 +945,8 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_emodiosortfieldtype"> EModioSortFieldType</a></li>
 <li><a href="#_emodioimagestate"> EModioImageState</a></li>
 <li><a href="#_emodiomodstate"> EModioModState</a></li>
+<li><a href="#_emodiorating"> EModioRating</a></li>
+<li><a href="#_emodioreporttype"> EModioReportType</a></li>
 <li><a href="#_efilesizeunit"> EFileSizeUnit</a></li>
 </ul>
 </li>
@@ -1975,6 +1980,87 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <hr>
 </div>
 <div class="sect3">
+<h4 id="K2_SubmitModRatingAsync">SubmitModRatingAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_SubmitModRatingAsync.png" alt="nd img K2 SubmitModRatingAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_SubmitModRatingAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">Mod</span><span class="p">,</span> <span class="n">EModioRating</span> <span class="n">Rating</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this user.</p>
+</div>
+<h5 id="_requirements" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+<li>
+<p><em>no-rate-limiting</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_10" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The mod the user is rating</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Rating</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rating the user wishes to submit</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_error_values" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GenericError::SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UserDataError::InvalidUser</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No authenticated user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NetworkError</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Couldn&#8217;t connect to mod.io servers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EntityNotFoundError</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specified mod could not be found</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="K2_ShutdownAsync">ShutdownAsync</h4>
 <div class="imageblock">
 <div class="content">
@@ -1989,7 +2075,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with Modio::GenericError::OperationCanceled . This function will NOT block while the deinitialization occurs.</p>
 </div>
-<h5 id="_parameters_10" class="discrete">Parameters</h5>
+<h5 id="_parameters_11" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2023,7 +2109,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Begins email authentication for the current session by requesting a one-time code be sent to the specified email address if it is associated with a Mod.io account</p>
 </div>
-<h5 id="_requirements" class="discrete">Requirements</h5>
+<h5 id="_requirements_2" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2037,7 +2123,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_11" class="discrete">Parameters</h5>
+<h5 id="_parameters_12" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2058,7 +2144,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values" class="discrete">Error Values</h5>
+<h5 id="_error_values_2" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2082,6 +2168,69 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <hr>
 </div>
 <div class="sect3">
+<h4 id="K2_ReportContentAsync">ReportContentAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_ReportContentAsync.png" alt="nd img K2 ReportContentAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_ReportContentAsync</span><span class="p">(</span><span class="n">FModioReportParams</span> <span class="n">Report</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sends a content report to mod.io. When using this function, please inform your users that if they provide their contact name or details in the Report parameter, that those may be shared with the person responsible for the content being reported. For more information on what data in a report will be shared with whom, please see <a href="https://mod.io/report/widget">our website&#8217;s report form</a> for more information.</p>
+</div>
+<h5 id="_requirements_3" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_13" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Report</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Information about the content being reported and a description of the report.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback providing a status code to indicate successful submission of the report.</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_error_values_3" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NetworkError</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Couldn&#8217;t Connect to mod.io servers</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">InvalidArgsError</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required information in the report did not pass validation</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="K2_QueryUserProfile">QueryUserProfile</h4>
 <div class="imageblock">
 <div class="content">
@@ -2096,7 +2245,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Fetches the currently authenticated Mod.io user profile if there is one associated with the current platform user</p>
 </div>
-<h5 id="_parameters_12" class="discrete">Parameters</h5>
+<h5 id="_parameters_14" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2134,7 +2283,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Provides progress information for a mod installation or update operation if one is currently in progress.</p>
 </div>
-<h5 id="_parameters_13" class="discrete">Parameters</h5>
+<h5 id="_parameters_15" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2172,7 +2321,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Provides a list of mods for the current game, that match the parameters specified in the filter</p>
 </div>
-<h5 id="_requirements_2" class="discrete">Requirements</h5>
+<h5 id="_requirements_4" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2183,7 +2332,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_14" class="discrete">Parameters</h5>
+<h5 id="_parameters_16" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2204,7 +2353,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_2" class="discrete">Error Values</h5>
+<h5 id="_error_values_4" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2238,7 +2387,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the set of mods the specified user has installed on this device</p>
 </div>
-<h5 id="_parameters_15" class="discrete">Parameters</h5>
+<h5 id="_parameters_17" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2276,7 +2425,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Downloads the avatar of the currently authenticated user. Will only perform a download if there is no local cache of the avatar or if that cached copy is out-of-date.</p>
 </div>
-<h5 id="_requirements_3" class="discrete">Requirements</h5>
+<h5 id="_requirements_5" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2290,7 +2439,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_16" class="discrete">Parameters</h5>
+<h5 id="_parameters_18" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2311,7 +2460,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_3" class="discrete">Error Values</h5>
+<h5 id="_error_values_5" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2349,7 +2498,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>This function retrieves the information required for a game to display the mod.io terms of use to a player who wishes to create a mod.io account</p>
 </div>
-<h5 id="_requirements_4" class="discrete">Requirements</h5>
+<h5 id="_requirements_6" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2357,7 +2506,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_17" class="discrete">Parameters</h5>
+<h5 id="_parameters_19" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2382,7 +2531,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_4" class="discrete">Error Values</h5>
+<h5 id="_error_values_6" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2416,7 +2565,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Fetches the available tags used on mods for the current game. These tags can them be used in conjunction with the FilterParams passed to ListAllMods Will be cached when first received</p>
 </div>
-<h5 id="_requirements_5" class="discrete">Requirements</h5>
+<h5 id="_requirements_7" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2427,7 +2576,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_18" class="discrete">Parameters</h5>
+<h5 id="_parameters_20" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2444,7 +2593,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_5" class="discrete">Error Values</h5>
+<h5 id="_error_values_7" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2478,7 +2627,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Downloads the logo for the specified mod. Will use existing file if it is already present on disk</p>
 </div>
-<h5 id="_requirements_6" class="discrete">Requirements</h5>
+<h5 id="_requirements_8" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2489,7 +2638,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_19" class="discrete">Parameters</h5>
+<h5 id="_parameters_21" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2514,7 +2663,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_6" class="discrete">Error Values</h5>
+<h5 id="_error_values_8" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2556,7 +2705,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Get a gallery image for the specified mod ID. If it already exists on disk the file will be reused unless it is outdated</p>
 </div>
-<h5 id="_requirements_7" class="discrete">Requirements</h5>
+<h5 id="_requirements_9" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2567,7 +2716,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_20" class="discrete">Parameters</h5>
+<h5 id="_parameters_22" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2596,7 +2745,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_7" class="discrete">Error Values</h5>
+<h5 id="_error_values_9" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2638,7 +2787,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Downloads the creator avatar for a specified mod. Will use existing file if it is already present on disk and not outdated</p>
 </div>
-<h5 id="_requirements_8" class="discrete">Requirements</h5>
+<h5 id="_requirements_10" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2649,7 +2798,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_21" class="discrete">Parameters</h5>
+<h5 id="_parameters_23" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2674,7 +2823,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_8" class="discrete">Error Values</h5>
+<h5 id="_error_values_10" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2716,7 +2865,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Fetches detailed information about the specified mod, including description and file metadata for the most recent release</p>
 </div>
-<h5 id="_requirements_9" class="discrete">Requirements</h5>
+<h5 id="_requirements_11" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2727,7 +2876,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_22" class="discrete">Parameters</h5>
+<h5 id="_parameters_24" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2748,7 +2897,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_9" class="discrete">Error Values</h5>
+<h5 id="_error_values_11" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2786,7 +2935,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Synchronises the local list of the current user&#8217;s subscribed mods with the server. Any mods that have been externally subscribed will be automatically marked for installation, and mods that have been externally removed from the user&#8217;s subscriptions may be uninstalled if no other local users have a current subscription.</p>
 </div>
-<h5 id="_parameters_23" class="discrete">Parameters</h5>
+<h5 id="_parameters_25" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2820,7 +2969,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Enables the automatic management of installed mods on the system based on the user&#8217;s subscriptions.</p>
 </div>
-<h5 id="_parameters_24" class="discrete">Parameters</h5>
+<h5 id="_parameters_26" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2854,7 +3003,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>De-authenticates the current Mod.io user for the current session, and clears all user-specific data stored on the current device. Any subscribed mods that are installed but do not have other local users subscribed will be uninstalled</p>
 </div>
-<h5 id="_requirements_10" class="discrete">Requirements</h5>
+<h5 id="_requirements_12" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2868,7 +3017,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_25" class="discrete">Parameters</h5>
+<h5 id="_parameters_27" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2885,7 +3034,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_10" class="discrete">Error Values</h5>
+<h5 id="_error_values_12" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2919,7 +3068,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Uses platform-specific authentication to associate a Mod.io user account with the current platform user</p>
 </div>
-<h5 id="_requirements_11" class="discrete">Requirements</h5>
+<h5 id="_requirements_13" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -2933,7 +3082,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_26" class="discrete">Parameters</h5>
+<h5 id="_parameters_28" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2958,7 +3107,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_11" class="discrete">Error Values</h5>
+<h5 id="_error_values_13" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -2996,7 +3145,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Completes email authentication for the current session by submitting the one-time code sent to the user&#8217;s email address</p>
 </div>
-<h5 id="_requirements_12" class="discrete">Requirements</h5>
+<h5 id="_requirements_14" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -3010,7 +3159,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_27" class="discrete">Parameters</h5>
+<h5 id="_parameters_29" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -3031,7 +3180,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_12" class="discrete">Error Values</h5>
+<h5 id="_error_values_14" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -3069,7 +3218,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Checks if the automatic management process is currently installing or removing mods</p>
 </div>
-<h5 id="_parameters_28" class="discrete">Parameters</h5>
+<h5 id="_parameters_30" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -3107,7 +3256,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>If the last request to the mod.io servers returned a validation failure, this function returns extended information describing the fields that failed validation.</p>
 </div>
-<h5 id="_requirements_13" class="discrete">Requirements</h5>
+<h5 id="_requirements_15" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -3115,7 +3264,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </li>
 </ul>
 </div>
-<h5 id="_parameters_29" class="discrete">Parameters</h5>
+<h5 id="_parameters_31" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -3153,7 +3302,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more room for a mod that the user wants to install, and as such will return an error if the current user is subscribed to the mod. To remove a mod the current user is subscribed to, use <a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a>.</p>
 </div>
-<h5 id="_parameters_30" class="discrete">Parameters</h5>
+<h5 id="_parameters_32" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -3174,7 +3323,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_13" class="discrete">Error Values</h5>
+<h5 id="_error_values_15" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -3212,7 +3361,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Disables automatic installation or uninstallation of mods based on the user&#8217;s subscriptions. Allows currently processing installation to complete; will cancel any pending operations when called.</p>
 </div>
-<h5 id="_parameters_31" class="discrete">Parameters</h5>
+<h5 id="_parameters_33" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -3669,6 +3818,9 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </div>
 <div class="sect2">
 <h3 id="_modioerrorcode">ModioErrorCode</h3>
+<div class="paragraph">
+<p>wrapper around Modio::ErrorCode</p>
+</div>
 <hr>
 </div>
 <div class="sect2">
@@ -3824,12 +3976,12 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioGameID">FModioGameID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameID</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameId</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The Mod.io-provided ID for the game</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioApiKey">FModioApiKey</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">APIKey</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ApiKey</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The Mod.io-provided API key for your application or game</p></td>
 </tr>
 <tr>
@@ -3897,6 +4049,10 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </tr>
 </tbody>
 </table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modioreportparams">ModioReportParams</h3>
 <hr>
 </div>
 <div class="sect2">
@@ -4030,7 +4186,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Changes the portal for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_32" class="discrete">Parameters</h4>
+<h4 id="_parameters_34" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4072,7 +4228,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Make initialization options, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_33" class="discrete">Parameters</h4>
+<h4 id="_parameters_35" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4118,7 +4274,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Create a game id from a integer, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_34" class="discrete">Parameters</h4>
+<h4 id="_parameters_36" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4152,7 +4308,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Creates an AuthenticationParams object</p>
 </div>
-<h4 id="_parameters_35" class="discrete">Parameters</h4>
+<h4 id="_parameters_37" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4198,7 +4354,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Create a ApiKey id from a string, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_36" class="discrete">Parameters</h4>
+<h4 id="_parameters_38" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4229,7 +4385,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetValue</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_37" class="discrete">Parameters</h4>
+<h4 id="_parameters_39" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4264,7 +4420,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetMessage</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_38" class="discrete">Parameters</h4>
+<h4 id="_parameters_40" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4299,7 +4455,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Checks if the passed-in ErrorCode matches the specified error condition</p>
 </div>
-<h4 id="_parameters_39" class="discrete">Parameters</h4>
+<h4 id="_parameters_41" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4341,7 +4497,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Runs a filter over the user&#8217;s subscription list</p>
 </div>
-<h4 id="_parameters_40" class="discrete">Parameters</h4>
+<h4 id="_parameters_42" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4456,7 +4612,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetLogoSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Logo</span><span class="p">,</span> <span class="n">EModioLogoSize</span> <span class="n">LogoSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_41" class="discrete">Parameters</h4>
+<h4 id="_parameters_43" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4495,7 +4651,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetGallerySize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">GalleryImage</span><span class="p">,</span> <span class="n">EModioGallerySize</span> <span class="n">GallerySize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_42" class="discrete">Parameters</h4>
+<h4 id="_parameters_44" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4534,7 +4690,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetAvatarSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Avatar</span><span class="p">,</span> <span class="n">EModioAvatarSize</span> <span class="n">AvatarSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_43" class="discrete">Parameters</h4>
+<h4 id="_parameters_45" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4573,7 +4729,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetPath</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_44" class="discrete">Parameters</h4>
+<h4 id="_parameters_46" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4608,7 +4764,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioModState</span> <span class="n">GetModState</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_45" class="discrete">Parameters</h4>
+<h4 id="_parameters_47" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4643,7 +4799,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModInfo</span> <span class="n">GetModProfile</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_46" class="discrete">Parameters</h4>
+<h4 id="_parameters_48" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4678,7 +4834,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModID</span> <span class="n">GetID</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_47" class="discrete">Parameters</h4>
+<h4 id="_parameters_49" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4716,7 +4872,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="paragraph">
 <p>Dividend/Divisor and return the floating point result with no checks *</p>
 </div>
-<h4 id="_parameters_48" class="discrete">Parameters</h4>
+<h4 id="_parameters_50" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4751,7 +4907,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidSecurityCodeFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_49" class="discrete">Parameters</h4>
+<h4 id="_parameters_51" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4786,7 +4942,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidEmailAddressFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_50" class="discrete">Parameters</h4>
+<h4 id="_parameters_52" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4877,7 +5033,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">Filesize_ToString</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MaxDecimals</span><span class="p">,</span> <span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">Unit</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_51" class="discrete">Parameters</h4>
+<h4 id="_parameters_53" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5355,6 +5511,10 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserTermsOfUseError</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SubmitReportError</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that a report for the specified content could not be submitted.</p></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -5493,8 +5653,78 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_efilesizeunit"><a id="EFileSizeUnit"></a> EFileSizeUnit</h3>
+<h3 id="_emodiorating"><a id="EModioRating"></a> EModioRating</h3>
 <h4 id="_values_17" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Neutral</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Positive</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Negative</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodioreporttype"><a id="EModioReportType"></a> EModioReportType</h3>
+<h4 id="_values_18" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Generic</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">DMCA</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NotWorking</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RudeContent</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IllegalContent</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">StolenContent</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FalseInformation</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Other</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_efilesizeunit"><a id="EFileSizeUnit"></a> EFileSizeUnit</h3>
+<h4 id="_values_19" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5529,7 +5759,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-08-24 20:28:04 +1000
+Last updated 2021-09-01 16:51:15 +1000
 </div>
 </div>
 </body>

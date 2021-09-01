@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io UE4 Plugin.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 
 #include "Engine.h"
@@ -10,31 +20,11 @@
 
 using ModioTestExpectedResult = TVariant<FModioErrorCode, Modio::ErrorConditionTypes>;
 
-ModioTestExpectedResult MakeExpected(Modio::ErrorCode RawErrorCode)
-{
-	ModioTestExpectedResult Expected;
-	Expected.Set<FModioErrorCode>(FModioErrorCode(RawErrorCode));
-	return Expected;
-}
+ModioTestExpectedResult MakeExpected(Modio::ErrorCode RawErrorCode);
 
-ModioTestExpectedResult MakeExpected(Modio::ErrorConditionTypes Condition)
-{
-	ModioTestExpectedResult Expected;
-	Expected.Set<Modio::ErrorConditionTypes>(Condition);
-	return Expected;
-}
+ModioTestExpectedResult MakeExpected(Modio::ErrorConditionTypes Condition);
 
-bool CheckExpectedValue(FModioErrorCode ec, ModioTestExpectedResult ExpectedResult)
-{
-	if (ExpectedResult.IsType<FModioErrorCode>())
-	{
-		return ec.GetRawErrorCode() == ExpectedResult.Get<FModioErrorCode>().GetRawErrorCode();
-	}
-	else
-	{
-		return Modio::ErrorCodeMatches(ec.GetRawErrorCode(), ExpectedResult.Get<Modio::ErrorConditionTypes>());
-	}
-}
+bool CheckExpectedValue(FModioErrorCode ec, ModioTestExpectedResult ExpectedResult);
 
 class FModioTestLatentCommandBase : public IAutomationLatentCommand
 {
@@ -50,45 +40,13 @@ protected:
 	FAutomationTestBase* CurrentTest = nullptr;
 
 public:
-	FModioTestLatentCommandBase(FAutomationTestBase* AssociatedTest) : CurrentTest(AssociatedTest)
-	{
-		Modio = GEngine->GetEngineSubsystem<UModioSubsystem>();
-	}
+	FModioTestLatentCommandBase(FAutomationTestBase* AssociatedTest);
 	virtual ~FModioTestLatentCommandBase() {}
 
-	virtual bool Update() override
-	{
-		switch (CurrentState)
-		{
-			case LatentCommandState::NotStarted:
-				CurrentState = LatentCommandState::InProgress;
-				Start();
-				return false;
-				break;
-			case LatentCommandState::InProgress:
-				if (Modio == nullptr)
-				{
-					return true;
-				}
-				else
-				{
-					Modio->RunPendingHandlers();
-					return false;
-				}
-				break;
-			case LatentCommandState::Complete:
-
-				return true;
-				break;
-		}
-		return true;
-	}
+	virtual bool Update() override;
 	UModioSubsystem* Modio = nullptr;
 	virtual void Start() = 0;
-	virtual void Done()
-	{
-		CurrentState = LatentCommandState::Complete;
-	}
+	virtual void Done();
 };
 
 class FModioTestLatentCommandBaseExpectedResult : public FModioTestLatentCommandBase

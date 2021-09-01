@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io SDK.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
+ *  
+ */
+
 #pragma once
 
 #ifdef MODIO_SEPARATE_COMPILATION
@@ -16,6 +26,7 @@
 #include "modio/detail/ops/mod/GetModMediaLogoOp.h"
 #include "modio/detail/ops/mod/GetModTagsOp.h"
 #include "modio/detail/ops/mod/ListAllModsOp.h"
+#include "modio/detail/ops/mod/SubmitModRatingOp.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 
 // Implementation header - do not include directly
@@ -108,4 +119,14 @@ namespace Modio
 		}
 	}
 
+	void SubmitModRatingAsync(Modio::ModID ModID, Modio::Rating Rating, std::function<void(Modio::ErrorCode)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback) &&
+			Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
+				Modio::Detail::SubmitModRatingOp(ModID, Rating), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
 } // namespace Modio

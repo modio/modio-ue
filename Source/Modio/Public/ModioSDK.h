@@ -1,3 +1,13 @@
+/* 
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  
+ *  This file is part of the mod.io UE4 Plugin.
+ *  
+ *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   
+ */
+
 #pragma once
 
 //#if PLATFORM_WINDOWS
@@ -9,19 +19,6 @@
 //#endif
 
 #define MODIO_PLATFORM_UNREAL 1
-
-// Ensure that we can run asio without any exceptions
-namespace asio
-{
-	namespace detail
-	{
-		template<typename Exception>
-		void throw_exception(const Exception& e)
-		{
-			checkf(false, TEXT("Asio threw a exception with the message %s"), *e.what());
-		}
-	} // namespace detail
-} // namespace asio
 
 #pragma push_macro("check")
 
