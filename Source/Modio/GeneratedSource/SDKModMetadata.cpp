@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #pragma once
@@ -19,6 +19,7 @@
 #include "modio/core/entities/ModioModInfo.h"
 #include "modio/core/entities/ModioModInfoList.h"
 #include "modio/core/entities/ModioModTagOptions.h"
+#include "modio/detail/ops/mod/GetModDependenciesOp.h"
 #include "modio/detail/ops/mod/GetModDetailsOp.h"
 #include "modio/detail/ops/mod/GetModInfoOp.h"
 #include "modio/detail/ops/mod/GetModMediaAvatarOp.h"
@@ -126,6 +127,19 @@ namespace Modio
 		{
 			return asio::async_compose<std::function<void(Modio::ErrorCode)>, void(Modio::ErrorCode)>(
 				Modio::Detail::SubmitModRatingOp(ModID, Rating), Callback,
+				Modio::Detail::Services::GetGlobalContext().get_executor());
+		}
+	}
+
+	void GetModDependenciesAsync(
+		Modio::ModID ModID,
+		std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList> Dependencies)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireNotRateLimited(Callback))
+		{
+			return asio::async_compose<std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>,
+									   void(Modio::ErrorCode, Modio::Optional<Modio::ModDependencyList>)>(
+				Modio::Detail::GetModDependenciesOp(ModID, Modio::Detail::SDKSessionData::CurrentGameID()), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
 	}

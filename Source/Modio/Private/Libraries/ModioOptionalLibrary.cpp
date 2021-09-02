@@ -1,17 +1,18 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #include "Libraries/ModioOptionalLibrary.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioUser.h"
+#include "Types/ModioModDependencyList.h"
 
 template<typename BPOptionalType>
 bool IsSetInternal(const BPOptionalType& Optional)
@@ -104,8 +105,20 @@ bool UModioOptionalLibrary::IsSet_ModioOptionalTerms(const FModioOptionalTerms& 
 	return IsSetInternal(OptionalTerms);
 }
 
-
 bool UModioOptionalLibrary::GetValue_ModioOptionalTerms(const FModioOptionalTerms& OptionalTerms, FModioTerms& Terms)
 {
 	return GetValueInternal(OptionalTerms, Terms);
+}
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalModDependencyList(
+	const struct FModioOptionalModDependencyList& OptionalDependencyList)
+{
+	return IsSetInternal(OptionalDependencyList);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalModDependencyList(
+	const struct FModioOptionalModDependencyList& OptionalDependencyList,
+	struct FModioModDependencyList& DependencyList)
+{
+	return GetValueInternal(OptionalDependencyList, DependencyList);
 }

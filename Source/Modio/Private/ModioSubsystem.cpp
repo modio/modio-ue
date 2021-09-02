@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #include "ModioSubsystem.h"
@@ -15,6 +15,7 @@
 #include "Internal/Convert/FilterParams.h"
 #include "Internal/Convert/InitializeOptions.h"
 #include "Internal/Convert/ModCollectionEntry.h"
+#include "Internal/Convert/ModDependency.h"
 #include "Internal/Convert/ModInfo.h"
 #include "Internal/Convert/ModInfoList.h"
 #include "Internal/Convert/ModManagementEvent.h"
@@ -510,15 +511,13 @@ void UModioSubsystem::ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOn
 								  [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); });
 }
 
-void UModioSubsystem::SubmitModRatingAsync(FModioModID Mod, EModioRating Rating,
-													 FOnErrorOnlyDelegateFast Callback)
+void UModioSubsystem::SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::SubmitModRatingAsync(ToModio(Mod), ToModio(Rating),
 								[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); });
 }
 
-void UModioSubsystem::K2_SubmitModRatingAsync(FModioModID Mod, EModioRating Rating,
-														FOnErrorOnlyDelegate Callback)
+void UModioSubsystem::K2_SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegate Callback)
 {
 	SubmitModRatingAsync(Mod, Rating, FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) {
 							 Callback.ExecuteIfBound(ec);
@@ -534,7 +533,32 @@ void UModioSubsystem::K2_ReportContentAsync(FModioReportParams Report, FOnErrorO
 {
 	ReportContentAsync(Report, FOnErrorOnlyDelegateFast::CreateLambda(
 								   [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+}
 
+void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback)
+{
+	Modio::GetModDependenciesAsync(
+		ToModio(ModID), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModDependencyList> Dependencies) {
+			if (Dependencies)
+			{
+				FModioModDependencyList Out;
+				Out.InternalList = ToUnreal<FModioModDependency>(Dependencies->GetRawList());
+				Out.PagedResult = FModioPagedResult(Dependencies.value());
+				Callback.ExecuteIfBound(ec, Out);
+			}
+			else
+			{
+				Callback.ExecuteIfBound(ec, {});
+			}
+		});
+}
+
+MODIO_API void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegate Callback)
+{
+	GetModDependenciesAsync(ModID, FOnGetModDependenciesDelegateFast::CreateLambda(
+									   [Callback](FModioErrorCode ec, TOptional<FModioModDependencyList> Dependencies) {
+										   Callback.ExecuteIfBound(ec, FModioOptionalModDependencyList(MoveTempIfPossible(Dependencies)));
+									   }));
 }
 
 /// File scope implementations

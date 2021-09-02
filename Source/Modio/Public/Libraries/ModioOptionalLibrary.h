@@ -17,6 +17,7 @@
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioImage.h"
+#include "Types/ModioModDependencyList.h"
 
 // clang-format off
 #include "ModioOptionalLibrary.generated.h"
@@ -176,4 +177,28 @@ class UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalTerms(
 		const struct FModioOptionalTerms& OptionalTerms,
 		struct FModioTerms& Terms);
+
+	/**
+	 * Check if the optional mod dependency list has a valid value
+	 *
+	 * @param OptionalDependencyList - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioOptionalModDependencyList)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalModDependencyList(
+		const struct FModioOptionalModDependencyList& OptionalDependencyList);
+
+	/**
+	 * Get the dependency list from the optional if it's set
+	 *
+	 * @param OptionalDependencyList -
+	 * @param DependencyList - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalModDependencyList)")
+	static bool GetValue_ModioOptionalModDependencyList(
+		const struct FModioOptionalModDependencyList& OptionalDependencyList,
+		struct FModioModDependencyList& DependencyList);
 };

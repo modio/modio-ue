@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -19,6 +19,7 @@
 #include "Types/ModioImage.h"
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioModCollectionEntry.h"
+#include "Types/ModioModDependencyList.h"
 #include "Types/ModioModInfo.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModManagementEvent.h"
@@ -40,6 +41,7 @@ DECLARE_DELEGATE_TwoParams(FOnGetModInfoDelegateFast, FModioErrorCode, TOptional
 DECLARE_DELEGATE_TwoParams(FOnGetMediaDelegateFast, FModioErrorCode, TOptional<FModioImage>);
 DECLARE_DELEGATE_TwoParams(FOnGetModTagOptionsDelegateFast, FModioErrorCode, TOptional<FModioModTagOptions>);
 DECLARE_DELEGATE_TwoParams(FOnGetTermsOfUseDelegateFast, FModioErrorCode, TOptional<FModioTerms>);
+DECLARE_DELEGATE_TwoParams(FOnGetModDependenciesDelegateFast, FModioErrorCode, TOptional<FModioModDependencyList>);
 
 // Blueprint version of delegates
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnErrorOnlyDelegate, FModioErrorCode, ErrorCode);
@@ -51,6 +53,8 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetMediaDelegate, FModioErrorCode, ErrorCo
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModTagOptionsDelegate, FModioErrorCode, ErrorCode, FModioOptionalModTagOptions,
 								   ModTagOptions);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetTermsOfUseDelegate, FModioErrorCode, ErrorCode, FModioOptionalTerms, Terms);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModDependenciesDelegate, FModioErrorCode, ErrorCode,
+								   FModioOptionalModDependencyList, Dependencies);
 
 /**
  * @brief Thin wrapper around the mod.io SDK. This mostly wraps all the functions available in modio/ModioSDK.h that's
@@ -319,6 +323,19 @@ public:
 	MODIO_API void GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Callback);
 
 	/**
+	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
+	 * @param ModID The mod to retrieve dependencies for
+	 * @param Callback Callback providing a status code and an optional ModTagOptions object containing the available
+	 * tags
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @experimental
+	 **/
+	MODIO_API void GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback);
+
+	/**
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the
 	 * specified email address if it is associated with a Mod.io account
 	 * @param EmailAddress The email address to send the code to
@@ -396,7 +413,6 @@ public:
 	 * @param Callback Callback providing a status code for the download and an optional path to the downloaded image
 	 **/
 	MODIO_API void GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
-
 
 	/**
 	 * @brief Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a
@@ -625,6 +641,20 @@ public:
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModTagOptionsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModTagOptionsAsync(FOnGetModTagOptionsDelegate Callback);
+
+	/**
+	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
+	 * @param ModID The mod to retrieve dependencies for
+	 * @param Callback Callback providing a status code and an optional ModTagOptions object containing the available
+	 * tags
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @experimental
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "GetModDependenciesAsync", Category = "mod.io|Mods")
+	MODIO_API void K2_GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegate Callback);
 
 	/**
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the
