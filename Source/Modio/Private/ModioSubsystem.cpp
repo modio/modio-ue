@@ -14,6 +14,7 @@
 #include "Internal/Convert/ErrorCode.h"
 #include "Internal/Convert/FilterParams.h"
 #include "Internal/Convert/InitializeOptions.h"
+#include "Internal/Convert/List.h"
 #include "Internal/Convert/ModCollectionEntry.h"
 #include "Internal/Convert/ModDependency.h"
 #include "Internal/Convert/ModInfo.h"
@@ -274,7 +275,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize Avata
 							});
 }
 
-void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, Modio::GalleryIndex Index,
+void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 									   FOnGetMediaDelegateFast Callback)
 {
 	Modio::GetModMediaAsync(ToModio(ModId), ToModio(GallerySize), Index,
@@ -557,7 +558,8 @@ MODIO_API void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, FO
 {
 	GetModDependenciesAsync(ModID, FOnGetModDependenciesDelegateFast::CreateLambda(
 									   [Callback](FModioErrorCode ec, TOptional<FModioModDependencyList> Dependencies) {
-										   Callback.ExecuteIfBound(ec, FModioOptionalModDependencyList(MoveTempIfPossible(Dependencies)));
+										   Callback.ExecuteIfBound(
+											   ec, FModioOptionalModDependencyList(MoveTempIfPossible(Dependencies)));
 									   }));
 }
 

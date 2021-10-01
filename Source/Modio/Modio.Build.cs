@@ -19,7 +19,6 @@ public class Modio : ModuleRules
     {
         PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
         PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
-
         bEnableUndefinedIdentifierWarnings = false;
         bEnforceIWYU = true;
         //bUseUnity = false;

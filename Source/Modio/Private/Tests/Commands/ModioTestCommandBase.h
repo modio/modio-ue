@@ -15,6 +15,7 @@
 #include "Misc/TVariant.h"
 #include "ModioSubsystem.h"
 #include "Types/ModioErrorCode.h"
+#include "ModioSDK.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
 

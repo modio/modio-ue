@@ -14,6 +14,7 @@
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 #include <system_error>
+#include "ModioSDK.h"
 
 EModioAvatarSize UModioExampleLibrary::GetAvatarThumbnailSize()
 {
@@ -144,7 +145,7 @@ void UModioExampleLibrary::ListUserSubscriptionAsync(const FModioFilterParams& F
 	if (!IsValid(Subsystem))
 	{
 		// @todo: Exchange this for a mod.io internal error when we have one in the SDK
-		Callback.ExecuteIfBound(FModioErrorCode(std::make_error_code(std::errc::not_supported)), {});
+		Callback.ExecuteIfBound(FModioErrorCode(Modio::ErrorCode(std::make_error_code(std::errc::not_supported))), {});
 		return;
 	}
 

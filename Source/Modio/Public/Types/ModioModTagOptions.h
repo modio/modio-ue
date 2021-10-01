@@ -16,6 +16,11 @@
 
 #include "ModioModTagOptions.generated.h"
 
+namespace Modio
+{
+	class ModTagOptions;
+}
+
 #if CPP
 // Native version of FModioModTagOptions
 struct MODIO_API FModioModTagOptions : public FModioPagedResult, public FModioList<TArray, FModioModTagInfo>

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "Templates/UnrealTemplate.h"
-#include "Internal/ModioConvert.h"
 
 #if CPP
 /**
@@ -107,11 +106,3 @@ private:
 };
 #endif
 
-/** Convert a Modio::List to a FModioList */
-template<template<typename...> typename DestListType, typename DestValueType, typename SourceListType>
-FModioList<DestListType, DestValueType> ToUnrealList(SourceListType Value)
-{
-	FModioList<DestListType, DestValueType> Result;
-	Result.InternalList = ToUnreal<DestValueType>(Value.GetRawList());
-	return Result;
-}

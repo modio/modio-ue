@@ -57,6 +57,7 @@ FORCEINLINE Modio::UserID ToModio(const FModioUserID& In);
 
 #pragma region Implementation
 
+
 // @todo: Rename this to ToModio as it doesn't matter that it's the part of STD of modio
 FORCEINLINE std::string ToSTD(const FString& String)
 {

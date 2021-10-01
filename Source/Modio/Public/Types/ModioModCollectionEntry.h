@@ -18,6 +18,11 @@
 // clang-format on
 
 
+namespace Modio
+{
+	class ModCollectionEntry;
+}
+
 /// @brief Enum representing the current state of a mod
 UENUM(BlueprintType)
 enum class EModioModState : uint8

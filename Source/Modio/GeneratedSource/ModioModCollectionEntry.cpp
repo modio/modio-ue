@@ -1,18 +1,20 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
 	#include "modio/core/ModioModCollectionEntry.h"
 #endif
 
+#include "modio/core/ModioErrorCode.h"
 #include "modio/core/ModioLogger.h"
+#include "modio/detail/ModioConstants.h"
 #include "modio/detail/ModioJsonHelpers.h"
 #include "nlohmann/json.hpp"
 #include <algorithm>
@@ -24,7 +26,8 @@ namespace Modio
 		  CurrentState(Modio::ModState::InstallationPending),
 		  ModProfile(ProfileData),
 		  LocalUserSubscriptions(),
-		  PathOnDisk(CalculatedModPath) {};
+		  PathOnDisk(CalculatedModPath),
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {};
 
 	ModCollectionEntry::ModCollectionEntry(const ModCollectionEntry& Other)
 		: ID(Other.ID),
@@ -32,7 +35,13 @@ namespace Modio
 		  ModProfile(Other.ModProfile),
 		  LocalUserSubscriptionCount(Other.LocalUserSubscriptionCount.load()),
 		  LocalUserSubscriptions(Other.LocalUserSubscriptions),
-		  PathOnDisk(Other.PathOnDisk) {};
+		  PathOnDisk(Other.PathOnDisk),
+		  RetriesRemainingThisSession(Modio::Detail::Constants::Configuration::DefaultNumberOfRetries) {};
+
+	uint8_t ModCollectionEntry::GetRetriesRemaining()
+	{
+		return RetriesRemainingThisSession;
+	}
 
 	void ModCollectionEntry::UpdateModProfile(ModInfo ProfileData)
 	{
@@ -76,11 +85,65 @@ namespace Modio
 	void ModCollectionEntry::SetModState(Modio::ModState NewState)
 	{
 		CurrentState = NewState;
+		if (CurrentState == Modio::ModState::Installed)
+		{
+			RetriesRemainingThisSession = Modio::Detail::Constants::Configuration::DefaultNumberOfRetries;
+		}
 	}
 
-	void ModCollectionEntry::MarkModNoRetry()
+	void ModCollectionEntry::MarkModNoRetryThisSession()
 	{
 		ShouldNotRetry.store(true);
+	}
+
+	void ModCollectionEntry::SetLastError(Modio::ErrorCode Reason)
+	{
+		// For uninstallations, defer immediately if the error indicates we should defer, else make a number of retry
+		// attempts then stop
+		if (GetModState() == ModState::UninstallPending)
+		{
+			if (Modio::ErrorCodeMatches(Reason, Modio::ErrorConditionTypes::ModDeleteDeferredError))
+			{
+				MarkModNoRetryThisSession();
+				return;
+			}
+			else
+			{
+				if (RetriesRemainingThisSession > 0)
+				{
+					RetriesRemainingThisSession--;
+				}
+				if (RetriesRemainingThisSession == 0)
+				{
+					MarkModNoRetryThisSession();
+				}
+			}
+		}
+		// For installations, if we should retry, make a fixed number of attempts then stop.
+		// If the error is unrecoverable, prevent future reattempts permanently.
+		// Otherwise, defer to next startup
+		else
+		{
+			if (Modio::ErrorCodeMatches(Reason, Modio::ErrorConditionTypes::ModInstallRetryableError))
+			{
+				if (RetriesRemainingThisSession > 0)
+				{
+					RetriesRemainingThisSession--;
+				}
+				if (RetriesRemainingThisSession == 0)
+				{
+					MarkModNoRetryThisSession();
+				}
+			}
+			else if (Modio::ErrorCodeMatches(Reason, Modio::ErrorConditionTypes::ModInstallUnrecoverableError))
+			{
+				NeverRetryReason = Reason;
+			}
+			else
+			{
+				MarkModNoRetryThisSession();
+			}
+		}
 	}
 
 	void ModCollectionEntry::ClearModNoRetry()
@@ -90,7 +153,8 @@ namespace Modio
 
 	bool ModCollectionEntry::ShouldRetry()
 	{
-		return !ShouldNotRetry.load();
+		// Should only retry if we have don't have a never retry reason AND ShouldNotRetry is not set
+		return !NeverRetryReason && !ShouldNotRetry.load();
 	}
 
 	Modio::ModState ModCollectionEntry::GetModState() const
@@ -158,6 +222,7 @@ namespace Modio
 		LocalUserSubscriptions = Other.LocalUserSubscriptions;
 		LocalUserSubscriptionCount.store(Other.LocalUserSubscriptionCount.load());
 		PathOnDisk = Other.PathOnDisk;
+		RetriesRemainingThisSession = Other.RetriesRemainingThisSession;
 		return *this;
 	};
 
@@ -175,9 +240,10 @@ namespace Modio
 			}
 			else
 			{
-				Modio::Detail::Logger().Log(
-					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
-					"Mod {0} is in state Downloading or Extracting without a transaction in progress. Saving state as InstallationPending", Entry.ID);
+				Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+											"Mod {0} is in state Downloading or Extracting without a transaction in "
+											"progress. Saving state as InstallationPending",
+											Entry.ID);
 				EntryState = Modio::ModState::InstallationPending;
 			}
 		}
@@ -188,7 +254,10 @@ namespace Modio
 			 {Modio::Detail::Constants::JSONKeys::ModEntrySubCount, Entry.LocalUserSubscriptions},
 			 {Modio::Detail::Constants::JSONKeys::ModEntryState, EntryState},
 			 {Modio::Detail::Constants::JSONKeys::ModSizeOnDisk, Entry.SizeOnDisk},
-			 {Modio::Detail::Constants::JSONKeys::ModPathOnDisk, Entry.PathOnDisk.string()}});
+			 {Modio::Detail::Constants::JSONKeys::ModPathOnDisk, Entry.PathOnDisk.string()},
+			 {Modio::Detail::Constants::JSONKeys::ModNeverRetryCode, Entry.NeverRetryReason.value()},
+			 {Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory,
+			  Modio::Detail::ModioErrorCategoryID(Entry.NeverRetryReason.category())}});
 	}
 
 	void from_json(const nlohmann::json& j, ModCollectionEntry& Entry)
@@ -201,6 +270,14 @@ namespace Modio
 		Modio::Detail::ParseSafe(j, StateTmp, Modio::Detail::Constants::JSONKeys::ModEntryState);
 		Entry.CurrentState.store(StateTmp);
 		Modio::Detail::ParseSafe(j, Entry.PathOnDisk, Modio::Detail::Constants::JSONKeys::ModPathOnDisk);
+		if (j.contains(Modio::Detail::Constants::JSONKeys::ModNeverRetryCode) &&
+			j.contains(Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory))
+		{
+			Entry.NeverRetryReason =
+				std::error_code(j.at(Modio::Detail::Constants::JSONKeys::ModNeverRetryCode).get<uint32_t>(),
+								Modio::Detail::GetModioErrorCategoryByID(
+									j.at(Modio::Detail::Constants::JSONKeys::ModNeverRetryCategory).get<uint64_t>()));
+		}
 	}
 
 	UserSubscriptionList::UserSubscriptionList(std::vector<Modio::ModID>&& NewIDs)
@@ -321,6 +398,26 @@ namespace Modio
 			}
 		}
 		return false;
+	}
+
+	std::vector<std::shared_ptr<Modio::ModCollectionEntry>> ModCollection::SortEntriesByRetryPriority() const
+	{
+		std::vector<std::shared_ptr<Modio::ModCollectionEntry>> SortedEntries;
+		// Copy the entries to the vector
+		for (const std::pair<Modio::ModID, std::shared_ptr<Modio::ModCollectionEntry>>& Elem : ModEntries)
+		{
+			SortedEntries.push_back(Elem.second);
+		}
+		// Sort the entries by priority (that is, entries which can be retried should be first, and entries which
+		// haven't been retried this session should be higher )
+		auto FirstElemWithNoRetry =
+			std::partition(SortedEntries.begin(), SortedEntries.end(),
+						   [](std::shared_ptr<Modio::ModCollectionEntry> Elem) { return Elem->ShouldRetry(); });
+		std::partition(
+			SortedEntries.begin(), FirstElemWithNoRetry, [](std::shared_ptr<Modio::ModCollectionEntry> Elem) {
+				return Elem->GetRetriesRemaining() == Modio::Detail::Constants::Configuration::DefaultNumberOfRetries;
+			});
+		return SortedEntries;
 	}
 
 } // namespace Modio

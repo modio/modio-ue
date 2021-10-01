@@ -290,7 +290,7 @@ public:
 	 * @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
 	 * @error FilesystemError::InsufficientSpace|Not enough space for the file
 	 **/
-	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, Modio::GalleryIndex Index,
+	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 									FOnGetMediaDelegateFast Callback);
 
 	/**
