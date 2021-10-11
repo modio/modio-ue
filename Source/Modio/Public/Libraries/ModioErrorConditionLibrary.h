@@ -17,7 +17,7 @@
 
 
 UCLASS()
-class UModioErrorConditionLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioErrorConditionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

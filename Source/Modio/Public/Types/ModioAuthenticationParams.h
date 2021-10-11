@@ -28,7 +28,7 @@ enum class EModioAuthenticationProvider : uint8
 
 /** @brief Simple struct to encapsulate data passed to external authentication systems */
 USTRUCT(BlueprintType)
-struct FModioAuthenticationParams
+struct MODIO_API FModioAuthenticationParams
 {
 	GENERATED_BODY();
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)

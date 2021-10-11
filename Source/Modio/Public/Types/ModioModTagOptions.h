@@ -45,7 +45,7 @@ struct MODIO_API FModioModTagOptions
 #endif
 
 USTRUCT(BlueprintType)
-struct FModioOptionalModTagOptions
+struct MODIO_API FModioOptionalModTagOptions
 {
 	GENERATED_BODY()
 

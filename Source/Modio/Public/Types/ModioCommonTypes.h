@@ -1,34 +1,31 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 #include "Misc/Crc.h"
 
-// clang-format off
 #include "ModioCommonTypes.generated.h"
-// clang-format on
 
-//Forward decls
+// Forward decls
 namespace Modio
 {
 	struct ModID;
 	struct GameID;
 	struct FileMetadataID;
 	struct UserID;
-}
-
+} // namespace Modio
 
 /** @brief Enum representing what environment your game is deployed in */
 UENUM(BlueprintType)
 enum class EModioEnvironment : uint8
-{	
+{
 	// Test/Private environment
 	Test,
 	// Live/Public environment
@@ -58,11 +55,11 @@ enum class EModioLogoSize : uint8
 	// Original Size
 	Original,
 	// 320x180px
-	Thumb320, 
+	Thumb320,
 	// 640x360px
-	Thumb640, 
+	Thumb640,
 	// 1280x720px
-	Thumb1280 
+	Thumb1280
 };
 
 /** @brief Enum representing avatar image sizes */
@@ -72,9 +69,9 @@ enum class EModioAvatarSize : uint8
 	// Original Size
 	Original,
 	// 50x50px Thumbnail
-	Thumb50, 
+	Thumb50,
 	// 100x100px Thumbnail
-	Thumb100 
+	Thumb100
 };
 
 /** */
@@ -84,19 +81,19 @@ enum class EModioGallerySize : uint8
 	// Original Size
 	Original,
 	// 320x180px Thumbnail
-	Thumb320 
+	Thumb320
 };
 
 /** @brief Degree of severity for the log output */
-UENUM()
+UENUM(BlueprintType)
 enum class EModioLogLevel : uint8
 {
 	// Detailed low-level debugging output. Not intended for general use
-	Trace = 0, 
+	Trace = 0,
 	// Informational output containing status messages
-	Info = 1, 
+	Info = 1,
 	// Warnings about incorrect plugin usage, timeouts
-	Warning = 2, 
+	Warning = 2,
 	// Only errors
 	Error = 3
 };
@@ -131,14 +128,14 @@ struct MODIO_API FModioModID
 	FModioModID();
 	constexpr explicit FModioModID(int64 InModId) : ModID(InModId) {}
 
-	friend uint32 GetTypeHash(FModioModID ModioModId);
+	MODIO_API friend uint32 GetTypeHash(FModioModID ModioModId);
 
-	friend bool operator==(FModioModID A, FModioModID B)
+	MODIO_API friend bool operator==(FModioModID A, FModioModID B)
 	{
 		return A.ModID == B.ModID;
 	}
 
-	friend bool operator!=(FModioModID A, FModioModID B)
+	MODIO_API friend bool operator!=(FModioModID A, FModioModID B)
 	{
 		return A.ModID != B.ModID;
 	}
@@ -161,7 +158,24 @@ struct MODIO_API FModioModID
 		}
 		return FString::Printf(TEXT("%lld"), ModID);
 	}
-	
+
+	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioModID& ID)
+	{
+		return Ar << ID.ModID;
+	}
+
+	bool Serialize(FArchive& Ar)
+	{
+		Ar << *this;
+		return true;
+	}
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << *this;
+		bOutSuccess = true;
+		return true;
+	}
+
 private:
 	friend struct Modio::ModID ToModio(const FModioModID& In);
 	int64 ModID;
@@ -172,7 +186,9 @@ struct TStructOpsTypeTraits<FModioModID> : public TStructOpsTypeTraitsBase2<FMod
 {
 	enum
 	{
-		WithIdenticalViaEquality = true
+		WithIdenticalViaEquality = true,
+		WithSerializer = true,
+		WithNetSerializer = true
 	};
 };
 
@@ -185,9 +201,9 @@ struct MODIO_API FModioGameID
 	FModioGameID();
 	constexpr explicit FModioGameID(int64 InGameId) : GameID(InGameId) {}
 
-	friend uint32 GetTypeHash(FModioGameID ModioGameId);
+	MODIO_API friend uint32 GetTypeHash(FModioGameID ModioGameId);
 
-	friend bool operator==(FModioGameID A, FModioGameID B)
+	MODIO_API friend bool operator==(FModioGameID A, FModioGameID B)
 	{
 		return A.GameID == B.GameID;
 	}
@@ -202,6 +218,23 @@ struct MODIO_API FModioGameID
 	}
 
 	static FModioGameID InvalidGameID();
+	
+	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioGameID& ID)
+	{
+		return Ar << ID.GameID;
+	}
+
+	bool Serialize(FArchive& Ar)
+	{
+		Ar << *this;
+		return true;
+	}
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << *this;
+		bOutSuccess = true;
+		return true;
+	}
 
 private:
 	friend struct Modio::GameID ToModio(const FModioGameID& In);
@@ -213,7 +246,9 @@ struct TStructOpsTypeTraits<FModioGameID> : public TStructOpsTypeTraitsBase2<FMo
 {
 	enum
 	{
-		WithIdenticalViaEquality = true
+		WithIdenticalViaEquality = true,
+		WithSerializer = true,
+		WithNetSerializer = true
 	};
 };
 
@@ -226,9 +261,9 @@ struct MODIO_API FModioFileMetadataID
 	FModioFileMetadataID();
 	constexpr explicit FModioFileMetadataID(int64 InFileMetadataId) : FileMetadataID(InFileMetadataId) {}
 
-	friend uint32 GetTypeHash(FModioFileMetadataID FileMetadataID);
+	MODIO_API friend uint32 GetTypeHash(FModioFileMetadataID FileMetadataID);
 
-	friend bool operator==(FModioFileMetadataID A, FModioFileMetadataID B)
+	MODIO_API friend bool operator==(FModioFileMetadataID A, FModioFileMetadataID B)
 	{
 		return A.FileMetadataID == B.FileMetadataID;
 	}
@@ -242,6 +277,23 @@ struct MODIO_API FModioFileMetadataID
 		return FString::Printf(TEXT("%lld"), FileMetadataID);
 	}
 
+	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioFileMetadataID& ID)
+	{
+		return Ar << ID.FileMetadataID;
+	}
+
+	bool Serialize(FArchive& Ar)
+	{
+		Ar << *this;
+		return true;
+	}
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << *this;
+		bOutSuccess = true;
+		return true;
+	}
+
 private:
 	friend struct Modio::FileMetadataID ToModio(const FModioFileMetadataID& In);
 	int64 FileMetadataID;
@@ -252,7 +304,9 @@ struct TStructOpsTypeTraits<FModioFileMetadataID> : public TStructOpsTypeTraitsB
 {
 	enum
 	{
-		WithIdenticalViaEquality = true
+		WithIdenticalViaEquality = true,
+		WithSerializer = true,
+		WithNetSerializer = true
 	};
 };
 
@@ -266,9 +320,9 @@ struct MODIO_API FModioUserID
 
 	constexpr explicit FModioUserID(int64 InUserID) : UserID(InUserID) {}
 
-	friend uint32 GetTypeHash(FModioUserID UserID);
+	MODIO_API friend uint32 GetTypeHash(FModioUserID UserID);
 
-	friend bool operator==(FModioUserID A, FModioUserID B)
+	MODIO_API friend bool operator==(FModioUserID A, FModioUserID B)
 	{
 		return A.UserID == B.UserID;
 	}
@@ -282,6 +336,23 @@ struct MODIO_API FModioUserID
 		return FString::Printf(TEXT("%lld"), UserID);
 	}
 
+	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioUserID& ID)
+	{
+		return Ar << ID.UserID;
+	}
+
+	bool Serialize(FArchive& Ar)
+	{
+		Ar << *this;
+		return true;
+	}
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << *this;
+		bOutSuccess = true;
+		return true;
+	}
+
 private:
 	friend struct Modio::UserID ToModio(const FModioUserID& In);
 	int64 UserID;
@@ -292,7 +363,9 @@ struct TStructOpsTypeTraits<FModioUserID> : public TStructOpsTypeTraitsBase2<FMo
 {
 	enum
 	{
-		WithIdenticalViaEquality = true
+		WithIdenticalViaEquality = true,
+		WithSerializer = true,
+		WithNetSerializer = true
 	};
 };
 

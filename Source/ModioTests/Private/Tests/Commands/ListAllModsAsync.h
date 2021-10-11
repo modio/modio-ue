@@ -63,7 +63,7 @@ public:
 	}
 	void Callback(FModioErrorCode ec, TOptional<FModioModInfoList> ModInfoList)
 	{
-		CurrentTest->TestEqual("ListAllMods completes with InvalidResponse error", Modio::ErrorCodeMatches(ec.GetRawErrorCode(), Modio::HttpError::InvalidResponse), true);
+		CurrentTest->TestEqual("ListAllMods completes with NetworkError error", CheckError(ec, EModioErrorCondition::NetworkError), true);
 		CurrentTest->TestFalse("When ListAllMods returns with InvalidResponse error, ModInfoList should not have a value",
 							  ModInfoList.IsSet());
 		Done();

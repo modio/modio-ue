@@ -11,9 +11,6 @@
 #include "Engine.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Misc/AutomationTest.h"
-#include "Tests/Commands/InitializeAsync.h"
-#include "Tests/Commands/ShutdownAsync.h"
-#include "Tests/Commands/SubscribeToModAsync.h"
 #include "Internal/Convert/ModStats.h"
 
 #if WITH_DEV_AUTOMATION_TESTS

@@ -12,9 +12,8 @@
 
 #include "Types/ModioCommonTypes.h"
 
-// clang-format off
 #include "ModioUser.generated.h"
-// clang-format on
+
 
 namespace Modio
 {

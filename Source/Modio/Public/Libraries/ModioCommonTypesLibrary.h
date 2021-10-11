@@ -15,12 +15,11 @@
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioAuthenticationParams.h"
 
-// clang-format off
 #include "ModioCommonTypesLibrary.generated.h"
-// clang-format on
+
 
 UCLASS()
-class UModioCommonTypesLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioCommonTypesLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:

@@ -14,14 +14,13 @@
 #include "Types/ModioImage.h"
 #include "Types/ModioImageState.h"
 
-// clang-format off
 #include "ModioImageLibrary.generated.h"
-// clang-format on
+
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnLoadImageDelegate, class UTexture2DDynamic*, Texture);
 
 UCLASS()
-class UModioImageLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioImageLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:

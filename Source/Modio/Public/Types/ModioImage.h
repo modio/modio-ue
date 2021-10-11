@@ -50,7 +50,7 @@ private:
 };
 
 USTRUCT(BlueprintType)
-struct FModioOptionalImage
+struct MODIO_API FModioOptionalImage
 {
 	GENERATED_BODY()
 

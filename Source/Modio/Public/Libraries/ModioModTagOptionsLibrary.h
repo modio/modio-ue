@@ -13,12 +13,11 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioModTagOptions.h"
 
-// clang-format off
 #include "ModioModTagOptionsLibrary.generated.h"
-// clang-format on
+
 
 UCLASS()
-class UModioModTagOptionsLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioModTagOptionsLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

@@ -17,9 +17,8 @@
 #include "Types/ModioURLList.h"
 #include "Types/ModioUser.h"
 
-// clang-format off
 #include "ModioModInfo.generated.h"
-// clang-format on
+
 
 namespace Modio
 {
@@ -120,7 +119,7 @@ struct MODIO_API FModioModInfo
 };
 
 USTRUCT(BlueprintType)
-struct FModioOptionalModInfo
+struct MODIO_API FModioOptionalModInfo
 {
 	GENERATED_BODY()
 

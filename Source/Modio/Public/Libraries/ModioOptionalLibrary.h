@@ -19,12 +19,11 @@
 #include "Types/ModioImage.h"
 #include "Types/ModioModDependencyList.h"
 
-// clang-format off
 #include "ModioOptionalLibrary.generated.h"
-// clang-format on
+
 
 UCLASS()
-class UModioOptionalLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

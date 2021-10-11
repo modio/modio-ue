@@ -12,12 +12,10 @@
 
 #include "Types/ModioCommonTypes.h"
 
-// clang-format off
 #include "ModioInitializeOptions.generated.h"
-// clang-format on
 
 USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeInitializeOptions"))
-struct FModioInitializeOptions
+struct MODIO_API FModioInitializeOptions
 {
 	GENERATED_BODY()
 

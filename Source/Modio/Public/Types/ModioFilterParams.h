@@ -12,9 +12,8 @@
 
 #include "Types/ModioCommonTypes.h"
 
-// clang-format off
 #include "ModioFilterParams.generated.h"
-// clang-format on
+
 
 /// Forward declaration of SDK type for declaration of conversion function below
 namespace Modio

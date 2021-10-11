@@ -22,7 +22,7 @@
  * @experimental
  */
 USTRUCT(BlueprintType)
-struct FModioModDependency
+struct MODIO_API FModioModDependency
 {
 	GENERATED_BODY();
 	
@@ -59,7 +59,7 @@ struct MODIO_API FModioModDependencyList
 
 
 USTRUCT(BlueprintType)
-struct FModioOptionalModDependencyList
+struct MODIO_API FModioOptionalModDependencyList
 {
 	GENERATED_BODY()
 

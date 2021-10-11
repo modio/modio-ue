@@ -16,7 +16,7 @@
 
 /** @brief Settings that can be configured per project that generally don't change during the run of a game */
 UCLASS(Config = Game, defaultconfig)
-class UModioSettings : public UObject
+class MODIO_API UModioSettings : public UObject
 {
 	GENERATED_BODY()
 public:

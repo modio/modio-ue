@@ -12,9 +12,8 @@
 
 #include "Containers/UnrealString.h"
 
-// clang-format off
 #include "ModioMetadata.generated.h"
-// clang-format on
+
 
 USTRUCT(BlueprintType)
 struct MODIO_API FModioMetadata

@@ -13,9 +13,8 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioErrorCode.h"
 
-// clang-format off
 #include "ModioModManagementEvent.generated.h"
-// clang-format on
+
 
 /** @brief What type of event occurred */
 UENUM(BlueprintType)

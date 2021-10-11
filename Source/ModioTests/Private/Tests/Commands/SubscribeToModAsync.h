@@ -19,7 +19,7 @@ class FModioSubscribeToModAsyncCommand : public FModioTestLatentCommandBaseExpec
 
 public:
 	FModioSubscribeToModAsyncCommand(FAutomationTestBase* AssociatedTest, const FModioModID ModID,
-									 ModioTestExpectedResult ExpectedResult)
+									 EModioErrorCondition ExpectedResult)
 		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, ExpectedResult),
 		  ModID(ModID)
 	{}
@@ -33,9 +33,7 @@ public:
 	void Callback(FModioErrorCode ec)
 	{
 		CurrentTest->TestEqual("Subscription completes with expected result",
-							   ExpectedResult.IsType<FModioErrorCode>()
-								   ? ec.GetRawErrorCode() == ExpectedResult.Get<FModioErrorCode>().GetRawErrorCode()
-								   : Modio::ErrorCodeMatches(ec.GetRawErrorCode(), ExpectedResult.Get<Modio::ErrorConditionTypes>()),
+							   CheckExpected(ec),
 							   true);
 		Done();
 	}

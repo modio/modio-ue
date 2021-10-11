@@ -19,7 +19,7 @@ class FModioGetModInfoAsyncCommand : public FModioTestLatentCommandBaseExpectedR
 
 public:
 	FModioGetModInfoAsyncCommand(FAutomationTestBase* AssociatedTest, const FModioModID ModID,
-									 ModioTestExpectedResult ExpectedResult)
+									 EModioErrorCondition ExpectedResult)
 		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, ExpectedResult),
 		  ModID(ModID)
 	{}
@@ -44,7 +44,7 @@ class FModioGetModInfoBadResponseAsyncCommand : public FModioTestLatentCommandBa
 
 public:
 	FModioGetModInfoBadResponseAsyncCommand(FAutomationTestBase* AssociatedTest, const FModioModID ModID,
-							ModioTestExpectedResult ExpectedResult)
+							EModioErrorCondition ExpectedResult)
 		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, ExpectedResult),
 		  ModID(ModID)
 	{}
@@ -56,7 +56,7 @@ public:
 	}
 	void Callback(FModioErrorCode ec, TOptional<FModioModInfo> ModInfo)
 	{
-		CurrentTest->TestEqual("GetModInfo handles invalid responses correctly", CheckExpectedValue(ec, ExpectedResult), true);
+		CurrentTest->TestEqual("GetModInfo handles invalid responses correctly", CheckExpected(ec) , true);
 		CurrentTest->TestFalse("When GetModInfo returns an invalid response, ModInfo has no value", ModInfo.IsSet());
 		Done();
 	}

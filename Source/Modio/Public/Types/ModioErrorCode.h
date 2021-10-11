@@ -11,9 +11,7 @@
 #pragma once
 #include "Templates/UniquePtr.h"
 
-// clang-format off
 #include "ModioErrorCode.generated.h"
-// clang-format on
 
 namespace Modio
 {

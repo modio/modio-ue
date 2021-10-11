@@ -8,37 +8,19 @@
  *   
  */
 
+
+#include "Libraries/ModioErrorConditionLibrary.h"
 #include "Tests/Commands/ModioTestCommandBase.h"
+
 
 #if WITH_DEV_AUTOMATION_TESTS
 
-ModioTestExpectedResult MakeExpected(Modio::ErrorCode RawErrorCode)
+bool FModioTestLatentCommandBase::CheckError(FModioErrorCode ec, EModioErrorCondition Value) 
 {
-	ModioTestExpectedResult Expected;
-	Expected.Set<FModioErrorCode>(FModioErrorCode(RawErrorCode));
-	return Expected;
+	return UModioErrorConditionLibrary::ErrorCodeMatches(ec, Value);
 }
 
-ModioTestExpectedResult MakeExpected(Modio::ErrorConditionTypes Condition)
-{
-	ModioTestExpectedResult Expected;
-	Expected.Set<Modio::ErrorConditionTypes>(Condition);
-	return Expected;
-}
-
-bool CheckExpectedValue(FModioErrorCode ec, ModioTestExpectedResult ExpectedResult)
-{
-	if (ExpectedResult.IsType<FModioErrorCode>())
-	{
-		return ec.GetRawErrorCode() == ExpectedResult.Get<FModioErrorCode>().GetRawErrorCode();
-	}
-	else
-	{
-		return Modio::ErrorCodeMatches(ec.GetRawErrorCode(), ExpectedResult.Get<Modio::ErrorConditionTypes>());
-	}
-}
-
- FModioTestLatentCommandBase::FModioTestLatentCommandBase(FAutomationTestBase* AssociatedTest)
+FModioTestLatentCommandBase::FModioTestLatentCommandBase(FAutomationTestBase* AssociatedTest)
 	: CurrentTest(AssociatedTest)
 {
 	Modio = GEngine->GetEngineSubsystem<UModioSubsystem>();
@@ -75,6 +57,13 @@ bool FModioTestLatentCommandBase::Update()
 void FModioTestLatentCommandBase::Done()
 {
 	CurrentState = LatentCommandState::Complete;
+}
+
+
+
+bool FModioTestLatentCommandBaseExpectedResult::CheckExpected(FModioErrorCode ec) 
+{
+	return CheckError(ec, ExpectedResult);
 }
 
 #endif

@@ -14,9 +14,8 @@
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioCommonTypes.h"
 
-// clang-format off
 #include "ModioSDKLibrary.generated.h"
-// clang-format on
+
 
 UENUM(BlueprintType)
 enum EFileSizeUnit

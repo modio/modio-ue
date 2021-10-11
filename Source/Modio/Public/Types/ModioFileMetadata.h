@@ -11,9 +11,9 @@
 #pragma once
 
 #include "Types/ModioCommonTypes.h"
-// clang-format off
+
 #include "ModioFileMetadata.generated.h"
-// clang-format on
+
 
 /** @brief Current state of the scanned file */
 UENUM(BlueprintType)

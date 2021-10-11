@@ -13,12 +13,11 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioErrorCode.h"
 
-// clang-format off
 #include "ModioErrorCodeLibrary.generated.h"
-// clang-format on
+
 
 UCLASS()
-class UModioErrorCodeLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioErrorCodeLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:

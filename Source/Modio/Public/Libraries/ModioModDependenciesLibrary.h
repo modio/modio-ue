@@ -13,12 +13,11 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioModDependencyList.h"
 
-// clang-format off
 #include "ModioModDependenciesLibrary.generated.h"
-// clang-format on
+
 
 UCLASS()
-class UModioModDependenciesLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioModDependenciesLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

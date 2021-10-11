@@ -473,7 +473,7 @@ public:
 	 * @param OnInitComplete Callback which will be invoked with the result of initialization
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "InitializeAsync", Category = "mod.io")
-	void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions, FOnErrorOnlyDelegate OnInitComplete);
+	MODIO_API void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions, FOnErrorOnlyDelegate OnInitComplete);
 
 	/**
 	 * @brief Sends a request to the Mod.io server to add the specified mod to the user's list of subscriptions, and
@@ -482,14 +482,14 @@ public:
 	 * @param OnSubscribeComplete Callback invoked when the subscription request is completed.
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "SubscribeToModAsync", Category = "mod.io|Mods")
-	void K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegate OnSubscribeComplete);
+	MODIO_API void K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegate OnSubscribeComplete);
 
 	/**
 	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
 	 * Modio::GenericError::OperationCanceled . This function will NOT block while the deinitialization occurs.
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "ShutdownAsync", Category = "mod.io")
-	void K2_ShutdownAsync(FOnErrorOnlyDelegate OnShutdownComplete);
+	MODIO_API void K2_ShutdownAsync(FOnErrorOnlyDelegate OnShutdownComplete);
 
 	/**
 	 * @brief Sends a request to the Mod.io server to remove the specified mod from the user's list of subscriptions.
@@ -559,7 +559,7 @@ public:
 	 * @error GenericError::SDKNotInitialized|SDK not initialized
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ListAllModsAsync", Category = "mod.io|Mods")
-	void K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegate Callback);
+	MODIO_API void K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegate Callback);
 
 	/**
 	 * @brief Fetches detailed information about the specified mod, including description and file metadata for the

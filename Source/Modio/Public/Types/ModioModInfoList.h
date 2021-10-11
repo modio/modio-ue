@@ -13,9 +13,9 @@
 #include "Types/ModioList.h"
 #include "Types/ModioModInfo.h"
 #include "Types/ModioPagedResult.h"
-// clang-format off
+
 #include "ModioModInfoList.generated.h"
-// clang-format on
+
 
 namespace Modio
 {

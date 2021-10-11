@@ -47,7 +47,7 @@ struct MODIO_API FModioModProgressInfo
 };
 
 USTRUCT(BlueprintType)
-struct FModioOptionalModProgressInfo
+struct MODIO_API FModioOptionalModProgressInfo
 {
 	GENERATED_BODY()
 

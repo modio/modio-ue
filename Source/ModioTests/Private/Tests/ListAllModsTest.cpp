@@ -201,9 +201,9 @@ bool FModioListAllModsIDFilterTest::RunTest(const FString& Parameters)
 	ADD_LATENT_AUTOMATION_COMMAND(FModioInitializeAsyncCommand(this));
 
 	TArray<FModioModID> ModList;
-	ModList.Add(FModioModID(Modio::ModID(1)));
-	ModList.Add(FModioModID(Modio::ModID(2)));
-	ModList.Add(FModioModID(Modio::ModID(3)));
+	ModList.Add(FModioModID(1));
+	ModList.Add(FModioModID(2));
+	ModList.Add(FModioModID(3));
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioListAllModsAsyncCommand(this, FModioFilterParams().MatchingIDs(ModList)));
 

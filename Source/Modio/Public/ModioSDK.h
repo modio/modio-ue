@@ -10,14 +10,6 @@
 
 #pragma once
 
-//#if PLATFORM_WINDOWS
-//	// clang-format off
-//	#include "Windows/AllowWindowsPlatformTypes.h"
-//	#include "Windows/PreWindowsApi.h"
-//	#include "Windows/AllowWindowsPlatformAtomics.h"
-//// clang-format on
-//#endif
-
 #define MODIO_PLATFORM_UNREAL 1
 
 #pragma push_macro("check")
@@ -39,11 +31,3 @@
 #pragma warning(pop)
 
 #pragma pop_macro("check")
-
-//#if PLATFORM_WINDOWS
-//  // clang-format off
-//	#include "Windows/PostWindowsApi.h"
-//	#include "Windows/HideWindowsPlatformTypes.h"
-//	#include "Windows/HideWindowsPlatformAtomics.h"
-//  // clang-format on
-//#endif

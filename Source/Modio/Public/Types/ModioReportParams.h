@@ -18,7 +18,7 @@ namespace Modio
 }
 
 
-UENUM()
+UENUM(BlueprintType)
 enum class EModioReportType : uint8
 {
 	Generic = 0,

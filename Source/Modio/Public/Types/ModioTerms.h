@@ -70,7 +70,7 @@ struct MODIO_API FModioTerms
 };
 
 USTRUCT(BlueprintType)
-struct FModioOptionalTerms
+struct MODIO_API FModioOptionalTerms
 {
 	GENERATED_BODY()
 

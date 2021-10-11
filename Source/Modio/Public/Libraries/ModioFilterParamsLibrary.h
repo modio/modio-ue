@@ -12,12 +12,11 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioFilterParams.h"
-// clang-format on
+
 #include "ModioFilterParamsLibrary.generated.h"
-// clang-format off
 
 UCLASS()
-class UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
+class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

@@ -38,7 +38,7 @@ bool FModioGetModInfoBadResponseTest::RunTest(const FString& Parameters)
 {
 	ADD_LATENT_AUTOMATION_COMMAND(FModioInitializeBadResponseAsyncCommand(this));
 
-	ADD_LATENT_AUTOMATION_COMMAND(FModioGetModInfoBadResponseAsyncCommand(this, FModioModID(Modio::ModID(1)), MakeExpected(Modio::make_error_code(Modio::HttpError::InvalidResponse))));
+	ADD_LATENT_AUTOMATION_COMMAND(FModioGetModInfoBadResponseAsyncCommand(this, FModioModID(1), EModioErrorCondition::NetworkError));
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));
 	return true;

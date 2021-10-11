@@ -25,11 +25,18 @@ public class Modio : ModuleRules
         //Add stub generated header
         {
             string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "GeneratedHeader");
-
+            //Clean the generated source directory so that we dont have any stale files in it
+            if (Directory.Exists(GeneratedHeaderPath))
+            {
+                Directory.Delete(GeneratedHeaderPath, true);
+            }
             Directory.CreateDirectory(GeneratedHeaderPath);
 
+            Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Public"));
+            Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Private"));
+
             //Because this file is a dummy we don't need it as a dependency
-            string GeneratedHeaderFilePath = Path.Combine(GeneratedHeaderPath, "ModioGeneratedVariables.h");
+            string GeneratedHeaderFilePath = Path.Combine(GeneratedHeaderPath, "Private", "ModioGeneratedVariables.h");
             using (StreamWriter DummyGeneratedHeader = File.AppendText(GeneratedHeaderFilePath))
             { };
 
@@ -37,10 +44,11 @@ public class Modio : ModuleRules
             string ErrorConditionLibraryPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio/modio/core/ModioErrorCondition.h");
             // Add dependency on the upstream file so if it is modified we re-run and copy it again
             ExternalDependencies.Add(ErrorConditionLibraryPath);
-            File.Copy(ErrorConditionLibraryPath, Path.Combine(GeneratedHeaderPath, "ModioErrorCondition.h"), true);
+            File.Copy(ErrorConditionLibraryPath, Path.Combine(GeneratedHeaderPath, "Public", "ModioErrorCondition.h"), true);
 
 
             PublicIncludePaths.AddRange(new string[] {
+                Path.Combine(GeneratedHeaderPath, "Public")
                 });
 
             PublicSystemIncludePaths.AddRange(new string[] {
@@ -59,10 +67,12 @@ public class Modio : ModuleRules
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/ms-common/include"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/win32/win32"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/modio"),
-                GeneratedHeaderPath
+                Path.Combine(GeneratedHeaderPath, "Private"),
+                Path.Combine(GeneratedHeaderPath, "Public")
             });
         }
         // Add native SDK implementation to this module so we don't have to create an extraneous module
+        // TODO: @modio-ue4 cleanup by using UE_4_26_OR_LATER so we can use ConditionalAddModuleDirectory
         {
             string GeneratedSourcePath = Path.Combine(ModuleDirectory, "GeneratedSource");
 

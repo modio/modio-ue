@@ -11,9 +11,8 @@
 #pragma once
 #include "Blueprint/UserWidget.h"
 
-// clang-format off
 #include "ModioPopupContainer.generated.h"
-// clang-format on
+
 
 class UModioPopupBase;
 

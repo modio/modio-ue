@@ -9,15 +9,3 @@
  */
 
 #pragma once
-
-#include "ModioImageState.generated.h"
-
-
-UENUM(BlueprintType)
-enum class EModioImageState : uint8
-{
-	OnDisc,
-	LoadingIntoMemory,
-	InMemory,
-	Corrupted
-};
