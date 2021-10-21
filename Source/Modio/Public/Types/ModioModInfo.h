@@ -24,6 +24,16 @@ namespace Modio
 {
 	struct ModInfo;
 }
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EModioMaturityFlags : uint8
+{
+	None,
+	Alcohol = 1,
+	Drugs = 2,
+	Violence = 4,
+	Explicit = 8
+};
+
 
 /** @brief Full mod profile including current release information, media links, and stats */
 USTRUCT(BlueprintType)
@@ -75,15 +85,9 @@ struct MODIO_API FModioModInfo
 	 * @brief Flags for maturity options
 	 * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to
 	 * be labeled as mature.
-	 *
-	 * 0 = None set (default)
-	 * 1 = Alcohol
-	 * 2 = Drugs
-	 * 4 = Violence
-	 * 8 = Explicit
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "Profile")
-	uint8 ProfileMaturityOption;
+	EModioMaturityFlags ProfileMaturityOption;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Metadata")
 	FString MetadataBlob;

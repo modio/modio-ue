@@ -28,7 +28,7 @@
 
 namespace Modio
 {
-	Modio::ErrorCode EnableModManagement(std::function<void(Modio::ModManagementEvent)> Callback)
+	Modio::ErrorCode EnableModManagement(std::function<void(Modio::ModManagementEvent)> ModManagementHandler)
 	{
 		if (!Modio::Detail::SDKSessionData::IsInitialized())
 		{
@@ -38,7 +38,7 @@ namespace Modio
 		{
 			return Modio::make_error_code(Modio::ModManagementError::ModManagementAlreadyEnabled);
 		}
-		Modio::Detail::SDKSessionData::SetUserModManagementCallback(Callback);
+		Modio::Detail::SDKSessionData::SetUserModManagementCallback(ModManagementHandler);
 		Modio::Detail::SDKSessionData::AllowModManagement();
 		Modio::Detail::BeginModManagementLoopAsync([](Modio::ErrorCode ec) mutable {
 			if (ec)

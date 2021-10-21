@@ -934,6 +934,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <ul class="sectlevel2">
 <li><a href="#_emodiovirusstatus"> EModioVirusStatus</a></li>
 <li><a href="#_emodiovirusscanstatus"> EModioVirusScanStatus</a></li>
+<li><a href="#_emodiomaturityflags"> EModioMaturityFlags</a></li>
 <li><a href="#_emodiomodmanagementeventtype"> EModioModManagementEventType</a></li>
 <li><a href="#_emodioauthenticationprovider"> EModioAuthenticationProvider</a></li>
 <li><a href="#_emodiolanguage"> EModioLanguage</a></li>
@@ -3539,9 +3540,9 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Unix timestamp of the date the mod was marked live</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#uint8">uint8</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioMaturityFlags">EModioMaturityFlags</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ProfileMaturityOption</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Flags for maturity options Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to be labeled as mature. * 0 = None set (default) 1 = Alcohol 2 = Drugs 4 = Violence 8 = Explicit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Flags for maturity options Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to be labeled as mature.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
@@ -5273,11 +5274,44 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="_emodiomaturityflags"><a id="EModioMaturityFlags"></a> EModioMaturityFlags</h3>
+<h4 id="_values_3" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Alcohol</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Drugs</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Violence</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Explicit</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_emodiomodmanagementeventtype"><a id="EModioModManagementEventType"></a> EModioModManagementEventType</h3>
 <div class="paragraph">
 <p>What type of event occurred</p>
 </div>
-<h4 id="_values_3" class="discrete">Values</h4>
+<h4 id="_values_4" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5305,7 +5339,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
-<h4 id="_values_4" class="discrete">Values</h4>
+<h4 id="_values_5" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5345,7 +5379,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing the languages mod.io support responses in</p>
 </div>
-<h4 id="_values_5" class="discrete">Values</h4>
+<h4 id="_values_6" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5421,7 +5455,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Degree of severity for the log output</p>
 </div>
-<h4 id="_values_6" class="discrete">Values</h4>
+<h4 id="_values_7" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5450,7 +5484,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiogallerysize"><a id="EModioGallerySize"></a> EModioGallerySize</h3>
-<h4 id="_values_7" class="discrete">Values</h4>
+<h4 id="_values_8" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5474,7 +5508,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing avatar image sizes</p>
 </div>
-<h4 id="_values_8" class="discrete">Values</h4>
+<h4 id="_values_9" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5502,7 +5536,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing mod logo sizes</p>
 </div>
-<h4 id="_values_9" class="discrete">Values</h4>
+<h4 id="_values_10" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5534,7 +5568,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing the store or service your game is being distributed through</p>
 </div>
-<h4 id="_values_10" class="discrete">Values</h4>
+<h4 id="_values_11" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5590,7 +5624,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing what environment your game is deployed in</p>
 </div>
-<h4 id="_values_11" class="discrete">Values</h4>
+<h4 id="_values_12" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5611,7 +5645,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioerrorcondition"><a id="EModioErrorCondition"></a> EModioErrorCondition</h3>
-<h4 id="_values_12" class="discrete">Values</h4>
+<h4 id="_values_13" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5663,7 +5697,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum indicating which direction sorting should be applied</p>
 </div>
-<h4 id="_values_13" class="discrete">Values</h4>
+<h4 id="_values_14" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5687,7 +5721,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum indicating which field should be used to sort the results</p>
 </div>
-<h4 id="_values_14" class="discrete">Values</h4>
+<h4 id="_values_15" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5724,7 +5758,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioimagestate"><a id="EModioImageState"></a> EModioImageState</h3>
-<h4 id="_values_15" class="discrete">Values</h4>
+<h4 id="_values_16" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5756,7 +5790,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing the current state of a mod</p>
 </div>
-<h4 id="_values_16" class="discrete">Values</h4>
+<h4 id="_values_17" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5793,7 +5827,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiorating"><a id="EModioRating"></a> EModioRating</h3>
-<h4 id="_values_17" class="discrete">Values</h4>
+<h4 id="_values_18" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5818,7 +5852,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioreporttype"><a id="EModioReportType"></a> EModioReportType</h3>
-<h4 id="_values_18" class="discrete">Values</h4>
+<h4 id="_values_19" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5863,7 +5897,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_efilesizeunit"><a id="EFileSizeUnit"></a> EFileSizeUnit</h3>
-<h4 id="_values_19" class="discrete">Values</h4>
+<h4 id="_values_20" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -5898,7 +5932,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-10-11 17:07:36 +1100
+Last updated 2021-10-21 16:45:34 +1100
 </div>
 </div>
 </body>

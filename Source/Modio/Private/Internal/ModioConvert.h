@@ -15,6 +15,7 @@
 #include "Internal/ModioPrivateDefines.h"
 #include "Misc/DateTime.h"
 #include "ModioSDK.h"
+#include "Templates/UnrealTypeTraits.h"
 #include "Types/ModioCommonTypes.h"
 #include <chrono>
 #include <string>
@@ -381,5 +382,13 @@ FModioFileMetadataID ToUnreal(Modio::FileMetadataID Value)
 {
 	return FModioFileMetadataID(Value);
 }
+
+template<typename DestType, typename UnderlyingType, typename FlagType>
+typename TEnableIf<TIsDerivedFrom<FlagType, Modio::FlagImpl<UnderlyingType>>::Value, DestType>::Type ToUnreal(
+	FlagType Flags)
+{
+	return static_cast<DestType>(Flags.RawValue());
+}
+
 
 #pragma endregion
