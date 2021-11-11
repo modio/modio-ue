@@ -14,11 +14,14 @@
 #include "Subsystems/EngineSubsystem.h"
 #include "Types/ModioAuthenticationParams.h"
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioCreateModFileParams.h"
+#include "Types/ModioCreateModParams.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
 #include "Types/ModioImage.h"
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioModCollectionEntry.h"
+#include "Types/ModioModCreationHandle.h"
 #include "Types/ModioModDependencyList.h"
 #include "Types/ModioModInfo.h"
 #include "Types/ModioModInfoList.h"
@@ -42,6 +45,7 @@ DECLARE_DELEGATE_TwoParams(FOnGetMediaDelegateFast, FModioErrorCode, TOptional<F
 DECLARE_DELEGATE_TwoParams(FOnGetModTagOptionsDelegateFast, FModioErrorCode, TOptional<FModioModTagOptions>);
 DECLARE_DELEGATE_TwoParams(FOnGetTermsOfUseDelegateFast, FModioErrorCode, TOptional<FModioTerms>);
 DECLARE_DELEGATE_TwoParams(FOnGetModDependenciesDelegateFast, FModioErrorCode, TOptional<FModioModDependencyList>);
+DECLARE_DELEGATE_TwoParams(FOnSubmitNewModDelegateFast, FModioErrorCode, TOptional<FModioModID>);
 
 // Blueprint version of delegates
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnErrorOnlyDelegate, FModioErrorCode, ErrorCode);
@@ -55,6 +59,7 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModTagOptionsDelegate, FModioErrorCode,
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetTermsOfUseDelegate, FModioErrorCode, ErrorCode, FModioOptionalTerms, Terms);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModDependenciesDelegate, FModioErrorCode, ErrorCode,
 								   FModioOptionalModDependencyList, Dependencies);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnSubmitNewModDelegate, FModioErrorCode, ErrorCode, FModioOptionalModID, NewModID);
 
 /**
  * @brief Thin wrapper around the mod.io SDK. This mostly wraps all the functions available in modio/ModioSDK.h that's
@@ -335,6 +340,46 @@ public:
 	 **/
 	MODIO_API void GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback);
 
+	/**
+	 * @brief Gets a new mod handle for use with SubmitNewModAsync.
+	 * @returns New handle
+	 * @experimental
+	 */
+	MODIO_API FModioModCreationHandle GetModCreationHandle();
+
+	/**
+	 * @brief Requests the creation of a new mod on the server with the specified parameters
+	 * @param Handle The ModCreationHandle for this submission. Once this method invokes your callback indicating
+	 * success, the ModCreationHandle is invalid for the rest of the session and you should request a new one for the
+	 * next submission attempt.
+	 * @param Params Information about the new mod to create
+	 * @param Callback Callback providing a status code and an optional FModioModID for the newly created mod
+	 * @experimental
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	MODIO_API void SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
+									 FOnSubmitNewModDelegateFast Callback);
+
+	/**
+	 * @brief Queues the upload of a new mod file release for the specified mod, using the submitted parameters. The
+	 * upload's progress can be tracked in the same way as downloads; when completed, a Mod Management Event will be
+	 * triggered with the result code for the upload.
+	 * @param Mod The ID of the mod you are submitting a file for
+	 * @param Params Information about the mod file being created, including the root path of the directory that will be
+	 * archived
+	 * @experimental
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	MODIO_API void SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
 	/**
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the
 	 * specified email address if it is associated with a Mod.io account
@@ -768,6 +813,50 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModRatingAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @brief Gets a new mod handle for use with SubmitNewModAsync.
+	 * @returns New handle
+	 * @experimental
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetModCreationHandle", Category = "mod.io|Mods|Submission")
+	MODIO_API FModioModCreationHandle K2_GetModCreationHandle();
+
+	/**
+	 * @brief Requests the creation of a new mod on the server with the specified parameters
+	 * @param Handle The ModCreationHandle for this submission. Once this method invokes your callback indicating
+	 * success, the ModCreationHandle is invalid for the rest of the session and you should request a new one for the
+	 * next submission attempt.
+	 * @param Params Information about the new mod to create
+	 * @param Callback Callback providing a status code and an optional FModioModID for the newly created mod
+	 * @experimental
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModAsync", Category = "mod.io|Mods|Submission")
+	MODIO_API void K2_SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
+										FOnSubmitNewModDelegate Callback);
+
+	/**
+	 * @brief Queues the upload of a new mod file release for the specified mod, using the submitted parameters. The
+	 * upload's progress can be tracked in the same way as downloads; when completed, a Mod Management Event will be
+	 * triggered with the result code for the upload.
+	 * @param Mod The ID of the mod you are submitting a file for
+	 * @param Params Information about the mod file being created, including the root path of the directory that will be
+	 * archived
+	 * @experimental
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModFileForMod", Category = "mod.io|Mods|Submission")
+	MODIO_API void K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
 
 	/**
 	 * @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide

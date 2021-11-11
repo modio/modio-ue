@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #pragma once
@@ -22,6 +22,8 @@
 #include "modio/detail/ops/ModManagementLoop.h"
 #include "modio/detail/ops/SubscribeToModOp.h"
 #include "modio/detail/ops/UnsubscribeFromMod.h"
+#include "modio/detail/ops/mod/SubmitNewModFileOp.h"
+#include "modio/detail/ops/mod/SubmitNewModOp.h"
 #include "modio/detail/ops/modmanagement/ForceUninstallModOp.h"
 #include "modio/impl/SDKPreconditionChecks.h"
 #include "modio/userdata/ModioUserDataService.h"
@@ -178,6 +180,38 @@ namespace Modio
 				Modio::Detail::ForceUninstallModOp(ModToRemove), Callback,
 				Modio::Detail::Services::GetGlobalContext().get_executor());
 		}
+	}
+
+	void SubmitNewModAsync(Modio::ModCreationHandle Handle, Modio::CreateModParams Params,
+						   std::function<void(Modio::ErrorCode, Modio::Optional<Modio::ModID> CreatedModID)> Callback)
+	{
+		if (Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback))
+		{
+			if (Modio::Optional<Modio::ModID> ResolvedID =
+					Modio::Detail::SDKSessionData::ResolveModCreationHandle(Handle))
+			{
+				Modio::Detail::Logger().Log(
+					Modio::LogLevel::Warning, Modio::LogCategory::ModManagement,
+					"Attempted to call SubmitNewModAsync with an already-used handle. Returning existing Mod ID");
+				asio::post(Modio::Detail::Services::GetGlobalContext().get_executor(),
+						   [ID = ResolvedID.value(), Callback]() { Callback({}, ID); });
+				return;
+			}
+			return Modio::Detail::SubmitNewModAsync(Handle, Params, Callback);
+		}
+	}
+	Modio::ModCreationHandle GetModCreationHandle()
+	{
+		return Modio::Detail::SDKSessionData::GetNextModCreationHandle();
+	}
+
+	MODIOSDK_API void SubmitNewModFileForMod(Modio::ModID Mod, Modio::CreateModFileParams Params)
+	{
+		//TODO: @modio-core we should return the error code from this function so we can do our precondition checks
+		Modio::Detail::SDKSessionData::AddPendingModfileUpload(Mod, Params);
+
+		//(Modio::Detail::RequireSDKIsInitialized(Callback) && Modio::Detail::RequireUserIsAuthenticated(Callback)) && RequireModManagementEnabled
+		
 	}
 
 } // namespace Modio

@@ -47,7 +47,10 @@
 #ifndef BOOST_BEAST_ZLIB_DETAIL_INFLATE_STREAM_IPP
 #define BOOST_BEAST_ZLIB_DETAIL_INFLATE_STREAM_IPP
 
-#include "modio/compression/zlib/detail/inflate_stream.hpp"
+#ifdef MODIO_SEPARATE_COMPILATION
+#include "modio/detail/compression/zlib/detail/inflate_stream.hpp"
+#endif
+
 #include "modio/core/ModioErrorCode.h"
 #include <array>
 

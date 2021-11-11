@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -21,14 +21,11 @@
 #include <string>
 #include <vector>
 
-FORCEINLINE std::string ToSTD(const FString& String);
-FORCEINLINE std::vector<std::string> ToSTD(const TArray<FString>& StringArray);
-FORCEINLINE std::chrono::system_clock::time_point ToSTD(FDateTime Time);
-
-// @todo: Make a ToModio that handles TOptional through templates
+FORCEINLINE std::string ToModio(const FString& String);
+FORCEINLINE std::vector<std::string> ToModio(const TArray<FString>& StringArray);
+FORCEINLINE std::chrono::system_clock::time_point ToModio(FDateTime Time);
 
 FORCEINLINE int64 ToUnreal(std::int64_t Value);
-FORCEINLINE uint8 ToUnreal(std::uint8_t Value);
 FORCEINLINE double ToUnreal(double Value);
 FORCEINLINE bool ToUnreal(bool Value);
 FORCEINLINE uint64 ToUnreal(std::size_t Value);
@@ -58,15 +55,13 @@ FORCEINLINE Modio::UserID ToModio(const FModioUserID& In);
 
 #pragma region Implementation
 
-
 // @todo: Rename this to ToModio as it doesn't matter that it's the part of STD of modio
-FORCEINLINE std::string ToSTD(const FString& String)
+FORCEINLINE std::string ToModio(const FString& String)
 {
 	return std::string(TCHAR_TO_UTF8(*String));
 }
 
-// @todo: Rename this to ToModio as it doesn't matter that it's the part of STD of modio
-FORCEINLINE std::vector<std::string> ToSTD(const TArray<FString>& StringArray)
+FORCEINLINE std::vector<std::string> ToModio(const TArray<FString>& StringArray)
 {
 	std::vector<std::string> Result;
 	Result.reserve(StringArray.Num());
@@ -77,10 +72,8 @@ FORCEINLINE std::vector<std::string> ToSTD(const TArray<FString>& StringArray)
 	return Result;
 }
 
-// @todo: Rename this to ToModio as it doesn't matter that it's the part of STD of modio
-FORCEINLINE std::chrono::system_clock::time_point ToSTD(FDateTime Time)
+FORCEINLINE std::chrono::system_clock::time_point ToModio(FDateTime Time)
 {
-	// @todonow: Verify that this becomes correct by printf debugging
 	return std::chrono::system_clock::time_point(std::chrono::system_clock::duration(Time.ToUnixTimestamp()));
 }
 
@@ -90,11 +83,6 @@ FORCEINLINE int64 ToUnreal(std::int64_t Value)
 }
 
 FORCEINLINE bool ToUnreal(bool Value)
-{
-	return Value;
-}
-
-FORCEINLINE uint8 ToUnreal(std::uint8_t Value)
 {
 	return Value;
 }
@@ -389,6 +377,5 @@ typename TEnableIf<TIsDerivedFrom<FlagType, Modio::FlagImpl<UnderlyingType>>::Va
 {
 	return static_cast<DestType>(Flags.RawValue());
 }
-
 
 #pragma endregion

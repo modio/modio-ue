@@ -8,7 +8,6 @@
  *  
  */
 
-#if(0) //We don't currently create archives, this will be re-enabled later
 //
 // Copyright (c) 2016-2019 Vinnie Falco (vinnie dot falco at gmail dot com)
 //
@@ -48,20 +47,15 @@
 #ifndef BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_IPP
 #define BOOST_BEAST_ZLIB_DETAIL_DEFLATE_STREAM_IPP
 
-#include <boost/beast/zlib/detail/deflate_stream.hpp>
-#include <boost/beast/zlib/detail/ranges.hpp>
-#include <boost/beast/core/detail/type_traits.hpp>
-#include <boost/assert.hpp>
-#include <boost/config.hpp>
-#include <boost/make_unique.hpp>
-#include <boost/optional.hpp>
-#include <boost/throw_exception.hpp>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
+#ifdef MODIO_SEPARATE_COMPILATION
+#include "modio/detail/compression/zlib/deflate_stream.hpp"
+#endif
+
+#include "modio/detail/compression/zlib/detail/ranges.hpp"
+
 #include <memory>
 #include <stdexcept>
-#include <type_traits>
+#include <cassert>
 
 namespace boost {
 namespace beast {
@@ -142,7 +136,7 @@ gen_codes(ct_data *tree, int max_code, std::uint16_t *bl_count)
     }
     // Check that the bit counts in bl_count are consistent.
     // The last code must be all ones.
-    BOOST_ASSERT(code + bl_count[maxBits]-1 == (1<<maxBits)-1);
+    assert(code + bl_count[maxBits]-1 == (1<<maxBits)-1);
     for(n = 0; n <= max_code; n++)
     {
         int len = tree[n].dl;
@@ -174,7 +168,7 @@ deflate_stream::get_lut() ->
                 for(unsigned n = 0; n < run; ++n)
                     tables.length_code[length++] = code;
             }
-            BOOST_ASSERT(length == 0);
+            assert(length == 0);
             // Note that the length 255 (match length 258) can be represented
             // in two different ways: code 284 + 5 bits or code 285, so we
             // overwrite length_code[255] to use the best encoding:
@@ -191,7 +185,7 @@ deflate_stream::get_lut() ->
                     for(unsigned n = 0; n < run; ++n)
                         tables.dist_code[dist++] = code;
                 }
-                BOOST_ASSERT(dist == 256);
+                assert(dist == 256);
                 // from now on, all distances are divided by 128
                 dist >>= 7;
                 for(; code < dCodes; ++code)
@@ -201,7 +195,7 @@ deflate_stream::get_lut() ->
                     for(std::size_t n = 0; n < run; ++n)
                         tables.dist_code[256 + dist++] = code;
                 }
-                BOOST_ASSERT(dist == 256);
+                assert(dist == 256);
             }
 
             // Construct the codes of the static literal tree
@@ -253,15 +247,15 @@ doReset(
         windowBits = 9;
 
     if(level < 0 || level > 9)
-        BOOST_THROW_EXCEPTION(std::invalid_argument{
+        throw(std::invalid_argument{
             "invalid level"});
 
     if(windowBits < 8 || windowBits > 15)
-        BOOST_THROW_EXCEPTION(std::invalid_argument{
+        throw(std::invalid_argument{
             "invalid windowBits"});
 
     if(memLevel < 1 || memLevel > max_mem_level)
-        BOOST_THROW_EXCEPTION(std::invalid_argument{
+        throw(std::invalid_argument{
             "invalid memLevel"});
 
     w_bits_ = windowBits;
@@ -330,7 +324,7 @@ doTune(
 
 void
 deflate_stream::
-doParams(z_params& zs, int level, Strategy strategy, error_code& ec)
+doParams(z_params& zs, int level, Strategy strategy, Modio::ErrorCode& ec)
 {
     compress_func func;
 
@@ -338,7 +332,7 @@ doParams(z_params& zs, int level, Strategy strategy, error_code& ec)
         level = 6;
     if(level < 0 || level > 9)
     {
-        ec = error::stream_error;
+        ec = Modio::make_error_code(Modio::ZlibError::StreamError);
         return;
     }
     func = get_config(level_).func;
@@ -348,7 +342,7 @@ doParams(z_params& zs, int level, Strategy strategy, error_code& ec)
     {
         // Flush the last buffer:
         doWrite(zs, Flush::block, ec);
-        if(ec == error::need_buffers && pending_ == 0)
+        if(ec == Modio::ZlibError::NeedBuffers && pending_ == 0)
             ec = {};
     }
     if(level_ != level)
@@ -362,32 +356,31 @@ doParams(z_params& zs, int level, Strategy strategy, error_code& ec)
     strategy_ = strategy;
 }
 
-// VFALCO boost::optional param is a workaround for
+// VFALCO Modio::Optional param is a workaround for
 //        gcc "maybe uninitialized" warning
 //        https://github.com/boostorg/beast/issues/532
 //
 void
 deflate_stream::
-doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
+doWrite(z_params& zs, Modio::Optional<Flush> flush, Modio::ErrorCode& ec)
 {
     maybe_init();
 
     if(zs.next_out == 0 || (zs.next_in == 0 && zs.avail_in != 0) ||
         (status_ == FINISH_STATE && flush != Flush::finish))
     {
-        ec = error::stream_error;
+        ec = Modio::make_error_code(Modio::ZlibError::StreamError);
         return;
     }
     if(zs.avail_out == 0)
     {
-        ec = error::need_buffers;
+        ec = Modio::make_error_code(Modio::ZlibError::NeedBuffers);
         return;
     }
 
     // value of flush param for previous deflate call
-    auto old_flush = boost::make_optional<Flush>(
-        last_flush_.is_initialized(),
-        last_flush_ ? *last_flush_ : Flush::none);
+	auto old_flush = Modio::Optional<Flush> {
+        last_flush_ ? *last_flush_ : Flush::none};
 
     last_flush_ = flush;
 
@@ -403,7 +396,7 @@ doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
              * but this is not an error situation so make sure we
              * return OK instead of BUF_ERROR at next call of deflate:
              */
-            last_flush_ = boost::none;
+            last_flush_ = boost::beast::zlib::Flush::none;
             return;
         }
     }
@@ -415,14 +408,14 @@ doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
          * flushes. For repeated and useless calls with Flush::finish, we keep
          * returning Z_STREAM_END instead of Z_BUF_ERROR.
          */
-        ec = error::need_buffers;
+        ec = Modio::make_error_code(Modio::ZlibError::NeedBuffers);
         return;
     }
 
     // User must not provide more input after the first FINISH:
     if(status_ == FINISH_STATE && zs.avail_in != 0)
     {
-        ec = error::need_buffers;
+        ec = Modio::make_error_code(Modio::ZlibError::NeedBuffers);
         return;
     }
 
@@ -436,14 +429,14 @@ doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
         switch(strategy_)
         {
         case Strategy::huffman:
-            bstate = deflate_huff(zs, flush.get());
+            bstate = deflate_huff(zs, flush.value());
             break;
         case Strategy::rle:
-            bstate = deflate_rle(zs, flush.get());
+            bstate = deflate_rle(zs, flush.value());
             break;
         default:
         {
-            bstate = (this->*(get_config(level_).func))(zs, flush.get());
+            bstate = (this->*(get_config(level_).func))(zs, flush.value());
             break;
         }
         }
@@ -456,7 +449,7 @@ doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
         {
             if(zs.avail_out == 0)
             {
-                last_flush_ = boost::none; /* avoid BUF_ERROR next call, see above */
+                last_flush_ = boost::beast::zlib::Flush::none; /* avoid BUF_ERROR next call, see above */
             }
             return;
             /*  If flush != Flush::none && avail_out == 0, the next call
@@ -494,7 +487,7 @@ doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
             flush_pending(zs);
             if(zs.avail_out == 0)
             {
-                last_flush_ = boost::none; /* avoid BUF_ERROR at next call, see above */
+                last_flush_ = boost::beast::zlib::Flush::none; /* avoid BUF_ERROR at next call, see above */
                 return;
             }
         }
@@ -502,7 +495,7 @@ doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
 
     if(flush == Flush::finish)
     {
-        ec = error::end_of_stream;
+        ec = Modio::make_error_code(Modio::ZlibError::EndOfStream);
         return;
     }
 }
@@ -510,11 +503,11 @@ doWrite(z_params& zs, boost::optional<Flush> flush, error_code& ec)
 // VFALCO Warning: untested
 void
 deflate_stream::
-doDictionary(Byte const* dict, uInt dictLength, error_code& ec)
+doDictionary(Byte const* dict, uInt dictLength, Modio::ErrorCode& ec)
 {
     if(lookahead_)
     {
-        ec = error::stream_error;
+        ec = Modio::make_error_code(Modio::ZlibError::StreamError);
         return;
     }
 
@@ -564,13 +557,13 @@ doDictionary(Byte const* dict, uInt dictLength, error_code& ec)
 
 void
 deflate_stream::
-doPrime(int bits, int value, error_code& ec)
+doPrime(int bits, int value, Modio::ErrorCode& ec)
 {
     maybe_init();
 
     if((Byte *)(d_buf_) < pending_out_ + ((Buf_size + 7) >> 3))
     {
-        ec = error::need_buffers;
+        ec = Modio::make_error_code(Modio::ZlibError::NeedBuffers);
         return;
     }
 
@@ -627,7 +620,7 @@ init()
 
     if(! buf_ || buf_size_ != needed)
     {
-        buf_ = boost::make_unique_noinit<
+        buf_ = std::make_unique<
             std::uint8_t[]>(needed);
         buf_size_ = needed;
     }
@@ -960,7 +953,7 @@ scan_tree(
 {
     int n;                      // iterates over all tree elements
     int prevlen = -1;           // last emitted length
-    int curlen;                 // length of current code
+    int curlen = 0;                 // length of current code
     int nextlen = tree[0].dl;   // length of next code
     std::uint16_t count = 0;    // repeat count of the current code
     int max_count = 7;          // max repeat count
@@ -1064,7 +1057,7 @@ send_tree(
                 send_code(curlen, bl_tree_);
                 count--;
             }
-            BOOST_ASSERT(count >= 3 && count <= 6);
+            assert(count >= 3 && count <= 6);
             send_code(REP_3_6, bl_tree_);
             send_bits(count-3, 2);
         }
@@ -1145,8 +1138,8 @@ send_all_trees(
 {
     int rank;       // index in bl_order
 
-    BOOST_ASSERT(lcodes >= 257 && dcodes >= 1 && blcodes >= 4);
-    BOOST_ASSERT(lcodes <= lCodes && dcodes <= dCodes && blcodes <= blCodes);
+    assert(lcodes >= 257 && dcodes >= 1 && blcodes >= 4);
+    assert(lcodes <= lCodes && dcodes <= dCodes && blcodes <= blCodes);
     send_bits(lcodes-257, 5); // not +255 as stated in appnote.txt
     send_bits(dcodes-1,   5);
     send_bits(blcodes-4,  4); // not -3 as stated in appnote.txt
@@ -1193,7 +1186,7 @@ compress_block(
                 }
                 dist--; /* dist is now the match distance - 1 */
                 code = d_code(dist);
-                BOOST_ASSERT(code < dCodes);
+                assert(code < dCodes);
 
                 send_code(code, dtree);       /* send the distance code */
                 extra = lut_.extra_dbits[code];
@@ -1205,7 +1198,7 @@ compress_block(
             } /* literal or match pair ? */
 
             /* Check that the overlay between pending_buf and d_buf+l_buf is ok: */
-            BOOST_ASSERT((uInt)(pending_) < lit_bufsize_ + 2*lx);
+            assert((uInt)(pending_) < lit_bufsize_ + 2*lx);
         }
         while(lx < last_lit_);
     }
@@ -1442,7 +1435,7 @@ tr_flush_block(
         //        https://github.com/madler/zlib/issues/172
 
     #if 0
-        BOOST_ASSERT(buf);
+        assert(buf);
     #endif
         opt_lenb = static_lenb = stored_len + 5; // force a stored block
     }
@@ -1741,7 +1734,7 @@ longest_match(IPos cur_match)
     /* The code is optimized for HASH_BITS >= 8 and maxMatch-2 multiple of 16.
      * It is easy to get rid of this optimization if necessary.
      */
-    BOOST_ASSERT(hash_bits_ >= 8 && maxMatch == 258);
+    assert(hash_bits_ >= 8 && maxMatch == 258);
 
     /* Do not waste too much time if we already have a good match: */
     if(prev_length_ >= good_match_) {
@@ -1753,10 +1746,10 @@ longest_match(IPos cur_match)
     if((uInt)nice_match > lookahead_)
         nice_match = lookahead_;
 
-    BOOST_ASSERT((std::uint32_t)strstart_ <= window_size_-kMinLookahead);
+    assert((std::uint32_t)strstart_ <= window_size_-kMinLookahead);
 
     do {
-        BOOST_ASSERT(cur_match < strstart_);
+        assert(cur_match < strstart_);
         match = window_ + cur_match;
 
         /* Skip to next match if the match length cannot increase
@@ -1780,7 +1773,7 @@ longest_match(IPos cur_match)
          * the hash keys are equal and that HASH_BITS >= 8.
          */
         scan += 2, match++;
-        BOOST_ASSERT(*scan == *match);
+        assert(*scan == *match);
 
         /* We check for insufficient lookahead only every 8th comparison;
          * the 256th check will be made at strstart+258.
@@ -1794,7 +1787,7 @@ longest_match(IPos cur_match)
                 *++scan == *++match && *++scan == *++match &&
                 scan < strend);
 
-        BOOST_ASSERT(scan <= window_+(unsigned)(window_size_-1));
+        assert(scan <= window_+(unsigned)(window_size_-1));
 
         len = maxMatch - (int)(strend - scan);
         scan = strend - maxMatch;
@@ -1845,7 +1838,7 @@ f_stored(z_params& zs, Flush flush) ->
         /* Fill the window as much as possible: */
         if(lookahead_ <= 1) {
 
-            BOOST_ASSERT(strstart_ < w_size_+max_dist() ||
+            assert(strstart_ < w_size_+max_dist() ||
                    block_start_ >= (long)w_size_);
 
             fill_window(zs);
@@ -1854,7 +1847,7 @@ f_stored(z_params& zs, Flush flush) ->
 
             if(lookahead_ == 0) break; /* flush the current block */
         }
-        BOOST_ASSERT(block_start_ >= 0L);
+        assert(block_start_ >= 0L);
 
         strstart_ += lookahead_;
         lookahead_ = 0;
@@ -2132,7 +2125,7 @@ f_slow(z_params& zs, Flush flush) ->
             lookahead_--;
         }
     }
-    BOOST_ASSERT(flush != Flush::none);
+    assert(flush != Flush::none);
     if(match_available_)
     {
         tr_tally_lit(window_[strstart_-1], bflush);
@@ -2199,7 +2192,7 @@ f_rle(z_params& zs, Flush flush) ->
                 if(match_length_ > lookahead_)
                     match_length_ = lookahead_;
             }
-            BOOST_ASSERT(scan <= window_+(uInt)(window_size_-1));
+            assert(scan <= window_+(uInt)(window_size_-1));
         }
 
         /* Emit match if have run of minMatch or longer, else emit literal */
@@ -2300,5 +2293,4 @@ f_huff(z_params& zs, Flush flush) ->
 } // beast
 } // boost
 
-#endif
 #endif

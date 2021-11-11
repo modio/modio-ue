@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
@@ -72,8 +72,7 @@ namespace Modio
 
 	Modio::FilterParams& FilterParams::WithTags(std::vector<std::string> NewTags)
 	{
-		Tags.clear();
-		Tags.insert(Tags.end(), NewTags.begin(), NewTags.end());
+		Tags = std::move(NewTags);
 		return *this;
 	}
 
@@ -86,8 +85,7 @@ namespace Modio
 
 	Modio::FilterParams& FilterParams::WithoutTags(std::vector<std::string> NewTags)
 	{
-		ExcludedTags.clear();
-		ExcludedTags.insert(Tags.end(), NewTags.begin(), NewTags.end());
+		ExcludedTags = std::move(NewTags);
 		return *this;
 	}
 
@@ -95,6 +93,12 @@ namespace Modio
 	{
 		ExcludedTags.clear();
 		ExcludedTags.push_back(Tag);
+		return *this;
+	}
+
+	Modio::FilterParams& Modio::FilterParams::MetadataLike(std::string SearchString)
+	{
+		MetadataBlobSearchString = SearchString;
 		return *this;
 	}
 
@@ -192,7 +196,7 @@ namespace Modio
 			std::string TagStr;
 			for (std::string Tag : Tags)
 			{
-				TagStr += Tag + " ";
+				TagStr += Tag + ",";
 			}
 			TagStr.resize(TagStr.size() - 1);
 			FilterFields.push_back(fmt::format("tags={}", TagStr));
@@ -203,10 +207,15 @@ namespace Modio
 			std::string ExcludedTagStr;
 			for (std::string Tag : ExcludedTags)
 			{
-				ExcludedTagStr += Tag + " ";
+				ExcludedTagStr += Tag + ",";
 			}
 			ExcludedTagStr.resize(ExcludedTagStr.size() - 1);
 			FilterFields.push_back(fmt::format("tags-not-in={}", ExcludedTagStr));
+		}
+
+		if (MetadataBlobSearchString)
+		{
+			FilterFields.push_back(fmt::format("metadata_blob-lk=*{}*", *MetadataBlobSearchString));
 		}
 
 		std::string ResultLimitStr;

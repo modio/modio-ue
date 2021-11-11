@@ -213,4 +213,19 @@ bool FModioListAllModsIDFilterTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioListAllModsMetadataFilterTest, "Modio.ListAllMods.MetadataFilter",
+								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+									 EAutomationTestFlags::ProductFilter)
+bool FModioListAllModsMetadataFilterTest::RunTest(const FString& Parameters)
+{
+	ADD_LATENT_AUTOMATION_COMMAND(FModioInitializeAsyncCommand(this));
+
+
+	ADD_LATENT_AUTOMATION_COMMAND(FModioListAllModsAsyncCommand(this, FModioFilterParams().MetadataLike("SomeString")));
+
+
+	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

@@ -45,8 +45,8 @@ MODIO_END_CONVERT_SWITCHES
 FORCEINLINE Modio::AuthenticationParams ToModio(const FModioAuthenticationParams& UnrealParams)
 {
     Modio::AuthenticationParams Params;
-	Params.AuthToken = ToSTD(FGenericPlatformHttp::UrlEncode(UnrealParams.AuthToken));
-	Params.UserEmail = UnrealParams.UserEmail.TrimStartAndEnd().IsEmpty() ? Modio::Optional<std::string>(ToSTD(UnrealParams.UserEmail)) : Modio::Optional<std::string>();
+	Params.AuthToken = ToModio(FGenericPlatformHttp::UrlEncode(UnrealParams.AuthToken));
+	Params.UserEmail = UnrealParams.UserEmail.TrimStartAndEnd().IsEmpty() ? Modio::Optional<std::string>(ToModio(UnrealParams.UserEmail)) : Modio::Optional<std::string>();
 	Params.bUserHasAcceptedTerms = UnrealParams.bUserHasAcceptedTerms;
 
 	return Params;

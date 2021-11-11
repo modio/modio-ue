@@ -26,6 +26,8 @@ FORCEINLINE EModioModManagementEventType ToUnreal(Modio::ModManagementEvent::Eve
 			return EModioModManagementEventType::Uninstalled;
 		case Modio::ModManagementEvent::EventType::Updated:
 			return EModioModManagementEventType::Updated;
+		case Modio::ModManagementEvent::EventType::Uploaded:
+		return	EModioModManagementEventType::Uploaded;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EModioEnvironment Environment)"));

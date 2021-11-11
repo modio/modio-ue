@@ -17,7 +17,6 @@ namespace Modio
 	class ReportParams;
 }
 
-
 UENUM(BlueprintType)
 enum class EModioReportType : uint8
 {

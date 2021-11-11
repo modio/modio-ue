@@ -25,26 +25,26 @@ FORCEINLINE Modio::ReportParams ToModio(const FModioReportParams& In)
 
 	if (In.ReporterName && !In.ReporterName->TrimStartAndEnd().IsEmpty())
 	{
-		ReporterName = ToSTD(In.ReporterName.GetValue());
+		ReporterName = ToModio(In.ReporterName.GetValue());
 	}
 
 	if (In.ReporterContact && !In.ReporterContact->TrimStartAndEnd().IsEmpty())
 	{
-		ReporterContact = ToSTD(In.ReporterContact.GetValue());
+		ReporterContact = ToModio(In.ReporterContact.GetValue());
 	}
 
 	switch (In.ReportedResourceType)
 	{
 		case FModioReportParams::ResourceType::Game:
-			return Modio::ReportParams(Modio::GameID(In.ResourceID), ToModio(In.Type), ToSTD(In.ReportDescription),
+			return Modio::ReportParams(Modio::GameID(In.ResourceID), ToModio(In.Type), ToModio(In.ReportDescription),
 									   ReporterName, ReporterContact);
 			break;
 		case FModioReportParams::ResourceType::Mod:
-			return Modio::ReportParams(Modio::ModID(In.ResourceID), ToModio(In.Type), ToSTD(In.ReportDescription),
+			return Modio::ReportParams(Modio::ModID(In.ResourceID), ToModio(In.Type), ToModio(In.ReportDescription),
 									   ReporterName, ReporterContact);
 			break;
 		case FModioReportParams::ResourceType::User:
-			return Modio::ReportParams(Modio::UserID(In.ResourceID), ToModio(In.Type), ToSTD(In.ReportDescription),
+			return Modio::ReportParams(Modio::UserID(In.ResourceID), ToModio(In.Type), ToModio(In.ReportDescription),
 									   ReporterName, ReporterContact);
 			break;
 	}

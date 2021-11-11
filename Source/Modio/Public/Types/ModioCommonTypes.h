@@ -192,6 +192,14 @@ struct TStructOpsTypeTraits<FModioModID> : public TStructOpsTypeTraitsBase2<FMod
 	};
 };
 
+USTRUCT(BlueprintType)
+struct MODIO_API FModioOptionalModID
+{
+	GENERATED_BODY()
+
+	TOptional<FModioModID> Internal;
+};
+
 /** @brief Strong type for Game IDs */
 USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeGameId"))
 struct MODIO_API FModioGameID

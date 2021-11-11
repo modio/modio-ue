@@ -200,4 +200,25 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalModDependencyList(
 		const struct FModioOptionalModDependencyList& OptionalDependencyList,
 		struct FModioModDependencyList& DependencyList);
+
+
+	/**
+	 * Check if the ModioModID has a valid value
+	 *
+	 * @param OptionalID - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioModID)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalModID(const struct FModioOptionalModID& OptionalID);
+
+	/**
+	 * Get the ID from the optional if it's set
+	 *
+	 * @param OptionalID - if this returned false, then this will be defaulted
+	 * @param ID - the underlying value
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalID)")
+	static bool GetValue_ModioOptionalModID(const struct FModioOptionalModID& OptionalID, struct FModioModID& ID);
 };

@@ -11,11 +11,14 @@
 #include "ModioSubsystem.h"
 #include "Engine/Engine.h"
 #include "Internal/Convert/AuthParams.h"
+#include "Internal/Convert/CreateModFileParams.h"
+#include "Internal/Convert/CreateModParams.h"
 #include "Internal/Convert/ErrorCode.h"
 #include "Internal/Convert/FilterParams.h"
 #include "Internal/Convert/InitializeOptions.h"
 #include "Internal/Convert/List.h"
 #include "Internal/Convert/ModCollectionEntry.h"
+#include "Internal/Convert/ModCreationHandle.h"
 #include "Internal/Convert/ModDependency.h"
 #include "Internal/Convert/ModInfo.h"
 #include "Internal/Convert/ModInfoList.h"
@@ -354,7 +357,8 @@ void UModioSubsystem::GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Call
 		Callback.ExecuteIfBound({}, CachedModTags);
 		return;
 	}
-
+	// TODO: @modio-UE4 capturing `this` is bad and we shouldn't do it. Better to store the cached tags as a TSharedPtr
+	// and capture that by value, so we are guaranteed lifetime
 	Modio::GetModTagOptionsAsync(
 		[this, Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModTagOptions> ModTagOptions) {
 			CachedModTags = ToUnrealOptional<FModioModTagOptions>(ModTagOptions);
@@ -368,6 +372,15 @@ void UModioSubsystem::K2_GetModTagOptionsAsync(FOnGetModTagOptionsDelegate Callb
 		[Callback](FModioErrorCode ec, TOptional<FModioModTagOptions> ModTagOptions) {
 			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModTagOptions>(ModTagOptions));
 		}));
+}
+
+void UModioSubsystem::SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
+										FOnSubmitNewModDelegateFast Callback)
+{
+	Modio::SubmitNewModAsync(ToModio(Handle), ToModio(Params),
+							 [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModID> NewModID) {
+								 Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioModID>(NewModID));
+							 });
 }
 
 void UModioSubsystem::RequestEmailAuthCodeAsync(const FModioEmailAddress& EmailAddress,
@@ -554,13 +567,42 @@ void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, FOnGetModDepend
 		});
 }
 
-MODIO_API void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegate Callback)
+FModioModCreationHandle UModioSubsystem::GetModCreationHandle()
+{
+	return ToUnreal(Modio::GetModCreationHandle());
+}
+
+void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegate Callback)
 {
 	GetModDependenciesAsync(ModID, FOnGetModDependenciesDelegateFast::CreateLambda(
 									   [Callback](FModioErrorCode ec, TOptional<FModioModDependencyList> Dependencies) {
 										   Callback.ExecuteIfBound(
 											   ec, FModioOptionalModDependencyList(MoveTempIfPossible(Dependencies)));
 									   }));
+}
+
+void UModioSubsystem::SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params)
+{
+	Modio::SubmitNewModFileForMod(ToModio(Mod), ToModio(Params));
+}
+
+void UModioSubsystem::K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params)
+{
+	SubmitNewModFileForMod(Mod, Params);
+}
+
+FModioModCreationHandle UModioSubsystem::K2_GetModCreationHandle()
+{
+	return GetModCreationHandle();
+}
+
+void UModioSubsystem::K2_SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
+										   FOnSubmitNewModDelegate Callback)
+{
+	SubmitNewModAsync(
+		Handle, Params,
+		FOnSubmitNewModDelegateFast::CreateLambda(
+			[Callback](FModioErrorCode ec, TOptional<FModioModID> NewModID) { Callback.ExecuteIfBound(ec, FModioOptionalModID {NewModID}); }));
 }
 
 /// File scope implementations

@@ -22,7 +22,8 @@ enum class EModioModManagementEventType : uint8
 {
 	Installed, /** Mod installation to local storage */
 	Uninstalled, /** Mod uninstallation from local storage*/
-	Updated /** Mod local installation updated to latest version*/
+	Updated, /** Mod local installation updated to latest version*/
+	Uploaded, /** Mod file was uploaded*/
 };
 
 /** @brief Simple struct representing the outcome of a mod management operation */

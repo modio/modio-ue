@@ -122,3 +122,14 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalModDependencyList(
 {
 	return GetValueInternal(OptionalDependencyList, DependencyList);
 }
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalModID(const struct FModioOptionalModID& OptionalID) 
+{
+	return IsSetInternal(OptionalID);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalModID(const struct FModioOptionalModID& OptionalID,
+														struct FModioModID& ID)
+{
+	return GetValueInternal(OptionalID, ID);
+}

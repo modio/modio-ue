@@ -25,26 +25,31 @@ public class Modio : ModuleRules
         //Add stub generated header
         {
             string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "GeneratedHeader");
-            //Clean the generated source directory so that we dont have any stale files in it
-            if (Directory.Exists(GeneratedHeaderPath))
+
+            // Only process generated headers if we are using the NativeSDK as a git submodule
+            if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
             {
-                Directory.Delete(GeneratedHeaderPath, true);
+                //Clean the generated source directory so that we dont have any stale files in it
+                if (Directory.Exists(GeneratedHeaderPath))
+                {
+                    Directory.Delete(GeneratedHeaderPath, true);
+                }
+                Directory.CreateDirectory(GeneratedHeaderPath);
+
+                Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Public"));
+                Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Private"));
+
+                //Because this file is a dummy we don't need it as a dependency
+                string GeneratedHeaderFilePath = Path.Combine(GeneratedHeaderPath, "Private", "ModioGeneratedVariables.h");
+                using (StreamWriter DummyGeneratedHeader = File.AppendText(GeneratedHeaderFilePath))
+                { };
+
+                // Silly hack/workaround until 4.26 adds ConditionalAddModuleDirectory - we may change where this lives in the native SDK later
+                string ErrorConditionLibraryPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio/modio/core/ModioErrorCondition.h");
+                // Add dependency on the upstream file so if it is modified we re-run and copy it again
+                ExternalDependencies.Add(ErrorConditionLibraryPath);
+                File.Copy(ErrorConditionLibraryPath, Path.Combine(GeneratedHeaderPath, "Public", "ModioErrorCondition.h"), true);
             }
-            Directory.CreateDirectory(GeneratedHeaderPath);
-
-            Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Public"));
-            Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Private"));
-
-            //Because this file is a dummy we don't need it as a dependency
-            string GeneratedHeaderFilePath = Path.Combine(GeneratedHeaderPath, "Private", "ModioGeneratedVariables.h");
-            using (StreamWriter DummyGeneratedHeader = File.AppendText(GeneratedHeaderFilePath))
-            { };
-
-            // Silly hack/workaround until 4.26 adds ConditionalAddModuleDirectory - we may change where this lives in the native SDK later
-            string ErrorConditionLibraryPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio/modio/core/ModioErrorCondition.h");
-            // Add dependency on the upstream file so if it is modified we re-run and copy it again
-            ExternalDependencies.Add(ErrorConditionLibraryPath);
-            File.Copy(ErrorConditionLibraryPath, Path.Combine(GeneratedHeaderPath, "Public", "ModioErrorCondition.h"), true);
 
 
             PublicIncludePaths.AddRange(new string[] {
@@ -73,6 +78,9 @@ public class Modio : ModuleRules
         }
         // Add native SDK implementation to this module so we don't have to create an extraneous module
         // TODO: @modio-ue4 cleanup by using UE_4_26_OR_LATER so we can use ConditionalAddModuleDirectory
+
+        // We only need to check and update generated source if we are consuming the NativeSDK as a git submodule (ie we aren't in a standalone release context)
+        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
         {
             string GeneratedSourcePath = Path.Combine(ModuleDirectory, "GeneratedSource");
 

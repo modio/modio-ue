@@ -101,6 +101,13 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& MarkedLiveBefore(FDateTime LiveBefore);
 
 	/**
+	 * @brief Only include mods with a metadata blob containing the specified substring
+	 * @param SearchString The substring to search for
+	 * @return *this
+	 **/
+	FModioFilterParams& MetadataLike(FString SearchString);
+
+	/**
 	 * @brief Only include mods that have the specified tag
 	 * @param Tag Tag to include
 	 * @return *this
@@ -164,7 +171,7 @@ private:
 	TArray<FString> ExcludedTags;
 	TArray<FModioModID> IncludedIDs;
 	TArray<FModioModID> ExcludedIDs;
-
+	TOptional<FString> MetadataBlobSearchString;
 	bool isPaged = false;
 	int64 Index = 0;
 	int64 Count = 100;
