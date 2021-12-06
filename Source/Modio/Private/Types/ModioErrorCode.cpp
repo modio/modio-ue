@@ -13,50 +13,50 @@
 
 FModioErrorCode::FModioErrorCode(Modio::ErrorCode ec)
 {
-	Error = MakeUnique<Modio::ErrorCode>(ec);
+	InternalError = MakeUnique<Modio::ErrorCode>(ec);
 }
 
  FModioErrorCode::FModioErrorCode() 
  {
-	Error = MakeUnique<Modio::ErrorCode>();
+	 InternalError = MakeUnique<Modio::ErrorCode>();
  }
 
  FModioErrorCode::FModioErrorCode(const FModioErrorCode& Other) 
  {
-	Error = MakeUnique<Modio::ErrorCode>(Other.GetRawErrorCode());
+	 InternalError = MakeUnique<Modio::ErrorCode>(Other.GetRawErrorCode());
  }
 
  FModioErrorCode& FModioErrorCode::operator=(const FModioErrorCode& ec) 
 {
-	Error = MakeUnique<Modio::ErrorCode>(ec.GetRawErrorCode());
+	 InternalError = MakeUnique<Modio::ErrorCode>(ec.GetRawErrorCode());
 	return *this;
 }
 
  FModioErrorCode::~FModioErrorCode() 
  {
-	Error.Reset();
+	 InternalError.Reset();
  }
 
 FModioErrorCode::operator bool() const
 {
-	return Error->value() != 0;
+	return InternalError->value() != 0;
 }
 
 int FModioErrorCode::GetValue() const
 {
-	return Error->value();
+	return InternalError->value();
 }
 
 Modio::ErrorCode FModioErrorCode::GetRawErrorCode() const
 {
-	return *Error;
+	return *InternalError;
 }
 
-FString FModioErrorCode::GetMessage() const
+FString FModioErrorCode::GetErrorMessage() const
 {
-	if (*Error)
+	if (InternalError.IsValid())
 	{
-		return FString(UTF8_TO_TCHAR(Error->message().c_str()));
+		return FString(UTF8_TO_TCHAR(InternalError->message().c_str()));
 	}
 	else
 	{

@@ -9,6 +9,7 @@
  */
 
 #pragma once
+
 #include "Templates/UniquePtr.h"
 
 #include "ModioErrorCode.generated.h"
@@ -38,9 +39,9 @@ struct MODIO_API FModioErrorCode
 	Modio::ErrorCode GetRawErrorCode() const;
 
 	/** Get a human readable message from the error code */
-	FString GetMessage() const;
+	FString GetErrorMessage() const;
 
 private:
-	TUniquePtr<Modio::ErrorCode> Error;
+	TUniquePtr<Modio::ErrorCode> InternalError;
 };
 

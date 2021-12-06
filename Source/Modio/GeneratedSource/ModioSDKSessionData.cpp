@@ -136,6 +136,7 @@ namespace Modio
 		Modio::Detail::Buffer SDKSessionData::SerializeUserData()
 		{
 			nlohmann::json Data(Get().UserData);
+			Data["version"] = 1;
 			std::string UserData = Data.dump();
 			Modio::Detail::Buffer DataBuffer(UserData.size());
 			std::copy(UserData.begin(), UserData.end(), DataBuffer.begin());

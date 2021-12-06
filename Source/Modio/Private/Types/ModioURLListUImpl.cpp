@@ -9,8 +9,9 @@
  */
 
 #include "Internal/Convert/List.h"
-#include "ModioSDK.h"
 #include "Types/ModioURLList.h"
+
+#include "ModioSDK.h"
 
 FModioYoutubeURLList::FModioYoutubeURLList(const Modio::YoutubeURLList& URLList)
 	: FModioList(ToUnrealList<TArray, FString>(URLList))

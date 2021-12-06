@@ -15,6 +15,7 @@
 #include "Types/ModioInitializeOptions.h"
 #include "Modio.h"
 
+#if PLATFORM_WINDOWS
 // For GetUserSidString
 #include <processthreadsapi.h>
 #include <sddl.h>
@@ -59,13 +60,24 @@ static FORCEINLINE std::string GetUserSidString()
 	return SIDStringCopy;
 }
 
+#else
+
+#endif
+
 FORCEINLINE Modio::InitializeOptions ToModio(const FModioInitializeOptions& In )
 {
     Modio::InitializeOptions Options;
     Options.GameID = ToModio(In.GameId);
     Options.APIKey = ToModio(In.ApiKey);
     Options.GameEnvironment = ToModio(In.GameEnvironment);
-    Options.User = GetUserSidString();
+	#if PLATFORM_WINDOWS
+
+    Options.User = In.LocalSessionIdentifier.IsSet() ? ToModio(In.LocalSessionIdentifier.GetValue()) : GetUserSidString();
+	
+	#else
+	checkf(In.LocalSessionIdentifier.IsSet(), TEXT("Please set LocalSessionIdentifier on your InitializeOptions before passing them to InitializeAsync"))
+	Options.User = ToModio(In.LocalSessionIdentifier.GetValue());
+	#endif
     Options.PortalInUse = ToModio(In.PortalInUse);
     return Options;
 }

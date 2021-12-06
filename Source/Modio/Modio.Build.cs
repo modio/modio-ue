@@ -12,16 +12,110 @@
 using System.IO;
 using System.Collections.Generic;
 using UnrealBuildTool;
+using Tools.DotNETCommon;
+using System.Linq;
 
 public class Modio : ModuleRules
 {
+    private bool PlatformMatches(UnrealTargetPlatform PlatformToCheck, string PlatformIdentifier)
+    {
+        UnrealTargetPlatform Platform;
+        bool ParsedSuccessfully = UnrealTargetPlatform.TryParse(PlatformIdentifier, out Platform);
+        return ParsedSuccessfully && (PlatformToCheck == Platform);
+    }
+    public class ModioPlatformConfigFile
+    {
+        public class PlatformConfig
+        {
+            public List<string> IncludeDirectories = new List<string>();
+            public List<string> PlatformSpecificDefines = new List<string>();
+            public List<string> ModuleDependencies = new List<string>();
+        }
+        public Dictionary<string, PlatformConfig> Platforms;
+        public List<string> IncludeDirectories;
+        public List<string> PlatformSpecificDefines;
+        public List<string> ModuleDependencies = new List<string>();
+    };
+
+    private void DumpNativePlatformConfig(ModioPlatformConfigFile.PlatformConfig Config)
+    {
+        foreach(string IncludeDirectory in Config.IncludeDirectories)
+        {
+            Log.TraceInformation("Include: " + IncludeDirectory);
+        }
+        foreach (string Define in Config.PlatformSpecificDefines)
+        {
+            Log.TraceInformation("Define: " + Define);
+        }
+    }
+
+    private ModioPlatformConfigFile.PlatformConfig LoadNativePlatformConfig()
+    {
+        ModioPlatformConfigFile.PlatformConfig MergedConfig = null;
+        
+        foreach (var PlatformDirectory in Directory.EnumerateDirectories(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/platform")))
+        {
+            if (File.Exists(Path.Combine(PlatformDirectory, "ueplatform.json")))
+            {
+                //Ensure changes to the platform jsons result in a rebuild of the plugin
+                ExternalDependencies.Add(Path.Combine(PlatformDirectory, "ueplatform.json"));
+
+                ModioPlatformConfigFile CurrentConfig = Json.Load<ModioPlatformConfigFile>(new FileReference(Path.Combine(PlatformDirectory, "ueplatform.json")));
+                if (CurrentConfig != null)
+                {
+                    bool bFoundPlatformConfig = false;
+                    foreach (KeyValuePair<string, ModioPlatformConfigFile.PlatformConfig> Platform in CurrentConfig.Platforms)
+                    {
+                        if (PlatformMatches(Target.Platform, Platform.Key))
+                        {
+                            Log.TraceInformation("Merging in platform configuration " + Platform.Key);
+                            //This is the first matching platform we've found, so create our config
+                            if (MergedConfig == null)
+                            {
+                                MergedConfig = new ModioPlatformConfigFile.PlatformConfig();
+                            }
+
+                            MergedConfig.IncludeDirectories.AddRange(Platform.Value.IncludeDirectories);
+                            MergedConfig.PlatformSpecificDefines.AddRange(Platform.Value.PlatformSpecificDefines);
+                            MergedConfig.ModuleDependencies.AddRange(Platform.Value.ModuleDependencies);
+                            
+                            bFoundPlatformConfig = true;
+                        }
+                    }
+                    //Only merge in the base data for this file, if one of the platforms inside it was a match
+                    if (bFoundPlatformConfig)
+                    {
+                        MergedConfig.IncludeDirectories.AddRange(CurrentConfig.IncludeDirectories);
+                        MergedConfig.PlatformSpecificDefines.AddRange(CurrentConfig.PlatformSpecificDefines);
+                        MergedConfig.ModuleDependencies.AddRange(CurrentConfig.ModuleDependencies);
+                    }
+                }
+            }
+        }
+        if (MergedConfig != null)
+        {
+            //Treat all platform specific includes as relative to the root native platform directory
+            MergedConfig.IncludeDirectories =
+                MergedConfig.IncludeDirectories.Select((string IncludeDir) => Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/platform", IncludeDir)).ToList();
+        }
+        return MergedConfig;
+    }
+
     public Modio(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
         PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
         bEnableUndefinedIdentifierWarnings = false;
         bEnforceIWYU = true;
+        bAllowConfidentialPlatformDefines = true;
         //bUseUnity = false;
+        ModioPlatformConfigFile.PlatformConfig PlatformConfig = LoadNativePlatformConfig();
+
+        if (PlatformConfig == null)
+        {
+            throw new BuildException("Could not locate native platform configuration file. If you are using a confidential platform, please ensure you have placed the platform code into the correct directory.");
+        }
+        DumpNativePlatformConfig(PlatformConfig);
         //Add stub generated header
         {
             string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "GeneratedHeader");
@@ -58,7 +152,7 @@ public class Modio : ModuleRules
 
             PublicSystemIncludePaths.AddRange(new string[] {
                 });
-
+            // Add common private includes from the Native SDK
             PrivateIncludePaths.AddRange(new string[]
             {
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/json/single_include"),
@@ -69,13 +163,16 @@ public class Modio : ModuleRules
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/utfcpp/source"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/httpparser/src"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/interface"),
-                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/ms-common/include"),
-                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/win32/win32"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/modio"),
                 Path.Combine(GeneratedHeaderPath, "Private"),
                 Path.Combine(GeneratedHeaderPath, "Public")
             });
+
+            //Import private platform-specific includes from the Native SDK
+            PrivateIncludePaths.AddRange(PlatformConfig.IncludeDirectories);
+
         }
+
         // Add native SDK implementation to this module so we don't have to create an extraneous module
         // TODO: @modio-ue4 cleanup by using UE_4_26_OR_LATER so we can use ConditionalAddModuleDirectory
 
@@ -92,16 +189,23 @@ public class Modio : ModuleRules
             Directory.CreateDirectory(GeneratedSourcePath);
 
             //Copy all implementation headers (ipp files) to a generated source directory with the cpp extension so they will get compiled/linked
-            List<string> IPPFiles = new List<string>(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio"), "*.ipp", SearchOption.AllDirectories));
-            IPPFiles.AddRange(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/platform/ms-common"), "*.ipp", SearchOption.AllDirectories));
-            IPPFiles.AddRange(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/platform/win32"), "*.ipp", SearchOption.AllDirectories));
-
-            foreach (string IPPFile in IPPFiles)
             {
-                //Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
-                ExternalDependencies.Add(IPPFile);
-                string DestinationPath = Path.Combine(GeneratedSourcePath, Path.ChangeExtension(Path.GetFileName(IPPFile), ".cpp"));
-                File.Copy(IPPFile, DestinationPath, true);
+
+                List<string> IPPFiles = new List<string>(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio"), "*.ipp", SearchOption.AllDirectories));
+
+                // Add platform-specific include directories
+                foreach (string IncludePath in PlatformConfig.IncludeDirectories)
+                {
+                    IPPFiles.AddRange(Directory.GetFiles(IncludePath, "*.ipp", SearchOption.AllDirectories));
+                }
+
+                foreach (string IPPFile in IPPFiles)
+                {
+                    //Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
+                    ExternalDependencies.Add(IPPFile);
+                    string DestinationPath = Path.Combine(GeneratedSourcePath, Path.ChangeExtension(Path.GetFileName(IPPFile), ".cpp"));
+                    File.Copy(IPPFile, DestinationPath, true);
+                }
             }
 
             //Only supported from 4.26 onwards - workaround at the moment is for the GeneratedSourcePath to live inside the module directory
@@ -119,6 +223,8 @@ public class Modio : ModuleRules
             "Projects", "CoreUObject", "RHI", "RenderCore", "HTTP"
 			// ... add private dependencies that you statically link with here ...
 		});
+
+        PrivateDependencyModuleNames.AddRange(PlatformConfig.ModuleDependencies.ToArray());
 
         DynamicallyLoadedModuleNames.AddRange(new string[] {
 			// ... add any modules that your module loads dynamically here ...
@@ -141,18 +247,20 @@ public class Modio : ModuleRules
             // Enable Unreal-specific headers in the native SDK
             PrivateDefinitions.Add("MODIO_PLATFORM_UNREAL");
             // Disable header-only mode
-            PublicDefinitions.Add("MODIO_SEPARATE_COMPILATION=1");
+            PrivateDefinitions.Add("MODIO_SEPARATE_COMPILATION=1");
             // Disable unnecessary inlining as a result of header-only mode not being used
-            PublicDefinitions.Add("MODIO_IMPL=");
+            PrivateDefinitions.Add("MODIO_IMPL=");
 
-            // Pass-through the target platform
-            PublicDefinitions.Add("MODIO_TARGET_PLATFORM_ID=\"WIN\"");
+            foreach (string CompilerDefine in PlatformConfig.PlatformSpecificDefines)
+            {
+                PrivateDefinitions.Add(CompilerDefine);
+            }
 
             // Pass-through of SDK version identifier with Unreal prefix
             string VersionFilePath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.modio");
             string VersionString = File.ReadAllText(VersionFilePath);
             VersionString = VersionString.Trim();
-            PublicDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-{0}\"", VersionString));
+            PrivateDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-{0}\"", VersionString));
 
             // Add dependency on version file so if it is changed we trigger a rebuild
             ExternalDependencies.Add(VersionFilePath);

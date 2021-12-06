@@ -154,4 +154,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
 	static FModioInitializeOptions SetPortal(const FModioInitializeOptions& Options, EModioPortal PortalToUse);
+
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
+	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options, const FString& SessionIdentifier);
 };

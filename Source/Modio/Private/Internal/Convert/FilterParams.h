@@ -11,8 +11,8 @@
 #pragma once
 #include "Internal/ModioConvert.h"
 #include "Internal/ModioPrivateDefines.h"
-
 #include "ModioSDK.h"
+#include "Types/ModioFilterParams.h"
 
 MODIO_BEGIN_CONVERT_SWITCHES
 FORCEINLINE Modio::FilterParams::SortDirection ToModio(EModioSortDirection SortDirection)

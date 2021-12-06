@@ -12,9 +12,7 @@
 
 #define MODIO_PLATFORM_UNREAL 1
 
-#pragma push_macro("check")
 
-#undef check
 
 #pragma warning(push)
 // These warnings are in third party libraries and we don't care about those
@@ -23,11 +21,7 @@
 #pragma warning(disable : 4063)
 #include "modio/ModioSDK.h"
 
-
-
 #undef MODIO_PLATFORM_UNREAL
 #undef ASIO_NO_EXCEPTIONS
 
 #pragma warning(pop)
-
-#pragma pop_macro("check")

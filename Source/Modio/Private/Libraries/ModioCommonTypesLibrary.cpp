@@ -91,3 +91,11 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetPortal(const FModioInitiali
 	return DuplicateOptions;
 }
 
+FModioInitializeOptions UModioCommonTypesLibrary::SetSessionIdentifier(const FModioInitializeOptions& Options,
+																	   const FString& SessionIdentifier)
+{
+	FModioInitializeOptions DuplicateOptions {Options};
+	DuplicateOptions.LocalSessionIdentifier = SessionIdentifier;
+	return DuplicateOptions;
+}
+

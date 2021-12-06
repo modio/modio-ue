@@ -25,8 +25,17 @@ bool Modio::Detail::GetSubobjectSafe(const nlohmann::json& Json, const std::stri
 			OutSubobjectJson = Subobject;
 			return true;
 		}
+		else
+		{
+			Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+										"Subobject is null for SubobjectKey: {}", SubobjectKey);
+		}
 	}
-
+	else
+	{
+		Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+									"Json does not contain SubobjectKey: {}", SubobjectKey);
+	}
 	return false;
 }
 
@@ -39,6 +48,8 @@ bool Modio::Detail::ParseArraySizeSafe(const nlohmann::json& Json, std::size_t& 
 	}
 	else
 	{
+		Modio::Detail::Logger().Log(Modio::LogLevel::Warning, Modio::LogCategory::Core,
+									"Json ParseArraySizeSafe failed for Key: {}", Key);
 		return false;
 	}
 }

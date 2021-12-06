@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io SDK.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-sdk/blob/main/LICENSE>)
- *  
+ *
  */
 
 #ifdef MODIO_SEPARATE_COMPILATION
@@ -64,19 +64,12 @@ namespace Modio
 		{
 			Detail::ParseSafe(Json, ModInfo.Stats, "stats");
 		}
-
+		if (Json.contains("media"))
 		{
-			Detail::ParseSafe(Json, ModInfo.YoutubeURLs, "media");
-			Detail::ParseSafe(Json, ModInfo.SketchfabURLs, "media");
-		}
-
-		{
-			// @todo: Inefficient: This parses out much more data than needed just to throw it away
-			Modio::Detail::GalleryList Gallery;
-			if (Detail::ParseSafe(Json, Gallery, "media"))
-			{
-				ModInfo.NumGalleryImages = Gallery.Size();
-			}
+			Detail::ParseSafe(Json.at("media"), ModInfo.YoutubeURLs.GetRawList(), "youtube");
+			Detail::ParseSafe(Json.at("media"), ModInfo.SketchfabURLs.GetRawList(), "sketchfab");
+			Detail::ParseSafe(Json.at("media"), ModInfo.GalleryImages, "images");
+			ModInfo.NumGalleryImages = ModInfo.GalleryImages.Size();
 		}
 	}
 
@@ -98,8 +91,9 @@ namespace Modio
 							   {"submitted_by", Info.ProfileSubmittedBy},
 							   {"summary", Info.ProfileSummary},
 							   {"stats", Info.Stats},
-							   {"media", Info.YoutubeURLs}
-		};
+							   {"media", nlohmann::json::object({{"youtube", Info.YoutubeURLs.GetRawList()},
+																 {"sketchfab", Info.SketchfabURLs.GetRawList()},
+																 {"images", Info.GalleryImages}})}};
 	}
 
-}
+} // namespace Modio

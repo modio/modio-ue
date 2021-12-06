@@ -17,7 +17,7 @@ bool UModioErrorCodeLibrary::IsError(const FModioErrorCode& Error)
 
 FString UModioErrorCodeLibrary::GetMessage(const FModioErrorCode& Error)
 {
-	return Error.GetMessage();
+	return Error.GetErrorMessage();
 }
 
 int32 UModioErrorCodeLibrary::GetValue(const FModioErrorCode& Error)
