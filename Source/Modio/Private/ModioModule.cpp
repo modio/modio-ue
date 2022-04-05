@@ -1,20 +1,21 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "ModioModule.h"
-#include "Modio.h"
 #include "Core.h"
 #include "Engine/Engine.h"
+#include "HAL/PlatformFilemanager.h"
 #include "Logging/LogVerbosity.h"
+#include "Modio.h"
 #include "ModioSDK.h"
 #include "ModioSettings.h"
 
@@ -26,8 +27,22 @@
 
 void FModioModule::StartupModule()
 {
-	Modio::SetLogCallback([](Modio::LogLevel Level, std::string Message) {
+	IPlatformFile& FileManager = FPlatformFileManager::Get().GetPlatformFile();
+
+	// delete any existing ModioLogFile so we're only logging current session.
+	if (FileManager.FileExists(*ModioLogFile))
+	{
+		FileManager.DeleteFile(*ModioLogFile);
+	}
+
+	Modio::SetLogCallback([&](Modio::LogLevel Level, std::string Message) {
 		UE_LOG(LogModio, Log, TEXT("%s"), UTF8_TO_TCHAR(Message.c_str()));
+
+		// Append message to ModioLogFile.
+		// FFileHelper::SaveStringToFile() will create a new file if it does not yet exist
+		FFileHelper::SaveStringToFile(UTF8_TO_TCHAR(Message.c_str()), *ModioLogFile,
+									  FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(),
+									  EFileWrite::FILEWRITE_Append);
 	});
 
 	RegisterSettings();

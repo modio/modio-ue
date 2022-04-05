@@ -56,6 +56,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static MODIO_API FModioInitializeOptions GetProjectInitializeOptions();
 	
+#if WITH_DEV_AUTOMATION_TESTS
+	/// @brief Gets the automation test options. not exposed to BP to prevent accidental use by developers in BP
+	static MODIO_API FModioInitializeOptions GetAutomationTestOptions();
+#endif
+
 	/**
 	 * Does a basic validation if the email address supplied has a valid form
 	 * @return true if the email address has a valid format

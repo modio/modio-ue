@@ -29,13 +29,13 @@ struct MODIO_API FModioModDependency
 	/**
 	 * @brief The ID of the dependency
 	 */
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
 	FModioModID ModID;
 
 	/**
 	 * @brief The name of the dependency
 	 */
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
 	FString ModName;
 };
 
@@ -49,10 +49,10 @@ struct MODIO_API FModioModDependencyList
 {
 	GENERATED_BODY();
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependencyList")
 	FModioPagedResult PagedResult;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependencyList")
 	TArray<FModioModDependency> InternalList;
 };
 

@@ -17,7 +17,7 @@ struct MODIO_API FModioCreateModFileParams
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "mod.io|CreateModFileParams")
 	FString PathToModRootDirectory;
 
 	TOptional<FString> VersionString;

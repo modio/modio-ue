@@ -12,18 +12,18 @@
 #include "Engine/Texture.h"
 #include "Internal/ModioPrivateDefines.h"
 
-class UTexture2DDynamic* UModioImageLibrary::GetTexture(const FModioImage& Image)
+class UTexture2DDynamic* UModioImageLibrary::GetTexture(const FModioImageWrapper& Image)
 {
 	return Image.GetTexture();
 }
 
-void UModioImageLibrary::LoadAsync(const FModioImage& Image, FOnLoadImageDelegate OnImageLoaded)
+void UModioImageLibrary::LoadAsync(const FModioImageWrapper& Image, FOnLoadImageDelegate OnImageLoaded)
 {
 	Image.LoadAsync(FOnLoadImageDelegateFast::CreateLambda(
 		[OnImageLoaded](UTexture2DDynamic* Texture) { OnImageLoaded.ExecuteIfBound(Texture); }));
 }
 
-EModioImageState UModioImageLibrary::GetState(const FModioImage& Image)
+EModioImageState UModioImageLibrary::GetState(const FModioImageWrapper& Image)
 {
 	return Image.GetState();
 }

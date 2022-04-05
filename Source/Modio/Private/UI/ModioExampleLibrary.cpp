@@ -76,22 +76,24 @@ static TOptional<TFunction<bool(const FModioModInfo& A, const FModioModInfo& B)>
 		bSortAcending = false;
 	}
 
+// Warning: pasting formed an invalid preprocessing token
+// https://stackoverflow.com/questions/46356185/pasting-formed-an-invalid-processing-token
 #define SORT_FUNC(SORT_ASC, VARIABLE)                                         \
 	(SORT_ASC) ? TFunction<bool(const FModioModInfo&, const FModioModInfo&)>( \
-					 [](const FModioModInfo& A, const FModioModInfo& B) {     \
-						 if (A.##VARIABLE < B.##VARIABLE)                     \
+					 [](const FModioModInfo& First, const FModioModInfo& Second) {     \
+						 if (First.VARIABLE < Second.VARIABLE)                     \
 						 {                                                    \
 							 return true;                                     \
 						 }                                                    \
-						 return A.ModId < B.ModId;                            \
+						 return First.ModId < Second.ModId;                            \
 					 })                                                       \
 			   : TFunction<bool(const FModioModInfo&, const FModioModInfo&)>( \
-					 [](const FModioModInfo& A, const FModioModInfo& B) {     \
-						 if (A.##VARIABLE > B.##VARIABLE)                     \
+					 [](const FModioModInfo& First, const FModioModInfo& Second) {     \
+						 if (First.VARIABLE > Second.VARIABLE)                     \
 						 {                                                    \
 							 return true;                                     \
 						 }                                                    \
-						 return A.ModId > B.ModId;                            \
+						 return First.ModId > Second.ModId;                            \
 					 })
 
 	// @todo: Optimize: Do the select first
@@ -124,9 +126,9 @@ static TOptional<TFunction<bool(const FModioModInfo& A, const FModioModInfo& B)>
 	{
 		SortFunc = bSortAcending
 					   ? TFunction<bool(const FModioModInfo&, const FModioModInfo&)>(
-							 [](const FModioModInfo& A, const FModioModInfo& B) { return A.ModId < B.ModId; })
+							 [](const FModioModInfo& First, const FModioModInfo& Second) { return First.ModId < Second.ModId; })
 					   : TFunction<bool(const FModioModInfo&, const FModioModInfo&)>(
-							 [](const FModioModInfo& A, const FModioModInfo& B) { return A.ModId > B.ModId; });
+							 [](const FModioModInfo& First, const FModioModInfo& Second) { return First.ModId > Second.ModId; });
 	}
 	else
 	{

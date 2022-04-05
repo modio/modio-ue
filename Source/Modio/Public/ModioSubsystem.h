@@ -18,7 +18,7 @@
 #include "Types/ModioCreateModParams.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
-#include "Types/ModioImage.h"
+#include "Types/ModioImageWrapper.h"
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioModCollectionEntry.h"
 #include "Types/ModioModCreationHandle.h"
@@ -41,7 +41,7 @@ DECLARE_DELEGATE_OneParam(FOnErrorOnlyDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_OneParam(FOnModManagementDelegateFast, FModioModManagementEvent);
 DECLARE_DELEGATE_TwoParams(FOnListAllModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnGetModInfoDelegateFast, FModioErrorCode, TOptional<FModioModInfo>);
-DECLARE_DELEGATE_TwoParams(FOnGetMediaDelegateFast, FModioErrorCode, TOptional<FModioImage>);
+DECLARE_DELEGATE_TwoParams(FOnGetMediaDelegateFast, FModioErrorCode, TOptional<FModioImageWrapper>);
 DECLARE_DELEGATE_TwoParams(FOnGetModTagOptionsDelegateFast, FModioErrorCode, TOptional<FModioModTagOptions>);
 DECLARE_DELEGATE_TwoParams(FOnGetTermsOfUseDelegateFast, FModioErrorCode, TOptional<FModioTerms>);
 DECLARE_DELEGATE_TwoParams(FOnGetModDependenciesDelegateFast, FModioErrorCode, TOptional<FModioModDependencyList>);
@@ -413,7 +413,7 @@ public:
 
 	/**
 	 * @brief Uses platform-specific authentication to associate a Mod.io user account with the current platform user
-	 * @param User Authentication payload data to submit to the provider
+	 * @param User Authentication payload data to submit to the provider. 
 	 * @param Provider The provider to use to perform the authentication
 	 * @param Callback Callback invoked once the authentication request has been made
 	 * @requires initialized-sdk
@@ -491,6 +491,22 @@ public:
 	/** Get our image cache */
 	struct FModioImageCache& GetImageCache() const;
 
+	/*
+	@brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
+	exist should you choose to restore it at a later date. Archiving is restricted to team managers and administrators
+	only. Note that restoration and permanent deletion of a mod is possible only via web interface.
+	@param Mod The mod to be archived.
+	@requires authenticated-user
+	@requires initialized-sdk
+	@requires no-rate-limiting
+	@error ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod.This
+	action is restricted to team managers and administrators only.
+	@errorcategory NetworkError|Couldn't connect to mod.io servers
+	@error GenericError::SDKNotInitialized|SDK not initialized
+	@errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	*/
+	MODIO_API void ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegateFast Callback);
+
 private:
 	TUniquePtr<struct FModioImageCache> ImageCache;
 
@@ -510,6 +526,7 @@ private:
 
 public:
 #pragma region Blueprint methods
+
 	/**
 	 * @brief Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the
 	 * set of mods the specified user has installed on this device
@@ -518,7 +535,8 @@ public:
 	 * @param OnInitComplete Callback which will be invoked with the result of initialization
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "InitializeAsync", Category = "mod.io")
-	MODIO_API void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions, FOnErrorOnlyDelegate OnInitComplete);
+	MODIO_API void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions,
+									  FOnErrorOnlyDelegate OnInitComplete);
 
 	/**
 	 * @brief Sends a request to the Mod.io server to add the specified mod to the user's list of subscriptions, and
@@ -871,6 +889,23 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ReportContentAsync", Category = "mod.io")
 	MODIO_API void K2_ReportContentAsync(FModioReportParams Report, FOnErrorOnlyDelegate Callback);
+
+	/*
+	@brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
+	exist should you choose to restore it at a later date. Archiving is restricted to team managers and administrators
+	only. Note that restoration and permanent deletion of a mod is possible only via web interface.
+	@param Mod The mod to be archived.
+	@requires authenticated-user
+	@requires initialized-sdk
+	@requires no-rate-limiting
+	@error ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod.This
+	action is restricted to team managers and administrators only.
+	@errorcategory NetworkError|Couldn't connect to mod.io servers
+	@error GenericError::SDKNotInitialized|SDK not initialized
+	@errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	*/
+	UFUNCTION(BlueprintCallable, DisplayName = "ArchiveModAsync", Category = "mod.io|Mods")
+	MODIO_API void K2_ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegate Callback);
 
 #pragma endregion
 };

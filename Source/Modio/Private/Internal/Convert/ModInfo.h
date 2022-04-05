@@ -19,6 +19,20 @@
 #include "ModioSDK.h"
 #include "Types/ModioModInfo.h"
 
+template<typename DestValueType, typename SourceValueType, typename... OtherParams>
+TArray<DestValueType> ToUnrealD(const std::vector<SourceValueType, OtherParams...>& OriginalArray)
+{
+    TArray<DestValueType> Result;
+
+    Result.Reserve(OriginalArray.size());
+    for (const auto& It : OriginalArray)
+    {
+        Result.Emplace(ToUnreal(It));
+    }
+
+    return Result;
+}
+
 FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 {
 	FModioModInfo Out;
@@ -34,9 +48,14 @@ FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 	Out.ProfileDateLive = ToUnrealDateTime(In.ProfileDateLive);
 	Out.ProfileMaturityOption = ToUnreal<EModioMaturityFlags, Modio::MaturityOption>(In.ProfileMaturityOption);
 	Out.MetadataBlob = FString(In.MetadataBlob.c_str()); // Converting verbatim rather than via TCHAR as ToUnreal does
-	Out.FileInfo = ToUnreal(In.FileInfo);
-	Out.MetadataKvp = ToUnreal<FModioMetadata>(In.MetadataKvp);
-	Out.Tags = ToUnreal<FModioModTag>(In.Tags);
+
+    if (In.FileInfo.has_value())
+    {
+        Out.FileInfo = ToUnreal(In.FileInfo.value());
+    }
+
+    Out.MetadataKvp = ToUnrealD<FModioMetadata>(In.MetadataKvp);
+	Out.Tags = ToUnrealD<FModioModTag>(In.Tags);
 	Out.NumGalleryImages = ToUnreal(In.NumGalleryImages);
 	Out.YoutubeURLs = ToUnreal(In.YoutubeURLs);
 	Out.SketchfabURLs = ToUnreal(In.SketchfabURLs);

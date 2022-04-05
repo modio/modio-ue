@@ -11,7 +11,7 @@
 #pragma once
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioCommonTypes.h"
-#include "Types/ModioImage.h"
+#include "Types/ModioImageWrapper.h"
 #include "Types/ModioImageState.h"
 
 #include "ModioImageLibrary.generated.h"
@@ -26,15 +26,15 @@ class MODIO_API UModioImageLibrary : public UBlueprintFunctionLibrary
 public:
 	/** Get the texture if if has been loaded by any FModioImage instance */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Image")
-	static class UTexture2DDynamic* GetTexture(const FModioImage& Image);
+	static class UTexture2DDynamic* GetTexture(const FModioImageWrapper& Image);
 
 	/** Load the texture into memory async, if it's already in memory, then we will return immediately */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Image")
-	static void LoadAsync(const FModioImage& Image, FOnLoadImageDelegate OnImageLoaded);
+	static void LoadAsync(const FModioImageWrapper& Image, FOnLoadImageDelegate OnImageLoaded);
 
 	/** Get the current state of the image */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Image")
-	static EModioImageState GetState(const FModioImage& Image);
+	static EModioImageState GetState(const FModioImageWrapper& Image);
 
 	/**
 	 * If a logo size is EModioLogoSize::Original, then the size of the Logo returned,

@@ -9,14 +9,26 @@
  */
 
 #include "Types/ModioModInfoList.h"
-#include "Internal/Convert/List.h"
+
 #include "Internal/Convert/ModInfo.h"
+
+#include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
 FModioModInfoList::FModioModInfoList(const Modio::ModInfoList& ModInfoList)
-	: FModioPagedResult(ModInfoList),
-	  FModioList(ToUnrealList<TArray, FModioModInfo>(ModInfoList))
-{}
+	: FModioPagedResult(ModInfoList)
+//    FModioList(ToUnrealList<TArray, FModioModInfo>(ModInfoList))
+{
+    TArray<FModioModInfo> Result;
+
+    Result.Reserve(ModInfoList.Size());
+    for (const Modio::ModInfo& It : ModInfoList)
+    {
+        Result.Emplace(ToUnreal(It));
+    }
+
+    InternalList = Result;
+}
 
 FModioModInfoList::FModioModInfoList(const FModioPagedResult& PagedResult, TArray<FModioModInfo>&& ModInfoList)
 	: FModioPagedResult(PagedResult),

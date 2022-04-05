@@ -25,7 +25,7 @@ FORCEINLINE Modio::CreateModParams ToModio(const FModioCreateModParams& In)
 	Out.bVisible = ToModioOptional<bool>(In.bVisible);
 	Out.Description = ToModioOptional<std::string>(In.Description);
 	Out.HomepageURL = ToModioOptional<std::string>(In.HomepageURL);
-	Out.Stock = ToModioOptional<std::size_t>(In.QuantityAvailable);
+	Out.Stock = ToModioOptional<int64>(In.QuantityAvailable);
 	Out.MaturityRating = In.MaturityFlags.IsSet() ? static_cast<Modio::MaturityOption>(In.MaturityFlags.GetValue()): Modio::Optional<Modio::MaturityOption>{};
 	Out.MetadataBlob = ToModioOptional<std::string>(In.MetadataBlob);
 	Out.Tags = ToModioOptional<std::vector<std::string>>(In.Tags);

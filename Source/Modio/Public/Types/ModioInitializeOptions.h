@@ -20,19 +20,19 @@ struct MODIO_API FModioInitializeOptions
 	GENERATED_BODY()
 
 	/** @brief The Mod.io-provided ID for the game */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io", meta=(ShowOnlyInnerProperties))
 	FModioGameID GameId = FModioGameID::InvalidGameID();
 
 	/** @brief The Mod.io-provided API key for your application or game */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io", meta=(ShowOnlyInnerProperties))
 	FModioApiKey ApiKey = FModioApiKey::InvalidAPIKey();
 
 	/** @brief The mod.io environment you want to run the SDK on */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	EModioEnvironment GameEnvironment = EModioEnvironment::Test;
 
 	/** @brief The portal your title is running through */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	EModioPortal PortalInUse = EModioPortal::None;
 
 	/// @brief String representing the local session. We recommend setting this to a unique per-user string.

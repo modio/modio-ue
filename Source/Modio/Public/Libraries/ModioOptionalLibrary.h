@@ -16,7 +16,7 @@
 #include "Types/ModioModProgressInfo.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioTerms.h"
-#include "Types/ModioImage.h"
+#include "Types/ModioImageWrapper.h"
 #include "Types/ModioModDependencyList.h"
 
 #include "ModioOptionalLibrary.generated.h"
@@ -153,7 +153,7 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalImage)")
 	static bool GetValue_ModioOptionalImage(
 		const struct FModioOptionalImage& OptionalImage,
-		struct FModioImage& Image);
+		struct FModioImageWrapper& Image);
 
 	/**
 	 * Check if the terms has a valid value

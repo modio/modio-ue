@@ -17,7 +17,7 @@
  * Baseclass for lists that are returned from the API so that you can use the list transparantly from it's underlying
  * type and append on additional functionaly in subclasses
  */
-template<template<typename...> typename ContainerType, typename ValueType>
+template<template<typename...> class ContainerType, typename ValueType>
 struct MODIO_API FModioList
 {
 	using ListType = ContainerType<ValueType>;
@@ -98,10 +98,9 @@ struct MODIO_API FModioList
 		return InternalList.end();
 	}
 
-	template<template<typename...> typename DestListType, typename DestValueType, typename SourceListType>
+	template<template<typename...> class DestListType, typename DestValueType, typename SourceListType>
 	friend FModioList<DestListType, DestValueType> ToUnrealList(SourceListType Value);
 
-private:
 	ListType InternalList;
 };
 #endif

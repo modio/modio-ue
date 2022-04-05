@@ -13,15 +13,19 @@
 #define MODIO_PLATFORM_UNREAL 1
 
 
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    // These warnings are in third party libraries and we don't care about those
+    #pragma warning(disable : 4265 4996 4668 4191 4583 4582)
+    // These warnings is in our code, and should be fixed
+    #pragma warning(disable : 4063)
+#endif
 
-#pragma warning(push)
-// These warnings are in third party libraries and we don't care about those
-#pragma warning(disable : 4265 4996 4668 4191 4583 4582)
-// These warnings is in our code, and should be fixed
-#pragma warning(disable : 4063)
 #include "modio/ModioSDK.h"
 
 #undef MODIO_PLATFORM_UNREAL
 #undef ASIO_NO_EXCEPTIONS
 
-#pragma warning(pop)
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#endif

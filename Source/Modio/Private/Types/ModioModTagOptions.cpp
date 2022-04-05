@@ -9,14 +9,26 @@
  */
 
 #include "Types/ModioModTagOptions.h"
-#include "Internal/Convert/List.h"
+
 #include "Internal/Convert/ModTagInfo.h"
+
+#include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
-FModioModTagOptions::FModioModTagOptions(const Modio::ModTagOptions& ModInfoList)
-	: FModioPagedResult(ModInfoList),
-	  FModioList(ToUnrealList<TArray, FModioModTagInfo>(ModInfoList))
-{}
+FModioModTagOptions::FModioModTagOptions(const Modio::ModTagOptions& ModTagList)
+	: FModioPagedResult(ModTagList)
+//    FModioList(ToUnrealList<TArray, FModioModTagInfo>(ModInfoList))
+{
+    TArray<FModioModTagInfo> Result;
+
+    Result.Reserve(ModTagList.Size());
+    for (const Modio::ModTagInfo& It : ModTagList)
+    {
+        Result.Emplace(ToUnreal(It));
+    }
+
+    InternalList = Result;
+}
 
 FModioOptionalModTagOptions::FModioOptionalModTagOptions(TOptional<FModioModTagOptions>&& ModTagOptions)
 	: Internal(MoveTemp(ModTagOptions))

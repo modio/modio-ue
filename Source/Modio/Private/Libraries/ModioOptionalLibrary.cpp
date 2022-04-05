@@ -95,7 +95,7 @@ bool UModioOptionalLibrary::IsSet_ModioOptionalImage(const struct FModioOptional
 }
 
 bool UModioOptionalLibrary::GetValue_ModioOptionalImage(const struct FModioOptionalImage& OptionalImage,
-														struct FModioImage& Image)
+														struct FModioImageWrapper& Image)
 {
 	return GetValueInternal(OptionalImage, Image);
 }

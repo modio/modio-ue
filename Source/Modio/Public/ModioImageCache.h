@@ -23,7 +23,7 @@ struct FModioImageCache
 	class UTexture2DDynamic* GetImage(const FString& ImagePath);
 	EModioImageState GetImageState(const FString& ImagePath);
 private:	
-	friend struct FModioImage;
+	friend struct FModioImageWrapper;
 
 	void UpdateImageState(const FString& ImagePath, EModioImageState NewState, class UTexture2DDynamic* Image = nullptr);
 	

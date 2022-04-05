@@ -803,6 +803,12 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_parameter_validation_errors">Parameter Validation Errors</a></li>
 </ul>
 </li>
+<li><a href="#_submitting_new_mods_and_uploading_files">Submitting new mods and uploading files</a>
+<ul class="sectlevel3">
+<li><a href="#_submitting_a_new_mod">Submitting a new mod</a></li>
+<li><a href="#_submitting_a_file_for_a_mod">Submitting a file for a mod</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_classes">Classes</a>
@@ -888,7 +894,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiocreatemodfileparams">ModioCreateModFileParams</a></li>
 <li><a href="#_modiocreatemodparams">ModioCreateModParams</a></li>
 <li><a href="#_modiofilterparams">ModioFilterParams</a></li>
-<li><a href="#_modioimage">ModioImage</a></li>
+<li><a href="#_modioimagewrapper">ModioImageWrapper</a></li>
 <li><a href="#_modioinitializeoptions">ModioInitializeOptions</a></li>
 <li><a href="#_modiomodcollectionentry">ModioModCollectionEntry</a></li>
 <li><a href="#_modiomodcreationhandle">ModioModCreationHandle</a></li>
@@ -901,6 +907,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiolink">ModioLink</a></li>
 <li><a href="#_modiooptionaluser">ModioOptionalUser</a></li>
 <li><a href="#_modiovalidationerror">ModioValidationError</a></li>
+<li><a href="#_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</a></li>
 </ul>
 </li>
 <li><a href="#_functions">Functions</a>
@@ -913,7 +920,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#MakeApiKey">Make Api Key</a></li>
 <li><a href="#GetValue">Get Value</a></li>
 <li><a href="#GetMessage">Get Message</a></li>
-<li><a href="#ErrorCodeMatches">Error Code Matches</a></li>
 <li><a href="#ListUserSubscriptionAsync">List User Subscription Async</a></li>
 <li><a href="#GetLogoThumbnailSize">Get Logo Thumbnail Size</a></li>
 <li><a href="#GetLogoFullSize">Get Logo Full Size</a></li>
@@ -936,6 +942,8 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#GetProjectEnvironment">Get Project Environment</a></li>
 <li><a href="#GetProjectApiKey">Get Project Api Key</a></li>
 <li><a href="#Filesize_ToString">ToString (Filesize)</a></li>
+<li><a href="#K2_SubmitNewModFileForModFromMemory">SubmitNewModFileForModFromMemory</a></li>
+<li><a href="#K2_LoadModFileToMemory">LoadModFileToMemory</a></li>
 </ul>
 </li>
 <li><a href="#_enums">Enums</a>
@@ -952,7 +960,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_emodiologosize"> EModioLogoSize</a></li>
 <li><a href="#_emodioportal"> EModioPortal</a></li>
 <li><a href="#_emodioenvironment"> EModioEnvironment</a></li>
-<li><a href="#_emodioerrorcondition"> EModioErrorCondition</a></li>
 <li><a href="#_emodiosortdirection"> EModioSortDirection</a></li>
 <li><a href="#_emodiosortfieldtype"> EModioSortFieldType</a></li>
 <li><a href="#_emodioimagestate"> EModioImageState</a></li>
@@ -1421,7 +1428,54 @@ For best performance it should be called at least once per frame, so it should e
 <img src="img/authenticate_user_external.png" alt="authenticate user external">
 </div>
 </div>
+<div class="paragraph">
+<p>Note that the SDK will automatically URL encode parameters (such as the auth token) when making the request.</p>
+</div>
+<div class="sect4">
+<h5 id="_steam_authentication_example">Steam Authentication Example</h5>
+<div class="paragraph">
+<p>In order to use the Steam authentication functionality, you must add your games <a href="https://partner.steamgames.com/apps/sdkauth">Encrypted App Ticket Key</a> from Steamworks. On your games profile on mod.io, go to Edit &gt; Options and add the key. You can then call <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a> and provide the users Encrypted App Ticket as the Auth Token. Note that the Auth Token must be Base64 encoded when passed</p>
+</div>
+<div class="paragraph">
+<p>Below is a sample Blueprint method that will get the users current Encrypted App Ticket that you can use in your Authentication request. Add this to a BlueprintLibrary in your games codebase.</p>
+</div>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetTicket, int32, LocalUserNum, FString, TokenData);
+
+UFUNCTION(BlueprintCallable)
+static void GetSteamAuthTicket(int32 LocalUserNum, FOnGetTicket Callback)
+{
+    //Get the steam subsystem
+    FOnlineSubsystemSteam* SteamSubsystem = static_cast&lt;FOnlineSubsystemSteam*&gt;(IOnlineSubsystem::Get());
+    //Add a handler to the subsystem for when the ticket has been retrieved
+    SteamSubsystem-&gt;GetEncryptedAppTicketInterface()-&gt;OnEncryptedAppTicketResultDelegate.AddLambda(
+        [LocalUserNum, OnComplete = Callback](bool bEncryptedDataAvailable, int32 ResultCode) {
+
+            TArray&lt;uint8&gt; TokenData;
+            if (bEncryptedDataAvailable)
+            {
+                //If the ticket was retrieved successfully, get its data
+                SteamSubsystem-&gt;GetEncryptedAppTicketInterface()-&gt;GetEncryptedAppTicket(TokenData);
+            }
+            //Call the user callback with the base64-encoded ticket, ready for submission via AuthenticateUserExternalAsync
+            OnComplete.ExecuteIfBound(LocalUserNum, FBase64::Encode(TokenData));
+        });
+    //Begin the actual async request for the ticket, which will invoke the above lambda when it completes
+    SteamSubsystem-&gt;GetEncryptedAppTicketInterface()-&gt;RequestEncryptedAppTicket(nullptr, 0);
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that if you are on 4.27 or above, Epic provides a helper method in OnlineIdentityInterface::GetLinkedAccountAuthToken that will get the current account&#8217;s auth token without having to take a direct dependency on FOnlineSubsystemSteam. Ensure that the token is Base64 encoded when being passed to <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a>.</p>
+</div>
+</div>
+</details>
 <hr>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -1607,7 +1661,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <p>In your application, you probably don&#8217;t actually need to handle different network errors in different ways, for example. The semantics of networking errors are largely 'try the function again later'.</p>
 </div>
 <div class="paragraph">
-<p>This is where <a href="#ErrorCodeMatches">Error Code Matches</a> comes in.</p>
+<p>This is where <a href="#ErrorCodeMatches">[ErrorCodeMatches]</a> comes in.</p>
 </div>
 <div class="paragraph">
 <p>It allows you to query if the error satisfies a particular condition, such as 'does this code represent some kind of networking error', without needing to explicitly check the code against all the individual errors in the category:</p>
@@ -1641,6 +1695,97 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </div>
 </div>
 <hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_submitting_new_mods_and_uploading_files">Submitting new mods and uploading files</h3>
+<div class="paragraph">
+<p>The plugin includes a way for you to support uploading mods from inside your game or editor. In order to upload a mod, the process is to submit a new mod, which will create the mod for your game; and then submit a file for the mod.</p>
+</div>
+<div class="sect3">
+<h4 id="_submitting_a_new_mod">Submitting a new mod</h4>
+<div class="paragraph">
+<p>In order to submit a mod, you have to first create a mod handle using <a href="#K2_GetModCreationHandle">GetModCreationHandle</a> and use that handle when calling <a href="#K2_SubmitNewModAsync">SubmitNewModAsync</a></p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<img src="img/submit_new_mod.png" alt="submit new mod">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::SubmitNewMod()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		FModioModCreationHandle Handle = GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;GetModCreationHandle();
+
+		FModioCreateModParams Params;
+		Params.Name = TEXT("My Awesome Mod");
+		Params.Description = TEXT("This is an amazing mod");
+		Params.PathToLogoFile = TEXT("C:\\temp\\image.png");
+
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;SubmitNewModAsync(Handle, Params, FOnSubmitNewModDelegateFast::CreateUObject(this, &amp;UModioManager::OnSubmitNewModCallback));
+	}
+}
+
+void UModioManager::OnSubmitNewModCallback(FModioErrorCode ErrorCode, TOptional&lt;FModioModID&gt; ModId)
+{
+	if (ErrorCode == false)
+	{
+		// Mod was submitted successfully. Use ModId to submit some files to it.
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+<div class="sect3">
+<h4 id="_submitting_a_file_for_a_mod">Submitting a file for a mod</h4>
+<div class="paragraph">
+<p>Once you have successfully submitted a mod, you can then submit a file for that mod using <a href="#K2_SubmitNewModFileForMod">SubmitNewModFileForMod</a>. When you submit a file, you pass a <a href="#_modiocreatemodfileparams">ModioCreateModFileParams</a> containing the directory of the files that you want to submit. The plugin will then compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you&#8217;ll get notified of the completed upload by the Mod Management callbacks.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>As an example, after the callback for submitting a mod has completed, you can get the Mod Id to use for file submission.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/submit_new_mod_file.png" alt="submit new mod file">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::SubmitNewModFile(FModioModID ModId)
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		FModioCreateModFileParams Params;
+		Params.PathToModRootDirectory = TEXT("C:\\temp\\mod_folder");
+
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;SubmitNewModFileForMod(ModId, Params);
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 </div>
 </div>
 </div>
@@ -4305,7 +4450,7 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_modioimage">ModioImage</h3>
+<h3 id="_modioimagewrapper">ModioImageWrapper</h3>
 <div class="paragraph">
 <p>wrapper for images that&#8217;s returned by the api</p>
 </div>
@@ -4388,6 +4533,26 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
+<h4 id="_variables_15" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioPagedResult">FModioPagedResult</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PagedResult</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FModioModDependency&gt;">TArray&lt;FModioModDependency&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalList</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 <div class="sect2">
@@ -4407,7 +4572,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h4 id="_variables_15" class="discrete">Variables</h4>
+<h4 id="_variables_16" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -4438,7 +4603,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Class representing the progress of a mod installation or update</p>
 </div>
-<h4 id="_variables_16" class="discrete">Variables</h4>
+<h4 id="_variables_17" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -4484,7 +4649,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>This struct contains strings that should be displayed to a user when displaying the terms of use and offering to create a mod.io account</p>
 </div>
-<h4 id="_variables_17" class="discrete">Variables</h4>
+<h4 id="_variables_18" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -4528,7 +4693,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiolink">ModioLink</h3>
-<h4 id="_variables_18" class="discrete">Variables</h4>
+<h4 id="_variables_19" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -4564,7 +4729,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Wrapper struct containing information about a field validation error</p>
 </div>
-<h4 id="_variables_19" class="discrete">Variables</h4>
+<h4 id="_variables_20" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -4581,6 +4746,25 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ValidationFailureDescription</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">String description of the validation failure</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</h3>
+<h4 id="_variables_21" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;uint8&gt;">TArray&lt;uint8&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModMemory</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -4875,48 +5059,6 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="ErrorCodeMatches">Error Code Matches</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_ErrorCodeMatches.png" alt="nd img ErrorCodeMatches">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ErrorCodeMatches</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">EModioErrorCondition</span> <span class="n">Condition</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Checks if the passed-in ErrorCode matches the specified error condition</p>
-</div>
-<h4 id="_parameters_45" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Error Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The code to check</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Condition</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The error condition to check against</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true if the code matches the condition</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_13" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>true if the code matches the condition</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="ListUserSubscriptionAsync">List User Subscription Async</h3>
 <div class="imageblock">
 <div class="content">
@@ -4931,7 +5073,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Runs a filter over the user&#8217;s subscription list</p>
 </div>
-<h4 id="_parameters_46" class="discrete">Parameters</h4>
+<h4 id="_parameters_45" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5001,7 +5143,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">LoadAsync</span><span class="p">(</span><span class="n">FModioImage</span> <span class="n">Image</span><span class="p">,</span> <span class="n">FOnLoadImageDelegate</span> <span class="n">OnImageLoaded</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">LoadAsync</span><span class="p">(</span><span class="n">FModioImageWrapper</span> <span class="n">Image</span><span class="p">,</span> <span class="n">FOnLoadImageDelegate</span> <span class="n">OnImageLoaded</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -5015,7 +5157,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UTexture2DDynamic</span><span class="o">*</span> <span class="n">GetTexture</span><span class="p">(</span><span class="n">FModioImage</span> <span class="n">Image</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UTexture2DDynamic</span><span class="o">*</span> <span class="n">GetTexture</span><span class="p">(</span><span class="n">FModioImageWrapper</span> <span class="n">Image</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -5029,7 +5171,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioImageState</span> <span class="n">GetState</span><span class="p">(</span><span class="n">FModioImage</span> <span class="n">Image</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioImageState</span> <span class="n">GetState</span><span class="p">(</span><span class="n">FModioImageWrapper</span> <span class="n">Image</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -5046,7 +5188,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetLogoSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Logo</span><span class="p">,</span> <span class="n">EModioLogoSize</span> <span class="n">LogoSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_47" class="discrete">Parameters</h4>
+<h4 id="_parameters_46" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5067,7 +5209,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_14" class="discrete">Returns</h4>
+<h4 id="_returns_13" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the logo if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -5085,7 +5227,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetGallerySize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">GalleryImage</span><span class="p">,</span> <span class="n">EModioGallerySize</span> <span class="n">GallerySize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_48" class="discrete">Parameters</h4>
+<h4 id="_parameters_47" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5106,7 +5248,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_15" class="discrete">Returns</h4>
+<h4 id="_returns_14" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the gallery image if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -5124,7 +5266,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetAvatarSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Avatar</span><span class="p">,</span> <span class="n">EModioAvatarSize</span> <span class="n">AvatarSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_49" class="discrete">Parameters</h4>
+<h4 id="_parameters_48" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5145,7 +5287,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_16" class="discrete">Returns</h4>
+<h4 id="_returns_15" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the avatar if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -5163,7 +5305,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetPath</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_50" class="discrete">Parameters</h4>
+<h4 id="_parameters_49" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5180,7 +5322,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_17" class="discrete">Returns</h4>
+<h4 id="_returns_16" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Path to the mod&#8217;s installation folder on disk NOTE: If the mod is not yet installed this path may not yet exist. Check <a href="#GetModState">Get Mod State</a> before trying to load files in this location</p>
 </div>
@@ -5198,7 +5340,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioModState</span> <span class="n">GetModState</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_51" class="discrete">Parameters</h4>
+<h4 id="_parameters_50" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5215,7 +5357,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_18" class="discrete">Returns</h4>
+<h4 id="_returns_17" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>EModioModState enum representing current state of the mod</p>
 </div>
@@ -5233,7 +5375,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModInfo</span> <span class="n">GetModProfile</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_52" class="discrete">Parameters</h4>
+<h4 id="_parameters_51" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5250,7 +5392,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_19" class="discrete">Returns</h4>
+<h4 id="_returns_18" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioModInfo containing mod profile data</p>
 </div>
@@ -5268,7 +5410,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModID</span> <span class="n">GetID</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_53" class="discrete">Parameters</h4>
+<h4 id="_parameters_52" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5285,7 +5427,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_20" class="discrete">Returns</h4>
+<h4 id="_returns_19" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Mod ID</p>
 </div>
@@ -5306,7 +5448,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Dividend/Divisor and return the floating point result with no checks *</p>
 </div>
-<h4 id="_parameters_54" class="discrete">Parameters</h4>
+<h4 id="_parameters_53" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5341,7 +5483,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidSecurityCodeFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_55" class="discrete">Parameters</h4>
+<h4 id="_parameters_54" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5358,7 +5500,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_21" class="discrete">Returns</h4>
+<h4 id="_returns_20" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the security code has a valid format</p>
 </div>
@@ -5376,7 +5518,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidEmailAddressFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_56" class="discrete">Parameters</h4>
+<h4 id="_parameters_55" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5393,7 +5535,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_22" class="discrete">Returns</h4>
+<h4 id="_returns_21" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the email address has a valid format</p>
 </div>
@@ -5467,7 +5609,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">Filesize_ToString</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MaxDecimals</span><span class="p">,</span> <span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">Unit</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_57" class="discrete">Parameters</h4>
+<h4 id="_parameters_56" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5492,10 +5634,112 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_23" class="discrete">Returns</h4>
+<h4 id="_returns_22" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>A text formatted from your specifications</p>
 </div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="K2_SubmitNewModFileForModFromMemory">SubmitNewModFileForModFromMemory</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_SubmitNewModFileForModFromMemory.png" alt="nd img K2 SubmitNewModFileForModFromMemory">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_SubmitNewModFileForModFromMemory</span><span class="p">(</span><span class="n">UModioSubsystem</span><span class="o">*</span> <span class="n">Target</span><span class="p">,</span> <span class="n">FModioModID</span> <span class="n">Mod</span><span class="p">,</span> <span class="n">FModioCreateModFileMemoryParams</span> <span class="n">Params</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Queues the upload of a new mod file release for the specified mod, using the submitted parameters. This upload method accepts a a block of memory TArray&lt;uint8&gt; rather than a file path. The upload&#8217;s progress can be tracked in the same way as downloads; when completed, a Mod Management Event will be triggered with the result code for the upload.</p>
+</div>
+<h4 id="_requirements_19" class="discrete">Requirements</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+</ul>
+</div>
+<h4 id="_parameters_57" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the mod you are submitting a file for</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Information about the mod file being created, including the memory that wiull be uploaded as a mod</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="K2_LoadModFileToMemory">LoadModFileToMemory</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_LoadModFileToMemory.png" alt="nd img K2 LoadModFileToMemory">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">K2_LoadModFileToMemory</span><span class="p">(</span><span class="n">UModioSubsystem</span><span class="o">*</span> <span class="n">Target</span><span class="p">,</span> <span class="n">FModioModID</span> <span class="n">ModId</span><span class="p">,</span> <span class="n">TArray</span><span class="o">&lt;</span><span class="n">uint8</span><span class="o">&gt;</span> <span class="n">ModData</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Loads an installed mod file into memory.</p>
+</div>
+<h4 id="_requirements_20" class="discrete">Requirements</h4>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+</ul>
+</div>
+<h4 id="_parameters_58" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Id</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Data</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A byte array of the mod that has been loaded</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">True if the mod file is successfully loaded; false if it cannot be loaded</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -5942,60 +6186,11 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_emodioerrorcondition"><a id="EModioErrorCondition"></a> EModioErrorCondition</h3>
-<h4 id="_values_13" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NoError</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NetworkError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code represents a connection or HTTP error between the client and the mod.io server.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ConfigurationError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates the SDK&#8217;s configuration is not valid - the game ID or API key are incorrect or the game has been deleted.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InvalidArgsError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates the arguments passed to the function have failed validation or were otherwise invalid.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">FilesystemError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates a permission or IO error when accessing local filesystem data.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InternalError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code represents an internal SDK error - please inform mod.io of the error code value.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EntityNotFoundError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that a specified game, mod, media file or mod file was not found.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UserTermsOfUseError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that the user has not yet accepted the mod.io Terms of Use.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SubmitReportError</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that a report for the specified content could not be submitted.</p></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_emodiosortdirection"><a id="EModioSortDirection"></a> EModioSortDirection</h3>
 <div class="paragraph">
 <p>Enum indicating which direction sorting should be applied</p>
 </div>
-<h4 id="_values_14" class="discrete">Values</h4>
+<h4 id="_values_13" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -6019,7 +6214,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum indicating which field should be used to sort the results</p>
 </div>
-<h4 id="_values_15" class="discrete">Values</h4>
+<h4 id="_values_14" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -6056,7 +6251,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioimagestate"><a id="EModioImageState"></a> EModioImageState</h3>
-<h4 id="_values_16" class="discrete">Values</h4>
+<h4 id="_values_15" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -6088,7 +6283,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing the current state of a mod</p>
 </div>
-<h4 id="_values_17" class="discrete">Values</h4>
+<h4 id="_values_16" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -6125,7 +6320,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiorating"><a id="EModioRating"></a> EModioRating</h3>
-<h4 id="_values_18" class="discrete">Values</h4>
+<h4 id="_values_17" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -6150,7 +6345,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioreporttype"><a id="EModioReportType"></a> EModioReportType</h3>
-<h4 id="_values_19" class="discrete">Values</h4>
+<h4 id="_values_18" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -6195,7 +6390,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_efilesizeunit"><a id="EFileSizeUnit"></a> EFileSizeUnit</h3>
-<h4 id="_values_20" class="discrete">Values</h4>
+<h4 id="_values_19" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -6230,7 +6425,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-12-06 12:52:16 +1100
+Last updated 2022-04-05 14:18:46 +1000
 </div>
 </div>
 </body>

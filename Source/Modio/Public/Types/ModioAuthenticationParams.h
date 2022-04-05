@@ -31,10 +31,10 @@ USTRUCT(BlueprintType)
 struct MODIO_API FModioAuthenticationParams
 {
 	GENERATED_BODY();
-	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	FString AuthToken;
-	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	FString UserEmail;
-	UPROPERTY(BlueprintReadWrite, EditInstanceOnly)
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	bool bUserHasAcceptedTerms = false;
 };

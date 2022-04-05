@@ -267,7 +267,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize Avata
 								// function returning type T so we can be explicit about the expected type
 								if (Path)
 								{
-									FModioImage Out;
+									FModioImageWrapper Out;
 									Out.ImagePath = ToUnreal(Path.value());
 									Callback.ExecuteIfBound(ec, Out);
 								}
@@ -289,7 +289,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize Gall
 								// function returning type T so we can be explicit about the expected type
 								if (Path)
 								{
-									FModioImage Out;
+									FModioImageWrapper Out;
 									Out.ImagePath = ToUnreal(Path.value());
 									Callback.ExecuteIfBound(ec, Out);
 								}
@@ -310,7 +310,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSiz
 								// function returning type T so we can be explicit about the expected type
 								if (Path)
 								{
-									FModioImage Out;
+									FModioImageWrapper Out;
 									Out.ImagePath = ToUnreal(Path.value());
 									Callback.ExecuteIfBound(ec, Out);
 								}
@@ -326,7 +326,7 @@ void UModioSubsystem::K2_GetModMediaAvatarAsync(FModioModID ModId, EModioAvatarS
 {
 	GetModMediaAsync(
 		ModId, AvatarSize,
-		FOnGetMediaDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioImage> Media) {
+		FOnGetMediaDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> Media) {
 			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(Media));
 		}));
 }
@@ -336,7 +336,7 @@ void UModioSubsystem::K2_GetModMediaGalleryImageAsync(FModioModID ModId, EModioG
 {
 	GetModMediaAsync(
 		ModId, GallerySize, Index,
-		FOnGetMediaDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioImage> Media) {
+		FOnGetMediaDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> Media) {
 			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(Media));
 		}));
 }
@@ -345,7 +345,7 @@ void UModioSubsystem::K2_GetModMediaLogoAsync(FModioModID ModId, EModioLogoSize 
 {
 	GetModMediaAsync(
 		ModId, LogoSize,
-		FOnGetMediaDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioImage> Media) {
+		FOnGetMediaDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> Media) {
 			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(Media));
 		}));
 }
@@ -469,7 +469,7 @@ void UModioSubsystem::GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMedia
 								 // template function returning type T so we can be explicit about the expected type
 								 if (Media)
 								 {
-									 FModioImage Out;
+									 FModioImageWrapper Out;
 									 Out.ImagePath = ToUnreal(Media.value());
 									 Callback.ExecuteIfBound(ec, Out);
 								 }
@@ -483,7 +483,7 @@ void UModioSubsystem::GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMedia
 void UModioSubsystem::K2_GetUserMediaAvatarAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegate Callback)
 {
 	GetUserMediaAsync(AvatarSize, FOnGetMediaDelegateFast::CreateLambda(
-									  [Callback](FModioErrorCode ec, TOptional<FModioImage> ModioMedia) {
+									  [Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> ModioMedia) {
 										  Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(ModioMedia));
 									  }));
 }
@@ -549,6 +549,20 @@ void UModioSubsystem::K2_ReportContentAsync(FModioReportParams Report, FOnErrorO
 								   [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
+
+TArray<FModioModDependency> ToUnreal(const std::vector<Modio::ModDependency>& OriginalArray)
+{
+    TArray<FModioModDependency> Result;
+
+    Result.Reserve(OriginalArray.size());
+    for (const auto& It : OriginalArray)
+    {
+        Result.Emplace(ToUnreal(It));
+    }
+
+    return Result;
+}
+
 void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback)
 {
 	Modio::GetModDependenciesAsync(
@@ -556,7 +570,7 @@ void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, FOnGetModDepend
 			if (Dependencies)
 			{
 				FModioModDependencyList Out;
-				Out.InternalList = ToUnreal<FModioModDependency>(Dependencies->GetRawList());
+				Out.InternalList = ToUnreal(Dependencies->GetRawList());
 				Out.PagedResult = FModioPagedResult(Dependencies.value());
 				Callback.ExecuteIfBound(ec, Out);
 			}
@@ -601,8 +615,20 @@ void UModioSubsystem::K2_SubmitNewModAsync(FModioModCreationHandle Handle, FModi
 {
 	SubmitNewModAsync(
 		Handle, Params,
-		FOnSubmitNewModDelegateFast::CreateLambda(
-			[Callback](FModioErrorCode ec, TOptional<FModioModID> NewModID) { Callback.ExecuteIfBound(ec, FModioOptionalModID {NewModID}); }));
+		FOnSubmitNewModDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioModID> NewModID) {
+			Callback.ExecuteIfBound(ec, FModioOptionalModID {NewModID});
+		}));
+}
+
+void UModioSubsystem::ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::ArchiveModAsync(ToModio(Mod), [Callback](Modio::ErrorCode ec) { Callback.ExecuteIfBound(ToUnreal(ec)); });
+}
+
+void UModioSubsystem::K2_ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegate Callback)
+{
+	ArchiveModAsync(
+		Mod, FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 /// File scope implementations

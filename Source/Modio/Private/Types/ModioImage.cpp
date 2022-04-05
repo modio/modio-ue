@@ -8,7 +8,7 @@
  *   
  */
 
-#include "Types/ModioImage.h"
+#include "Types/ModioImageWrapper.h"
 
 #include "Async/Async.h"
 #include "Engine/Engine.h"
@@ -32,7 +32,7 @@ static void WriteRawToTexture_RenderThread(FTexture2DDynamicResource* TextureRes
 										   bool bUseSRGB = true);
 #endif
 
-class UTexture2DDynamic* FModioImage::GetTexture() const
+class UTexture2DDynamic* FModioImageWrapper::GetTexture() const
 {
 	UTexture2DDynamic* Texture = nullptr;
 	if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
@@ -43,7 +43,7 @@ class UTexture2DDynamic* FModioImage::GetTexture() const
 	return Texture;
 }
 
-TOptional<FModioImage::FTextureCreationData> FModioImage::LoadTextureDataFromDisk(const FString& ImagePath)
+TOptional<FModioImageWrapper::FTextureCreationData> FModioImageWrapper::LoadTextureDataFromDisk(const FString& ImagePath)
 {
 #if !UE_SERVER
 	IImageWrapperModule& ImageWrapperModule =
@@ -70,7 +70,7 @@ TOptional<FModioImage::FTextureCreationData> FModioImage::LoadTextureDataFromDis
 	return {};
 }
 
-EModioImageState FModioImage::GetState() const
+EModioImageState FModioImageWrapper::GetState() const
 {
 	if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
@@ -79,8 +79,11 @@ EModioImageState FModioImage::GetState() const
 	return EModioImageState::OnDisc;
 }
 
-void FModioImage::LoadAsync(FOnLoadImageDelegateFast Callback) const
+void FModioImageWrapper::LoadAsync(FOnLoadImageDelegateFast Callback) const
 {
+#if UE_SERVER
+	Callback.ExecuteIfBound(nullptr);
+#else
 	// Check if it's already loaded, if so, don't load it again
 	if (UTexture2DDynamic* Texture = GetTexture())
 	{
@@ -142,6 +145,7 @@ void FModioImage::LoadAsync(FOnLoadImageDelegateFast Callback) const
 			});
 		});
 	}
+#endif
 }
 
 #if !UE_SERVER

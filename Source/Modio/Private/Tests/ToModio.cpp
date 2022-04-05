@@ -8,7 +8,6 @@
  *   
  */
 
-#include "Engine.h"
 #include "Internal/Convert/AuthParams.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Misc/AutomationTest.h"

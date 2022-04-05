@@ -20,7 +20,7 @@ uint32 GetTypeHash(FModioModID ModioModId)
 	return FCrc::MemCrc32(&ModioModId.ModID, sizeof(Modio::ModID));
 }
 
-FModioGameID::FModioGameID() : GameID(INDEX_NONE) {}
+FModioGameID::FModioGameID() : GameId(INDEX_NONE) {}
 
 FModioGameID FModioGameID::InvalidGameID()
 {
@@ -29,7 +29,7 @@ FModioGameID FModioGameID::InvalidGameID()
 
 uint32 GetTypeHash(FModioGameID ModioGameId)
 {
-	return FCrc::MemCrc32(&ModioGameId.GameID, sizeof(Modio::GameID));
+	return FCrc::MemCrc32(&ModioGameId.GameId, sizeof(Modio::GameID));
 }
 
 FModioFileMetadataID::FModioFileMetadataID() : FileMetadataID(INDEX_NONE) {}

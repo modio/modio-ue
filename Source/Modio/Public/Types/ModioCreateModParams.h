@@ -17,13 +17,13 @@ struct MODIO_API FModioCreateModParams
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "mod.io|ModParams")
 	FString PathToLogoFile;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "mod.io|ModParams")
 	FString Name;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "mod.io|ModParams")
 	FString Summary;
 
 	TOptional<FString> NamePath;

@@ -20,7 +20,7 @@ public:
 	using FModioTestLatentCommandBase::Update;
 	virtual void Start() override
 	{
-		Modio->InitializeAsync(UModioSDKLibrary::GetProjectInitializeOptions(),
+		Modio->InitializeAsync(UModioSDKLibrary::GetAutomationTestOptions(),
 							   FOnErrorOnlyDelegateFast::CreateSP(this, &FModioInitializeAsyncCommand::Callback));
 	}
 	void Callback(FModioErrorCode ec)

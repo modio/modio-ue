@@ -15,7 +15,7 @@
 #include "ModioSDK.h"
 
 /** Convert a Modio::List to a FModioList */
-template<template<typename...> typename DestListType, typename DestValueType, typename SourceListType>
+template<template<typename...> class DestListType, typename DestValueType, typename SourceListType>
 FModioList<DestListType, DestValueType> ToUnrealList(SourceListType Value)
 {
 	FModioList<DestListType, DestValueType> Result;

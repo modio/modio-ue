@@ -31,7 +31,7 @@ public:
 	{
 		Modio->GetModMediaAsync(ModID, Size, FOnGetMediaDelegateFast::CreateSP(this, &FGetModLogoCommand::Callback));
 	}
-	void Callback(FModioErrorCode ec, TOptional<FModioImage> ModInfo)
+	void Callback(FModioErrorCode ec, TOptional<FModioImageWrapper> ModInfo)
 	{
 		CurrentTest->TestEqual("Mod Logo retrieval completed with expected result", ec, false);
 		Done();
@@ -58,7 +58,7 @@ public:
 		Modio->GetModMediaAsync(ModID, Size, Index,
 								FOnGetMediaDelegateFast::CreateSP(this, &FGetModGalleryImageCommand::Callback));
 	}
-	void Callback(FModioErrorCode ec, TOptional<FModioImage> ModInfo)
+	void Callback(FModioErrorCode ec, TOptional<FModioImageWrapper> ModInfo)
 	{
 		CurrentTest->TestEqual("Mod Logo retrieval completed with expected result", ec, false);
 		Done();
@@ -83,7 +83,7 @@ public:
 		Modio->GetModMediaAsync(ModID, Size,
 								FOnGetMediaDelegateFast::CreateSP(this, &FGetModCreatorAvatarCommand::Callback));
 	}
-	void Callback(FModioErrorCode ec, TOptional<FModioImage> ModInfo)
+	void Callback(FModioErrorCode ec, TOptional<FModioImageWrapper> ModInfo)
 	{
 		CurrentTest->TestEqual("Mod Logo retrieval completed with expected result", ec, false);
 		Done();

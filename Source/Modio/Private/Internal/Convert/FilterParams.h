@@ -65,12 +65,12 @@ FORCEINLINE Modio::FilterParams ToModio(const FModioFilterParams& In)
 
 	if (In.DateRangeBegin)
 	{
-		Out.MarkedLiveAfter(ToModio(In.DateRangeBegin.GetValue()));
+		Out.MarkedLiveAfter(ToModioDateTime(In.DateRangeBegin.GetValue()));
 	}
 
 	if (In.DateRangeEnd)
 	{
-		Out.MarkedLiveBefore(ToModio(In.DateRangeEnd.GetValue()));
+		Out.MarkedLiveBefore(ToModioDateTime(In.DateRangeEnd.GetValue()));
 	}
 
 	if (In.MetadataBlobSearchString.IsSet())

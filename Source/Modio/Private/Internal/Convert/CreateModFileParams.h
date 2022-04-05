@@ -9,6 +9,9 @@
  */
 
 #pragma once
+
+#include "Internal/Convert/Numerics.h"
+
 #include "Internal/Convert/Optional.h"
 #include "Internal/ModioConvert.h"
 #include "ModioSDK.h"

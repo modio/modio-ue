@@ -28,6 +28,11 @@ public:
 	 * @param Condition The error condition to check against
 	 * @return true if the code matches the condition
 	 */
-	UFUNCTION(BlueprintCallable, Category = "mod.io|Error Handling")
+
+	 // NOTE: The definition of EModioErrorCondition is duplicated here because of an issue
+	 // reported here:
+	 // https://forums.unrealengine.com/t/ustruct-type-must-be-a-uclass-ustruct-or-uenum/358937
+	 // Because of that, the line below was commented.
+	// UFUNCTION(BlueprintCallable, Category = "mod.io|Error Handling")
 	static bool ErrorCodeMatches(FModioErrorCode ErrorCode, EModioErrorCondition Condition);
 };

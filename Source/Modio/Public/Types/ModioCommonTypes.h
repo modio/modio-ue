@@ -207,29 +207,29 @@ struct MODIO_API FModioGameID
 	GENERATED_BODY()
 
 	FModioGameID();
-	constexpr explicit FModioGameID(int64 InGameId) : GameID(InGameId) {}
+	constexpr explicit FModioGameID(int64 InGameId) : GameId(InGameId) {}
 
 	MODIO_API friend uint32 GetTypeHash(FModioGameID ModioGameId);
 
 	MODIO_API friend bool operator==(FModioGameID A, FModioGameID B)
 	{
-		return A.GameID == B.GameID;
+		return A.GameId == B.GameId;
 	}
 
 	FString ToString() const
 	{
-		if (GameID < 0)
+		if (GameId < 0)
 		{
 			return TEXT("InvalidGameID");
 		}
-		return FString::Printf(TEXT("%lld"), GameID);
+		return FString::Printf(TEXT("%lld"), GameId);
 	}
 
 	static FModioGameID InvalidGameID();
-	
+
 	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioGameID& ID)
 	{
-		return Ar << ID.GameID;
+		return Ar << ID.GameId;
 	}
 
 	bool Serialize(FArchive& Ar)
@@ -245,8 +245,11 @@ struct MODIO_API FModioGameID
 	}
 
 private:
+	friend struct FModioGameIDStructCustomization;
 	friend struct Modio::GameID ToModio(const FModioGameID& In);
-	int64 GameID;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
+	int64 GameId;
+
 };
 
 template<>
@@ -401,6 +404,8 @@ struct MODIO_API FModioApiKey
 	static FModioApiKey InvalidAPIKey();
 
 private:
+	friend struct FModioApiKeyStructCustomization;
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
 	FString ApiKey;
 };
 

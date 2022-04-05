@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include "Internal/Convert/Optional.h"
 #include "Internal/ModioConvert.h"
+#include "Types/ModioMetadata.h"
 #include "ModioSDK.h"
 
 FORCEINLINE FModioMetadata ToUnreal(const Modio::Metadata& In)

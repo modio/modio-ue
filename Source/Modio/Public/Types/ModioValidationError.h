@@ -23,12 +23,12 @@ struct MODIO_API FModioValidationError
 	/**
 	 * @brief String description of the field that failed validation
 	 */
-	UPROPERTY(BlueprintReadOnly, EditInstanceOnly)
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ValidationError")
 	FString FieldName;
 
 	/**
 	 * @brief String description of the validation failure
 	 */
-	UPROPERTY(BlueprintReadOnly, EditInstanceOnly)
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ValidationError")
 	FString ValidationFailureDescription;
 };
