@@ -787,6 +787,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <ul class="sectlevel3">
 <li><a href="#_email_authentication">Email authentication</a></li>
 <li><a href="#_ssoexternal_authentication">SSO/External authentication</a></li>
+<li><a href="#_token_lifetime_re_authentication">Token Lifetime &amp; Re-Authentication</a></li>
 </ul>
 </li>
 <li><a href="#_plugin_quick_start_browsing_available_mods">Plugin quick-start: Browsing available mods</a></li>
@@ -801,12 +802,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_checking_for_errors">Checking for errors</a></li>
 <li><a href="#_inspecting_errorcodes_more_deeply">Inspecting ErrorCodes more deeply</a></li>
 <li><a href="#_parameter_validation_errors">Parameter Validation Errors</a></li>
-</ul>
-</li>
-<li><a href="#_submitting_new_mods_and_uploading_files">Submitting new mods and uploading files</a>
-<ul class="sectlevel3">
-<li><a href="#_submitting_a_new_mod">Submitting a new mod</a></li>
-<li><a href="#_submitting_a_file_for_a_mod">Submitting a file for a mod</a></li>
 </ul>
 </li>
 </ul>
@@ -1031,6 +1026,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>You can find your Game ID and API Key by going to the applicable mod.io environment, going to your Profile and selecting "API Access" from the navigation bar.</p>
+</div>
 <hr>
 </div>
 <div class="sect2">
@@ -1276,6 +1274,9 @@ Changing this value while the SDK is initialized is not supported and behaviour 
 <p>As mentioned in <a href="#_maintaining_the_plugin_event_loop">Maintaining the plugin event loop</a>, the plugin&#8217;s internal event loop requires care and attention in the form of <a href="#RunPendingHandlers">Run Pending Handlers</a>.
 For best performance it should be called at least once per frame, so it should either go into your project&#8217;s main loop or into a <code>tick</code>-style function on an appropriate controller/manager object.</p>
 </div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
 <div class="imageblock">
 <div class="content">
 <img src="img/run_pending_handlers.png" alt="run pending handlers">
@@ -1305,14 +1306,74 @@ For best performance it should be called at least once per frame, so it should e
 </li>
 </ul>
 </div>
-<div class="paragraph">
-<p>Doing the reverse and shutting down the plugin is equally simple:</p>
 </div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::Init()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;InitializeAsync(UModioSDKLibrary::GetProjectInitializeOptions(), FOnErrorOnlyDelegateFast::CreateUObject(this, &amp;UModioManager::OnInitCallback));
+	}
+
+
+	UE_LOG(LogModioGame, Log, TEXT("Initializing Modio SDK"));
+}
+
+void UModioManager::OnInitCallback(FModioErrorCode ErrorCode)
+{
+    UE_LOG(LogModioGame, Log, TEXT("Error initializing Modio SDK, the error code was %s"), *ErrorCode.GetErrorMessage());
+}
+
+void UModioManager::Tick(float DeltaTime)
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;RunPendingHandlers();
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>Doing the reverse and shutting down the plugin is equally simple.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
 <div class="imageblock">
 <div class="content">
 <img src="img/shutdownasync_runhandlers.png" alt="shutdownasync runhandlers">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::Shutdown()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;ShutdownAsync(FOnErrorOnlyDelegateFast::CreateUObject(this, &amp;UModioManager::OnShutdownCallback));
+	}
+}
+
+void UModioManager::OnShutdownCallback(FModioErrorCode ErrorCode)
+{
+	UE_LOG(LogModioGame, Log, TEXT("Shutdown failed, error code was %s"), *ErrorCode.GetErrorMessage());
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 <div class="ulist">
 <div class="title">Notes</div>
 <ul>
@@ -1342,13 +1403,42 @@ For best performance it should be called at least once per frame, so it should e
 <div class="sect4">
 <h5 id="_submitting_an_email_address">Submitting an email address</h5>
 <div class="paragraph">
-<p>To request an email authentication code be sent to a user&#8217;s email address, use the <a href="#K2_RequestEmailAuthCodeAsync">RequestEmailAuthCodeAsync</a> node.</p>
+<p>You can request an email authentication code to be sent to a users email address.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>From Blueprint, you can use the <a href="#K2_RequestEmailAuthCodeAsync">RequestEmailAuthCodeAsync</a> node.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="img/request_email_auth_code.png" alt="request email auth code">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>void UModioManager::RequestEmailAuthCode(const FString &amp;EmailAddress)
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;RequestEmailAuthCodeAsync(FModioEmailAddress(*EmailAddress), FOnErrorOnlyDelegateFast::CreateUObject(this, &amp;UModioManager::OnRequestEmailCodeMailSentCallback));
+	}
+}
+
+void UModioManager::OnRequestEmailCodeMailSentCallback(FModioErrorCode ErrorCode)
+{
+	UE_LOG(LogModioGame, Log, TEXT("Requesting email auth code failed, error code was %s"), *ErrorCode.GetErrorMessage());
+}</pre>
+</div>
+</div>
+</div>
+</details>
 <div class="paragraph">
 <p>Once this is done, prompt the user to check their email address and provide them with a way to enter the code that was sent to them.</p>
 </div>
@@ -1359,13 +1449,42 @@ For best performance it should be called at least once per frame, so it should e
 <div class="sect4">
 <h5 id="_submitting_an_email_authentication_code">Submitting an email authentication code</h5>
 <div class="paragraph">
-<p>Submitting an email authentication code is very similar to the process for requesting the code, and is done by calling <a href="#K2_AuthenticateUserEmailAsync">AuthenticateUserEmailAsync</a>.</p>
+<p>Submitting an email authentication code is very similar to the process for requesting the code.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>You can do this by calling <a href="#K2_AuthenticateUserEmailAsync">AuthenticateUserEmailAsync</a>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="img/authenticate_user_email.png" alt="authenticate user email">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>void UModioManager::AuthenticateUserEmail(const FString&amp; AuthCode)
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;AuthenticateUserEmailAsync(FModioEmailAuthCode(*AuthCode), FOnErrorOnlyDelegateFast::CreateUObject(this, &amp;UModioManager::OnAuthenticateUserEmailCallback));
+	}
+}
+
+void UModioManager::OnAuthenticateUserEmailCallback(FModioErrorCode ErrorCode)
+{
+	UE_LOG(LogModioGame, Log, TEXT("Email auth code failed, error code was %s"), *ErrorCode.GetErrorMessage());
+}</pre>
+</div>
+</div>
+</div>
+</details>
 <div class="paragraph">
 <p>Once this completes successfully, the user is authenticated and you can then manage the user&#8217;s subscriptions.</p>
 </div>
@@ -1428,68 +1547,33 @@ For best performance it should be called at least once per frame, so it should e
 <img src="img/authenticate_user_external.png" alt="authenticate user external">
 </div>
 </div>
-<div class="paragraph">
-<p>Note that the SDK will automatically URL encode parameters (such as the auth token) when making the request.</p>
 </div>
-<div class="sect4">
-<h5 id="_steam_authentication_example">Steam Authentication Example</h5>
+<div class="sect3">
+<h4 id="_token_lifetime_re_authentication">Token Lifetime &amp; Re-Authentication</h4>
 <div class="paragraph">
-<p>In order to use the Steam authentication functionality, you must add your games <a href="https://partner.steamgames.com/apps/sdkauth">Encrypted App Ticket Key</a> from Steamworks. On your games profile on mod.io, go to Edit &gt; Options and add the key. You can then call <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a> and provide the users Encrypted App Ticket as the Auth Token. Note that the Auth Token must be Base64 encoded when passed</p>
+<p>By default, tokens issued via email token exchange have a lifetime of 1 year. You can verify that a user has been successfully authenticated by using <a href="#K2_QueryUserProfile">QueryUserProfile</a>. A success and non-null result indicates that a user has been authenticated.</p>
 </div>
 <div class="paragraph">
-<p>Below is a sample Blueprint method that will get the users current Encrypted App Ticket that you can use in your Authentication request. Add this to a BlueprintLibrary in your games codebase.</p>
+<p>If a user is not authenticated for any reason (for instance their token has been invalidated by changing their password, or their profile data has been removed from their device) then you should prompt them for the authentication flow.</p>
 </div>
-<details>
-<summary class="title">C++ Example</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetTicket, int32, LocalUserNum, FString, TokenData);
-
-UFUNCTION(BlueprintCallable)
-static void GetSteamAuthTicket(int32 LocalUserNum, FOnGetTicket Callback)
-{
-    //Get the steam subsystem
-    FOnlineSubsystemSteam* SteamSubsystem = static_cast&lt;FOnlineSubsystemSteam*&gt;(IOnlineSubsystem::Get());
-    //Add a handler to the subsystem for when the ticket has been retrieved
-    SteamSubsystem-&gt;GetEncryptedAppTicketInterface()-&gt;OnEncryptedAppTicketResultDelegate.AddLambda(
-        [LocalUserNum, OnComplete = Callback](bool bEncryptedDataAvailable, int32 ResultCode) {
-
-            TArray&lt;uint8&gt; TokenData;
-            if (bEncryptedDataAvailable)
-            {
-                //If the ticket was retrieved successfully, get its data
-                SteamSubsystem-&gt;GetEncryptedAppTicketInterface()-&gt;GetEncryptedAppTicket(TokenData);
-            }
-            //Call the user callback with the base64-encoded ticket, ready for submission via AuthenticateUserExternalAsync
-            OnComplete.ExecuteIfBound(LocalUserNum, FBase64::Encode(TokenData));
-        });
-    //Begin the actual async request for the ticket, which will invoke the above lambda when it completes
-    SteamSubsystem-&gt;GetEncryptedAppTicketInterface()-&gt;RequestEncryptedAppTicket(nullptr, 0);
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that if you are on 4.27 or above, Epic provides a helper method in OnlineIdentityInterface::GetLinkedAccountAuthToken that will get the current account&#8217;s auth token without having to take a direct dependency on FOnlineSubsystemSteam. Ensure that the token is Base64 encoded when being passed to <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a>.</p>
-</div>
-</div>
-</details>
 <hr>
-</div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_plugin_quick_start_browsing_available_mods">Plugin quick-start: Browsing available mods</h3>
 <div class="paragraph">
-<p>Now that you&#8217;ve followed the instructions in <a href="#_plugin_quick_start_initialization_and_teardown">Plugin quick-start: Initialization and Teardown</a> you can begin to query the available mods for information you can display to your end users. The primary way this is done is through <a href="#K2_ListAllModsAsync">ListAllModsAsync</a>.</p>
+<p>Now that you&#8217;ve followed the instructions in <a href="#_plugin_quick_start_initialization_and_teardown">Plugin quick-start: Initialization and Teardown</a> you can begin to query the available mods for information you can display to your end users. The ListMods methods support filtering, allowing for pagination, result limits, filtering by tag etc. By default, the filter asks for the first 100 results (the maximum number returnable in a query), sorting by mod ID.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>The primary way this is done is through <a href="#K2_ListAllModsAsync">ListAllModsAsync</a>.</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="img/list_all_mods.png" alt="list all mods">
 </div>
-</div>
-<div class="paragraph">
-<p>You&#8217;ll note that <a href="#K2_ListAllModsAsync">ListAllModsAsync</a> takes a <a href="#_modiofilterparams">ModioFilterParams</a> object as its first parameter. The default state of this object is set to ask for the first 100 results (the maximum number returnable in a query), sorting by mod ID.</p>
 </div>
 <div class="paragraph">
 <p>To search for a specific query string, sort in a different order, or combine different filters, you can use a <a href="#_modiofilterparams">ModioFilterParams</a> object like this:</p>
@@ -1499,6 +1583,41 @@ static void GetSteamAuthTicket(int32 LocalUserNum, FOnGetTicket Callback)
 <img src="img/list_all_mods_filter.png" alt="list all mods filter">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>void UModioManager::ListAllMods()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		FModioFilterParams Filter;
+		Filter.PagedResults(1, 5).IndexedResults(3, 5).WithTags("Multiplayer").SortBy(EModioSortFieldType::ID, EModioSortDirection::Descending);
+
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;ListAllModsAsync(Filter, FOnListAllModsDelegateFast::CreateUObject(this, &amp;UModioManager::OnListAllModsCallback));
+	}
+}
+
+void UModioManager::OnListAllModsCallback(FModioErrorCode ErrorCode, TOptional&lt;FModioModInfoList&gt; OptionalModList)
+{
+	// Ensure we don't have an error code
+	if (ErrorCode == false)
+	{
+		// ModList is guaranteed to be valid if there is no error
+		TArray&lt;FModioModInfo&gt; ModInfo = OptionalModList.GetValue().GetRawList();
+
+		// Do something with ModInfo
+
+		// You can use OptionalModList().GetValue().Paged related methods to make further paginated requests if required
+	}
+}</pre>
+</div>
+</div>
+</div>
+</details>
 <hr>
 </div>
 <div class="sect2">
@@ -1514,6 +1633,9 @@ static void GetSteamAuthTicket(int32 LocalUserNum, FOnGetTicket Callback)
 <div class="paragraph">
 <p>When a user 'unsubscribes' to a mod, they&#8217;re indicating they&#8217;d like to have that mod uninstalled from any device they&#8217;re logged in on.</p>
 </div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
 <div class="paragraph">
 <p>The API for managing subscriptions is simple and consists of a call to either <a href="#K2_SubscribeToModAsync">SubscribeToModAsync</a> or <a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a delegate to receive the status of the request:</p>
 </div>
@@ -1527,16 +1649,84 @@ static void GetSteamAuthTicket(int32 LocalUserNum, FOnGetTicket Callback)
 <img src="img/unsubscribe_from_mod.png" alt="unsubscribe from mod">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::SubscribeToMod(FModioModID ModId)
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;SubscribeToModAsync(ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &amp;UModioManager::OnSubscribeToModCallback, ModId));
+	}
+}
+
+void UModioManager::OnSubscribeToModCallback(FModioErrorCode ErrorCode, FModioModID ModId)
+{
+	// Do something with the successfully subscribed Mod ID
+}
+
+void UModioManager::UnsubscribeFromMod(FModioModID ModId)
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;UnsubscribeFromModAsync(ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &amp;UModioManager::OnUnsubscribeFromModCallback, ModId));
+	}
+}
+
+void UModioManager::OnUnsubscribeFromModCallback(FModioErrorCode ErrorCode, FModioModId ModId)
+{
+	// Do something with the successfully unsubscribed Mod ID
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>Note that in order for a user to be able to subscribe or unsubscribe from mods, mod management has to be enabled.</p>
+</div>
 <div class="sect4">
 <h5 id="_external_subscription_changes">External subscription changes</h5>
 <div class="paragraph">
-<p>Because the mod.io service is available as a website as well as integration within your applications, users can manage their subscriptions (and therefore installations) outside of your application. This means that we need to be able to query the server for any external subscription changes. To do this, you will need to use <a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a> to synchronise the server state with the plugin&#8217;s local subscriptions:</p>
+<p>Because the mod.io service is available as a website as well as integration within your applications, users can manage their subscriptions (and therefore installations) outside of your application. This means that we need to be able to query the server for any external subscription changes. To do this, you will need to fetch external updates  <a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a> to synchronise the server state with the plugin&#8217;s local subscriptions.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>You can use <a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a> from Blueprint:</p>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="img/fetch_external_updates.png" alt="fetch external updates">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::FetchExternalUpdates()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast::CreateUObject(this, &amp;UModioManager::OnFetchExternalUpdatesCallback));
+	}
+}
+
+void UModioManager::OnFetchExternalUpdatesCallback(FModioErrorCode ErrorCode)
+{
+
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -1568,11 +1758,34 @@ This collection includes mods that are still in the process of being installed! 
 </tr>
 </table>
 </div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
 <div class="imageblock">
 <div class="content">
 <img src="img/query_user_subscriptions.png" alt="query user subscriptions">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::FetchExternalUpdates()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		TMap&lt;FModioModID, FModioModCollectionEntry&gt; SubscribedMods = GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;QueryUserSubscriptions();
+
+		// Do something with Subscribed Mods ie display on a UI
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 </div>
 </div>
 <div class="sect3">
@@ -1583,11 +1796,55 @@ This collection includes mods that are still in the process of being installed! 
 <div class="paragraph">
 <p>In order to display a notification to your users when a mod is finished installing or updating, <a href="#K2_EnableModManagement">EnableModManagement</a> asks you to provide it with a callback. Because <a href="#K2_EnableModManagement">EnableModManagement</a> is not an async function (ie it doesn&#8217;t end with *Async), the callback operates differently to asynchronous result callbacks you use elsewhere in the plugin. A callback given to this function will be held by the plugin until a corresponding call to <a href="#DisableModManagement">Disable Mod Management</a> or <a href="#K2_ShutdownAsync">ShutdownAsync</a>, and the callback will be invoked every time a mod is automatically installed, updated, or uninstalled by the plugin&#8217;s internal event loop.</p>
 </div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
 <div class="imageblock">
 <div class="content">
 <img src="img/enable_mod_management.png" alt="enable mod management">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::EnableModManagement()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;EnableModManagement(FOnModManagementDelegateFast::CreateUObject(this, &amp;UModioManager::OnModManagementEnabledCallback));
+	}
+}
+
+void UModioManager::OnModManagementEnabledCallback(FModioModManagementEvent ModioModManagementEvent)
+{
+	switch(ModioModManagementEvent.Event)
+	{
+	case EModioModManagementEventType::Installed:
+		UE_LOG(LogModioGame, Log, TEXT("Received an Installed event for Mod %s"), *ModioModManagementEvent.ID.ToString());
+		break;
+
+	case EModioModManagementEventType::Uninstalled:
+		UE_LOG(LogModioGame, Log, TEXT("Received an Uninstalled event for Mod %s"), *ModioModManagementEvent.ID.ToString());
+		break;
+	case EModioModManagementEventType::Updated:
+		UE_LOG(LogModioGame, Log, TEXT("Received an Updated event for Mod %s"), *ModioModManagementEvent.ID.ToString());
+		break;
+
+	case EModioModManagementEventType::Uploaded:
+		UE_LOG(LogModioGame, Log, TEXT("Received an Uploaded event for Mod %s"), *ModioModManagementEvent.ID.ToString());
+		break;
+
+	default:;
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 <div class="paragraph">
 <p>While mod management is enabled, the plugin assumes that it has the ability to make changes to the filesystem, including deleting mods that the user has no longer subscribed to. As a result you should make sure that you don&#8217;t have any open handles to files inside the mod directories when you call <a href="#K2_EnableModManagement">EnableModManagement</a>.</p>
 </div>
@@ -1597,11 +1854,35 @@ This collection includes mods that are still in the process of being installed! 
 <div class="paragraph">
 <p>Call <a href="#IsModManagementBusy">Is Mod Management Busy</a> to see if mod management is currently updating, installing, or uninstalling a mod.</p>
 </div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
 <div class="imageblock">
 <div class="content">
 <img src="img/disable_mod_management.png" alt="disable mod management">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::DisableModManagement()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;IsModManagementBusy() == false)
+		{
+			GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;DisableModManagement();
+		}
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 <div class="sect4">
 <h5 id="_retrieving_mod_directory_paths_for_loading">Retrieving mod directory paths for loading</h5>
 <div class="paragraph">
@@ -1610,11 +1891,34 @@ This collection includes mods that are still in the process of being installed! 
 <div class="paragraph">
 <p>The easiest way to do this is by using <a href="#QueryUserInstallations">Query User Installations</a>. This function allows you to specify if you want to include outdated mods or not, and will return a collection of <a href="#_modiomodcollectionentry">ModioModCollectionEntry</a> objects that you can query for folder paths you can use to load files into your title.</p>
 </div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
 <div class="imageblock">
 <div class="content">
 <img src="img/query_user_installations.png" alt="query user installations">
 </div>
 </div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>void UModioManager::GetInstalledMods()
+{
+	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
+	{
+		TMap&lt;FModioModID, FModioModCollectionEntry&gt; InstalledMods = GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;QueryUserInstallations(false);
+
+		// Do something with each installed mod, ie adding paths/loading the content appropriately
+	}
+}</code></pre>
+</div>
+</div>
+</div>
+</details>
 <hr>
 </div>
 </div>
@@ -1695,97 +1999,6 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 </div>
 </div>
 <hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_submitting_new_mods_and_uploading_files">Submitting new mods and uploading files</h3>
-<div class="paragraph">
-<p>The plugin includes a way for you to support uploading mods from inside your game or editor. In order to upload a mod, the process is to submit a new mod, which will create the mod for your game; and then submit a file for the mod.</p>
-</div>
-<div class="sect3">
-<h4 id="_submitting_a_new_mod">Submitting a new mod</h4>
-<div class="paragraph">
-<p>In order to submit a mod, you have to first create a mod handle using <a href="#K2_GetModCreationHandle">GetModCreationHandle</a> and use that handle when calling <a href="#K2_SubmitNewModAsync">SubmitNewModAsync</a></p>
-</div>
-<details>
-<summary class="title">Blueprint Example</summary>
-<div class="content">
-<div class="imageblock">
-<div class="content">
-<img src="img/submit_new_mod.png" alt="submit new mod">
-</div>
-</div>
-</div>
-</details>
-<details>
-<summary class="title">C++ Example</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>void UModioManager::SubmitNewMod()
-{
-	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
-	{
-		FModioModCreationHandle Handle = GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;GetModCreationHandle();
-
-		FModioCreateModParams Params;
-		Params.Name = TEXT("My Awesome Mod");
-		Params.Description = TEXT("This is an amazing mod");
-		Params.PathToLogoFile = TEXT("C:\\temp\\image.png");
-
-		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;SubmitNewModAsync(Handle, Params, FOnSubmitNewModDelegateFast::CreateUObject(this, &amp;UModioManager::OnSubmitNewModCallback));
-	}
-}
-
-void UModioManager::OnSubmitNewModCallback(FModioErrorCode ErrorCode, TOptional&lt;FModioModID&gt; ModId)
-{
-	if (ErrorCode == false)
-	{
-		// Mod was submitted successfully. Use ModId to submit some files to it.
-	}
-}</code></pre>
-</div>
-</div>
-</div>
-</details>
-</div>
-<div class="sect3">
-<h4 id="_submitting_a_file_for_a_mod">Submitting a file for a mod</h4>
-<div class="paragraph">
-<p>Once you have successfully submitted a mod, you can then submit a file for that mod using <a href="#K2_SubmitNewModFileForMod">SubmitNewModFileForMod</a>. When you submit a file, you pass a <a href="#_modiocreatemodfileparams">ModioCreateModFileParams</a> containing the directory of the files that you want to submit. The plugin will then compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you&#8217;ll get notified of the completed upload by the Mod Management callbacks.</p>
-</div>
-<details>
-<summary class="title">Blueprint Example</summary>
-<div class="content">
-<div class="paragraph">
-<p>As an example, after the callback for submitting a mod has completed, you can get the Mod Id to use for file submission.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/submit_new_mod_file.png" alt="submit new mod file">
-</div>
-</div>
-</div>
-</details>
-<details>
-<summary class="title">C++ Example</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code>void UModioManager::SubmitNewModFile(FModioModID ModId)
-{
-	if (GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;())
-	{
-		FModioCreateModFileParams Params;
-		Params.PathToModRootDirectory = TEXT("C:\\temp\\mod_folder");
-
-		GEngine-&gt;GetEngineSubsystem&lt;UModioSubsystem&gt;()-&gt;SubmitNewModFileForMod(ModId, Params);
-	}
-}</code></pre>
-</div>
-</div>
-</div>
-</details>
 </div>
 </div>
 </div>
@@ -6425,7 +6638,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-05 14:18:46 +1000
+Last updated 2022-04-07 12:20:29 +1000
 </div>
 </div>
 </body>
