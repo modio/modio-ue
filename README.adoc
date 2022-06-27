@@ -65,7 +65,7 @@ The settings have the following parameters:
 
 == Further reading
 
-To begin using the Plugin, either from Blueprint or from C++, please read our link:doc/getting-started.adoc[Getting Started Guide] for a detailed explanation of initialization and usage.
+To begin using the Plugin, either from Blueprint or from C++, please read our link:Doc/getting-started.adoc[Getting Started Guide] for a detailed explanation of initialization and usage.
 
 * link:Doc/getting-started.adoc#plugin-quick-start-initialization-and-teardown[SDK initialization and event loop]
 * link:Doc/getting-started.adoc#plugin-quick-start-user-authentication[Authentication]

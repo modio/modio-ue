@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -18,7 +18,6 @@
 #include "Types/ModioUser.h"
 
 #include "ModioModInfo.generated.h"
-
 
 namespace Modio
 {
@@ -33,7 +32,6 @@ enum class EModioMaturityFlags : uint8
 	Violence = 4,
 	Explicit = 8
 };
-
 
 /** @brief Full mod profile including current release information, media links, and stats */
 USTRUCT(BlueprintType)
@@ -89,6 +87,10 @@ struct MODIO_API FModioModInfo
 	UPROPERTY(BlueprintReadOnly, Category = "Profile")
 	EModioMaturityFlags ProfileMaturityOption;
 
+	/** @brief Is the mod marked as visible? */
+	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	bool bVisible;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Metadata")
 	FString MetadataBlob;
 
@@ -119,6 +121,7 @@ struct MODIO_API FModioModInfo
 	/** @brief Stats and rating information for the mod */
 	UPROPERTY(BlueprintReadOnly, Category = "Stats")
 	FModioModStats Stats;
+
 	friend struct FModioModInfo ToUnreal(const struct Modio::ModInfo& In);
 };
 

@@ -45,7 +45,7 @@ public:
 	EModioPortal DefaultPortal = EModioPortal::None;
 
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(EditDefaultsOnly, config, Category = "Project|Automation Testing", meta = (ShowOnlyInnerProperties))
+	UPROPERTY(EditDefaultsOnly, config, Category = "Project|Automation Testing")
 	FModioInitializeOptions AutomationTestOptions;
 
 	UPROPERTY(EditDefaultsOnly, config, Category = "Project|Automation Testing")

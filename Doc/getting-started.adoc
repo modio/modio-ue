@@ -73,7 +73,7 @@ NOTE: The plugin event loop, any internal event handlers, and all callbacks you 
 
 ==== Non-blocking, asynchronous interface
 
-The plugin communicates with the mod.io servers, the filesystem on the device you're using, and platform-provided services for authentication. All of these may not return results immediately, so many functions provided by the ModioSubsystem are non-blocking and asynchronous.
+The plugin communicates with the mod.io servers, the filesystem on the device you're using, and platform-provided services for authentication. All of these may not return results immediately, so many functions provided by the ModioSubsystem are non-blocking and asynchronous. For example, the initialization function returns immediately. However, your game should consider the ModioSybsystem as initialized only when the init callback executes.
 
 NOTE: All async methods in the public API end with the suffix `Async`. 
 
@@ -110,9 +110,8 @@ The plugin stores mods in a game-specific directory in the following directory b
 
 [stripes=odd,frame=none,cols="1,^1,^1"]
 |===
-|Windows | Linux | OSX
-
-|`${FolderID_Public}/mod.io` | TBD |TBD
+| Windows                    | Linux                    | OSX
+|`${FolderID_Public}/mod.io` | `${USER_HOME}/mod.io`    | `${USER_HOME}/Library/Application Support/mod.io`
 |===
 
 However, this value can be overridden in one of two ways:
@@ -156,6 +155,7 @@ image::img/initasync_getoptions.png[]
 
 .Notes
 * The error-handling in this sample has been omitted. See <<Plugin quick-start: Error Handling>> for more information on error handling. 
+* To fully initialize the SDK, you must receive confirmation from the callback. Consider that most functions return after invocation, nonetheless, their effects are only visible in their callback function
 
 ====
 
@@ -347,6 +347,45 @@ This means the external authentication flow is the following:
 Here's what steps 1 and 2 might look like in Blueprint:
 
 image::img/authenticate_user_external.png[]
+
+Note that the SDK will automatically URL encode parameters (such as the auth token) when making the request.
+
+===== Steam Authentication Example
+
+In order to use the Steam authentication functionality, you must add your games https://partner.steamgames.com/apps/sdkauth[Encrypted App Ticket Key] from Steamworks. On your games profile on mod.io, go to Edit > Options and add the key. You can then call <<K2_AuthenticateUserExternalAsync>> and provide the users Encrypted App Ticket as the Auth Token. Note that the Auth Token must be Base64 encoded when passed 
+
+Below is a sample Blueprint method that will get the users current Encrypted App Ticket that you can use in your Authentication request. Add this to a BlueprintLibrary in your games codebase.
+
+.C++ Example
+[%collapsible]
+====
+[source]
+----
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetTicket, int32, LocalUserNum, FString, TokenData);
+UFUNCTION(BlueprintCallable)
+static void GetSteamAuthTicket(int32 LocalUserNum, FOnGetTicket Callback)
+{
+    //Get the steam subsystem
+    FOnlineSubsystemSteam* SteamSubsystem = static_cast<FOnlineSubsystemSteam*>(IOnlineSubsystem::Get());
+    //Add a handler to the subsystem for when the ticket has been retrieved
+    SteamSubsystem->GetEncryptedAppTicketInterface()->OnEncryptedAppTicketResultDelegate.AddLambda(
+        [LocalUserNum, OnComplete = Callback](bool bEncryptedDataAvailable, int32 ResultCode) {
+            
+            TArray<uint8> TokenData;
+            if (bEncryptedDataAvailable)
+            {
+                //If the ticket was retrieved successfully, get its data
+                SteamSubsystem->GetEncryptedAppTicketInterface()->GetEncryptedAppTicket(TokenData);
+            }
+            //Call the user callback with the base64-encoded ticket, ready for submission via AuthenticateUserExternalAsync
+            OnComplete.ExecuteIfBound(LocalUserNum, FBase64::Encode(TokenData));
+        });
+    //Begin the actual async request for the ticket, which will invoke the above lambda when it completes
+    SteamSubsystem->GetEncryptedAppTicketInterface()->RequestEncryptedAppTicket(nullptr, 0);
+}
+----
+Note that if you are on 4.27 or above, Epic provides a helper method in OnlineIdentityInterface::GetLinkedAccountAuthToken that will get the current account's auth token without having to take a direct dependency on FOnlineSubsystemSteam. Ensure that the token is Base64 encoded when being passed to <<K2_AuthenticateUserExternalAsync>>.
+====
 
 ==== Token Lifetime & Re-Authentication
 
@@ -713,3 +752,85 @@ image::img/get_last_validation_error.png[]
 
 '''
 
+==== Submitting a new mod
+
+In order to submit a mod, you have to first create a mod handle using <<K2_GetModCreationHandle>> and use that handle when calling <<K2_SubmitNewModAsync>>
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/submit_new_mod.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source]
+----
+
+void UModioManager::SubmitNewMod()
+{
+	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		FModioModCreationHandle Handle = GEngine->GetEngineSubsystem<UModioSubsystem>()->GetModCreationHandle();
+
+		FModioCreateModParams Params;
+		Params.Name = TEXT("My Awesome Mod");
+		Params.Description = TEXT("This is an amazing mod");
+		Params.PathToLogoFile = TEXT("C:\\temp\\image.png");
+
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->SubmitNewModAsync(Handle, Params, FOnSubmitNewModDelegateFast::CreateUObject(this, &UModioManager::OnSubmitNewModCallback));
+	}
+}
+
+void UModioManager::OnSubmitNewModCallback(FModioErrorCode ErrorCode, TOptional<FModioModID> ModId)
+{
+	if (ErrorCode == false)
+	{
+		// Mod was submitted successfully. Use ModId to submit some files to it.
+	}
+}
+
+----
+
+====
+
+
+==== Submitting a file for a mod
+
+Once you have successfully submitted a mod, you can then submit a file for that mod using <<K2_SubmitNewModFileForMod>>. When you submit a file, you pass a <<ModioCreateModFileParams>> containing the directory of the files that you want to submit. The plugin will then compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you'll get notified of the completed upload by the Mod Management callbacks.
+
+.Blueprint Example
+[%collapsible]
+====
+
+As an example, after the callback for submitting a mod has completed, you can get the Mod Id to use for file submission.
+
+image::img/submit_new_mod_file.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source]
+----
+
+void UModioManager::SubmitNewModFile(FModioModID ModId)
+{
+	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		FModioCreateModFileParams Params;
+		Params.PathToModRootDirectory = TEXT("C:\\temp\\mod_folder");
+
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->SubmitNewModFileForMod(ModId, Params);
+	}
+}
+
+----
+
+====

@@ -27,4 +27,6 @@ struct MODIO_API FModioCreateModFileParams
 	TOptional<bool> bSetAsActiveRelease;
 
 	TOptional<FString> MetadataBlob;
+
+	TOptional<TArray<EModioModfilePlatform>> ModfilePlatforms;
 };

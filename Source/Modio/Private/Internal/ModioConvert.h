@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-
-
 int64 ToUnreal(std::int64_t Value);
 double ToUnreal(double Value);
 bool ToUnreal(bool Value);
@@ -38,6 +36,7 @@ struct FModioMetadata ToUnreal(const Modio::Metadata& In);
 struct FModioModTag ToUnreal(const Modio::ModTag& In);
 struct FModioModInfo ToUnreal(const Modio::ModInfo& In);
 struct FModioModDependency ToUnreal(const Modio::ModDependency& In);
+struct FModioUnsigned64 ToUnreal(const Modio::FileSize& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
@@ -54,6 +53,7 @@ Modio::AvatarSize ToModio(EModioAvatarSize AvatarSize);
 Modio::GallerySize ToModio(EModioGallerySize GallerySize);
 Modio::LogoSize ToModio(EModioLogoSize LogoSize);
 Modio::Environment ToModio(EModioEnvironment Environment);
+Modio::ModfilePlatform ToModio(EModioModfilePlatform Platform);
 Modio::Portal ToModio(EModioPortal Portal);
 Modio::Language ToModio(EModioLanguage Language);
 
@@ -69,7 +69,6 @@ typename TEnableIf<TIsDerivedFrom<FlagType, Modio::FlagImpl<UnderlyingType>>::Va
 {
 	return static_cast<DestType>(Flags.RawValue());
 }
-
 
 template<typename DestValueType, typename SourceValueType, typename... OtherParams>
 TArray<DestValueType> ToUnreal(std::vector<SourceValueType, OtherParams...>&& OriginalArray)
@@ -110,6 +109,5 @@ std::vector<DestValueType> ToModio(const TArray<SourceValueType>& OriginalArray)
 	}
 	return Out;
 }
-
 
 #pragma endregion

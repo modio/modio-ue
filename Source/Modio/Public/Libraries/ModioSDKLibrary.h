@@ -20,7 +20,7 @@
 UENUM(BlueprintType)
 enum EFileSizeUnit
 {
-	Largest = 0, // Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.23MB)
+	Largest = 0, // Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb)
 	B = 1,
 	KB = 1024,
 	MB = 1024 * 1024,
@@ -86,12 +86,12 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|String",
 			  meta = (DisplayName = "ToString (Filesize)", CompactNodeTitle = "Filesize"))
-	static FText Filesize_ToString(int64 FileSize, int32 MaxDecimals = 2, EFileSizeUnit Unit = EFileSizeUnit::Largest);
+	static MODIO_API FText Filesize_ToString(int64 FileSize, int32 MaxDecimals = 2, EFileSizeUnit Unit = EFileSizeUnit::Largest);
 
 	/** Converts an integer64 value to a string */
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToString (integer64)", CompactNodeTitle = "->", BlueprintAutocast),
 			  Category = "mod.io|Utilities|String")
-	static FString Conv_Int64ToString(int64 InInt);
+	static MODIO_API FString Conv_Int64ToString(int64 InInt);
 
 	/**
 	 * @brief Converts a passed in integer to text based on formatting options
@@ -104,7 +104,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToText (integer64)", AdvancedDisplay = "1", BlueprintAutocast),
 			  Category = "mod.io|Utilities|Text")
-	static FText Conv_Int64ToText(int64 Value, bool bAlwaysSign = false, bool bUseGrouping = true,
+	static MODIO_API FText Conv_Int64ToText(int64 Value, bool bAlwaysSign = false, bool bUseGrouping = true,
 								  int32 MinimumIntegralDigits = 1, int32 MaximumIntegralDigits = 324);
 
 	/** @brief Dividend/Divisor and return the floating point result with no checks **/
@@ -112,5 +112,5 @@ public:
 			  meta = (DisplayName = "Get Percent (integer64/integer64)", CompactNodeTitle = "Percent",
 					  Keywords = "/ % percent pct"),
 			  Category = "mod.io|Math|integer64")
-	static float Pct_Int64Int64(int64 Dividend, int64 Divisor);
+	static MODIO_API float Pct_Int64Int64(int64 Dividend, int64 Divisor);
 };

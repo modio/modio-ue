@@ -47,6 +47,15 @@ FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In)
 	Out.ModID = ToUnreal(In.GetID());
 	Out.ModPath = ToUnreal(In.GetPath());
 	Out.ModProfile = ToUnreal(In.GetModProfile());
+	Out.SizeOnDisk = FModioUnsigned64(0);
+	if (In.GetSizeOnDisk())
+	{
+		if (*In.GetSizeOnDisk())
+		{
+			Out.SizeOnDisk = ToUnreal(*In.GetSizeOnDisk());
+		}
+	}
+	
 	return Out;
 }
 

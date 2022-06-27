@@ -31,7 +31,8 @@ enum class EModioSortFieldType : uint8
 	SubscriberCount, /** use number of subscribers */
 	Rating, /** use mod rating */
 	DateMarkedLive, /** use date mod was marked live */
-	DateUpdated /** use date mod was last updated */
+	DateUpdated, /** use date mod was last updated */
+	DownloadsTotal /** use downloads total */
 };
 
 /// @brief Enum indicating which direction sorting should be applied

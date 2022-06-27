@@ -1,4 +1,5 @@
 #include "Internal/ModioConvert.h"
+#include "Types/ModioUnsigned64.h"
 
 std::string ToModio(const FString& String)
 {
@@ -47,18 +48,20 @@ FString ToUnreal(const std::string& String)
 	return UTF8_TO_TCHAR(String.c_str());
 }
 
-
-
 FString ToUnreal(const Modio::filesystem::path& Path)
 {
 	return UTF8_TO_TCHAR(Path.generic_u8string().c_str());
+}
+
+FModioUnsigned64 ToUnreal(const Modio::FileSize& In)
+{
+	return FModioUnsigned64(In);
 }
 
 FDateTime ToUnrealDateTime(std::int64_t UnixTimestamp)
 {
 	return FDateTime::FromUnixTimestamp(UnixTimestamp);
 }
-
 
 Modio::ApiKey ToModio(const FModioApiKey& In)
 {
@@ -92,7 +95,6 @@ Modio::UserID ToModio(const FModioUserID& In)
 {
 	return Modio::UserID(In.UserID);
 }
-
 
 Modio::LogLevel ToModio(EModioLogLevel UnrealLogLevel)
 {
@@ -172,6 +174,37 @@ Modio::Environment ToModio(EModioEnvironment Environment)
 
 	checkf(false, TEXT("Missed a case in ToModio(EModioEnvironment Environment)"));
 	return Modio::Environment::Test;
+}
+
+Modio::ModfilePlatform ToModio(EModioModfilePlatform Platform)
+{
+	switch (Platform)
+	{
+		case EModioModfilePlatform::Android:
+			return Modio::ModfilePlatform::Android;
+		case EModioModfilePlatform::iOS:
+			return Modio::ModfilePlatform::iOS;
+		case EModioModfilePlatform::Linux:
+			return Modio::ModfilePlatform::Linux;
+		case EModioModfilePlatform::Mac:
+			return Modio::ModfilePlatform::Mac;
+		case EModioModfilePlatform::Oculus:
+			return Modio::ModfilePlatform::Oculus;
+		case EModioModfilePlatform::PS4:
+			return Modio::ModfilePlatform::PS4;
+		case EModioModfilePlatform::PS5:
+			return Modio::ModfilePlatform::PS5;
+		case EModioModfilePlatform::Switch:
+			return Modio::ModfilePlatform::Switch;
+		case EModioModfilePlatform::Windows:
+			return Modio::ModfilePlatform::Windows;
+		case EModioModfilePlatform::XboxOne:
+			return Modio::ModfilePlatform::XboxOne;
+		case EModioModfilePlatform::XboxSeriesX:
+			return Modio::ModfilePlatform::XboxSeriesX;
+	}
+	checkf(false, TEXT("Unhandled value in ToModio(EModioModfilePlatform Platform)"));
+	return Modio::ModfilePlatform::Windows;
 }
 
 Modio::Portal ToModio(EModioPortal Portal)

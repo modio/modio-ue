@@ -1,16 +1,18 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
+#include "Internal/Convert/ModStats.h"
+#include "Internal/ModioConvert.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Misc/AutomationTest.h"
-#include "Internal/Convert/ModStats.h"
+#include "Types/ModioUnsigned64.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
 
@@ -32,7 +34,22 @@ bool FModioConvertDataToUnrealFormatTest::RunTest(const FString& Parameters)
 	TestEqual("RatingPercentagePositive", (int32)OutObj.RatingPercentagePositive, (int32)InObj.RatingPercentagePositive);
 	TestEqual("RatingWeightedAggregate", FMath::IsNearlyEqual((float) OutObj.RatingWeightedAggregate, (float) InObj.RatingWeightedAggregate),
 			  true);
-	TestEqual(TEXT("RatingDisplayText"), OutObj.RatingDisplayText.Equals(FString(InObj.RatingDisplayText.c_str())), true);
+	TestEqual(TEXT("RatingDisplayText"), OutObj.RatingDisplayText.Equals(FString(InObj.RatingDisplayText.c_str())),
+			  true);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioUnsigned64ConversionTest, "Modio.DataConversion.NativeToUnreal.ModioUnsigned64",
+								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+									 EAutomationTestFlags::ProductFilter)
+
+bool FModioUnsigned64ConversionTest::RunTest(const FString& Parameters)
+{
+	uint64 TestValue = 0xF00DF00DF00DF00D;
+	Modio::FileSize InFileSize = Modio::FileSize(TestValue);
+	FModioUnsigned64 OutValue = ToUnreal(InFileSize);
+	TestEqual(TEXT("Underlying"), TestValue, OutValue.Underlying);
 
 	return true;
 }

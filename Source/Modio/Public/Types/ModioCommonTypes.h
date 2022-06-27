@@ -48,6 +48,22 @@ enum class EModioPortal : uint8
 	XboxLive
 };
 
+/** @brief Enum representing the platform(s) that a modfile is enabled for */
+enum class EModioModfilePlatform : uint8
+{
+	Windows,
+	Mac,
+	Linux,
+	Android,
+	iOS,
+	XboxOne,
+	XboxSeriesX,
+	PS4,
+	PS5,
+	Switch,
+	Oculus
+};
+
 /** @brief Enum representing mod logo sizes */
 UENUM(BlueprintType)
 enum class EModioLogoSize : uint8
@@ -249,7 +265,6 @@ private:
 	friend struct Modio::GameID ToModio(const FModioGameID& In);
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
 	int64 GameId;
-
 };
 
 template<>

@@ -47,9 +47,10 @@ void UModioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	if (const UModioSettings* Settings = GetDefault<UModioSettings>())
+	if (const UModioSettings* Settings = GetMutableDefault<UModioSettings>())
 	{
 		SetLogLevel(Settings->LogLevel);
+		UE_LOG(LogModio, Display, TEXT("Setting log level to %d"), (int32) Settings->LogLevel);
 	}
 	ImageCache = MakeUnique<FModioImageCache>();
 }
@@ -118,9 +119,9 @@ void UModioSubsystem::FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetch
 	});
 }
 
-void UModioSubsystem::EnableModManagement(FOnModManagementDelegateFast Callback)
+FModioErrorCode UModioSubsystem::EnableModManagement(FOnModManagementDelegateFast Callback)
 {
-	Modio::EnableModManagement([this, Callback](Modio::ModManagementEvent Event) {
+	return Modio::EnableModManagement([this, Callback](Modio::ModManagementEvent Event) {
 		// @todo: For some smarter caching, look at the event and see if we should invalidate the cache
 		InvalidateUserInstallationCache();
 		Callback.ExecuteIfBound(ToUnreal(Event));
@@ -157,9 +158,9 @@ void UModioSubsystem::K2_FetchExternalUpdatesAsync(FOnErrorOnlyDelegate OnFetchD
 		FOnErrorOnlyDelegateFast::CreateLambda([OnFetchDone](FModioErrorCode ec) { OnFetchDone.ExecuteIfBound(ec); }));
 }
 
-void UModioSubsystem::K2_EnableModManagement(FOnModManagementDelegate Callback)
+FModioErrorCode UModioSubsystem::K2_EnableModManagement(FOnModManagementDelegate Callback)
 {
-	EnableModManagement(FOnModManagementDelegateFast::CreateLambda(
+	return EnableModManagement(FOnModManagementDelegateFast::CreateLambda(
 		[Callback](FModioModManagementEvent Event) { Callback.ExecuteIfBound(Event); }));
 }
 
@@ -549,18 +550,17 @@ void UModioSubsystem::K2_ReportContentAsync(FModioReportParams Report, FOnErrorO
 								   [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
-
 TArray<FModioModDependency> ToUnreal(const std::vector<Modio::ModDependency>& OriginalArray)
 {
-    TArray<FModioModDependency> Result;
+	TArray<FModioModDependency> Result;
 
-    Result.Reserve(OriginalArray.size());
-    for (const auto& It : OriginalArray)
-    {
-        Result.Emplace(ToUnreal(It));
-    }
+	Result.Reserve(OriginalArray.size());
+	for (const auto& It : OriginalArray)
+	{
+		Result.Emplace(ToUnreal(It));
+	}
 
-    return Result;
+	return Result;
 }
 
 void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback)
@@ -629,6 +629,17 @@ void UModioSubsystem::K2_ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegate C
 {
 	ArchiveModAsync(
 		Mod, FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+}
+
+void UModioSubsystem::VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::VerifyUserAuthenticationAsync([Callback](Modio::ErrorCode ec) { Callback.ExecuteIfBound(ToUnreal(ec)); });
+}
+
+void UModioSubsystem::K2_VerifyUserAuthenticationAsync(FOnErrorOnlyDelegate Callback)
+{
+	VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec){
+		Callback.ExecuteIfBound(ec);}));
 }
 
 /// File scope implementations

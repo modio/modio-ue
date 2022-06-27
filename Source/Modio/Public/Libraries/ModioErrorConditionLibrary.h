@@ -33,6 +33,6 @@ public:
 	 // reported here:
 	 // https://forums.unrealengine.com/t/ustruct-type-must-be-a-uclass-ustruct-or-uenum/358937
 	 // Because of that, the line below was commented.
-	// UFUNCTION(BlueprintCallable, Category = "mod.io|Error Handling")
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Error Handling")
 	static bool ErrorCodeMatches(FModioErrorCode ErrorCode, EModioErrorCondition Condition);
 };

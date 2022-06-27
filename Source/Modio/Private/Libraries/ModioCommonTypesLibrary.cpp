@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #include "Libraries/ModioCommonTypesLibrary.h"
@@ -21,11 +21,10 @@ FString UModioCommonTypesLibrary::Conv_GameIDToString(FModioGameID GameId)
 	return GameId.ToString();
 }
 
-FModioAuthenticationParams UModioCommonTypesLibrary::MakeAuthParams(const FString AuthToken,
-																		   const FString EmailAddress,
-																		   const bool bHasAcceptedTOS)
+FModioAuthenticationParams UModioCommonTypesLibrary::MakeAuthParams(const FString AuthToken, const FString EmailAddress,
+																	const bool bHasAcceptedTOS)
 {
-	return FModioAuthenticationParams { AuthToken, EmailAddress, bHasAcceptedTOS };
+	return FModioAuthenticationParams {AuthToken, EmailAddress, bHasAcceptedTOS};
 }
 
 FModioApiKey UModioCommonTypesLibrary::MakeApiKey(const FString ApiKey)
@@ -73,7 +72,9 @@ FString UModioCommonTypesLibrary::Conv_UserIDToString(FModioUserID UserID)
 	return UserID.ToString();
 }
 
-FModioInitializeOptions UModioCommonTypesLibrary::MakeInitializeOptions(int64 GameId, const FString& APIKey, EModioEnvironment GameEnvironment, EModioPortal PortalInUse)
+FModioInitializeOptions UModioCommonTypesLibrary::MakeInitializeOptions(int64 GameId, const FString& APIKey,
+																		EModioEnvironment GameEnvironment,
+																		EModioPortal PortalInUse)
 {
 	FModioInitializeOptions Options;
 	Options.GameId = FModioGameID(GameId);
@@ -99,3 +100,12 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetSessionIdentifier(const FMo
 	return DuplicateOptions;
 }
 
+bool UModioCommonTypesLibrary::EqualTo(const FModioModID& A, const FModioModID& B)
+{
+	return A == B;
+}
+
+bool UModioCommonTypesLibrary::NotEqualTo(const FModioModID& A, const FModioModID& B)
+{
+	return A != B;
+}

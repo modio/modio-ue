@@ -32,6 +32,11 @@ FModioReportParams::FModioReportParams(FModioModID Mod, EModioReportType Type, F
 				   ReporterContact)
 {}
 
+FModioReportParams::FModioReportParams(FModioModID Mod, EModioReportType Type) :
+FModioReportParams(ToModio(Mod), ResourceType::Mod, Type, FString(), FString(), FString())
+{}
+
+
 FModioReportParams::FModioReportParams(int64 ResourceID, ResourceType ReportedResourceType, EModioReportType Type,
 				   FString ReportDescription,
 			 TOptional<FString> ReporterName, TOptional<FString> ReporterContact)

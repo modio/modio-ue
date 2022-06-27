@@ -25,5 +25,10 @@ FORCEINLINE Modio::CreateModFileParams ToModio(const FModioCreateModFileParams& 
 	Out.Changelog = ToModioOptional<std::string>(In.Changelog);
 	Out.bSetAsActive = ToModioOptional<bool>(In.bSetAsActiveRelease);
 	Out.MetadataBlob = ToModioOptional<std::string>(In.MetadataBlob);
+	if (In.ModfilePlatforms.IsSet())
+	{
+		Out.Platforms = ToModio<Modio::ModfilePlatform, EModioModfilePlatform>(In.ModfilePlatforms.GetValue());
+	}
+
 	return Out;
 }

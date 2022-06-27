@@ -11,6 +11,8 @@
 #pragma once
 
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioUnsigned64.h"
+
 
 #include "ModioModProgressInfo.generated.h"
 
@@ -27,19 +29,19 @@ struct MODIO_API FModioModProgressInfo
 
 	/** @brief Total size of the downloaded file */
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo")
-	int64 TotalDownloadSize;
+	FModioUnsigned64 TotalDownloadSize;
 
 	/** @brief Current amount downloaded in bytes */
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo|Current")
-	int64 CurrentlyDownloadedBytes;
+	FModioUnsigned64 CurrentlyDownloadedBytes;
 
 	/** @brief Total size on disk when fully extracted */
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo")
-	int64 TotalExtractedSizeOnDisk;
+	FModioUnsigned64 TotalExtractedSizeOnDisk;
 
 	/** @brief Amount of data currently extracted */
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo|Current")
-	int64 CurrentlyExtractedBytes;
+	FModioUnsigned64 CurrentlyExtractedBytes;
 
 	/** @brief The mod ID of the mod being processed */
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo")

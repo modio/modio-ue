@@ -47,6 +47,8 @@ FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 	Out.ProfileDateUpdated = ToUnrealDateTime(In.ProfileDateUpdated);
 	Out.ProfileDateLive = ToUnrealDateTime(In.ProfileDateLive);
 	Out.ProfileMaturityOption = ToUnreal<EModioMaturityFlags, Modio::MaturityOption>(In.ProfileMaturityOption);
+	Out.bVisible = In.bVisible;
+
 	Out.MetadataBlob = FString(In.MetadataBlob.c_str()); // Converting verbatim rather than via TCHAR as ToUnreal does
 
     if (In.FileInfo.has_value())

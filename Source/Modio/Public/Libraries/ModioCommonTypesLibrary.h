@@ -1,22 +1,21 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Types/ModioAuthenticationParams.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioInitializeOptions.h"
-#include "Types/ModioAuthenticationParams.h"
 
 #include "ModioCommonTypesLibrary.generated.h"
-
 
 UCLASS()
 class MODIO_API UModioCommonTypesLibrary : public UBlueprintFunctionLibrary
@@ -41,14 +40,15 @@ public:
 	static FString Conv_GameIDToString(FModioGameID GameId);
 
 	/**
-	 * @brief Creates an AuthenticationParams object 
+	 * @brief Creates an AuthenticationParams object
 	 * @param AuthToken - Authentication provider-supplied OAuth token
 	 * @param EmailAddress - User email address, can be left blank
 	 * @param bHasAcceptedTOS - Has the user been shown the TOS and accepted the TOS?
 	 * @return The constructed FModioAuthenticationParams object for use with <<K2_AuthenticateUserExternalAsync>>
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
-	static FModioAuthenticationParams MakeAuthParams(const FString AuthToken, const FString EmailAddress, const bool bHasAcceptedTOS);
+	static FModioAuthenticationParams MakeAuthParams(const FString AuthToken, const FString EmailAddress,
+													 const bool bHasAcceptedTOS);
 
 	/**
 	 * @brief Create a ApiKey id from a string, should only be used in conjunction with InitializeAsync
@@ -56,7 +56,6 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
 	static FModioApiKey MakeApiKey(const FString ApiKey);
-
 
 	/**
 	 * @brief Converts a ApiKey string so you can debug output it
@@ -123,7 +122,7 @@ public:
 	 * @return FModioEmailAddress object
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToEmailAdress (String)", CompactNodeTitle = "->", BlueprintAutocast),
+			  meta = (DisplayName = "ToEmailAddress (String)", CompactNodeTitle = "->", BlueprintAutocast),
 			  Category = "mod.io|Utilities")
 	static FModioEmailAddress Conv_StringToEmailAddress(const FString& Email);
 
@@ -140,11 +139,14 @@ public:
 	/**
 	 * @brief Make initialization options, should only be used in conjunction with InitializeAsync
 	 * @param GameId - a positive integer that maps to your game
-	 * @param APIKey - APIKey available at https://<your-game-name>.test.mod.io/edit/api or https://<your-game-name>.mod.io/edit/api
+	 * @param APIKey - APIKey available at https://<your-game-name>.test.mod.io/edit/api or
+	 * https://<your-game-name>.mod.io/edit/api
 	 * @param GameEnvironment - If your environment is setup on test or production
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
-	static FModioInitializeOptions MakeInitializeOptions(int64 GameId, const FString& APIKey, EModioEnvironment GameEnvironment, EModioPortal PortalInUse = EModioPortal::None);
+	static FModioInitializeOptions MakeInitializeOptions(int64 GameId, const FString& APIKey,
+														 EModioEnvironment GameEnvironment,
+														 EModioPortal PortalInUse = EModioPortal::None);
 
 	/**
 	 * @brief Changes the portal for the provided set of initialization options
@@ -156,5 +158,20 @@ public:
 	static FModioInitializeOptions SetPortal(const FModioInitializeOptions& Options, EModioPortal PortalToUse);
 
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
-	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options, const FString& SessionIdentifier);
+	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options,
+														const FString& SessionIdentifier);
+
+	/**
+	 * @brief Compares two ModioModIDs, returning true if equal
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
+			  meta = (CompactNodeTitle = "==", Keywords = "== equal", DisplayName = "ModioModID == ModioModID"))
+	static bool EqualTo(const FModioModID& A, const FModioModID& B);
+
+	/**
+	 * @brief Compares two ModioModIDs, returning true if not equal
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
+			  meta = (CompactNodeTitle = "!=", Keywords = "!= not equal", DisplayName = "ModioModID != ModioModID"))
+	static bool NotEqualTo(const FModioModID& A, const FModioModID& B);
 };

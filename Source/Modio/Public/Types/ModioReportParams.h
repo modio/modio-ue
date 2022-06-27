@@ -35,10 +35,16 @@ USTRUCT(BlueprintType)
 struct MODIO_API FModioReportParams
 {
 	GENERATED_BODY();
-
-
+	
 	FModioReportParams();
 
+	/// @docpublic
+	/// @brief Creates a content report for a game.
+	/// @param Mod The ID of the content being reported
+	/// @param Type The nature of the content report
+	FModioReportParams(struct FModioModID Mod, EModioReportType Type);
+
+	/// @docpublic
 	/// @brief Creates a content report for a game.
 	/// @param Game The ID of the game being reported
 	/// @param Type The nature of the content report
@@ -70,8 +76,6 @@ struct MODIO_API FModioReportParams
 	/// empty
 	FModioReportParams(struct FModioModID Mod, EModioReportType Type, FString ReportDescription,
 							TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
-
-private:
 	
 
 	enum class ResourceType : uint8

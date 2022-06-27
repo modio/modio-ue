@@ -37,3 +37,8 @@ const FString FModioModCollectionEntry::GetPath() const
 		return {};
 	}
 }
+
+FModioUnsigned64 FModioModCollectionEntry::GetSizeOnDisk() const 
+{
+	return FModioUnsigned64(SizeOnDisk);
+}

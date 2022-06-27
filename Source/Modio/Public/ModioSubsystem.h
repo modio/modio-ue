@@ -183,7 +183,7 @@ public:
 	 * @error ModManagementError::ModManagementAlreadyEnabled|Mod management was already enabled. The mod management
 	 * callback has not been changed
 	 */
-	MODIO_API void EnableModManagement(FOnModManagementDelegateFast Callback);
+	MODIO_API FModioErrorCode EnableModManagement(FOnModManagementDelegateFast Callback);
 
 	/**
 	 * @brief Disables automatic installation or uninstallation of mods based on the user's subscriptions. Allows
@@ -390,7 +390,8 @@ public:
 	 * @requires no-authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync to
+	 * @error
+|Authenticated user already signed-in. Call ClearUserDataAsync to
 	 * de-authenticate the old user, then Shutdown() and reinitialize the SDK first.
 	 **/
 	MODIO_API void RequestEmailAuthCodeAsync(const FModioEmailAddress& EmailAddress, FOnErrorOnlyDelegateFast Callback);
@@ -413,7 +414,7 @@ public:
 
 	/**
 	 * @brief Uses platform-specific authentication to associate a Mod.io user account with the current platform user
-	 * @param User Authentication payload data to submit to the provider. 
+	 * @param User Authentication payload data to submit to the provider.
 	 * @param Provider The provider to use to perform the authentication
 	 * @param Callback Callback invoked once the authentication request has been made
 	 * @requires initialized-sdk
@@ -427,6 +428,20 @@ public:
 	MODIO_API void AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
 												 EModioAuthenticationProvider Provider,
 												 FOnErrorOnlyDelegateFast Callback);
+	/**
+	 * @docpublic
+	 * @brief Queries the server to verify the state of the currently authenticated user if there is one present. An
+	 * empty ErrorCode is passed to the callback to indicate successful verification, i.e. the mod.io server was
+	 * contactable and the user's authentication remains valid.
+	 * @param Callback Callback invoked with the results of the verification process
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	MODIO_API void VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -490,6 +505,7 @@ public:
 
 	/** Get our image cache */
 	struct FModioImageCache& GetImageCache() const;
+	void ShowUserAuthenticationDialog();
 
 	/*
 	@brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
@@ -580,7 +596,7 @@ public:
 	 * by the SDK
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "EnableModManagement", Category = "mod.io|Mod Management")
-	MODIO_API void K2_EnableModManagement(FOnModManagementDelegate Callback);
+	MODIO_API FModioErrorCode K2_EnableModManagement(FOnModManagementDelegate Callback);
 
 	/**
 	 * @brief Provides progress information for a mod installation or update operation if one is currently in progress.
@@ -769,6 +785,22 @@ public:
 	MODIO_API void K2_AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
 													EModioAuthenticationProvider Provider,
 													FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Queries the server to verify the state of the currently authenticated user if there is one present. An
+	 * empty ErrorCode is passed to the callback to indicate successful verification, i.e. the mod.io server was
+	 * contactable and the user's authentication remains valid.
+	 * @param Callback Callback invoked with the results of the verification process
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "VerifyUserAuthenticationAsync", Category = "mod.io|Authentication")
+	MODIO_API void K2_VerifyUserAuthenticationAsync(FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player

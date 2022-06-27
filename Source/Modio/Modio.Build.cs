@@ -217,7 +217,7 @@ public class Modio : ModuleRules
         PublicIncludePaths.AddRange(new string[] {
                 Path.Combine(GeneratedHeaderPath, "Public")
                 });
-
+        ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedHeaderPath, "Public")));
         // Add common private includes from the Native SDK
         PrivateIncludePaths.AddRange(new string[]
         {
