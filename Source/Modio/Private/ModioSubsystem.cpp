@@ -70,6 +70,14 @@ bool UModioSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 
 void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FOnErrorOnlyDelegateFast OnInitComplete)
 {
+#if WITH_EDITOR
+	if (const UModioSettings* Settings = GetMutableDefault<UModioSettings>())
+	{
+		UE_LOG(LogModio, Display, TEXT("Setting log level to %d"), (int32) Settings->LogLevel);
+		SetLogLevel(Settings->LogLevel);
+	}
+#endif
+
 	Modio::InitializeAsync(ToModio(Options), [this, OnInitComplete](Modio::ErrorCode ec) {
 		InvalidateUserSubscriptionCache();
 

@@ -11,6 +11,7 @@
 #include "Libraries/ModioSDKLibrary.h"
 #include "Internationalization/Regex.h"
 #include "ModioSettings.h"
+#include "ModioTestSettings.h"
 
 FModioGameID UModioSDKLibrary::GetProjectGameId()
 {
@@ -43,7 +44,7 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptions()
 FModioInitializeOptions UModioSDKLibrary::GetAutomationTestOptions()
 {
 	#if WITH_EDITORONLY_DATA
-	const UModioSettings* Settings = GetDefault<UModioSettings>();
+	const UModioTestSettings* Settings = GetDefault<UModioTestSettings>();
 	FModioInitializeOptions Options = Settings->AutomationTestOptions;
 	if (!Settings->AutomationSessionID.IsEmpty())
 	{

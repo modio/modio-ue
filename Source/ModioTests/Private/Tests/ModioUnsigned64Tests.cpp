@@ -118,6 +118,22 @@ bool FModioUnsigned64OperatorAddTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioUnsigned64ArithmeticPercentTest, "Modio.ModioUnsigned64.Arithmetic.Percent",
+								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+									 EAutomationTestFlags::ProductFilter)
+
+bool FModioUnsigned64ArithmeticPercentTest::RunTest(const FString& Parameters)
+{
+	uint64 Value = 0xabcdF00d;
+	FModioUnsigned64 First = FModioUnsigned64(Value);
+	FModioUnsigned64 Second = First * 2;
+	float Result = UModioUnsigned64Library::Percentage_Unsigned64(First, Second);
+	TestEqual("ResultCorrect1", FMath::IsNearlyEqual(Result, 50.f), true);
+	Result = UModioUnsigned64Library::Percentage_Unsigned64(Second, First);
+	TestEqual("ResultCorrect2", FMath::IsNearlyEqual(Result, 200.f), true);
+	return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioUnsigned64MakeBreakComponentTest, "Modio.ModioUnsigned64.MakeBreak",
 								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
 									 EAutomationTestFlags::ProductFilter)

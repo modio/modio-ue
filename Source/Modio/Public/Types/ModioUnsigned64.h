@@ -98,6 +98,10 @@ struct MODIO_API FModioUnsigned64
 	{
 		return FModioUnsigned64(LHS.Underlying - RHS);
 	}
+	FORCEINLINE friend FModioUnsigned64 operator*(const FModioUnsigned64& LHS, const uint64 RHS)
+	{
+		return FModioUnsigned64(LHS.Underlying * RHS);
+	}
 
 	FORCEINLINE friend double operator/(const FModioUnsigned64& LHS, double Divisor)
 	{
@@ -170,10 +174,18 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64",
-			  meta = (CompactNodeTitle = "/", Keywords = "/ divide", DisplayName = "ModioUnsigned64 / ModioUnsigned64"))
+			  meta = (CompactNodeTitle = "/", Keywords = "/ divide",
+					  DisplayName = "ModioUnsigned64 / ModioUnsigned64 (truncate)"))
 	static FModioUnsigned64 Divide(const FModioUnsigned64& LHS, const FModioUnsigned64& RHS)
 	{
 		return LHS / RHS;
+	}
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64",
+			  meta = (CompactNodeTitle = "/", Keywords = "/ divide", DisplayName = "ModioUnsigned64 / ModioUnsigned64"))
+	static float DivideToFloat(const FModioUnsigned64& LHS, const FModioUnsigned64& RHS)
+	{
+		return (float) ((double) LHS / (double) RHS);
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64",
@@ -181,6 +193,12 @@ public:
 	static float DivideFloat(const FModioUnsigned64& LHS, const float RHS)
 	{
 		return (float) (LHS / (double) RHS);
+	}
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64")
+	static float Percentage_Unsigned64(const FModioUnsigned64& LHS, const FModioUnsigned64& RHS)
+	{
+		return DivideToFloat(LHS, RHS) * 100;
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64")

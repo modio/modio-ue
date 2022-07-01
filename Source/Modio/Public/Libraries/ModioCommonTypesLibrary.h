@@ -160,7 +160,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options,
 														const FString& SessionIdentifier);
-
+	/**
+	 * @brief Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use
+	 * with care.
+	 * @param In - the FModioModID to retrieve the value for
+	 * @return The underlying value 
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities")
+	static int64 GetRawValueFromModID(const FModioModID& In);
 	/**
 	 * @brief Compares two ModioModIDs, returning true if equal
 	 */

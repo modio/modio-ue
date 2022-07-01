@@ -44,14 +44,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, config, Category = "Project")
 	EModioPortal DefaultPortal = EModioPortal::None;
 
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditDefaultsOnly, config, Category = "Project|Automation Testing")
-	FModioInitializeOptions AutomationTestOptions;
-
-	UPROPERTY(EditDefaultsOnly, config, Category = "Project|Automation Testing")
-	FString AutomationSessionID;
-#endif
-
 private:
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

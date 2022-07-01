@@ -193,6 +193,15 @@ struct MODIO_API FModioModID
 	}
 
 private:
+	/// @brief Function for retrieving the underlying value of an FModioModID for use in custom serialization. Not
+	/// recommended for any other use. FModioModIDs should be treated as opaque.
+	/// @param In the FModioModID to retrieve the value for
+	/// @return the underlying numeric ID.
+	MODIO_API friend int64 GetUnderlyingValue(const FModioModID& In)
+	{
+		return In.ModID;
+	}
+
 	friend struct Modio::ModID ToModio(const FModioModID& In);
 	int64 ModID;
 };

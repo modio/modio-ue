@@ -100,6 +100,12 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetSessionIdentifier(const FMo
 	return DuplicateOptions;
 }
 
+
+int64 UModioCommonTypesLibrary::GetRawValueFromModID(const FModioModID& In) 
+{
+	return GetUnderlyingValue(In);
+}
+
 bool UModioCommonTypesLibrary::EqualTo(const FModioModID& A, const FModioModID& B)
 {
 	return A == B;

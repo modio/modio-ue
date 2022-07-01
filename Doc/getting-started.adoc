@@ -172,7 +172,6 @@ void UModioManager::Init()
 		GEngine->GetEngineSubsystem<UModioSubsystem>()->InitializeAsync(UModioSDKLibrary::GetProjectInitializeOptions(), FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::OnInitCallback));
 	}
 	
-
 	UE_LOG(LogModioGame, Log, TEXT("Initializing Modio SDK"));
 }
 
