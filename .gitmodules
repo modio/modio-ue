@@ -8,3 +8,6 @@
 [submodule "Source/ThirdParty/mbedtls"]
 	path = Source/ThirdParty/mbedtls
 	url = https://github.com/Mbed-TLS/mbedtls.git
+[submodule "Source/ThirdParty/msdfgen"]
+	path = Source/ThirdParty/msdfgen
+	url = https://github.com/stephenwhittle/msdfgen.git

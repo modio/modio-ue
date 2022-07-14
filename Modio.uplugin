@@ -36,6 +36,11 @@
 			]
 		},
 		{
+			"Name": "ModioUI",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
 			"Name": "ModioTests",
 			"Type": "Editor",
 			"LoadingPhase": "Default",
@@ -44,6 +49,21 @@
 				"Mac",
 				"Linux"
 			]
+		},
+		{
+			"Name": "ModioUIEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
+		},
+		{
+			"Name": "MSDFSupportEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "MSDFSupport",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		},
 		{
 			"Name": "uring",
@@ -60,6 +80,12 @@
 			"WhitelistPlatforms": [
 				"Linux"
 			]
+		}
+	],
+	"LocalizationTargets": [
+		{
+			"Name": "ModioUI",
+			"LoadingPolicy": "Always"
 		}
 	]
 }

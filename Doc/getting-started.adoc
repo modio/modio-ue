@@ -63,7 +63,7 @@ The plugin uses UTF8 for all strings, as does the mod.io REST API.
 
 ==== Thread-safety guarantees
 
-[caption=2.0.0-alpha] 
+[caption=CURRENT RELEASE] 
 NOTE: The mod.io plugin is currently NOT thread-safe. All calls to plugin functions should be made on the game thread.
 
 [caption=FUTURE RELEASE] 
@@ -163,7 +163,7 @@ image::img/initasync_getoptions.png[]
 [%collapsible]
 ====
 
-[source]
+[source,c++]
 ----
 void UModioManager::Init()
 {
@@ -205,7 +205,7 @@ image::img/shutdownasync_runhandlers.png[]
 [%collapsible]
 ====
 
-[source]
+[source,c++]
 ----
 
 void UModioManager::Shutdown()
@@ -262,7 +262,7 @@ image::img/request_email_auth_code.png[]
 [%collapsible]
 ====
 
-[code]
+[source,c++]
 ----
 void UModioManager::RequestEmailAuthCode(const FString &EmailAddress)
 {
@@ -301,7 +301,7 @@ image::img/authenticate_user_email.png[]
 [%collapsible]
 ====
 
-[code]
+[source,c++]
 ----
 
 void UModioManager::AuthenticateUserEmail(const FString& AuthCode)
@@ -358,7 +358,7 @@ Below is a sample Blueprint method that will get the users current Encrypted App
 .C++ Example
 [%collapsible]
 ====
-[source]
+[source,c++]
 ----
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetTicket, int32, LocalUserNum, FString, TokenData);
 UFUNCTION(BlueprintCallable)
@@ -415,7 +415,7 @@ image::img/list_all_mods_filter.png[]
 .C++ Example
 [%collapsible]
 ====
-[code]
+[source,c++]
 ----
 void UModioManager::ListAllMods()
 {
@@ -475,7 +475,7 @@ image::img/unsubscribe_from_mod.png[]
 .C++ Example
 [%collapsible]
 ====
-[source]
+[source,c++]
 ----
 
 void UModioManager::SubscribeToMod(FModioModID ModId)
@@ -528,7 +528,7 @@ image::img/fetch_external_updates.png[]
 .C++ Example
 [%collapsible]
 ====
-[source]
+[source,c++]
 ----
 
 void UModioManager::FetchExternalUpdates()
@@ -567,7 +567,7 @@ image::img/query_user_subscriptions.png[]
 .C++ Example
 [%collapsible]
 ====
-[source]
+[source,c++]
 ----
 
 void UModioManager::FetchExternalUpdates()
@@ -601,7 +601,7 @@ image::img/enable_mod_management.png[]
 .C++ Example
 [%collapsible]
 ====
-[source]
+[source,c++]
 ----
 
 void UModioManager::EnableModManagement()
@@ -655,7 +655,7 @@ image::img/disable_mod_management.png[]
 .C++ Example
 [%collapsible]
 ====
-[source]
+[source,c++]
 ----
 
 void UModioManager::DisableModManagement()
@@ -690,7 +690,7 @@ image::img/query_user_installations.png[]
 .C++ Example
 [%collapsible]
 ====
-[source]
+[source,c++]
 ----
 
 void UModioManager::GetInstalledMods()
@@ -751,6 +751,17 @@ image::img/get_last_validation_error.png[]
 
 '''
 
+=== Plugin quick-start: In-game mod submission
+
+Submitting a mod from inside your game and making it visible to other players involves two steps:
+* Submission of the mod
+* Submission of the mod's data (aka 'the mod file')
+
+These two steps are outlined below.
+
+[caption=CURRENT RELEASE] 
+NOTE: Support for editing the details of an existing mod is currently not available but will be added in a future release. 
+
 ==== Submitting a new mod
 
 In order to submit a mod, you have to first create a mod handle using <<K2_GetModCreationHandle>> and use that handle when calling <<K2_SubmitNewModAsync>>
@@ -767,7 +778,7 @@ image::img/submit_new_mod.png[]
 [%collapsible]
 ====
 
-[source]
+[source,c++]
 ----
 
 void UModioManager::SubmitNewMod()
@@ -816,7 +827,7 @@ image::img/submit_new_mod_file.png[]
 [%collapsible]
 ====
 
-[source]
+[source,c++]
 ----
 
 void UModioManager::SubmitNewModFile(FModioModID ModId)

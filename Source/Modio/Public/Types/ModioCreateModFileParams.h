@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include "Types/ModioCommonTypes.h"
 
 #include "ModioCreateModFileParams.generated.h"
 
