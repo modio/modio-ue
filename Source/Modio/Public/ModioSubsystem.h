@@ -16,6 +16,7 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioCreateModFileParams.h"
 #include "Types/ModioCreateModParams.h"
+#include "Types/ModioEditModParams.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
 #include "Types/ModioImageWrapper.h"
@@ -200,6 +201,19 @@ public:
 	MODIO_API bool IsModManagementBusy();
 
 	/**
+	 * @brief Cancels or suspends the current mod update, installation, or upload, and begins processing a pending
+	 * operation for the specified mod ID
+	 * @param ModToPrioritize The ID for the mod to prioritize
+	 * @return Error code indicating the status of the prioritization request. Will be empty if either the
+	 * prioritization was successful, or the mod was already being processed
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @error GenericError::BadParameter|No pending transfer for the specified mod to prioritize
+	 */
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Mod Management")
+	MODIO_API FModioErrorCode PrioritizeTransferForMod(FModioModID ModToPrioritize);
+
+	/**
 	 * @brief Provides progress information for a mod installation or update operation if one is currently in progress.
 	 * @return Optional ModProgressInfo object containing information regarding the progress of the installation
 	 * operation.
@@ -380,6 +394,25 @@ public:
 	 * @error UserDataError::InvalidUser|No authenticated user
 	 */
 	MODIO_API void SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
+
+	/**
+	 * @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
+	 * values. Fields left empty on the Params object will not be updated.
+	 * @param Mod The ID of the mod you wish to edit
+	 * @params Params Descriptor containing the fields that should be altered.
+	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
+	 * object if the edits were performed successfully
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	MODIO_API void SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
+										 FOnGetModInfoDelegateFast Callback);
+
 	/**
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the
 	 * specified email address if it is associated with a Mod.io account
@@ -907,6 +940,25 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModFileForMod", Category = "mod.io|Mods|Submission")
 	MODIO_API void K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
+
+	/**
+	 * @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
+	 * values. Fields left empty on the Params object will not be updated.
+	 * @param Mod The ID of the mod you wish to edit
+	 * @params Params Descriptor containing the fields that should be altered.
+	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
+	 * object if the edits were performed successfully
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModChangesAsync", Category = "mod.io|Mods|Editing")
+	MODIO_API void K2_SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
+										 FOnGetModInfoDelegate Callback);
 
 	/**
 	 * @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide

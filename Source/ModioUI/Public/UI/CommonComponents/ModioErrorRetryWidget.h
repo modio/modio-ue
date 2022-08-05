@@ -28,13 +28,13 @@ protected:
 
 	virtual void SynchronizeProperties() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* RetryButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ErrorText;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere,Category="Widgets")
 	FString ErrorTextValue;
 
 public:

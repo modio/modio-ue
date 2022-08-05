@@ -33,14 +33,14 @@ public:
 
 	virtual void SetBrushFromMaterial(UMaterialInterface* Material) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioImage")
 	virtual void DisplayImageWithMaterial(UTexture2DDynamic* Texture, UMaterialInterface* Material,
 										  FName ImageParameterName);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioImage")
 	virtual void LoadImageFromFileAsync(FModioImageWrapper ImageLoader);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioImage")
 	void LoadImageFromFileWithMaterialAsync(FModioImageWrapper ImageLoader, UMaterialInterface* Material,
 											FName ImageParameterName);
 };

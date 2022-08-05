@@ -33,28 +33,28 @@ protected:
 
 	TArray<TSharedPtr<FText>> BoundValues;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TArray<FText> TabNames;
 	TSharedPtr<STileView<TSharedPtr<FText>>> MyListView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FTableRowStyle TEMP_TableRowStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category="Widgets")
 	FModioUIStyleRef TabButtonStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category="Widgets")
 	FModioUIStyleRef InactiveTabButtonStyle;
 
 	/// @brief Style for the tab which is selected but not hovered/focused
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FSlateBrush SelectedButtonBrush;
 
 	UPROPERTY(EditAnywhere, meta = (ReadOnlyKeys, EditCondition = "1==0", EditConditionHides, ShowOnlyInnerProperties,
-									EditFixedSize, EditFixedOrder, NoResetToDefault))
+									EditFixedSize, EditFixedOrder, NoResetToDefault), Category="Widgets")
 	TMap<FName, FModioUIColorRef> SerializedColors;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FVector2D ItemSize;
 
 	virtual void PostLoad() override;

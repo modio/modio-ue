@@ -17,7 +17,7 @@ protected:
 	virtual void NativeSetListItemString(const FString& InString) {};
 	
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIUserStringListEntry")
 	void SetListItemString(const FString& InString);
     
 	void SetListItemString_Implementation(const FString& InString)

@@ -73,25 +73,25 @@ protected:
 
 	TArray<UModioModInfoUI*> PendingDownloads;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioUserProfileButton* ProfileIcon;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* UserLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ActivityText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* LogOutButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioDownloadQueueOpProgress* CurrentOpProgress;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* UnsubscribeButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioListView* OperationQueue;
 
 	/// @brief Shows the newly updated user as the profile badge, name etc

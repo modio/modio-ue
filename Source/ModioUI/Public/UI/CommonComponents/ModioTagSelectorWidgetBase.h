@@ -26,17 +26,17 @@ protected:
 
 	void Refresh();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* TagCategoryLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioListViewString* CategoryTagList;
 
 	void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTagSelectorWidgetBase")
 	TArray<FString> GetSelectedTags();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTagSelectorWidgetBase")
 	void ClearSelectedTags();
 };

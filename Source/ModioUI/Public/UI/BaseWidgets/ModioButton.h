@@ -30,7 +30,7 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category = "Data Binding")
 	FOnSetLabel OnSetLabel;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere, meta=(StyleClass="ModioButtonStyle", DesignerRebuild))
+	UPROPERTY(BlueprintReadOnly,EditAnywhere, meta=(StyleClass="ModioButtonStyle", DesignerRebuild), Category="Appearance")
 	FModioUIStyleRef ButtonStyle = FModioUIStyleRef {"DefaultButtonStyle"};
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Appearance",
@@ -52,9 +52,9 @@ public:
 
 	// this should be a container of styles, and we store one of those globally
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioButton")
 	void SetLabel(FText NewLabel);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioButton")
 	void SetButtonStyle(FModioUIStyleRef ButtonStyleRef, bool bApplyStyle = false);
 };

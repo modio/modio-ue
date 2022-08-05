@@ -25,16 +25,16 @@ protected:
 	TSharedPtr<FActiveTimerHandle> CurrentAnimationTimer;
 	
 	virtual void SynchronizeProperties() override;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	EModioNotificationControllerSlotEdge Edge;
 
 	/** The alignment of the object horizontally. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "Edge==EModioNotificationControllerSlotEdge::Top||Edge==EModioNotificationControllerSlotEdge::Bottom", EditConditionHides))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "Edge==EModioNotificationControllerSlotEdge::Top||Edge==EModioNotificationControllerSlotEdge::Bottom", EditConditionHides), Category="Widget")
 	TEnumAsByte<EHorizontalAlignment> NotificationHorizontalAlignment;
 
 	/** The alignment of the object vertically. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-			  meta=(EditCondition = "Edge==EModioNotificationControllerSlotEdge::Left||Edge==EModioNotificationControllerSlotEdge::Right", EditConditionHides))
+			  meta=(EditCondition = "Edge==EModioNotificationControllerSlotEdge::Left||Edge==EModioNotificationControllerSlotEdge::Right", EditConditionHides), Category="Widget")
 	TEnumAsByte<EVerticalAlignment> NotificationVerticalAlignment;
 
 #if WITH_EDITOR
@@ -46,10 +46,10 @@ protected:
 	float VisibleDuration = 5;
 
 	/// @brief Changing this in the editor allows you to preview the animation transition
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	bool bExpanded = false;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta=(ClampMin=0.01))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta=(ClampMin=0.01), Category="Widget")
 	float AnimationTime = 0.1f;
 
 	UPROPERTY()

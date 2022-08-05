@@ -24,10 +24,10 @@ struct MODIOUI_API FModioModInfoPropertyDescriptor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="ModioModInfoPropertyDescriptor")
 	FText Label;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="ModioModInfoPropertyDescriptor")
 	EModioModInfoPropertyType Property;
 };
 
@@ -43,12 +43,12 @@ protected:
 
 	virtual void NativeOnSetDataSource() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="ModioModPropertyInspectorBase")
 	TArray<FModioModInfoPropertyDescriptor> PropertiesToDisplay;
 	
 	bool bRoutedUpdatePropertyDisplay = false;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioModPropertyInspectorBase")
 	void UpdatePropertyDisplay();
 
 	virtual void NativeOnUpdatePropertyDisplay();

@@ -21,6 +21,6 @@ protected:
 public:
 	UMaterialInterface* GetMaterialInstance() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (GetOptions = "GetValidGlyphNames"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (GetOptions = "GetValidGlyphNames"), Category="Widget")
 	FName GlyphName;
 };

@@ -24,25 +24,25 @@ protected:
 	FString GetTagGroupNameForTagValue(FString TagValue);
 
 	#if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	int32 NumberOfPreviewTags = 1;
 #endif
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	int32 NumberOfTagsToShow = 1;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TArray<FModioModTag> Tags;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText ExcessTagCountText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UModioTagWidgetBase> TagWidgetClass;
 	
 	TOptional<FModioModTagOptions> TagOptions;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Widgets")
 	void SetTags(TArray<FModioModTag> NewTags);
 };

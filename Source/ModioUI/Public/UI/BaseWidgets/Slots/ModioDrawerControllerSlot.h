@@ -25,16 +25,16 @@ protected:
 	TSharedPtr<FActiveTimerHandle> CurrentAnimationTimer;
 	
 	virtual void SynchronizeProperties() override;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	EModioDrawerControllerSlotEdge Edge;
 
 	/** The alignment of the object horizontally. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "Edge==EModioDrawerControllerSlotEdge::Top||Edge==EModioDrawerControllerSlotEdge::Bottom", EditConditionHides))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "Edge==EModioDrawerControllerSlotEdge::Top||Edge==EModioDrawerControllerSlotEdge::Bottom", EditConditionHides), Category="Widgets")
 	TEnumAsByte<EHorizontalAlignment> DrawerHorizontalAlignment;
 
 	/** The alignment of the object vertically. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-			  meta=(EditCondition = "Edge==EModioDrawerControllerSlotEdge::Left||Edge==EModioDrawerControllerSlotEdge::Right", EditConditionHides))
+			  meta=(EditCondition = "Edge==EModioDrawerControllerSlotEdge::Left||Edge==EModioDrawerControllerSlotEdge::Right", EditConditionHides), Category="Widgets")
 	TEnumAsByte<EVerticalAlignment> DrawerVerticalAlignment;
 
 #if WITH_EDITOR
@@ -43,10 +43,10 @@ protected:
 #endif
 
 	/// @brief Changing this in the editor allows you to preview the animation transition
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	bool bExpanded = false;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta=(ClampMin=0.01))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta=(ClampMin=0.01), Category="Widgets")
 	float AnimationTime = 0.1f;
 
 	UPROPERTY()

@@ -174,10 +174,10 @@ public:
 	void ShowLogoutDialog();
 	void ShowModReportDialog(UObject* DialogDataSource);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,  Category="ModioUISubsystem")
 	void RequestSubscriptionForModID(FModioModID ID);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestRemoveSubscriptionForModID(FModioModID ID);
 
 	void RequestRemoveSubscriptionForModID(FModioModID ID, FOnErrorOnlyDelegateFast DedicatedCallback);
@@ -198,69 +198,69 @@ public:
 	// Perhaps this should also carry the error code and a TOptional<bool> for the newly changed state?
 	FOnModSubscriptionStatusChanged OnSubscriptionStatusChanged;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestUserAvatar();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestEmailAuthentication(FModioEmailAuthCode Code);
 
 	/// @brief Special native-only overload for when we want direct notification of success or failure but still want to
 	/// broadcast UI events
 	void RequestEmailAuthentication(FModioEmailAuthCode Code, FOnErrorOnlyDelegateFast DedicatedCallback);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestExternalAuthentication(FModioAuthenticationParams Params, EModioAuthenticationProvider Provider);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestGalleryImageDownloadForModID(FModioModID ID, int32 Index,
 											 EModioGallerySize ImageSize = EModioGallerySize::Original);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestLogoDownloadForModID(FModioModID ID, EModioLogoSize LogoSize = EModioLogoSize::Thumb320);
 
 	TOptional<FModioModTagOptions> GetTagOptionsList();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	float GetCurrentDPIScaleValue();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestModInfoForModIDs(TArray<FModioModID> IDs);
 
 	// Uses RequestIdentifier so requesters can tell if a set of results or an error belongs to them
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestListAllMods(FModioFilterParams Params, FString RequestIdentifier);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	FText FormatText(FText Input);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	class UModioUIStyleSet* GetDefaultStyleSet();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	UMaterialInterface* GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	TArray<FName> GetAllNamedStyleNames();
 
 	void SetControllerOverrideType(EModioUIInputMode NewOverride);
 
-	UFUNCTION(BlueprintCallable, Category = "mod.io|UI")
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	UModioMenu* ShowModBrowserUIForPlayer(TSubclassOf<UModioMenu> MenuClass, APlayerController* Controller,
 										  FOnModBrowserClosed BrowserClosedDelegate);
 
 	/// @brief Sends a command to the browser UI in the form of a virtual keypress
-	UFUNCTION(BlueprintCallable, Category = "mod.io|UI")
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void SendCommandToBrowserUI(FKey CommandKey, int32 UserIndex = 0);
 
-	UFUNCTION(BlueprintCallable, Category = "mod.io|UI")
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void ShowDetailsForMod(FModioModID ID);
 
-	UFUNCTION(BlueprintCallable, Category = "mod.io|UI")
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	bool DisplaySearchResults(FModioFilterParams SearchParameters);
 
-	UFUNCTION(BlueprintCallable, Category = "mod.io|UI")
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayNotification(UPARAM(ref) TScriptInterface<IModioUINotification>& Notification);
-	UFUNCTION(BlueprintCallable, Category = "mod.io|UI")
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
 
 	void ExecuteOnModBrowserClosedDelegate();

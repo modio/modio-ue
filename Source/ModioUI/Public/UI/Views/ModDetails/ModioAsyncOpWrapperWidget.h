@@ -26,6 +26,6 @@ protected:
 	void NativeNotifyOperationState(EModioUIAsyncOperationWidgetState NewState) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioAsyncOpWrapperWidget")
 	void SetActualAsyncOperationWidget(const TScriptInterface<IModioUIAsyncOperationWidget>& Widget);
 };

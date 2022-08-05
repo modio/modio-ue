@@ -46,9 +46,9 @@ protected:
 	UFUNCTION()
 	void SubmitModReport();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioPopupMenu* MoreOptionsMenu;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileActiveFrame;
 };

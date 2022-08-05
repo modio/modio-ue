@@ -39,16 +39,16 @@ protected:
 	void SubmitModReport();
 	UFUNCTION()
 	void NativeMoreOptionsClicked();
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* SizeOnDiskLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioPopupMenu* MoreOptionsMenu;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioCollectionTileStatus* StatusWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* StatusLine;
 
 	// We don't need a text for any other status because all mods are either subscribed for the local user or installed

@@ -5,6 +5,7 @@
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioImageWrapper.h"
 #include "UObject/Interface.h"
+#include "ModioUISubsystem.h"
 
 #include "IModioUIMediaDownloadCompletedReceiver.generated.h"
 

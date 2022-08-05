@@ -27,6 +27,6 @@ protected:
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widgets")
 	FModioUIStyleRef StyleRef = {FName("DefaultLogoTextStyle") };
 };

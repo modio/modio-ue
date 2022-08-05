@@ -25,14 +25,14 @@ protected:
 	virtual void UpdateVisibility();
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
 	bool ToggleDrawerExpanded(int32 SlotIndex, bool bCloseOtherDrawers = true);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
 	void SetDrawerExpanded(int32 SlotIndex, bool bExpandedState, bool bCloseOtherDrawers = true);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
 	bool IsAnyDrawerExpanded() const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
 	void CollapseAllDrawers();
 };

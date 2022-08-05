@@ -16,7 +16,7 @@ class MODIOUI_API UModioTagInfoUI : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ModioTagInfoUI")
 	FModioModTagInfo Underlying;
 
 	TArray<TSharedPtr<FString>> SelectedTagValues;
@@ -33,10 +33,10 @@ protected:
 	TArray<UModioTagInfoUI*> CachedUITagInfos;
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ModioTagOptionsUI")
 	FModioModTagOptions Underlying;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTagOptionsUI")
 	TArray<class UModioTagInfoUI*> GetTagCategoriesForUI()
 	{
 		if (CachedUITagInfos.Num() != Underlying.GetRawList().Num())

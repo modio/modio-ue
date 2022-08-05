@@ -2,6 +2,7 @@
 
 #include "Types/ModioModManagementEvent.h"
 #include "UObject/Interface.h"
+#include "ModioUISubsystem.h"
 
 #include "IModioUIModManagementEventReceiver.generated.h"
 

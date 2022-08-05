@@ -28,22 +28,22 @@ protected:
 	void UpdateTimeRemaining(FModioUnsigned64 ProgressSinceLastUpdate, FModioUnsigned64 AmountRemaining,
 							 double SecondsSinceLastUpdate);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioProgressBar* ProgressBar;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* TimeRemainingText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets")
 	FText TimeRemainingTextFormat;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets")
 	FText SpeedTextFormat;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* OperationSpeedText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* OperationProgressText;
 
 	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;

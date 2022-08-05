@@ -26,6 +26,6 @@ protected:
 
 public:
 	/// @brief Call this to pass in a delegate that will receive operation state change notifications
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIAsyncRetryWidget")
 	void SetRetryRequestedDelegate(const FOnRetryRequested& Delegate);
 };

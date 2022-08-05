@@ -20,7 +20,7 @@ protected:
 	UPROPERTY()
 	TMap<FName, UWidget*> NamedWidgets;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere)
+	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category="Widgets")
 	TArray<FName> DesignerSpecifiedSlotNames;
 
 	// UNamedSlotInterface Begin

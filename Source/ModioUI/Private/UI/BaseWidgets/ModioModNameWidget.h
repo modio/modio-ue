@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/Widget.h"
+#include "CoreMinimal.h"
 #include "UI/Interfaces/IModioUIDataSourceWidget.h"
 #include "UI/Styles/ModioUIStyleRef.h"
 
@@ -16,19 +16,20 @@ class MODIOUI_API UModioModNameWidget : public UWidget, public IModioUIDataSourc
 
 private:
 	UPROPERTY()
-	UObject *DataSource;
-	
+	UObject* DataSource;
+
 protected:
 	virtual void NativeSetDataSource(UObject* InDataSource) override
 	{
 		DataSource = InDataSource;
 	}
-	
+
 	TSharedPtr<class SModioRichTextBlock> MyText;
 
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "DefaultDialogStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "DefaultDialogStyle"),
+			  Category = "ModioModNameWidget")
 	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultDialogStyle"};
 };

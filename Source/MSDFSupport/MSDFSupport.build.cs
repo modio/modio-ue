@@ -64,7 +64,7 @@ public class MSDFSupport : ModuleRules
     }
     public void CopyCommonGeneratedSource(string GeneratedSourcePath)
     {
-        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/msdfgen/.git")))
+        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/msdfgen/.git")) || Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/msdfgen/.git")))
         {
             //Clean the generated source directory so that we dont have any stale files in it
             if (Directory.Exists(GeneratedSourcePath))
@@ -101,7 +101,7 @@ public class MSDFSupport : ModuleRules
     }
     public void CopyCommonGeneratedHeaders(string GeneratedHeaderPath)
     {
-        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/msdfgen/.git")))
+        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/msdfgen/.git")) || Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/msdfgen/.git")))
         {
             //Clean the generated header directory so that we dont have any stale files in it
             if (Directory.Exists(GeneratedHeaderPath))

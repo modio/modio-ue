@@ -32,22 +32,22 @@ protected:
 	TMap<FName, FModioUIColorRef> SerializedColors;
 
 	UPROPERTY(EditAnywhere, meta = (ReadOnlyKeys, EditCondition = "true==false", EditConditionHides,
-									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder))
+									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder), Category="Style")
 	TMap<FName, FModioUIMaterialRef> SerializedMaterials;
 
 	UPROPERTY()
 	TMap<FString, FName> PropertyPathToColorPresetMap;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, meta = (ShowOnlyInnerProperties), Category="Style")
 	TMap<FName, USlateWidgetStyleContainerBase*> WidgetStyles;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ShowOnlyInnerProperties), Category="Style")
 	TMap<FName, FSlateBrush> NamedBrushes;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ShowOnlyInnerProperties), Category="Style")
 	TMap<FName, UTexture2D*> NamedGlyphs;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Meta = (ShowOnlyInnerProperties), Category="Style")
 	TMap<FName, UModioProceduralBrushParams*> NamedBrushMaterialsNew;
 
 	// We can probably clear this cache in a ModioUISubsystem::Shutdown call?
@@ -57,10 +57,10 @@ protected:
 	TMap<FName, UMaterialInstanceDynamic*> MaterialInstanceCache;
 
 	UPROPERTY(EditAnywhere,
-			  meta = (ReadOnlyKeys, EditFixedSize, EditFixedOrder, CustomReset = "ResetInputMappingGlyphs"))
+			  meta = (ReadOnlyKeys, EditFixedSize, EditFixedOrder, CustomReset = "ResetInputMappingGlyphs"), Category="Style")
 	TMap<FKey, FModioInputMappingGlyph> InputMappingGlyphs;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Style")
 	UMaterialInterface* DefaultGlyphMaterial;
 
 	const FSlateWidgetStyle* GetWidgetStyleInternal(const FName DesiredTypeName, const FName StyleName) const override;
@@ -78,13 +78,13 @@ protected:
 public:
 	UModioUIStyleSet(const FObjectInitializer& Initializer);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Style")
 	TMap<FName, FModioUIColor> ColorPresets;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Style")
 	TMap<FName, FLinearColor> OldColorPresets;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Style")
 	FModioComboBoxStyle DefaultComboBoxStyle;
 
 	const FName& GetStyleSetName() const override;

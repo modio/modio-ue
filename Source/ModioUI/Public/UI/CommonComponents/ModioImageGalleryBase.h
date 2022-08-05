@@ -40,28 +40,28 @@ protected:
 
 	virtual UWidget* GenerateContentWidget();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category="Widgets")
 	FOnDisplayImage OnDisplayImage;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category="Widgets")
 	FGetWidget OnConstructWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category="Widgets")
 	FGetInt32 OnGetItemCount;
 
 	/// @brief Widget class to wrap as the images in this gallery. Bind OnConstructWidget if you want to do something
 	/// else
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = ModioUIImageDisplay))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = ModioUIImageDisplay), Category="Widgets")
 	TSubclassOf<UUserWidget> ImageWidgetClass;
 	int32 CurrentImageIndex = 0;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioImageGalleryBase")
 	void DisplayGalleryImageAtIndex(EModioUIDirection Direction, int32 DirectIndex = -1);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioImageGalleryBase")
 	void ResetGallery();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioImageGalleryBase")
 	void RefreshCurrentImage();
 
 	virtual FOnDisplayImage& GetImageDisplayDelegate()

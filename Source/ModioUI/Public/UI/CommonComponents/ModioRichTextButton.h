@@ -30,24 +30,24 @@ protected:
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	UModioRichTextBlock* ButtonContent;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	UModioInputBindingImage* InputHintImage;
 
 	TOptional<FKey> KeyForInputHint;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText ButtonLabel;
 
 	UFUNCTION()
 	TArray<FString> GetStyleNames() const;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (GetOptions = "GetStyleNames"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (GetOptions = "GetStyleNames"), Category="Widgets")
 	FName DefaultStyleName = FName("default");
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TEnumAsByte<ETextJustify::Type> Justification;
 
 	virtual void NativeDisplayHintForInput(FKey VirtualKey) override;

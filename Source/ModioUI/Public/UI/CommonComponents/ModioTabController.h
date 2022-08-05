@@ -23,13 +23,13 @@ class MODIOUI_API UModioTabController : public UModioUserWidgetBase
 protected:
 	bool bRoutedOnCurrentTabChanged = false;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioInputBindingImage* NavigatePreviousHint;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioTileView* TabButtons;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioInputBindingImage* NavigateNextHint;
 
 	virtual void NativeOnCurrentTabChanged(int64 TabIndex, UObject* AssociatedItem);
@@ -45,18 +45,18 @@ protected:
 	ESlateVisibility GetInputHintVisibility(EModioUIInputMode InputMode);
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTabController")
 	void SetTabItems(TArray<UObject*> NewItems);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTabController")
 	void SetCurrentTab(int64 TabIndex);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTabController")
 	void NextTab();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTabController")
 	void PrevTab();
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Category="ModioTabController")
 	FOnCurrentTabChanged OnCurrentTabChanged;
 };

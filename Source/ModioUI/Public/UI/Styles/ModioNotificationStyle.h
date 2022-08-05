@@ -46,31 +46,31 @@ struct MODIOUI_API FModioNotificationStyle : public FSlateWidgetStyle
 		return StyleNames;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widget")
 	FModioUIStyleRef TextStyleSet;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (GetOptions = "GetStyleNames"))
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (GetOptions = "GetStyleNames"), Category="Widget")
 	FName PrimaryTextStyleName = FName("default");
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (GetOptions = "GetStyleNames"))
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (GetOptions = "GetStyleNames"), Category="Widget")
 	FName SecondaryTextStyleName = FName("default");
 	
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FModioUIMaterialRef ErrorSuccessGlyph;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FModioUIMaterialRef ErrorFailureGlyph;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FModioUIMaterialRef BackgroundMaterial;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef SuccessColor;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef ErrorColor;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FMargin ContentPadding;
 };
 
@@ -79,7 +79,7 @@ class UModioNotificationStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioNotificationStyle Style;
 
 	virtual void PostLoad() override

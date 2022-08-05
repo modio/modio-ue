@@ -12,7 +12,6 @@
 
 #define MODIO_PLATFORM_UNREAL 1
 
-
 /*
 
 #pragma warning(push)

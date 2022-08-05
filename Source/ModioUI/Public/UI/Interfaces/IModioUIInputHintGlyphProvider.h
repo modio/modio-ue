@@ -20,7 +20,7 @@ protected:
 		PURE_VIRTUAL(IModioUIInputHintGlyphProvider::NativeGetInputGlyphMaterialForInputType, return nullptr;);
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioUIInputHintGlyphProvider")
 	UMaterialInterface* GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType);
 
 	UMaterialInterface* GetInputGlyphMaterialForInputType_Implementation(FKey VirtualInput, EModioUIInputMode InputType)

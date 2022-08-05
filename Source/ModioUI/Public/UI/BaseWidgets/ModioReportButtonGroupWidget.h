@@ -36,7 +36,7 @@ protected:
 		DialogController = Controller;
 	}
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "DefaultDialogButtonStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "DefaultDialogButtonStyle"), Category="Widgets")
 	FModioUIStyleRef ButtonStyle {"DefaultDialogButtonStyle"};
 	
 	TArray<TSharedPtr<SButton>> Buttons;

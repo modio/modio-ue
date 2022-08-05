@@ -16,13 +16,13 @@ class MODIOUI_API UModioProgressBar : public UProgressBar
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioProgressBarStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioProgressBarStyle"), Category="Widget")
 	FModioUIStyleRef StyleRef;
 
 	virtual void SynchronizeProperties() override;
 	virtual void PreSave(const class ITargetPlatform* TargetPlatform) override;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioProgressBar")
 	void SetStyleRef(FModioUIStyleRef NewStyle);
 };

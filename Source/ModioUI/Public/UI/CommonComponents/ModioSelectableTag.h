@@ -34,6 +34,6 @@ protected:
 		}
 	};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioCheckBox* TagSelectedCheckbox;
 };

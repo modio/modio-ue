@@ -31,7 +31,7 @@ class UModioProgressBarStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioProgressBarStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

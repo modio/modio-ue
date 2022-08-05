@@ -19,21 +19,21 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 	virtual void NativePreConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioListView* TagSelectorList;
 	int32 CurrentlyDisplayedTagCategoryIndex = 0;
 	int32 TagCategoryCount = 0;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
 	TArray<FString> GetSelectedTags();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
 	void ClearSelectedTags();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
 	void DisplayNextTagCategory();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
 	void DisplayPrevTagCategory();
 };

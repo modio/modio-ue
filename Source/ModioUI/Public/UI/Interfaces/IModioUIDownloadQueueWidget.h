@@ -18,7 +18,7 @@ protected:
 	virtual void NativeRefreshDownloadQueue() {};
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIDownloadQueueWidget")
 	void DisplayUserInfo(FModioOptionalUser NewUser);
 
 	void DisplayUserInfo_Implementation(FModioOptionalUser NewUser)
@@ -26,7 +26,7 @@ public:
 		NativeDisplayUserInfo(NewUser);
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIDownloadQueueWidget")
 	void RefreshDownloadQueue();
 
 	void RefreshDownloadQueue_Implementation()

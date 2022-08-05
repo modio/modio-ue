@@ -24,17 +24,17 @@ protected:
 	virtual FEventReply NativeValidateCodeInputCharacter(FString Character);
 	virtual FString NativeGatherInput() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioCodeInputWidget")
 	FEventReply ValidateCodeInputCharacter(const FString& Character);
 	FEventReply ValidateCodeInputCharacter_Implementation(const FString& Character);
 
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	int32 NumberOfCharacters = 5;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCodeInputStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCodeInputStyle"), Category="Widgets")
 	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultCodeInputStyle"};
 
 	virtual void NativeGetTextValidationRules(TArray<FModioTextValidationRule>& Rules)
@@ -55,7 +55,7 @@ protected:
 			  meta = (EditCondition = "bValidateInput", EditConditionHides))
 	bool bDisplayValidationErrors = false;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widgets")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 
 	TSharedPtr<SVerticalBox> MyVerticalBox;

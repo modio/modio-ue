@@ -17,10 +17,11 @@ struct MODIOUI_API FModioUIAuthenticationProviderInfo
 	UPROPERTY()
 	bool bIsEmailAuthentication = false;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "!bIsEmailAuthentication", EditConditionHides))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "!bIsEmailAuthentication", EditConditionHides),
+			  Category = "ModioUIAuthenticationProviderInfo")
 	EModioAuthenticationProvider ProviderID;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioUIAuthenticationProviderInfo")
 	FText ProviderUILabel;
 };
 
@@ -49,7 +50,7 @@ public:
 	/// @brief Allows the consuming title to inform the UI which types of external authentication the UI should offer to
 	/// the user
 	/// @returns An array of EModioAuthenticationProvider values, one for each external authentication to support
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIAuthenticationDataProvider")
 	TArray<FModioUIAuthenticationProviderInfo> GetAuthenticationTypes();
 
 	TArray<FModioUIAuthenticationProviderInfo> GetAuthenticationTypes_Implementation()
@@ -58,7 +59,7 @@ public:
 	}
 
 	/// @brief Callback so the consuming application can populate the relevant OAuth token
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIAuthenticationDataProvider")
 	FModioAuthenticationParams GetAuthenticationParams(EModioAuthenticationProvider Provider);
 
 	FModioAuthenticationParams GetAuthenticationParams_Implementation(EModioAuthenticationProvider Provider)
@@ -66,12 +67,11 @@ public:
 		return NativeGetAuthenticationParams(Provider);
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIAuthenticationDataProvider")
 	bool ShouldOfferEmailAuthentication();
 
 	bool ShouldOfferEmailAuthentication_Implementation()
 	{
 		return NativeShouldOfferEmailAuthentication();
 	}
-
 };

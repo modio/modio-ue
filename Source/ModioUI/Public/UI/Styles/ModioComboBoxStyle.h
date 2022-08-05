@@ -23,15 +23,15 @@ struct MODIOUI_API FModioComboBoxStyle : public FSlateWidgetStyle
 			.SetPressed(FSlateColorBrush(FLinearColor(0.5, 0.5, 0.5)));
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FComboBoxStyle ComboBoxStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FModioWidgetBorderStyle MenuBorderStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FModioWidgetBorderStyle ButtonBorderStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FTableRowStyle DropdownItemStyle;
 };

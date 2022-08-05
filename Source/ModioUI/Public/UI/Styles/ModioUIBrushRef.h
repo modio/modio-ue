@@ -12,7 +12,7 @@ struct MODIOUI_API FModioUIMaterialRef
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FName MaterialName;
 
 	friend class FModioSlateBrushStructCustomization;

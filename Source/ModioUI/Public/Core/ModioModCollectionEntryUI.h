@@ -17,11 +17,11 @@ class MODIOUI_API UModioModCollectionEntryUI : public UObject, public IModioModI
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category="ModioModCollectionEntryUI")
 	FModioModCollectionEntry Underlying;
 
 	/// @brief Is this entry in the current user's subscriptions?
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient,  Category="ModioModCollectionEntryUI")
 	bool bCachedSubscriptionStatus = false;
 
 	virtual FModioModInfo GetFullModInfo_Implementation() override

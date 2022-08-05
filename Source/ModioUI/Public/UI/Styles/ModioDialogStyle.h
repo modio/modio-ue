@@ -24,19 +24,19 @@ struct MODIOUI_API FModioDialogStyle : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FMargin ContentPadding;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FSlateBrush BackgroundBrush;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widgets")
 	FModioUIStyleRef TitleTextStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widgets")
 	FModioUIStyleRef ContentTextStyle;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (StyleClass = "ModioButtonStyle"))
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category="Widgets")
 	FModioUIStyleRef ButtonStyle;
 
 };
@@ -46,7 +46,7 @@ class UModioDialogStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widgets")
 	FModioDialogStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

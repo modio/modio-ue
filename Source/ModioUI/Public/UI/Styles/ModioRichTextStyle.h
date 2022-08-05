@@ -58,11 +58,11 @@ struct MODIOUI_API FModioRichTextStyle : public FSlateWidgetStyle
 		return StyleInstance;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	TMap<FName, FTextBlockStyle> Styles;
 
 	/// @brief Inline Style overrides (Should this be moved someplace else perhaps?)
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widgets")
 	TMap<FName, FModioTextBlockStyleOverride> InlineStyleOverrides;
 };
 
@@ -71,7 +71,7 @@ class UModioRichTextStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widgets")
 	FModioRichTextStyle Style;
 	
 	virtual void PostLoad() override

@@ -20,23 +20,23 @@ protected:
 	TSharedRef<SWidget> RebuildWidget() override;
 	TSharedPtr<SModioCircle> MyCircle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 10, ClampMax = 1000))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 10, ClampMax = 1000), Category="Widgets")
 	float Resolution = 60;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0.0, ClampMax = 360.0))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0.0, ClampMax = 360.0), Category="Widgets")
 	float StartAngleInDegrees = 0;
 
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0.0, ClampMax = 360.0))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0.0, ClampMax = 360.0), Category="Widgets")
 	float ArcInDegrees = 360;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1), Category="Widgets")
 	float Radius = 1;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1), Category="Widgets")
 	float Thickness = 1;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FSlateColor ColorAndOpacity = FLinearColor::White;
 
 public:

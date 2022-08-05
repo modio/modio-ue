@@ -19,6 +19,6 @@ class MODIOUI_API UModioDialogBase : public UModioUserWidgetBase
 public:
 	bool Initialize() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FModioUIStyleRef DialogStyle = {FName("DefaultDialogStyle")};
 };

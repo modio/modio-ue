@@ -64,10 +64,10 @@ protected:
 			  meta = (EditCondition = "bValidateInput", EditConditionHides))
 	bool bDisplayValidationErrors = false;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioEditableTextBoxStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioEditableTextBoxStyle"), Category="Widgets")
 	FModioUIStyleRef TextBoxStyle = FModioUIStyleRef {"DefaultEditableTextBoxStyle"};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widgets")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 
 	TSharedPtr<SVerticalBox> MyVerticalBox;

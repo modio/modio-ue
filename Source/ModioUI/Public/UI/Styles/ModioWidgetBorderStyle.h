@@ -23,18 +23,18 @@ struct MODIOUI_API FModioWidgetBorderStyle : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	bool bMaskWithMaterial = false;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UMaterialInterface> MaskMaterial;
 
 	/// @brief Corner Radius will be multiplied against the shortest dimension of the widget instead of being absolute
 	/// in pixel terms
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Border Effect")
 	bool bRelativeRadius = false;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Border Effect")
 	float CornerRadius = 48;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Border Effect")
@@ -72,7 +72,7 @@ class UModioRoundedBorderStyle : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widgets")
 	FModioWidgetBorderStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

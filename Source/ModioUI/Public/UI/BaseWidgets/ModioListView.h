@@ -15,10 +15,10 @@ class MODIOUI_API UModioListView : public UListView
 	GENERATED_BODY()
 protected:
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	bool bSimulateSelection = false;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	int32 SimulatedSelectionIndex = 0;
 #endif
 

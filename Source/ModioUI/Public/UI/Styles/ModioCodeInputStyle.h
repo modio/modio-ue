@@ -21,19 +21,19 @@ struct MODIOUI_API FModioCodeInputStyle : public FTextBlockStyle
 	//FModioUIStyleRef TextBoxStyle;
 
 	/// @brief Brush to use for the box around each character element
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FSlateBrush CharacterBrush;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FModioUIColorRef ColorWhenFocused;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FModioUIMaterialRef FakeCaretMaterial;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FMargin CharacterSpacing;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
 	FVector2D MinimumCharacterSize;
 
 	static const FModioCodeInputStyle& GetDefault()
@@ -49,7 +49,7 @@ class UModioCodeInputStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioCodeInputStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

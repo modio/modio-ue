@@ -10,7 +10,7 @@ struct MODIOUI_API FModioUIColorRef
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Color")
 	FName ColorName;
 
 	friend class FModioSlateColorDetailsCustomization;

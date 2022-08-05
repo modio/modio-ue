@@ -26,12 +26,12 @@ protected:
 	}
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIPopupMenuContentWidget")
 	void SetMenuEntries(const FModioUIMenuCommandList& Entries);
 
 	void SetMenuEntries_Implementation(const FModioUIMenuCommandList& Entries);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIPopupMenuContentWidget")
 	void SetDesiredSize(const FVector2D& DesiredSize);
 
 	void SetDesiredSize_Implementation(const FVector2D& DesiredSize);

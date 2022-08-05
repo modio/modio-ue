@@ -16,7 +16,7 @@ class MODIOUI_API UModioSpecifiedMaterialParams : public UModioProceduralBrushPa
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	TSoftObjectPtr<UMaterialInterface> SpecifiedMaterial;
 
 	virtual UMaterialInterface* GetMaterialInstance() override;

@@ -18,13 +18,13 @@ class MODIOUI_API UModioRoundedImage : public UModioImage
 protected:
 	virtual void SynchronizeProperties() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FModioUIMaterialRef MaterialToUse;
 
 	UPROPERTY(Transient)
 	UMaterialInterface* CachedReferencedMaterial;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FName TextureParameterName = "WidgetTexture";
 
 	virtual void LoadImageFromFileAsync(FModioImageWrapper ImageLoader) override;

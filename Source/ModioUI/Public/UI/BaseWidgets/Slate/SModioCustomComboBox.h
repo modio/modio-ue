@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Rendering/DrawElements.h"
+#include "Brushes/SlateColorBrush.h"
 #include "Slate/SRetainerWidget.h"
 #include "Types/SlateEnums.h"
 #include "UI/Styles/ModioUIColorRef.h"

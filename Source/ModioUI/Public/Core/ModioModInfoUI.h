@@ -27,6 +27,6 @@ public:
 		return Underlying.ModId;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ModioModInfoUI")
 	FModioModInfo Underlying;
 };

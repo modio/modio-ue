@@ -24,15 +24,15 @@ class MODIOUI_API UModioFeaturedView : public UModioMenuView,
 	GENERATED_BODY()
 protected:
 	int32 CurrentlySelectedCategoryColumn = INDEX_NONE;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioWidgetCarousel* PrimaryFeaturedCategory;
 
 	/// @brief Widget implementing ModioUIAsyncHandlerWidget to handle swapping between error widget, loading widget, or
 	/// the Primary Featured Category
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
 	UWidget* PrimaryFeaturedCategoryLoader;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioListView* AdditionalCategories;
 
 	// Holds the featured items so that they don't go out of scope

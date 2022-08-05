@@ -32,7 +32,7 @@ protected:
 
 	void UpdateBrushImage(EModioUIInputMode InputDevice);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FKey KeyToShow;
 
 	EModioUIInputMode LastDeviceType = EModioUIInputMode::Unknown;
@@ -41,13 +41,13 @@ protected:
 
 public:
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	EModioUIInputMode PreviewMode;
 #endif
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioInputBindingImage")
 	void SetKeyToShow(FKey NewKey);
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioInputBindingImage")
 	FGetVisibilityForInputModeDelegate& GetInputModeVisibilityDelegate();
 };

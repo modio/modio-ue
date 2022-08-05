@@ -20,25 +20,27 @@ struct MSDFSUPPORT_API FSVGConversionParams
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SVGConversionParams")
 	int32 SVGPathIndex;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPreserveRatio))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPreserveRatio), Category = "SVGConversionParams")
 	FVector2D OutputDimensions = FVector2D(32, 32);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SVGConversionParams")
 	bool bAutoFrame = true;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "AutoFrame"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "AutoFrame"), Category = "SVGConversionParams")
 	int32 ExtraMargin = 2;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "!bAutoFrame"), meta = (AllowPreserveRatio))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "!bAutoFrame"), meta = (AllowPreserveRatio),
+			  Category = "SVGConversionParams")
 	FVector2D Scale = FVector2D(1, 1);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "!bAutoFrame"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "!bAutoFrame"),
+			  Category = "SVGConversionParams")
 	FVector2D Translation;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SVGConversionParams")
 	int32 FieldRangeInPixels = 8;
 
 	// For future use
@@ -51,7 +53,7 @@ class MSDFSUPPORT_API USVGToSDFFunctionLibrary : public UBlueprintFunctionLibrar
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="SVGToSDFFunctionLibrary")
 	static bool ConvertSVGToMSDFData(const FString& FilePath, const FSVGConversionParams& Params,
 									 TArray<uint8>& Output);
 };

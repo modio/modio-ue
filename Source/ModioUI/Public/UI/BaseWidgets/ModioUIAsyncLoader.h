@@ -19,7 +19,7 @@ class MODIOUI_API UModioUIAsyncLoader : public UWidget, public IModioUIAsyncHand
 	GENERATED_BODY()
 protected:
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	EModioUIAsyncOperationWidgetState CurrentState = EModioUIAsyncOperationWidgetState::InProgress;
 
 	TSharedPtr<class SBox> MyBox;

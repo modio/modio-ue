@@ -19,6 +19,6 @@ class MODIOUI_API UModioComboBox : public UComboBox
 
 	virtual void SynchronizeProperties() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TEnumAsByte<EMenuPlacement> MenuPlacement;
 };

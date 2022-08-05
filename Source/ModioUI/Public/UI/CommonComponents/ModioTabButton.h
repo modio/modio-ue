@@ -18,7 +18,7 @@ class MODIOUI_API UModioTabButton : public UModioUserWidgetBase, public IUserObj
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (Bindwidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioButton* ClickableRegion;
 
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;

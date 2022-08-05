@@ -51,7 +51,7 @@ protected:
 															&IModioUIModDetailsDisplay::HandleDisplayModDetailsForID);
 		}
 	}
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIModDetailsDisplay")
 	void RegisterUserWidget(const TScriptInterface<IModioUIModDetailsDisplay>& DisplayWidget);
 	void RegisterUserWidget_Implementation(const TScriptInterface<IModioUIModDetailsDisplay>& DisplayWidget)
 	{
@@ -64,9 +64,9 @@ protected:
 	}
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIModDetailsDisplay")
 	void DisplayModDetails(const TScriptInterface<IModioModInfoUIDetails>& Details);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIModDetailsDisplay")
 	void DisplayModDetailsForID(const FModioModID& ModID);
 };

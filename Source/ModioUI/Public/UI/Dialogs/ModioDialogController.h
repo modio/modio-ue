@@ -42,7 +42,7 @@ protected:
 	/// not transitioning at all; positive, we are transitioning from collapsed ->visible
 	int32 AnimationDirection;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category="Widgets")
 	bool bCurrentlyDisplayingDialog = false;
 
 	UPROPERTY(Transient)
@@ -53,7 +53,7 @@ protected:
 
 	float GetBlurStrength() const;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FInterpCurveFloat BlurCurve;
 
 	UFUNCTION()
@@ -61,32 +61,32 @@ protected:
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UModioDialogInfo> AuthenticationChoiceDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UModioDialogInfo> UnsubscribeConfirmationDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UModioDialogInfo> EmailAuthenticationDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UModioDialogInfo> ReportContentDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UModioDialogInfo> ReportEmailDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UModioDialogInfo> UninstallConfirmationDialog;
 
 	/// @brief Needs to implement error display interface I guess
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UWidget> ErrorDisplayWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UModioDialogInfo> LogoutConfirmationDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UWidget> LoadingOverlay;
 
 	friend class UModioDialogBaseInternal;

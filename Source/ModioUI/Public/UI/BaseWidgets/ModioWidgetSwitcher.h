@@ -15,7 +15,7 @@ class MODIOUI_API UModioWidgetSwitcher : public UWidgetSwitcher
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintAssignable, EditAnywhere)
+	UPROPERTY(BlueprintAssignable, EditAnywhere, Category="Widgets")
 	FOnIndexChanged OnActiveWidgetChanged;
 	TArray<int32> ActiveWidgetIndexStack;
 

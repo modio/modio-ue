@@ -40,7 +40,7 @@ protected:
 
 	TWeakObjectPtr<UWidget> WeakExpandedWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category="Widgets")
 	bool bCurrentExpandedState = false;
 	virtual void NativeConstruct() override;
 
@@ -65,30 +65,30 @@ protected:
 							  const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId,
 							  const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FModioUIMaterialRef LoadingMaterial = FModioUIMaterialRef {"Loading"};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FModioUIMaterialRef ErrorMaterial = FModioUIMaterialRef {"ImageError"};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget)) UModioImage* Thumbnail;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget)) UModioImage* Thumbnail;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioUserWidgetBase* SubscriptionIndicator;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModName;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetAnim), Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* FocusTransition;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioRoundedBorder* TileBorder;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileFrame;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* SubscribeButton;
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -118,7 +118,7 @@ public:
 	FOnModTileSubscribeClicked OnSubscribeClicked;
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioModTileBase")
 	void SetExpandedState(bool bExpanded);
 
 	UFUNCTION()

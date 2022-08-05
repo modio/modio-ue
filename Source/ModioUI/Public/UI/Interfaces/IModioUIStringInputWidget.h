@@ -23,17 +23,17 @@ protected:
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIStringInputWidget")
 	void SetHint(const FText& HintText);
 
 	void SetHint_Implementation(const FText& HintText);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIStringInputWidget")
 	FString GatherInput();
 
 	FString GatherInput_Implementation();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIStringInputWidget")
 	void SetInput(const FString& Input);
 
 	void SetInput_Implementation(const FString& Input);

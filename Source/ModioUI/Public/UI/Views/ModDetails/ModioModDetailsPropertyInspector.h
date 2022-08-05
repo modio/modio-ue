@@ -33,7 +33,7 @@ protected:
 
 	virtual void NativeOnUpdatePropertyDisplay() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioGridPanel* PropertyGrid;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Appearance")

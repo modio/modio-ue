@@ -13,10 +13,10 @@ struct MODIOUI_API FModioDynamicImageStyle : public FSlateWidgetStyle
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere)
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
     FSlateBrush ImageLoadingBrush;
 
-    UPROPERTY(BlueprintReadWrite,EditAnywhere)
+    UPROPERTY(BlueprintReadWrite,EditAnywhere, Category="Widget")
     FSlateBrush ImageUnavailableBrush;
     
 };
@@ -27,7 +27,7 @@ class UModioDynamicImageStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioDynamicImageStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

@@ -100,43 +100,43 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnViewChanged(int64 ViewIndex);
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UNativeWidgetHost* MenuTitleContent;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioWidgetSwitcher* ViewController;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioMenuBar* MenuBar;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioImage* Background;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioDrawerController* DrawerController;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioDialogController* DialogController;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, MustImplement = "ModioUINotificationController"))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget, MustImplement = "ModioUINotificationController"))
 	UWidget* NotificationController;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UModioMenuView> FeaturedView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UModioMenuView> CollectionView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UModioMenuView> SearchResultsView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UModioMenuView> ModDetailsView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UModioDrawer> DownloadProgressDrawer;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UModioDrawer> RefineSearchDrawer;
 
 public:

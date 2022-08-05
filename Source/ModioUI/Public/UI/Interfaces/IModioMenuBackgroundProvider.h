@@ -23,7 +23,7 @@ protected:
 	PURE_VIRTUAL(IModioMenuBackgroundProvider::NativeGetBackgroundMaterial, return {};);
 
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioMenuBackgroundProvider")
 	UMaterialInterface* GetBackgroundMaterial();
 
 	UMaterialInterface* GetBackgroundMaterial_Implementation()

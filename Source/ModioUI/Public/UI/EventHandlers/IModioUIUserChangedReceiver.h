@@ -3,6 +3,7 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioUser.h"
 #include "UObject/Interface.h"
+#include "ModioUISubsystem.h"
 
 #include "IModioUIUserChangedReceiver.generated.h"
 

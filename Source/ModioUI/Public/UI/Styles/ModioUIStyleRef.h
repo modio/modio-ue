@@ -12,7 +12,7 @@ struct FModioUIStyleRef
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Style")
 	FName StyleName;
 
 public:

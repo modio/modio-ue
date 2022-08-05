@@ -1,3 +1,4 @@
+
 #pragma once
 #include "Styling/SlateTypes.h"
 #include "UI/Styles/ModioUIColorRef.h"
@@ -14,10 +15,10 @@ struct MODIOUI_API FModioEditableTextBoxStyle : public FEditableTextBoxStyle
 	{
 		return TypeName;
 	};
-	UPROPERTY(BlueprintReadOnly,EditAnywhere, meta=(InlineEditConditionToggle))
+	UPROPERTY(BlueprintReadOnly,EditAnywhere, meta=(InlineEditConditionToggle), Category="Widget")
 	bool bShowHintIcon = true;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere, meta=(EditCondition=bShowHintIcon))
+	UPROPERTY(BlueprintReadOnly,EditAnywhere, meta=(EditCondition=bShowHintIcon), Category="Widget")
 	FSlateBrush HintIcon;
 	
 	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category="Border")
@@ -42,7 +43,7 @@ class UModioEditableTextBoxStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioEditableTextBoxStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

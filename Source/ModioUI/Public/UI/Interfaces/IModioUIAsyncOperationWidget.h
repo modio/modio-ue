@@ -37,7 +37,7 @@ protected:
 
 	virtual void NativeRequestOperationRetry() {}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIAsyncOperationWidget")
 	void NotifyOperationState(EModioUIAsyncOperationWidgetState NewState);
 
 	void NotifyOperationState_Implementation(EModioUIAsyncOperationWidgetState NewState)
@@ -61,10 +61,10 @@ protected:
 
 public:
 	/// @brief Call this to pass in a delegate that will receive operation state change notifications
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIAsyncOperationWidget")
 	void SetOperationStateDelegate(const FOnSetOperationState& Delegate);
 
 	/// @brief Call this to request that the underlying widget retry the async operation
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIAsyncOperationWidget")
 	void RequestOperationRetry();
 };

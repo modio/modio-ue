@@ -26,13 +26,13 @@ protected:
 	UFUNCTION()
 	virtual void OnSearchClicked();
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* SearchButton;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* BackButton;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioUserProfileButton* UserProfileButton;
 
 public:

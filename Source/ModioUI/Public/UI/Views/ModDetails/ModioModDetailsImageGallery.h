@@ -64,10 +64,10 @@ protected:
 
 	void ShowImageInternal(int32 RawIndex);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioImageGalleryBase* ImageGallery;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioListViewInteger* NavButtons;
 };
 
@@ -80,10 +80,10 @@ protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioImage* Image;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Appearance")
 	TSoftObjectPtr<UMaterialInterface> SpecifiedMaterial;
 
 	// TODO: @modio-ue4-ui the colors here should possibly be put into some kind of common style

@@ -14,6 +14,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
+#include "Templates/UniquePtr.h"
 
 class FModioModule : public IModuleInterface
 {
@@ -24,6 +25,7 @@ public:
 
 private:
 	FString ModioLogFile = FPaths::ProjectLogDir() / TEXT("Modio.log");
+	TUniquePtr<class FArchive> ModioLog;
 	void RegisterSettings();
 	void UnregisterSettings();
 };

@@ -23,22 +23,22 @@ struct MODIOUI_API FModioTableRowStyle : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef BackgroundHoverColor;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef BackgroundSelectedColor;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef BackgroundColor;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef TextHoverColor;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef TextSelectedColor;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widget")
 	FModioUIColorRef TextColor;
 };
 
@@ -47,7 +47,7 @@ class UModioTableRowStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioTableRowStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

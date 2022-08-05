@@ -34,15 +34,28 @@ void FModioModule::StartupModule()
 	{
 		FileManager.DeleteFile(*ModioLogFile);
 	}
+	ModioLog =
+		TUniquePtr<FArchive>(IFileManager::Get().CreateFileWriter(*ModioLogFile, EFileWrite::FILEWRITE_Append));
 
 	Modio::SetLogCallback([&](Modio::LogLevel Level, std::string Message) {
-		UE_LOG(LogModio, Log, TEXT("%s"), UTF8_TO_TCHAR(Message.c_str()));
+		TRACE_CPUPROFILER_EVENT_SCOPE(ModioLogCallback);
 
-		// Append message to ModioLogFile.
-		// FFileHelper::SaveStringToFile() will create a new file if it does not yet exist
-		FFileHelper::SaveStringToFile(UTF8_TO_TCHAR(Message.c_str()), *ModioLogFile,
-									  FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(),
-									  EFileWrite::FILEWRITE_Append);
+		{
+			TRACE_CPUPROFILER_EVENT_SCOPE(ModioLogConsole);
+			UE_LOG(LogModio, Log, TEXT("%s"), UTF8_TO_TCHAR(Message.c_str()));
+		}
+
+		{
+			TRACE_CPUPROFILER_EVENT_SCOPE(ModioLogToFile);
+			
+			if (ModioLog)
+			{
+				{
+					TRACE_CPUPROFILER_EVENT_SCOPE(ModioLogSerialize);
+					ModioLog->Serialize(const_cast<char*>(Message.c_str()), Message.size());
+				}
+			}
+		}
 	});
 
 	RegisterSettings();

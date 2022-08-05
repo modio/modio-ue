@@ -50,13 +50,13 @@ protected:
 		  meta = (EditCondition = "bValidateInput", EditConditionHides))
 	bool bDisplayValidationErrors = false;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widgets")
 	FModioUIStyleRef ErrorTextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 	
 	TSharedPtr<SVerticalBox> MyVerticalBox;
 	TSharedPtr<SModioRichTextBlock> MyErrorTextBlock;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioMultiLineEditableTextBoxStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioMultiLineEditableTextBoxStyle"), Category="Widgets")
 	FModioUIStyleRef TextBoxStyle = FModioUIStyleRef {"DefaultMultiLineEditableTextBoxStyle"};
 
 };

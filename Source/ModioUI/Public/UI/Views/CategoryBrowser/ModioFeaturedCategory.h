@@ -41,21 +41,21 @@ protected:
 
 	FOnGetSelectionIndex SelectionIndexDelegate;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* Title;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioTileView* ItemList;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
 	UWidget* TileLoader;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioButton* SeeAllButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioButton* NavLeftButton;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioButton* NavRightButton;
 
 	UPROPERTY()
@@ -144,7 +144,7 @@ public:
 		return SelectionChangedDelegate;
 	}
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioFeaturedCategory")
 	void SetSelectionIndexDelegate(FOnGetSelectionIndex Delegate);
 	// delegate for See all button
 };

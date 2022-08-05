@@ -17,6 +17,6 @@ class MODIOUI_API UModioMoreOptionsDialog : public UModioDialogBase
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioTileView* OptionsList;
 };

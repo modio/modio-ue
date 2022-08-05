@@ -36,22 +36,22 @@ protected:
 	virtual TSharedRef<SWidget> NativeGetContentWidget();
 	virtual TSharedRef<SWidget> NativeGetOptionalContentWidget();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category="ModioDrawerContentBase")
 	UWidget* GetHeaderWidget();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category="ModioDrawerContentBase")
 	UWidget* GetContentWidget();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, Category="ModioDrawerContentBase")
 	UWidget* GetOptionalContentWidget();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	UNamedSlot* HeaderSlot;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	UNamedSlot* ContentSlot;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	UNamedSlot* OptionalContentSlot;
 
 public:

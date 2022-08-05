@@ -38,15 +38,15 @@ protected:
 
 	void ApplyStyling();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioDialogStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioDialogStyle"), Category="Widgets")
 	FModioUIStyleRef DialogStyle = {FName("DefaultDialogStyle")};
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* CancelButton;
 	
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* LoadingText;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
 	UImage* BackgroundImage;
 };

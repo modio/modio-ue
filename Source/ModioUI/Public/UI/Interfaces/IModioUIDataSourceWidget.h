@@ -18,7 +18,7 @@ protected:
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIDataSourceWidget")
 	void SetDataSource(UObject* InDataSource);
 
 	void SetDataSource_Implementation(UObject* InDataSource);

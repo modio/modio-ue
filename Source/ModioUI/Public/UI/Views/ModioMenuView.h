@@ -19,10 +19,10 @@ protected:
 	UWidget* CachedMenuTitleContentWidget;
 
 	/// @brief Displayed on the associated menu bar
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText MenuName;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSubclassOf<UUserWidget> TitleContentClass;
 
 public:

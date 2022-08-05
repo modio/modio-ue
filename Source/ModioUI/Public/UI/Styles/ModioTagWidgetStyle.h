@@ -26,19 +26,19 @@ struct MODIOUI_API FModioTagWidgetStyle : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget", meta = (StyleClass = "ModioRichTextStyle"))
 	FModioUIStyleRef TextStyleNew;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FSlateBrush TagBackgroundBrush;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FModioRichTextStyle TextStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FModioWidgetBorderStyle TagBackgroundStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FMargin ContentPadding;
 };
 
@@ -47,7 +47,7 @@ class UModioTagWidgetStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget", meta = (ShowOnlyInnerProperties))
 	FModioTagWidgetStyle Style;
 
 	virtual void PostLoad() override

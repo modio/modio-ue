@@ -39,19 +39,19 @@ class MODIOUI_API UModioUICommandInfoLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioCommonUICommands")
 	static struct FModioUIMenuEntry PreviousPageCommand();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioCommonUICommands")
 	static FModioUIMenuEntry NextPageCommand();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioCommonUICommands")
 	static FModioUIMenuEntry MoreOptionsCommand();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioCommonUICommands")
 	static FModioUIMenuEntry ConfirmCommand();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioCommonUICommands")
 	static FModioUIMenuEntry RefineSearchCommand();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioCommonUICommands")
 	static FModioUIMenuEntry BackCommand();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioCommonUICommands")
 	static FModioUIMenuEntry DownloadQueueCommand();
 
 };

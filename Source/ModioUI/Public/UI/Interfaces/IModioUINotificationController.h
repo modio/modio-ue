@@ -5,6 +5,7 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioUser.h"
 #include "UObject/Interface.h"
+#include "ModioUISubsystem.h"
 
 #include "IModioUINotificationController.generated.h"
 
@@ -52,7 +53,7 @@ protected:
 				Cast<ImplementingType>(this), &IModioUINotificationController::HandleDisplayNotificationWidget);
 		}
 	}
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUINotificationController")
 	void RegisterUserWidget(const TScriptInterface<IModioUINotificationController>& ControllerWidget);
 	void RegisterUserWidget_Implementation(const TScriptInterface<IModioUINotificationController>& ControllerWidget)
 	{
@@ -66,10 +67,10 @@ protected:
 
 public:
 	/// @brief Function to display an arbitrary notification widget that the caller has already configured
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUINotificationController")
 	void DisplayNotification(const TScriptInterface<IModioUINotification>& Notification);
 
 	/// @brief Function to display an error code notification widget
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUINotificationController")
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
 };

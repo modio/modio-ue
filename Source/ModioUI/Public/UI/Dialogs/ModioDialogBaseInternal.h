@@ -39,6 +39,7 @@ protected:
 	TSharedPtr<class SModioRichTextBlock> DialogTextBlock;
 	TSharedPtr<class STileView<TSharedPtr<FModioDialogButtonInfo>>> DialogButtons;
 
+	UPROPERTY()
 	UWidget* LoadingSpinner;
 
 	UPROPERTY()
@@ -48,9 +49,9 @@ protected:
 
 	virtual void BuildCommandList(TSharedRef<FUICommandList> InCommandList) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioDialogStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioDialogStyle"), Category="Widgets")
 	FModioUIStyleRef DialogStyle = {FName("DefaultDialogStyle")};
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FMargin ButtonSpacing;
 
 	UPROPERTY()

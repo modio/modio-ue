@@ -2,6 +2,7 @@
 
 #include "UObject/Interface.h"
 #include "Types/ModioCommonTypes.h"
+#include "ModioUISubsystem.h"
 
 #include "IModioUISubscriptionsChangedReceiver.generated.h"
 

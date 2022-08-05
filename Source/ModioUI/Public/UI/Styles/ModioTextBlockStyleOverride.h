@@ -26,10 +26,10 @@ struct MODIOUI_API FModioTextBlockStyleOverride : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widgets")
 	FTextBlockStyle StyleProperties;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (EditCondition = "true!=false", EditConditionHides))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (EditCondition = "true!=false", EditConditionHides), Category="Widgets")
 	TMap<FName, bool> OverriddenProperties;
 
 	/// @brief Applies the overrides to the specified input style

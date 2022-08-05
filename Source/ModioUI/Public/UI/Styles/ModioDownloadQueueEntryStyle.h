@@ -25,13 +25,13 @@ struct MODIOUI_API FModioDownloadQueueEntryStyle : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FSlateBrush HighlightedBorderBrush;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category="Widget")
 	FModioUIStyleRef UnsubscribeButtonStyle = FModioUIStyleRef {"DefaultButtonStyle"};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widget")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 };
 
@@ -40,7 +40,7 @@ class UModioDownloadQueueEntryStyleContainer : public UModioUIWidgetStyleContain
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioDownloadQueueEntryStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

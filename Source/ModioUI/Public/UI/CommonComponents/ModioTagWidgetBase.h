@@ -24,22 +24,22 @@ protected:
 	UFUNCTION()
 	const struct FModioRichTextStyle& GetTagTextStyle();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FText TagTextFormat;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FString TagCategory;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FString TagValue;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* TagText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioImage* TagBackground;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioTagWidgetStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioTagWidgetStyle"), Category="Widgets")
 	FModioUIStyleRef TagStyle = FModioUIStyleRef {"DefaultTagWidgetStyle"};
 
 public:

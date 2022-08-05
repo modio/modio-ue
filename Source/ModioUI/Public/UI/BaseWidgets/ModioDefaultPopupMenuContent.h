@@ -42,13 +42,13 @@ protected:
 		return &TextStyle;
 	}
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FModioUIStyleRef BorderStyle = FModioUIStyleRef {"DefaultPopupBorderStyle"};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FModioUIMaterialRef RetainerMaterial = FModioUIMaterialRef {"RoundedRectangle"};
 
 #if WITH_EDITORONLY_DATA

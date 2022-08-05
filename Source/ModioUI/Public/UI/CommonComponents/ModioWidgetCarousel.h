@@ -125,16 +125,16 @@ protected:
 	}
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioWidgetCarousel")
 	void SetItems(TArray<UObject*> Items);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioWidgetCarousel")
 	void ScrollLeft()
 	{
 		MyCarousel->ScrollLeft();
 	}
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioWidgetCarousel")
 	void ScrollRight()
 	{
 		MyCarousel->ScrollRight();

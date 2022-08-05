@@ -50,36 +50,36 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	TSharedPtr<SModioCustomComboBox<TSharedPtr<FText>>> MyComboBox;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText Description;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText LabelFormatText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText ValueFormatText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	bool bUseRoundedCorners = true;
 
 	//Possibly this can just reference ComboBoxStyle
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FModioUIStyleRef RoundedCornerStyle = FModioUIStyleRef {"DefaultComboBoxBorderStyle"};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FModioUIStyleRef ComboBoxStyle = FModioUIStyleRef {"DefaultComboBoxStyle"};
 
 	//TODO: @modio-ue4 move into the ComboBoxStyle
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FMargin ContentPadding = FMargin(20.0f, 8);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	bool bPreviewOpen = false;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TArray<FText> OptionValues;
 
 	TArray<TSharedPtr<FText>> BoundValues;
@@ -89,7 +89,7 @@ protected:
 	FOnSelectionChanged OnSelectionChanged;
 	FOnSelectionChangedWithDelegate OnSelectionChangedWithDelegate;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere)
+	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category="Widgets")
 	EModioPopupPlacement PopupPlacement = EModioPopupPlacement::AlignTopLeft;
 
 

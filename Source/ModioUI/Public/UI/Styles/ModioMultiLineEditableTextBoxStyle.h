@@ -15,7 +15,7 @@ struct MODIOUI_API FModioMultiLineEditableTextBoxStyle : public FEditableTextBox
 		return TypeName;
 	};
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere,meta=(StyleClass="ModioTextWidgetStyle"))
+	UPROPERTY(BlueprintReadWrite,EditAnywhere,meta=(StyleClass="ModioTextWidgetStyle"), Category="Widget")
 	FModioUIStyleRef TextStyle;
 
 	static const FModioMultiLineEditableTextBoxStyle& GetDefault()
@@ -31,7 +31,7 @@ class UModioMultiLineEditableTextBoxStyleContainer : public UModioUIWidgetStyleC
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioMultiLineEditableTextBoxStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

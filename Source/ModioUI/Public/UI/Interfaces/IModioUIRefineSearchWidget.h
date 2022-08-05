@@ -36,7 +36,7 @@ protected:
 
 	bool bRoutedSearchSettingsChanged = false;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
 	void NotifySettingsChanged(const FModioFilterParams& SearchSettings);
 
 	void NotifySettingsChanged_Implementation(const FModioFilterParams& SearchSettings)
@@ -50,7 +50,7 @@ protected:
 	virtual FOnSearchSettingsChanged& NativeGetOnSettingsChangedDelegate() = 0;
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
 	FString GetSearchString();
 
 	FString GetSearchString_Implementation()
@@ -58,7 +58,7 @@ public:
 		return NativeGetSearchString();
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
 	TArray<FString> GetSelectedTagValues();
 
 	TArray<FString> GetSelectedTagValues_Implementation()
@@ -66,7 +66,7 @@ public:
 		return NativeGetSelectedTagValues();
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
 	void RefreshTags();
 
 	void RefreshTags_Implementation()

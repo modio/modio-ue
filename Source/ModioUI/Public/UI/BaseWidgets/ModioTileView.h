@@ -22,10 +22,10 @@ protected:
 
 	TSharedPtr<class SModioTileView<UObject*>> MyDerivedTileView;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere)
+	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category="Widgets")
 	bool AllowPartialItems = false;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	bool CenterPanelItems;
 
 	virtual void OnItemHoveredChanged(UObject* Item, bool bNewSelectionState);
@@ -39,10 +39,10 @@ protected:
 	UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass,
 											   const TSharedRef<STableViewBase>& OwnerTable) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	bool bZoomSelectedEntryWidget = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Widgets")
 	ESlateVisibility ScrollbarVisibility;
 
 public:

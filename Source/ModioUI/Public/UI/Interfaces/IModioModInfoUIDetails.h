@@ -20,14 +20,14 @@ class MODIOUI_API IModioModInfoUIDetails : public IInterface
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent , Category="IModioModInfoUIDetails")
 	FModioModInfo GetFullModInfo();
 	virtual FModioModInfo GetFullModInfo_Implementation()
 	{
 		return FModioModInfo();
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="IModioModInfoUIDetails")
 	FModioModID GetModID();
 	virtual FModioModID GetModID_Implementation()
 	{

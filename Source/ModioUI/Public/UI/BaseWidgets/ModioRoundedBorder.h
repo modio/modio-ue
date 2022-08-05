@@ -19,10 +19,10 @@ class MODIOUI_API UModioRoundedBorder : public UModioRetainerBox
 
 public:
 	// TODO: make this a config var, then it can be overridden in the instances
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UMaterialInterface> RetainerMaterial;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRoundedBorderStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRoundedBorderStyle"), Category="Widgets")
 	FModioUIStyleRef BorderStyle;
 
 /*

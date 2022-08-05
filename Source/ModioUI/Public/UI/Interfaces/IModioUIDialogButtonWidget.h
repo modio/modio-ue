@@ -19,14 +19,14 @@ protected:
 	virtual void NativeSetDialogController(class UModioDialogController* Controller) {};
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIDialogButtonWidget")
 	void SetStyle(const FModioDialogStyle& Style);
 
 	void SetStyle_Implementation(const FModioDialogStyle& Style);
 
 	/// @brief Gives the button widget a reference back to the dialog controller so that the buttons can trigger custom
 	/// dialog flows
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIDialogButtonWidget")
 	void SetDialogController(class UModioDialogController* Controller);
 
 	void SetDialogController_Implementation(class UModioDialogController* Controller);

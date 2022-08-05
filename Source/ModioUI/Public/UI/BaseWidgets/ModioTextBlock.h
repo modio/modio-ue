@@ -16,7 +16,7 @@ class MODIOUI_API UModioTextBlock : public UTextBlock
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Appearance")
 	FModioUIStyleRef StyleRef = {FName("DefaultTextStyle") };
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Appearance")

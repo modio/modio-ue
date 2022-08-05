@@ -32,10 +32,10 @@ protected:
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIBusyStateWidget")
 	void DisplayBusyState();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIBusyStateWidget")
 	void EndBusyState(bool bErrorOccurred);
 
 };

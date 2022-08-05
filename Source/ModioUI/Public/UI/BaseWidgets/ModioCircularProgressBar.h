@@ -20,31 +20,31 @@ protected:
 	TSharedRef<SWidget> RebuildWidget() override;
 	TSharedPtr<SModioCircularProgressBar> MyProgressBar;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0), Category="Widgets")
 	int32 BackgroundThickness = 1;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1), Category="Widgets")
 	int32 ForegroundThickness = 1;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 1), Category="Widgets")
 	float Radius = 10;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (ClampMin = 0, ClampMax = 360))
+	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (ClampMin = 0, ClampMax = 360), Category="Widgets")
 	int32 StartAngleInDegrees = 0;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0, ClampMax = 1))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ClampMin = 0, ClampMax = 1), Category="Widgets")
 	float Progress = 0;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FLinearColor BackgroundColor = FLinearColor::Black;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
 	FLinearColor ForegroundColor = FLinearColor::White;
 
-	UPROPERTY(EditAnywhere, meta = (IsBindableEvent = "true"))
+	UPROPERTY(EditAnywhere, meta = (IsBindableEvent = "true"), Category="Widgets")
 	FGetFloat OnGetProgress;
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, Category="Widgets")
 	float GetProgress() const ;
 
 public:

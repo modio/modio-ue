@@ -24,6 +24,6 @@ class MSDFSUPPORT_API UMSDFAssetData : public UAssetUserData
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Params")
 	FSVGConversionParams ImportParameters;
 };

@@ -94,14 +94,15 @@ public:
 		return MakeShared<ModioErrorReportingWidgetWrapper>(this);
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void SetErrorString(const FString& InErrorString);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
+	void SetErrorString(const FString& InErrorString);
 
 	void SetErrorString_Implementation(const FString& InErrorString)
 	{
 		NativeSetErrorString(InErrorString);
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
 	void SetErrorText(const FText& InErrorText);
 
 	void SetErrorText_Implementation(const FText& InErrorText)
@@ -109,7 +110,7 @@ public:
 		NativeSetErrorText(InErrorText);
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
 	bool IsErrorSet() const;
 
 	bool IsErrorSet_Implementation() const
@@ -117,7 +118,7 @@ public:
 		return NativeIsErrorSet();
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
 	void DisplayError(const FModioErrorCode& ec);
 
 	void DisplayError_Implementation(const FModioErrorCode& ec)

@@ -32,11 +32,11 @@ class UModioUIWidgetStyleContainer : public USlateWidgetStyleContainerBase
 	GENERATED_BODY()
 protected:
 	UPROPERTY(EditAnywhere, meta = (ReadOnlyKeys, EditCondition = "true==false", EditConditionHides,
-									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder))
+									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder), Category="Widgets")
 	TMap<FName, FModioUIColorRef> SerializedColors;
 
 	UPROPERTY(EditAnywhere, meta = (ReadOnlyKeys, EditCondition = "true==false", EditConditionHides,
-									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder))
+									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder), Category="Widgets")
 	TMap<FName, FModioUIMaterialRef> SerializedMaterials;
 
 public:

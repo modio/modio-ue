@@ -55,7 +55,7 @@ protected:
 	UFUNCTION()
 	void NativeReportClicked();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioPopupMenu* MoreOptionsMenu;
 
 	UFUNCTION()
@@ -66,7 +66,7 @@ protected:
 
 	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileActiveFrame;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;

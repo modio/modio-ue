@@ -13,25 +13,25 @@ struct MODIOUI_API FModioInputMappingGlyph
 	GENERATED_BODY()
 
 	/// @brief Glyph to display for this input when the user is using a mouse
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Glpyphs")
 	TSoftObjectPtr<UTexture2D> MouseGlyph;
 
 	/// @brief Glyph to display for this input when the user is using a keyboard
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Glpyphs")
 	TSoftObjectPtr<UTexture2D> KeyboardGlyph;
 
 	/// @brief Glyph to display for this input when the user is using a controller and the game has informed us that it
 	/// is specifically an XBox controller
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Glpyphs")
 	TSoftObjectPtr<UTexture2D> XBoxControllerGlyph;
 
 	/// @brief Glyph to display for this input when the user is using a controller and the game has informed us that it
 	/// is specifically a Playstation controller
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Glpyphs")
 	TSoftObjectPtr<UTexture2D> PSControllerGlyph;
 
 	/// @brief The glyph to use when we don't have an explicit controller type
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Glpyphs")
 	TSoftObjectPtr<UTexture2D> FallbackControllerGlyph;
 
 	UTexture2D* GetInputGlyph(EModioUIInputMode InputMode)
@@ -65,7 +65,7 @@ class UModioInputMappingGlyphLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioInputMappingGlyphLibrary")
 	static UTexture2D* GetInputGlyph(FModioInputMappingGlyph& MappingGlyph, EModioUIInputMode InputMode)
 	{
 		return MappingGlyph.GetInputGlyph(InputMode);

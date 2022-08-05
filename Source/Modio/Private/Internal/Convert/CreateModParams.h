@@ -9,8 +9,8 @@
  */
 
 #pragma once
-#include "Internal/Convert/Optional.h"
 #include "Internal/Convert/Numerics.h"
+#include "Internal/Convert/Optional.h"
 #include "Internal/ModioConvert.h"
 #include "ModioSDK.h"
 #include "Types/ModioCreateModParams.h"
@@ -26,8 +26,9 @@ FORCEINLINE Modio::CreateModParams ToModio(const FModioCreateModParams& In)
 	Out.Description = ToModioOptional<std::string>(In.Description);
 	Out.HomepageURL = ToModioOptional<std::string>(In.HomepageURL);
 	Out.Stock = ToModioOptional<int64>(In.QuantityAvailable);
-	Out.MaturityRating = In.MaturityFlags.IsSet() ? static_cast<Modio::MaturityOption>(In.MaturityFlags.GetValue()): Modio::Optional<Modio::MaturityOption>{};
+	Out.MaturityRating = In.MaturityFlags.IsSet() ? static_cast<Modio::MaturityOption>(In.MaturityFlags.GetValue())
+												  : Modio::Optional<Modio::MaturityOption> {};
 	Out.MetadataBlob = ToModioOptional<std::string>(In.MetadataBlob);
 	Out.Tags = ToModioOptional<std::vector<std::string>>(In.Tags);
-    return Out;
+	return Out;
 }

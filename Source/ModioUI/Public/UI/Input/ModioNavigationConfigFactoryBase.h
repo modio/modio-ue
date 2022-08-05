@@ -133,21 +133,21 @@ class MODIOUI_API UModioNavigationConfigFactory : public UModioNavigationConfigF
 
 protected:
 	/** Should the Tab key perform next and previous style navigation. */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,  Category="ModioNavigationConfigFactory")
 	bool bTabNavigation;
 
 	/** Should we respect keys for navigation. */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioNavigationConfigFactory")
 	bool bKeyNavigation;
 
 	/** Should we respect the analog stick for navigation. */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioNavigationConfigFactory")
 	bool bAnalogNavigation;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioNavigationConfigFactory")
 	float AnalogNavigationHorizontalThreshold;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioNavigationConfigFactory")
 	float AnalogNavigationVerticalThreshold;
 
 	virtual TSharedRef<FNavigationConfig> CreateNavigationConfig() override

@@ -16,7 +16,7 @@ class MODIOUI_API UModioTextWidgetStyleContainer : public UModioUIWidgetStyleCon
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FTextBlockStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

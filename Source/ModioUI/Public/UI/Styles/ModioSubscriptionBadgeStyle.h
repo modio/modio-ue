@@ -25,16 +25,16 @@ struct MODIOUI_API FModioSubscriptionBadgeStyle : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FTextBlockStyle LabelStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widget")
 	FModioUIStyleRef LabelStyleNew;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioProgressBarStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioProgressBarStyle"), Category="Widget")
 	FModioUIStyleRef ProgressBarStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FModioWidgetBorderStyle BadgeBorderStyle;
 };
 
@@ -43,7 +43,7 @@ class UModioSubscriptionBadgeStyleContainer : public UModioUIWidgetStyleContaine
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioSubscriptionBadgeStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

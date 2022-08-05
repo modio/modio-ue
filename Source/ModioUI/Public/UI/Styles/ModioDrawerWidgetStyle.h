@@ -23,13 +23,13 @@ struct MODIOUI_API FModioDrawerWidgetStyle : public FSlateWidgetStyle
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FSlateBrush HeadingBackgroundBrush;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FSlateBrush ContentBackgroundBrush;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FSlateBrush FooterBackgroundBrush;
 };
 
@@ -38,7 +38,7 @@ class UModioDrawerWidgetStyleContainer : public UModioUIWidgetStyleContainer
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widget")
 	FModioDrawerWidgetStyle Style;
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override

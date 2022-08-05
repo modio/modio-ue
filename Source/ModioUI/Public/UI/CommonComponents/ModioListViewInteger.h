@@ -27,13 +27,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = ListView)
 	ESlateVisibility ScrollbarVisibility;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = 0))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ClampMin = 0), Category="ListView")
 	float EntrySpacing = 0.f;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="ListView")
 	bool bOverrideItemSize;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (EditCondition = bOverrideItemSize))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (EditCondition = bOverrideItemSize), Category="ListView")
 	FVector2D ItemSize;
 
 	void ResetSelectionStateOnDisplayedWidgets();

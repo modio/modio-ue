@@ -17,6 +17,6 @@ class MODIOUI_API UModioFilterParamsUI : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFilterParamsUI")
 	FModioFilterParams Underlying;
 };

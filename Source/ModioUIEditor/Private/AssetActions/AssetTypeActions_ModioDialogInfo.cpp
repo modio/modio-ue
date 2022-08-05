@@ -1,5 +1,6 @@
 #include "AssetActions/AssetTypeActions_ModioDialogInfo.h"
 #include "Editor/ModioDialogInfoEditorToolkit.h"
+#include "UI/Dialogs/ModioDialogBaseInternal.h"
 #include "UI/Dialogs/ModioDialogInfo.h"
 
 UClass* FAssetTypeActions_ModioDialogInfo::GetSupportedClass() const

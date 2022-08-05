@@ -9,6 +9,8 @@
  */
 
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using UnrealBuildTool;
@@ -122,7 +124,7 @@ public class Modio : ModuleRules
     private void CopyCommonGeneratedHeaders(string GeneratedHeaderPath)
     {
         // Only process generated headers if we are using the NativeSDK as a git submodule
-        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
+        if (Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")) || File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
         {
             //Clean the generated source directory so that we dont have any stale files in it
             if (Directory.Exists(GeneratedHeaderPath))
@@ -153,7 +155,7 @@ public class Modio : ModuleRules
     /// <param name="GeneratedSourcePath"> The root directory containing the platform-specific source directories </param>
     private void CopyPlatformGeneratedSource(string GeneratedSourcePath)
     {
-        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
+        if (Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")) || File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
         {
             foreach (var PlatformDirectory in Directory.EnumerateDirectories(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/platform")))
             {
@@ -184,7 +186,7 @@ public class Modio : ModuleRules
     private void CopyCommonGeneratedSource(string GeneratedSourcePath)
     {
         string CommonGeneratedSourcePath = Path.Combine(GeneratedSourcePath, "core");
-        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
+        if (Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")) || File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
         {
             //Clean the generated source directory so that we dont have any stale files in it
             if (Directory.Exists(CommonGeneratedSourcePath))

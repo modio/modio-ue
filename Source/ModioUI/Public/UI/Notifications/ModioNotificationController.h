@@ -26,9 +26,9 @@ protected:
 	virtual void NativeDisplayNotification(const TScriptInterface<class IModioUINotification>& Notification) override;
 	virtual void NativeDisplayErrorNotification(const FModioNotificationParams& Params) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUINotification"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUINotification"), Category="Widgets")
 	TSubclassOf<UWidget> ErrorNotificationClass;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	class UVerticalBox* NotificationList;
 };

@@ -28,7 +28,7 @@ protected:
 	TWeakObjectPtr<UModioDialogController> DialogController;
 	TSharedPtr<SHorizontalBox> ButtonBox;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* CancelButton;
 
 	virtual void NativeSetDialogController(class UModioDialogController* Controller) override

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UI/Dialogs/ModioDialogController.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 #include "ModioUISubsystem.h"
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
 #include "UI/Interfaces/IModioUITextValidator.h"
@@ -67,7 +68,25 @@ void UModioDialogController::HandleEmailRequestSent(FModioErrorCode ec, UModioDi
 		{
 			if (ActualDialog->InputWidget->Implements<UModioUITextValidator>())
 			{
-				FText Error = FText::FromString(ec.GetErrorMessage());
+				// Initialize error message in case below ifs fail
+				FText Error = FText::FromString("An unknown error occurred");
+
+				if (UModioErrorConditionLibrary::ErrorCodeMatches(ec, EModioErrorCondition::InvalidArgsError))
+				{
+					if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+					{
+						TArray<FModioValidationError> LastValidationError = Subsystem->GetLastValidationError();
+						if (LastValidationError.Num())
+						{
+							// todo: @modio-ui support localization
+							Error = FText::FromString(LastValidationError[0].ValidationFailureDescription);
+						}
+					}
+				}
+				else
+				{
+					Error = FText::FromString(ec.GetErrorMessage());
+				}
 				IModioUITextValidator::Execute_SetValidationError(ActualDialog->InputWidget, Error);
 			}
 		}
@@ -77,11 +96,10 @@ void UModioDialogController::HandleEmailRequestSent(FModioErrorCode ec, UModioDi
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
 			Subsystem->FetchExternalUpdatesAsync(
-			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::OnFetchExternalCompleted));
-			
+				FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::OnFetchExternalCompleted));
+
 			PushDialog(DestinationOnSuccess);
 		}
-		
 	}
 }
 
@@ -98,10 +116,14 @@ void UModioDialogController::SendEmailCodeRequest(FString EmailAddress, UModioDi
 
 void UModioDialogController::SubmitEmailAuthCode(FString Code, UModioDialogInfo* DestinationOnSuccess)
 {
-	// Proxy the request through the UI subsystem instead of hitting the UI subsystem directly so it broadcasts events to the UI as well as notifying us
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>()) 
+	// Proxy the request through the UI subsystem instead of hitting the UI subsystem directly so it broadcasts events
+	// to the UI as well as notifying us
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->RequestEmailAuthentication(FModioEmailAuthCode(Code), FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleEmailRequestSent, DestinationOnSuccess));
+		Subsystem->RequestEmailAuthentication(
+			FModioEmailAuthCode(Code),
+			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleEmailRequestSent,
+													DestinationOnSuccess));
 	}
 }
 
@@ -184,7 +206,6 @@ void UModioDialogController::ShowModReportDialog(UObject* DialogDataSource)
 	}
 }
 
-
 void UModioDialogController::ShowEmailAuthenticationDialog()
 {
 	if (!EmailAuthenticationDialog.IsNull())
@@ -200,7 +221,6 @@ void UModioDialogController::ShowLogoutDialog()
 		PushDialog(LogoutConfirmationDialog.LoadSynchronous());
 	}
 }
-
 
 void UModioDialogController::BeginExternalAuthentication(EModioAuthenticationProvider Provider)
 {
@@ -238,12 +258,12 @@ void UModioDialogController::ShowLoadingDialog()
 	ActualDialog->ShowLoadingSpinner();
 }
 
-
 void UModioDialogController::RequestUnsubscribe(const FModioModID& ModId, UModioDialogInfo* DestinationOnSuccess)
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->RequestRemoveSubscriptionForModID(ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleUnsubscribeError));
+		Subsystem->RequestRemoveSubscriptionForModID(
+			ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleUnsubscribeError));
 	}
 }
 
@@ -251,7 +271,8 @@ void UModioDialogController::ReportContentAsync(const FModioReportParams& Report
 {
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		Subsystem->ReportContentAsync(ReportData, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleReportContent, Destination));
+		Subsystem->ReportContentAsync(ReportData, FOnErrorOnlyDelegateFast::CreateUObject(
+													  this, &UModioDialogController::HandleReportContent, Destination));
 	}
 }
 
@@ -260,13 +281,12 @@ void UModioDialogController::HandleReportContent(FModioErrorCode ec, UModioDialo
 	if (!ec)
 	{
 		PushDialog(ModioDialogInfo);
-	} else
+	}
+	else
 	{
 		ShowErrorDialog(ec);
 	}
 }
-
-
 
 void UModioDialogController::HandleUnsubscribe(FModioModID ec, bool IsSubscribe)
 {
@@ -293,8 +313,9 @@ void UModioDialogController::LogOutCallback(FModioErrorCode ec)
 {
 	if (ec)
 	{
-		ShowErrorDialog(ec);	
-	} else
+		ShowErrorDialog(ec);
+	}
+	else
 	{
 		PopDialog();
 	}
@@ -307,4 +328,3 @@ void UModioDialogController::ShowReportEmailDialog(UObject* DialogDataSource)
 		PushDialog(ReportEmailDialog.LoadSynchronous(), DialogDataSource);
 	}
 }
-

@@ -49,6 +49,7 @@ enum class EModioPortal : uint8
 };
 
 /** @brief Enum representing the platform(s) that a modfile is enabled for */
+UENUM(BlueprintType)
 enum class EModioModfilePlatform : uint8
 {
 	Windows,

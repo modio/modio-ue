@@ -22,11 +22,12 @@ struct MODIOUI_API FModioInputMapping
 	FModioInputMapping() = default;
 	FModioInputMapping(FKey VirtualKey) : VirtualKey(VirtualKey) {}
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (EditCondition = "true==false"))
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (EditCondition = "true==false"),
+			  Category = "ModioInputMapping")
 	FKey VirtualKey;
 
 	/// @brief Array of FNames corresponding to project input axes or actions that are mapped to this virtual key
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioInputMapping")
 	TArray<FName> MappedProjectInputs;
 };
 
@@ -41,29 +42,32 @@ public:
 	UModioUISettings(const FObjectInitializer& Initializer);
 
 	/// @brief Map your project's input axes and actions to mod.io UI 'virtual keys' here
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, EditFixedSize)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, EditFixedSize, Category = "ModioUISettings")
 	TArray<FModioInputMapping> ModioToProjectInputMappings;
 
 	/// @brief The default style set to use for all mod.io UI widgets
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	TSoftObjectPtr<class UModioUIStyleSet> DefaultStyleSet;
 
 	/// @brief Optional factory class to instantiate a FNavigationConfig to use for handling navigation instead of
 	/// ModioToProjectInputMappings. Due to limitations with FSlateApplication, this FNavigationConfig will only support
 	/// a single user
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	TSoftObjectPtr<UModioNavigationConfigFactoryBase> NavigationConfigOverride;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioUIAuthenticationDataProvider"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioUIAuthenticationDataProvider"),
+			  Category = "ModioUISettings")
 	TSubclassOf<UObject> AuthenticationDataProvider;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioUIInputHintGlyphProvider"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioUIInputHintGlyphProvider"),
+			  Category = "ModioUISettings")
 	TSubclassOf<UObject> InputHintGlyphProvider;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioMenuBackgroundProvider"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioMenuBackgroundProvider"),
+			  Category = "ModioUISettings")
 	TSubclassOf<UObject> BackgroundImageProvider;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	TSoftObjectPtr<UModioModBrowserParams> BrowserCategoryConfiguration;
 
 #if WITH_EDITOR

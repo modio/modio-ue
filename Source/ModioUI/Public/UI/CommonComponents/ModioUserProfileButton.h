@@ -34,26 +34,26 @@ protected:
 	virtual void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
 	TOptional<FModioUser> CurrentUser;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioCircularProgressBar* DownloadProgressIndicator;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioButton* ProfileButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioImage* ProfileImage;
 
 	// To stop the material being GC'd while in use
 	UPROPERTY(Transient)
 	UMaterialInterface* GCMaterial;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UMaterialInterface> UserBrushMaterial;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TSoftObjectPtr<UMaterialInterface> NoUserBrushMaterial;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Widgets")
 	FName ProfileTextureParameterName = "WidgetTexture";
 
 	void NativeDestruct() override;

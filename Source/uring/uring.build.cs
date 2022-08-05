@@ -12,7 +12,7 @@ public class uring : ModuleRules
         PublicIncludePaths.AddRange(new string[] {Path.Combine(ModuleDirectory, "Public"), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src/include")});
 		PrivateIncludePaths.AddRange(new string[] {Path.Combine(GeneratedSourcePath), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src")});
         PrivateDefinitions.Add("LIBURING_INTERNAL=1");
-        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")))
+        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")) || Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")))
         {
             // Clean the generated source directory
             if (Directory.Exists(GeneratedSourcePath))

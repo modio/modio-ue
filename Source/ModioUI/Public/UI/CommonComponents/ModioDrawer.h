@@ -41,7 +41,7 @@ protected:
 	UPROPERTY()
 	TMap<FName, UWidget*> NamedWidgets;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioDrawerWidgetStyle"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioDrawerWidgetStyle"), Category="Widgets")
 	FModioUIStyleRef DrawerStyle;
 
 	UPROPERTY()
@@ -89,7 +89,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Footer Slot", meta = (DisplayName = "Vertical Alignment"))
 	TEnumAsByte<EVerticalAlignment> FooterVerticalAlignment;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Fill Rules")
 	int MinWidth;
 
 	// TODO: expose direction for animation?

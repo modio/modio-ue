@@ -13,6 +13,7 @@
 #include "Internal/Convert/AuthParams.h"
 #include "Internal/Convert/CreateModFileParams.h"
 #include "Internal/Convert/CreateModParams.h"
+#include "Internal/Convert/EditModParams.h"
 #include "Internal/Convert/ErrorCode.h"
 #include "Internal/Convert/FilterParams.h"
 #include "Internal/Convert/InitializeOptions.h"
@@ -32,6 +33,7 @@
 #include "Internal/Convert/User.h"
 #include "Internal/ModioConvert.h"
 #include "ModioSettings.h"
+#include "ProfilingDebugging/CpuProfilerTrace.h"
 #include <map>
 
 template<typename DestKey, typename DestValue, typename SourceKey, typename SourceValue>
@@ -79,6 +81,8 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 #endif
 
 	Modio::InitializeAsync(ToModio(Options), [this, OnInitComplete](Modio::ErrorCode ec) {
+		TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+
 		InvalidateUserSubscriptionCache();
 
 		OnInitComplete.ExecuteIfBound(ToUnreal(ec));
@@ -96,6 +100,7 @@ void UModioSubsystem::ListAllModsAsync(const FModioFilterParams& Filter, FOnList
 {
 	Modio::ListAllModsAsync(ToModio(Filter),
 							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> Result) {
+								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 								Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioModInfoList>(Result));
 							});
 }
@@ -103,6 +108,7 @@ void UModioSubsystem::ListAllModsAsync(const FModioFilterParams& Filter, FOnList
 void UModioSubsystem::SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegateFast OnSubscribeComplete)
 {
 	Modio::SubscribeToModAsync(ToModio(ModToSubscribeTo), [this, OnSubscribeComplete](Modio::ErrorCode ec) {
+		TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 		InvalidateUserSubscriptionCache();
 
 		OnSubscribeComplete.ExecuteIfBound(ToUnreal(ec));
@@ -113,6 +119,7 @@ void UModioSubsystem::UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 											  FOnErrorOnlyDelegateFast OnUnsubscribeComplete)
 {
 	Modio::UnsubscribeFromModAsync(ToModio(ModToUnsubscribeFrom), [this, OnUnsubscribeComplete](Modio::ErrorCode ec) {
+		TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 		InvalidateUserSubscriptionCache();
 
 		OnUnsubscribeComplete.ExecuteIfBound(ToUnreal(ec));
@@ -122,6 +129,7 @@ void UModioSubsystem::UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 void UModioSubsystem::FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetchDone)
 {
 	Modio::FetchExternalUpdatesAsync([this, OnFetchDone](Modio::ErrorCode ec) {
+		TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 		InvalidateUserSubscriptionCache();
 		OnFetchDone.ExecuteIfBound(ToUnreal(ec));
 	});
@@ -254,6 +262,7 @@ FModioOptionalUser UModioSubsystem::K2_QueryUserProfile()
 void UModioSubsystem::GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegateFast Callback)
 {
 	Modio::GetModInfoAsync(ToModio(ModId), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo> ModInfo) {
+		TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 		Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioModInfo>(ModInfo));
 	});
 }
@@ -270,6 +279,8 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize Avata
 {
 	Modio::GetModMediaAsync(ToModio(ModId), ToModio(AvatarSize),
 							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::filesystem::path> Path) {
+								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+
 								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
 								// because we already have a Modio::filesystem::path -> FString overload of ToUnreal
 								// TODO: @modio-ue4 Potentially refactor ToUnreal(Modio::filesystem::path) as a template
@@ -292,6 +303,8 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize Gall
 {
 	Modio::GetModMediaAsync(ToModio(ModId), ToModio(GallerySize), Index,
 							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::filesystem::path> Path) {
+								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+
 								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
 								// because we already have a Modio::filesystem::path -> FString overload of ToUnreal
 								// TODO: @modio-ue4 Potentially refactor ToUnreal(Modio::filesystem::path) as a template
@@ -313,6 +326,8 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSiz
 {
 	Modio::GetModMediaAsync(ToModio(ModId), ToModio(LogoSize),
 							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::filesystem::path> Path) {
+								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+
 								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
 								// because we already have a Modio::filesystem::path -> FString overload of ToUnreal
 								// TODO: @modio-ue4 Potentially refactor ToUnreal(Modio::filesystem::path) as a template
@@ -370,6 +385,8 @@ void UModioSubsystem::GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Call
 	// and capture that by value, so we are guaranteed lifetime
 	Modio::GetModTagOptionsAsync(
 		[this, Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModTagOptions> ModTagOptions) {
+			TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+
 			CachedModTags = ToUnrealOptional<FModioModTagOptions>(ModTagOptions);
 			Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioModTagOptions>(ModTagOptions));
 		});
@@ -608,6 +625,15 @@ void UModioSubsystem::SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFil
 	Modio::SubmitNewModFileForMod(ToModio(Mod), ToModio(Params));
 }
 
+void UModioSubsystem::SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
+											FOnGetModInfoDelegateFast Callback)
+{
+	Modio::SubmitModChangesAsync(ToModio(Mod), ToModio(Params),
+								 [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfo> ModInfo) {
+									 Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioModInfo>(ModInfo));
+								 });
+}
+
 void UModioSubsystem::K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params)
 {
 	SubmitNewModFileForMod(Mod, Params);
@@ -646,8 +672,23 @@ void UModioSubsystem::VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast Cal
 
 void UModioSubsystem::K2_VerifyUserAuthenticationAsync(FOnErrorOnlyDelegate Callback)
 {
-	VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec){
-		Callback.ExecuteIfBound(ec);}));
+	VerifyUserAuthenticationAsync(
+		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+}
+
+FModioErrorCode UModioSubsystem::PrioritizeTransferForMod(FModioModID ModToPrioritize)
+{
+	return ToUnreal(Modio::PrioritizeTransferForMod(ToModio(ModToPrioritize)));
+}
+
+void UModioSubsystem::K2_SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
+											   FOnGetModInfoDelegate Callback)
+{
+	SubmitModChangesAsync(
+		Mod, Params,
+		FOnGetModInfoDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioModInfo> MaybeModInfo) {
+			Callback.ExecuteIfBound(ec, FModioOptionalModInfo {MaybeModInfo});
+		}));
 }
 
 /// File scope implementations

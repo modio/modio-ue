@@ -21,7 +21,7 @@ protected:
 	}
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIAsyncHandlerWidgets")
 	void LinkAsyncOperationWidget(const TScriptInterface<IModioUIAsyncOperationWidget>& Widget);
 	void LinkAsyncOperationWidget_Implementation(const TScriptInterface<IModioUIAsyncOperationWidget>& Widget)
 	{

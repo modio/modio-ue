@@ -30,27 +30,27 @@ protected:
 
 	void OnContentClose();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText ButtonLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	TEnumAsByte<ETextJustify::Type> ButtonLabelJustification = ETextJustify::Center;
 
 	UPROPERTY(Transient)
 	class UModioRichTextButton* MenuButton;
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild), Category="Widgets")
 	FModioUIStyleRef ButtonStyle = FModioUIStyleRef {"DefaultButtonStyle"};
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioPopupMenu")
 	void SetMenuEntries(FModioUIMenuCommandList Entries);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUIPopupMenuContentWidget"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUIPopupMenuContentWidget"), Category="Widgets")
 	TSubclassOf<UWidget> MenuContentWidgetClass;
 
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	bool bPreviewOpened = false;
 #endif
 };

@@ -18,13 +18,13 @@ struct MODIOUI_API FModioNotificationParams
 
 	TMap<FName, FText> NamedTextFormats;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Notification")
 	FModioErrorCode ErrorCode;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Notification")
 	UObject* NotificationContextObject = nullptr;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Notification")
 	float Duration = 1;
 };
 
@@ -34,17 +34,17 @@ class UModioNotificationParamsLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams CreateErrorNotificationParams(FModioErrorCode StatusCode, const FText& SuccessText,
 																  const FText& ErrorText);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams CreateRatingNotification(FModioErrorCode StatusCode,
 															 const TScriptInterface<IModioModInfoUIDetails>& ModInfo);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams CreateSubscriptionNotification(
 		FModioErrorCode StatusCode);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams& AddFormatText(UPARAM(ref) FModioNotificationParams& NotificationParams,
 												   const FName& Name, const FText& Text)
 	{
@@ -52,7 +52,7 @@ public:
 		return NotificationParams;
 	}
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams& SetTextArg(UPARAM(ref) FModioNotificationParams& NotificationParams,
 												const FString& Name, const FText& Text)
 	{
@@ -60,7 +60,7 @@ public:
 		return NotificationParams;
 	}
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams& SetStringArg(UPARAM(ref) FModioNotificationParams& NotificationParams,
 												  const FString& Name, const FString& Value)
 	{
@@ -68,14 +68,14 @@ public:
 		return NotificationParams;
 	}
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams& SetFloatArg(UPARAM(ref) FModioNotificationParams& NotificationParams,
 												 const FString& Name, float Value)
 	{
 		NotificationParams.FormatArgs.Add(Name, Value);
 		return NotificationParams;
 	}
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams& SetIntegerArg(UPARAM(ref) FModioNotificationParams& NotificationParams,
 												   const FString& Name, int32 Value)
 	{
@@ -107,7 +107,7 @@ protected:
 	}
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="IModioUINotification")
 	UWidget* GetAsWidget();
 
 	UWidget* GetAsWidget_Implementation()
@@ -115,7 +115,7 @@ public:
 		return NativeGetAsWidget();
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioUINotification")
 	void Configure(const FModioNotificationParams& Params);
 
 	void Configure_Implementation(const FModioNotificationParams& Params)
@@ -123,14 +123,14 @@ public:
 		NativeConfigure(Params);
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioUINotification")
 	void Display();
 
 	void Display_Implementation()
 	{
 		NativeOnDisplay();
 	}
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioUINotification")
 	void SetNotificationExpireHandler(const FOnNotificationExpired& InDelegate);
 
 	void SetNotificationExpireHandler_Implementation(const FOnNotificationExpired& InDelegate)

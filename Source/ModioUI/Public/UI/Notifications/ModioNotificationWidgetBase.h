@@ -22,7 +22,7 @@ class MODIOUI_API UModioNotificationWidgetBase : public UModioUserWidgetBase, pu
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioNotificationStyle"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioNotificationStyle"), Category="Widgets")
 	FModioUIStyleRef NotificationStyle /* = FModioUIStyleRef {"DefaultErrorNotificationStyle"}*/;
 	virtual UWidget* NativeGetAsWidget() override
 	{
@@ -35,9 +35,9 @@ protected:
 	virtual void NativeConfigure(const FModioNotificationParams& Params) override;
 
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category="Widgets")
 	bool bPreviewAsError;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category="Widgets")
 	FModioNotificationParams PreviewParameters;
 #endif
 
@@ -45,7 +45,7 @@ protected:
 	virtual void SynchronizeProperties() override;
 #endif
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="ModioNotificationWidgetBase")
 	static UWidget* CreateFromParams(TSubclassOf<UWidget> NotificationClass, const FModioNotificationParams& Params,
 									 UWidget* Outer)
 	{
@@ -81,16 +81,16 @@ protected:
 	bool bDisplayStarted = false;
 	virtual void NativeOnDisplay();
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioImage* NotificationBackground;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioImage* StatusIndicator;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* NotificationTitle;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* NotificationMessage;
 
 public:

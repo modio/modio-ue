@@ -179,11 +179,26 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 				});
 				ResultsTileView->SetListItems(SearchResults);
 				ResultsTileView->RequestRefresh();
-				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::Success);
+
+				if (NoResultsDialog)
+				{
+					if (SearchResults.Num() > 0)
+					{
+						NoResultsDialog->SetVisibility(ESlateVisibility::Collapsed);
+					}
+					else
+					{
+						NoResultsDialog->SetVisibility(ESlateVisibility::Visible);
+					}
+				}
+
+				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
+																		   EModioUIAsyncOperationWidgetState::Success);
 			}
 			else
 			{
-				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::Error);
+				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
+																		   EModioUIAsyncOperationWidgetState::Error);
 				// Show some kind of error?
 			}
 		}
@@ -222,20 +237,30 @@ void UModioSearchResultsView::NativeOnSetDataSource()
 		{
 			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 			{
+				// Hide NoResultsDialog for new search
+				if (NoResultsDialog)
+				{
+					NoResultsDialog->SetVisibility(ESlateVisibility::Collapsed);
+				}
 				Subsystem->RequestListAllMods(Params->Underlying, Params->Underlying.ToString());
-				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::InProgress);
+				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(
+					this, EModioUIAsyncOperationWidgetState::InProgress);
 			}
 		}
 	}
 }
 
-
-void UModioSearchResultsView::NativeRequestOperationRetry() 
+void UModioSearchResultsView::NativeRequestOperationRetry()
 {
 	if (UModioFilterParamsUI* Params = Cast<UModioFilterParamsUI>(DataSource))
 	{
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
+			// Hide NoResultsDialog for new search
+			if (NoResultsDialog)
+			{
+				NoResultsDialog->SetVisibility(ESlateVisibility::Collapsed);
+			}
 			Subsystem->RequestListAllMods(Params->Underlying, Params->Underlying.ToString());
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																	   EModioUIAsyncOperationWidgetState::InProgress);

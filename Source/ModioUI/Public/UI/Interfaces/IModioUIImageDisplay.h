@@ -18,7 +18,7 @@ protected:
 	virtual void NativeDisplayImage(const FSlateBrush& Image);
 	
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIImageDisplay")
 	void DisplayImage(const FSlateBrush& Image);
 
 	void DisplayImage_Implementation(const FSlateBrush& Image)

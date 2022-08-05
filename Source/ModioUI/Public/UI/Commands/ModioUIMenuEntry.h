@@ -16,7 +16,7 @@ struct MODIOUI_API FModioUIMenuEntry
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
 	FText MenuEntryLabel;
 
 	bool operator==(const FModioUIMenuEntry& Other) const

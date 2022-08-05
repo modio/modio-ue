@@ -17,21 +17,21 @@ class MODIOUI_API UModioFeaturedCategoryParams : public UObject
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ModioFeaturedCategoryParams")
 	FText CategoryName;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFeaturedCategoryParams")
 	TArray<FString> Tags;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFeaturedCategoryParams")
 	TArray<FString> ExcludedTags;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFeaturedCategoryParams")
 	EModioSortDirection Direction;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFeaturedCategoryParams")
 	EModioSortFieldType SortField;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFeaturedCategoryParams")
 	int64 Count = 20;
 };

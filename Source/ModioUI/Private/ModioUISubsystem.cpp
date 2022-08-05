@@ -118,7 +118,7 @@ void UModioUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 			}
 		}
 	}
-	
+
 	GetDefaultStyleSet();
 }
 
