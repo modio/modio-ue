@@ -12,6 +12,7 @@
 #include "UI/CommonComponents/ModioModTile.h"
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
 #include "UI/Views/CategoryBrowser/ModioFeaturedCategoryParams.h"
+#include "UI/Views/ModDetails/ModioAsyncOpWrapperWidget.h"
 
 void UModioFeaturedCategory::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
@@ -22,6 +23,12 @@ void UModioFeaturedCategory::NativeOnListItemObjectSet(UObject* ListItemObject)
 		SetDataSource(Settings);
 	}
 }
+
+void UModioFeaturedCategory::NativeRequestOperationRetry()
+{
+	NativeOnSetDataSource();
+}
+
 
 void UModioFeaturedCategory::NativeOnSetDataSource()
 {
@@ -88,6 +95,10 @@ void UModioFeaturedCategory::NativeOnInitialized()
 	if (NavRightButton)
 	{
 		NavRightButton->OnClicked.AddDynamic(this, &UModioFeaturedCategory::HandleNavRightClicked);
+	}
+	if (CategoryViewContent)
+	{
+		CategoryViewContent->SetActualAsyncOperationWidget(TScriptInterface<IModioUIAsyncOperationWidget>(this));
 	}
 }
 

@@ -90,19 +90,19 @@ void UModioComboBoxString::SynchronizeProperties()
 
 	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
 	// Could we load the default style set?
-	FComboBoxStyle* ResolvedComboBoxStyle = nullptr;
+	//FComboBoxStyle* ResolvedComboBoxStyle = nullptr;
 	FModioWidgetBorderStyle* ResolvedMenuBorderStyle = nullptr;
 	FModioWidgetBorderStyle* ResolvedButtonBorderStyle = nullptr;
 	if (Settings && !Settings->DefaultStyleSet.IsNull())
 	{
 		UModioUIStyleSet* DefaultStyle = Settings->DefaultStyleSet.LoadSynchronous();
-		ResolvedComboBoxStyle = &DefaultStyle->DefaultComboBoxStyle.ComboBoxStyle;
+		//ResolvedComboBoxStyle = &DefaultStyle->DefaultComboBoxStyle.ComboBoxStyle;
 		ResolvedMenuBorderStyle = &DefaultStyle->DefaultComboBoxStyle.MenuBorderStyle;
 		ResolvedButtonBorderStyle = &DefaultStyle->DefaultComboBoxStyle.ButtonBorderStyle;
 	}
 	else
 	{
-		ResolvedComboBoxStyle = &WidgetStyle;
+		//ResolvedComboBoxStyle = &WidgetStyle;
 	}
 
 	if (ResolvedMenuBorderStyle && ResolvedMenuBorderStyle->bMaskWithMaterial)

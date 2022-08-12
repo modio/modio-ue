@@ -545,10 +545,16 @@ TMap<FModioModID, FModioModCollectionEntry> UModioSubsystem::QuerySystemInstalla
 	return ToUnreal<FModioModID, FModioModCollectionEntry>(Modio::QuerySystemInstallations());
 }
 
-void UModioSubsystem::ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegate Callback)
+void UModioSubsystem::ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::ForceUninstallModAsync(ToModio(ModToRemove),
 								  [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); });
+}
+
+void UModioSubsystem::K2_ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegate Callback)
+{
+	ForceUninstallModAsync(ModToRemove, FOnErrorOnlyDelegateFast::CreateLambda(
+											[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 void UModioSubsystem::SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegateFast Callback)

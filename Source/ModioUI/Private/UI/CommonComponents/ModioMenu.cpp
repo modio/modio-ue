@@ -486,3 +486,11 @@ void UModioMenu::ShowReportEmailDialog(UObject* DialogDataSource)
 		DialogController->ShowReportEmailDialog(DialogDataSource);
 	}
 }
+
+void UModioMenu::ShowUninstallConfirmationDialog(UObject* DialogDataSource)
+{
+	if (DialogController)
+	{
+		DialogController->ShowUninstallConfirmationDialog(DialogDataSource);
+	}
+}

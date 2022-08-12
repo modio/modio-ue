@@ -29,6 +29,7 @@ enum class EModioDialogAsyncCall : uint8
 	FetchTermsOfService,
 	SubmitReport,
 	UnsubscribeFromMod,
+	UninstallMod,
 	Logout
 };
 
@@ -54,20 +55,22 @@ struct MODIOUI_API FModioDialogButtonInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FText ButtonLabel;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	EModioDialogButtonCommand ButtonCommand;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonCommand==EModioDialogButtonCommand::AsyncCallThenPushDialog",
-					  EditConditionHides), Category="Widgets")
+					  EditConditionHides),
+			  Category = "Widgets")
 	EModioDialogAsyncCall AsyncCallType;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonCommand==EModioDialogButtonCommand::PushDialogWithOperation",
-					  EditConditionHides), Category="Widgets")
+					  EditConditionHides),
+			  Category = "Widgets")
 	EModioDialogOperationCall OperationCallType;
 
 	// clang-format off
@@ -85,49 +88,58 @@ class MODIOUI_API UModioDialogInfo : public UObject
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MultiLine = true), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MultiLine = true), Category = "Widgets")
 	FText TitleText;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	TSubclassOf<class UWidget> SubHeaderWidget;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "SubHeaderWidget!=nullptr", EditConditionHides), Category="Widgets")
-    TEnumAsByte<EHorizontalAlignment> SubHeaderWidgetHAlign;
-    
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "SubHeaderWidget!=nullptr", EditConditionHides), Category="Widgets")
-    TEnumAsByte<EVerticalAlignment> SubHeaderWidgetVAlign;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MultiLine = true), Category="Widgets")
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "SubHeaderWidget!=nullptr", EditConditionHides),
+			  Category = "Widgets")
+	TEnumAsByte<EHorizontalAlignment> SubHeaderWidgetHAlign;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "SubHeaderWidget!=nullptr", EditConditionHides),
+			  Category = "Widgets")
+	TEnumAsByte<EVerticalAlignment> SubHeaderWidgetVAlign;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MultiLine = true), Category = "Widgets")
 	FText DialogText;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MustImplement = ModioUIStringInputWidget), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MustImplement = ModioUIStringInputWidget), Category = "Widgets")
 	TSubclassOf<class UWidget> InputWidget;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
+			  Category = "Widgets")
 	TEnumAsByte<EHorizontalAlignment> InputWidgetHAlign;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
+			  Category = "Widgets")
 	TEnumAsByte<EVerticalAlignment> InputWidgetVAlign;
 
-	UPROPERTY(BlueprintReadWrite,EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
+			  Category = "Widgets")
 	TEnumAsByte<EStretchDirection::Type> InputWidgetScalingType = EStretchDirection::Both;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
+			  Category = "Widgets")
 	float InputWidgetHeightOverride;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
+			  Category = "Widgets")
 	FText InputWidgetHintText;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	TSubclassOf<class UWidget> ButtonAreaWidget;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "ButtonAreaWidget!=nullptr", EditConditionHides), Category="Widgets")
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere,
+			  meta = (EditCondition = "ButtonAreaWidget!=nullptr", EditConditionHides), Category = "Widgets")
 	TEnumAsByte<EHorizontalAlignment> ButtonAreaWidgetHAlign;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "ButtonAreaWidget!=nullptr", EditConditionHides), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere,
+			  meta = (EditCondition = "ButtonAreaWidget!=nullptr", EditConditionHides), Category = "Widgets")
 	TEnumAsByte<EVerticalAlignment> ButtonAreaWidgetVAlign;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
-			  meta = (EditCondition = "ButtonAreaWidget==nullptr", EditConditionHides), Category="Widgets")
+			  meta = (EditCondition = "ButtonAreaWidget==nullptr", EditConditionHides), Category = "Widgets")
 	TArray<FModioDialogButtonInfo> Buttons;
 };

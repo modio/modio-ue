@@ -16,6 +16,7 @@
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
 #include "UI/EventHandlers/IModioUIModInfoReceiver.h"
 #include "UI/Interfaces/IModioUIAsyncOperationWidget.h"
+#include "UI/Views/ModDetails/ModioAsyncOpWrapperWidget.h"
 
 #include "ModioFeaturedCategory.generated.h"
 
@@ -58,6 +59,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioButton* NavRightButton;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets", meta = (BindWidget))
+	UModioAsyncOpWrapperWidget* CategoryViewContent;
+
+	virtual void NativeRequestOperationRetry() override;
+	
 	UPROPERTY()
 	FModioFilterParams Filter;
 

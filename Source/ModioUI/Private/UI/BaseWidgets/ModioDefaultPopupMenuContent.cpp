@@ -77,19 +77,23 @@ void UModioDefaultPopupMenuContent::OnEntrySelected(TSharedPtr<FModioUIMenuEntry
 													ESelectInfo::Type SelectionType)
 {
 	NativeGetContentCloseDelegate().ExecuteIfBound();
-	if (CurrentCommandList.MappedActions.Contains(*SelectedEntry.Get()))
+
+	for (auto It = CurrentCommandList.MappedActions.CreateIterator(); ++It;)
 	{
-		const FModioUIAction& Action = CurrentCommandList.MappedActions[*SelectedEntry.Get()];
-		if (Action.CanExecuteAction.IsBound())
+		if (It.Key().MenuEntryLabel.EqualTo(SelectedEntry.Get()->MenuEntryLabel))
 		{
-			if (Action.CanExecuteAction.Execute())
+			const FModioUIAction& Action = It.Value();
+			if (Action.CanExecuteAction.IsBound())
+			{
+				if (Action.CanExecuteAction.Execute())
+				{
+					Action.ExecuteAction.ExecuteIfBound();
+				}
+			}
+			else
 			{
 				Action.ExecuteAction.ExecuteIfBound();
 			}
-		}
-		else
-		{
-			Action.ExecuteAction.ExecuteIfBound();
 		}
 	}
 }

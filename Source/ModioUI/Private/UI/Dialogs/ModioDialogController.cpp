@@ -224,9 +224,12 @@ void UModioDialogController::ShowLogoutDialog()
 
 void UModioDialogController::BeginExternalAuthentication(EModioAuthenticationProvider Provider)
 {
-	// Ask the subsystem to begin auth, start listening for it to complete ourselves. Will need a delegate on the
-	// subsystem for authentication failing too. Or else we call it on the modiosubsystem ourselves then broadcast that
-	// manually via the subsystem on success
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		Subsystem->RequestExternalAuthentication(
+			Provider, FOnErrorOnlyDelegateFast::CreateUObject(
+						  this, &UModioDialogController::HandleExternalAuthenticationComplete));
+	}
 }
 
 void UModioDialogController::ShowReportContentDialog()
@@ -237,11 +240,11 @@ void UModioDialogController::ShowReportContentDialog()
 	}
 }
 
-void UModioDialogController::ShowConfirmUninstallDialog()
+void UModioDialogController::ShowUninstallConfirmationDialog(UObject* DialogDataSource)
 {
 	if (!UninstallConfirmationDialog.IsNull())
 	{
-		PushDialog(UninstallConfirmationDialog.LoadSynchronous());
+		PushDialog(UninstallConfirmationDialog.LoadSynchronous(), DialogDataSource);
 	}
 }
 
@@ -264,6 +267,14 @@ void UModioDialogController::RequestUnsubscribe(const FModioModID& ModId, UModio
 	{
 		Subsystem->RequestRemoveSubscriptionForModID(
 			ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleUnsubscribeError));
+	}
+}
+
+void UModioDialogController::RequestUninstall(const FModioModID& ModId, UModioDialogInfo* Destination)
+{
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		Subsystem->RequestUninstallForModID(ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleUninstallError, Destination));
 	}
 }
 
@@ -293,9 +304,30 @@ void UModioDialogController::HandleUnsubscribe(FModioModID ec, bool IsSubscribe)
 	PopDialog();
 }
 
+
+void UModioDialogController::HandleExternalAuthenticationComplete(FModioErrorCode ec) 
+{
+	if (ec) {
+		ShowErrorDialog(ec);
+	}
+}
+
+
 void UModioDialogController::HandleUnsubscribeError(FModioErrorCode ec)
 {
 	if (ec)
+	{
+		ShowErrorDialog(ec);
+	}
+}
+
+void UModioDialogController::HandleUninstallError(FModioErrorCode ec, UModioDialogInfo* DestinationOnSuccess)
+{
+	if (!ec)
+	{
+		PushDialog(DestinationOnSuccess);
+	}
+	else
 	{
 		ShowErrorDialog(ec);
 	}

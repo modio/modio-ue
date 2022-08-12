@@ -87,6 +87,18 @@ void UModioUISubsystem::UnsubscribeHandler(FModioErrorCode ec, FModioModID ID)
 	}
 }
 
+void UModioUISubsystem::UninstallHandler(FModioErrorCode ec, FModioModID ID)
+{
+	// Need to create a synthetic FModioModManagementEvent to let the UI know an uninstallation has occurred.
+	// UninstallHandler is used by ForceUninstallAsync, which does not emit a ModManagementEvent as it's an async
+	// function with a callback, and is not used by the mod management loop.
+	FModioModManagementEvent Event;
+	Event.ID = ID;
+	Event.Event = EModioModManagementEventType::Uninstalled;
+	Event.Status = ec;
+	OnModManagementEvent.Broadcast(Event);
+}
+
 void UModioUISubsystem::ModManagementEventHandler(FModioModManagementEvent Event)
 {
 	OnModManagementEvent.Broadcast(Event);
@@ -176,6 +188,21 @@ void UModioUISubsystem::RequestRemoveSubscriptionForModID(FModioModID ID, FOnErr
 			}));
 	}
 }
+
+void UModioUISubsystem::RequestUninstallForModID(FModioModID ID, FOnErrorOnlyDelegateFast DedicatedCallback)
+{
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		Subsystem->ForceUninstallModAsync(
+			ID, FOnErrorOnlyDelegateFast::CreateLambda([HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
+															this, &UModioUISubsystem::UninstallHandler, ID),
+														DedicatedCallback](FModioErrorCode ec) {
+				DedicatedCallback.ExecuteIfBound(ec);
+				HookedHandler.ExecuteIfBound(ec);
+			}));
+	}
+}
+
 void UModioUISubsystem::RequestRateUpForModId(FModioModID ModId, FOnErrorOnlyDelegateFast DedicatedCallback)
 {
 	if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
@@ -473,8 +500,7 @@ void UModioUISubsystem::RequestEmailAuthentication(FModioEmailAuthCode Code, FOn
 	}
 }
 
-void UModioUISubsystem::RequestExternalAuthentication(FModioAuthenticationParams Params,
-													  EModioAuthenticationProvider Provider)
+void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvider Provider)
 {
 	// Query the settings, get the authentication data provider, invoke the provider to fill in the rest of the params
 	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
@@ -489,6 +515,32 @@ void UModioUISubsystem::RequestExternalAuthentication(FModioAuthenticationParams
 				Subsystem->AuthenticateUserExternalAsync(
 					NewParams, Provider,
 					FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioUISubsystem::OnAuthenticationComplete));
+			}
+		}
+	}
+}
+
+void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvider Provider,
+													  FOnErrorOnlyDelegateFast DedicatedCallback)
+{
+	// Query the settings, get the authentication data provider, invoke the provider to fill in the rest of the params
+	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
+	{
+		if (UClass* AuthProviderClass = Settings->AuthenticationDataProvider.Get())
+		{
+			UObject* TmpProvider = NewObject<UObject>(this, AuthProviderClass);
+			FModioAuthenticationParams NewParams =
+				IModioUIAuthenticationDataProvider::Execute_GetAuthenticationParams(TmpProvider, Provider);
+			if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+			{
+				Subsystem->AuthenticateUserExternalAsync(
+					NewParams, Provider,
+					FOnErrorOnlyDelegateFast::CreateLambda([HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
+																this, &UModioUISubsystem::OnAuthenticationComplete),
+															DedicatedCallback](FModioErrorCode ec) {
+						DedicatedCallback.ExecuteIfBound(ec);
+						HookedHandler.ExecuteIfBound(ec);
+					}));
 			}
 		}
 	}
@@ -636,6 +688,11 @@ void UModioUISubsystem::ShowModReportDialog(UObject* DialogDataSource)
 void UModioUISubsystem::ShowReportEmailDialog(UObject* DialogDataSource)
 {
 	ModBrowserInstance->ShowReportEmailDialog(DialogDataSource);
+}
+
+void UModioUISubsystem::ShowUninstallConfirmationDialog(UObject* DialogDataSource)
+{
+	ModBrowserInstance->ShowUninstallConfirmationDialog(DialogDataSource);
 }
 
 TOptional<FModioModTagOptions> UModioUISubsystem::GetTagOptionsList()

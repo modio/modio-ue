@@ -12,7 +12,6 @@
 	"SupportURL": "http://discord.mod.io",
 	"EngineVersion": "4.26.0",
 	"CanContainContent": true,
-	"IsBetaVersion": true,
 	"Installed": true,
 	"Modules": [
 		{
@@ -38,7 +37,12 @@
 		{
 			"Name": "ModioUI",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		},
 		{
 			"Name": "ModioTests",
@@ -53,17 +57,32 @@
 		{
 			"Name": "ModioUIEditor",
 			"Type": "Editor",
-			"LoadingPhase": "PostEngineInit"
+			"LoadingPhase": "PostEngineInit",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		},
 		{
 			"Name": "MSDFSupportEditor",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		},
 		{
 			"Name": "MSDFSupport",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		},
 		{
 			"Name": "uring",

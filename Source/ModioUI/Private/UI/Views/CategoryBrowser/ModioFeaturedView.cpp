@@ -8,6 +8,7 @@
 #include "Settings/ModioUISettings.h"
 #include "UI/BaseWidgets/Slate/SModioTileView.h"
 #include "UI/CommonComponents/ModioTabBar.h"
+#include "UI/Views/ModDetails/ModioAsyncOpWrapperWidget.h"
 
 void UModioFeaturedView::NativeBeginLoadExternalData()
 {
@@ -47,6 +48,11 @@ void UModioFeaturedView::NativeOnInitialized()
 		TScriptInterface<IModioUIAsyncOperationWidget> InterfaceWrapper =
 			TScriptInterface<IModioUIAsyncOperationWidget>(this);
 		IModioUIAsyncHandlerWidget::Execute_LinkAsyncOperationWidget(PrimaryFeaturedCategoryLoader, InterfaceWrapper);
+	}
+	
+	if (FeaturedViewContent)
+	{
+		FeaturedViewContent->SetActualAsyncOperationWidget(TScriptInterface<IModioUIAsyncOperationWidget>(this));
 	}
 
 	FetchPrimaryCategoryMods();

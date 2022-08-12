@@ -13,6 +13,7 @@
 #include "Widgets/Views/STableRow.h"
 #include "Widgets/Views/STableViewBase.h"
 #include "Materials/MaterialInterface.h"
+#include "Blueprint/UserWidget.h"
 
 #include "ModioDefaultPopupMenuContent.generated.h"
 
@@ -20,7 +21,7 @@
  *
  */
 UCLASS()
-class MODIOUI_API UModioDefaultPopupMenuContent : public UWidget, public IModioUIPopupMenuContentWidget
+class MODIOUI_API UModioDefaultPopupMenuContent : public UUserWidget, public IModioUIPopupMenuContentWidget
 {
 	GENERATED_BODY()
 protected:

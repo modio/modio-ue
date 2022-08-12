@@ -50,8 +50,16 @@ protected:
 		TWeakInterfacePtr<IModioUIErrorDisplayWidget> ReferencedWidget;
 
 	public:
-		ModioErrorReportingWidgetWrapper(IModioUIErrorDisplayWidget* WrappedObject)
-			: ReferencedWidget(*WrappedObject) {};
+#if UE_4_27_OR_LATER
+		ModioErrorReportingWidgetWrapper(IModioUIErrorDisplayWidget* WrappedObject) 
+		{
+			ReferencedWidget = TWeakInterfacePtr<IModioUIErrorDisplayWidget>(WrappedObject);
+		}
+#else
+		// 4.26 doesn't quite support what we need, so we'll just do it the old way
+		ModioErrorReportingWidgetWrapper(IModioUIErrorDisplayWidget* WrappedObject) : ReferencedWidget(*WrappedObject)
+			{}
+#endif
 		virtual void SetError(const FString& InErrorString)
 		{
 			if (ReferencedWidget.IsValid())

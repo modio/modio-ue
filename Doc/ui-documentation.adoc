@@ -16,6 +16,62 @@ The mod.io UE Plugin also includes a series of additional modules which provide 
 
 These modules are optional - you can remove them, the UI folder in the Plugin Content directory, and the associated entries in the modio.uplugin file, and the core functionality from the Modio module will remain available in your project.
 
+=== Displaying the Mod Browser
+
+The main Mod Browser widget is located at /Modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget. Once the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem, `UModioUISubsystem`.
+Currently the mod browser does not support being embedded inside your own UI hierarchy, so you must load it directly (for instance, from a button on your main menu).
+
+.Blueprint Example
+[%collapsible]
+====
+
+From Blueprint, you can use the <<ShowModBrowserUIForPlayer>> node.
+
+image::img/plugin_ui_showforplayer.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,c++, subs="+macros"]
+----
+// After you've called <<K2_InitializeAsync>> and the plugin is initialized successfully:
+
+if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+{
+    if (UWorld* CurrentWorld = GetWorld())
+    {
+        if (APlayerController* PC = CurrentWorld->GetFirstPlayerController())
+        {
+            // Create and bind a delegate to be invoked when the browser is closed
+            FOnModBrowserClosed BrowserClosedDelegate;
+            // OnModBrowserClosed needs to be marked UFUNCTION()
+            BrowserClosedDelegate.BindDynamic(this, &ASomeActor::OnModBrowserClosed);
+
+            // Get a reference to the mod browser implementation (this will be exposed in the UI Settings object
+            // in a future release)
+            FSoftClassPath MenuClassReference =
+                "/modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget_C";
+            UClass* ReferencedClass = MenuClassReference.ResolveClass();
+            if (ReferencedClass)
+            {
+                // Request the browser widget be instantiated and displayed
+                UModioMenu* MenuWidget =
+                    Subsystem->ShowModBrowserUIForPlayer(ReferencedClass, PC, BrowserClosedDelegate);
+                if (MenuWidget)
+                {
+                    // Focus the user on the browser
+                    UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PC, MenuWidget);
+                }
+            }
+        }
+    }
+}
+----
+====
+
 === Configuration
 
 The mod.io Mod Browser will utilise the configuration that you provided on the mod.io Plugin Settings page referenced above; however, there are a number of additional UI-specific settings you will need to update to match your project's requirements. These are all accessible on the `mod.io UI` settings page in your project settings.
@@ -85,67 +141,17 @@ This function will be invoked by the UI to offer your project a chance to return
 
 ==== Featured Rows & Categories
 
+image::img/plugin_ui_categories.png[]
+
 The mod.io Mod Browser allows you to customize the Featured row and secondary category rows with custom search criteria suitable for your game. By default, the browser uses the `Modio/UI/Browser/DefaultModBrowserParams` object, which you are free to modify to suit your needs. However, you can also create your own by creating a Data Asset inheriting from ModioModBrowserParams, and specifying that object as the `BrowserCategoryConfiguration` in the mod.io UI Settings.
+
+By default, the browser contains a single Featured Mods row (based off daily downloads), and additional rows of Highest Rated, Most Popular, Most Subscribers, Recently Added and Recently Updated.
 
 ==== Background Customization
 
+image::img/plugin_ui_backgroundprovider.png[]
+
 The mod.io Mod Browser supports a custom background or removal of a background altogether. Classes implementing `IModioMenuBackgroundProvider` allow the UI to query your project for a specific material to be used for the background. This is configurable in the mod.io UI Settings.
-
-=== Displaying the Mod Browser
-
-Once the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem, `UModioUISubsystem`.
-
-
-.Blueprint Example
-[%collapsible]
-====
-
-From Blueprint, you can use the <<ShowModBrowserUIForPlayer>> node.
-
-image::img/plugin_ui_showforplayer.png[]
-
-====
-
-.C++ Example
-[%collapsible]
-====
-
-[source,c++, subs="+macros"]
-----
-// After you've called <<K2_InitializeAsync>> and the plugin is initialized successfully:
-
-if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-{
-    if (UWorld* CurrentWorld = GetWorld())
-    {
-        if (APlayerController* PC = CurrentWorld->GetFirstPlayerController())
-        {
-            // Create and bind a delegate to be invoked when the browser is closed
-            FOnModBrowserClosed BrowserClosedDelegate;
-            // OnModBrowserClosed needs to be marked UFUNCTION()
-            BrowserClosedDelegate.BindDynamic(this, &ASomeActor::OnModBrowserClosed);
-
-            // Get a reference to the mod browser implementation (this will be exposed in the UI Settings object
-            // in a future release)
-            FSoftClassPath MenuClassReference =
-                "/modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget_C";
-            UClass* ReferencedClass = MenuClassReference.ResolveClass();
-            if (ReferencedClass)
-            {
-                // Request the browser widget be instantiated and displayed
-                UModioMenu* MenuWidget =
-                    Subsystem->ShowModBrowserUIForPlayer(ReferencedClass, PC, BrowserClosedDelegate);
-                if (MenuWidget)
-                {
-                    // Focus the user on the browser
-                    UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PC, MenuWidget);
-                }
-            }
-        }
-    }
-}
-----
-====
 
 === Styling and Customization
 

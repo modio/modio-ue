@@ -77,7 +77,7 @@ protected:
 			}
 			else
 			{
-				// Subsystem->RequestExternalAuthentication({}, ButtonInfo->ProviderID);
+				Subsystem->RequestExternalAuthentication(ButtonInfo->ProviderID);
 			}
 		}
 		return FReply::Handled();

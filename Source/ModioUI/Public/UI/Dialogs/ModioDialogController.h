@@ -96,7 +96,7 @@ protected:
 	void HandleEmailRequestSent(FModioErrorCode ec, UModioDialogInfo* DestinationOnSuccess);
 	void SendEmailCodeRequest(FString EmailAddress, UModioDialogInfo* DestinationOnSuccess);
 	void HandleUnsubscribe(FModioModID ec, bool IsSubscribe);
-
+	void HandleExternalAuthenticationComplete(FModioErrorCode ec);
 	void SubmitEmailAuthCode(FString Code, UModioDialogInfo* DestinationOnSuccess);
 
 public:
@@ -107,9 +107,12 @@ public:
 	void ShowAuthenticationChoiceDialog();
 	void ShowEmailAuthenticationDialog();
 	void ShowLogoutDialog();
+	
+	//Does this require a destination parameter?
 	void BeginExternalAuthentication(EModioAuthenticationProvider Provider);
+	
 	void ShowReportContentDialog();
-	void ShowConfirmUninstallDialog();
+	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
 	void ShowErrorDialog(FModioErrorCode ec, bool bCloseDialogsOnOK = false);
 
 	void ShowLoadingDialog();
@@ -117,6 +120,8 @@ public:
 	void ShowModUnsubscribeDialog(UObject* DialogDataSource);
 	void HandleUnsubscribeError(FModioErrorCode ModioErrorCode);
 	void RequestUnsubscribe(const FModioModID& ModId, UModioDialogInfo* DestinationOnSuccess);
+	void RequestUninstall(const FModioModID& ModId, UModioDialogInfo* DestinationOnSuccess);
+	void HandleUninstallError(FModioErrorCode ec, UModioDialogInfo* DestinationOnSuccess);
 	void LogOutCallback(FModioErrorCode ec);
 	void LogOut();
 	void ShowModReportDialog(UObject* DialogDataSource);

@@ -45,6 +45,7 @@ public:
 	void ShowLogoutDialog();
 	void ShowModReportDialog(UObject* DialogDataSource);
 	void ShowReportEmailDialog(UObject* DialogDataSource);
+	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
 	int32 GetPageIndex();
 
 private:

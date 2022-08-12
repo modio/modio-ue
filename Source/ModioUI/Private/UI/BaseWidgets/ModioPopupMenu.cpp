@@ -9,17 +9,17 @@
 void UModioPopupMenu::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
-	OnGetMenuContentEvent.BindDynamic(this, &UModioPopupMenu::GeneratePopupMenuContent);
+	OnGetUserMenuContentEvent.BindDynamic(this, &UModioPopupMenu::GeneratePopupMenuContent);
 }
 
-UWidget* UModioPopupMenu::GeneratePopupMenuContent()
+UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 {
 	// Currently we only use the width so that the popup has the same width as the menu anchor itself
 	FGeometry PaintGeo = GetPaintSpaceGeometry();
 	FVector2D ActualSize = PaintGeo.GetLocalSize();
 	if (MenuContentWidgetClass)
 	{
-		UWidget* ConcreteWidget = NewObject<UWidget>(this, MenuContentWidgetClass.Get());
+		UUserWidget* ConcreteWidget = CreateWidget<UUserWidget>(this, MenuContentWidgetClass.Get());
 		ConcreteWidget->TakeWidget();
 		if (ConcreteWidget->Implements<UModioUIPopupMenuContentWidget>())
 		{
@@ -37,7 +37,7 @@ UWidget* UModioPopupMenu::GeneratePopupMenuContent()
 	}
 	else
 	{
-		UWidget* ConcreteWidget = NewObject<UModioDefaultPopupMenuContent>(this);
+		UUserWidget* ConcreteWidget = CreateWidget<UModioDefaultPopupMenuContent>(this);
 		ConcreteWidget->TakeWidget();
 		if (ConcreteWidget->Implements<UModioUIPopupMenuContentWidget>())
 		{

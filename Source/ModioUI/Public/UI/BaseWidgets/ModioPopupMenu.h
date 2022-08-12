@@ -21,7 +21,7 @@ protected:
 	FModioUIMenuCommandList CurrentEntries;
 	virtual void SynchronizeProperties() override;
 	UFUNCTION()
-	UWidget* GeneratePopupMenuContent();
+	UUserWidget* GeneratePopupMenuContent();
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
@@ -47,7 +47,7 @@ public:
 	void SetMenuEntries(FModioUIMenuCommandList Entries);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUIPopupMenuContentWidget"), Category="Widgets")
-	TSubclassOf<UWidget> MenuContentWidgetClass;
+	TSubclassOf<UUserWidget> MenuContentWidgetClass;
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")

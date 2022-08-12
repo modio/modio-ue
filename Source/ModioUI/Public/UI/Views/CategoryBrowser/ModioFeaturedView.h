@@ -10,6 +10,7 @@
 #include "UI/Interfaces/IModioUIAsyncOperationWidget.h"
 #include "UI/Views/CategoryBrowser/ModioFeaturedCategory.h"
 #include "UI/Views/ModioMenuView.h"
+#include "UI/Views/ModDetails/ModioAsyncOpWrapperWidget.h"
 
 #include "ModioFeaturedView.generated.h"
 
@@ -34,6 +35,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioListView* AdditionalCategories;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets", meta = (BindWidget))
+	UModioAsyncOpWrapperWidget* FeaturedViewContent;
 
 	// Holds the featured items so that they don't go out of scope
 	UPROPERTY()

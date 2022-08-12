@@ -11,7 +11,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "ModioModule.h"
-#include "Core.h"
+#include "CoreMinimal.h"
 #include "Engine/Engine.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Logging/LogVerbosity.h"

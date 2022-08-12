@@ -23,12 +23,10 @@ void UModioModCollectionTile::NativeOnSetDataSource()
 																	   EModioUIAsyncOperationWidgetState::InProgress);
 			Subsystem->RequestLogoDownloadForModID(CollectionEntry->Underlying.GetModProfile().ModId);
 		}
-
 		if (ModName)
 		{
 			ModName->SetText(FText::FromString(CollectionEntry->Underlying.GetModProfile().ProfileName));
 		}
-
 		if (SizeOnDiskLabel)
 		{
 			const uint64 NumBytes = CollectionEntry->Underlying.GetSizeOnDisk().Underlying;
@@ -41,7 +39,6 @@ void UModioModCollectionTile::NativeOnSetDataSource()
 				SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 1));
 			}
 		}
-
 		// Perform the initial hide of the remove mod button if we are not subscribed (because we want users to use
 		// 'More Options' to do a force uninstall, in that case)
 		if (SubscribeButton)
@@ -69,6 +66,33 @@ void UModioModCollectionTile::NativeOnSetDataSource()
 		{
 			StatusLine->SetText(CollectionEntry->bCachedSubscriptionStatus ? SubscribedStatusText
 																		   : InstalledStatusText);
+		}
+		if (MoreOptionsMenu)
+		{
+			FModioUIMenuCommandList MenuEntries;
+			FModioUIExecuteAction PositiveRatingDelegate;
+			PositiveRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitPositiveRating);
+			FModioUIExecuteAction NegativeRatingDelegate;
+			NegativeRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitNegativeRating);
+			FModioUIExecuteAction ReportDelegate;
+			ReportDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitModReport);
+
+			MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateUp", "Rate Up")},
+										  FModioUIAction {PositiveRatingDelegate});
+			MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateDown", "Rate Down")},
+										  FModioUIAction {NegativeRatingDelegate});
+			MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("Report", "Report")},
+										  FModioUIAction {ReportDelegate});
+
+			// Force Uninstall should only be available if current user isn't subscribed
+			if (CollectionEntry->bCachedSubscriptionStatus == false)
+			{
+				FModioUIExecuteAction ForceUninstallDelegate;
+				ForceUninstallDelegate.BindDynamic(this, &UModioModCollectionTile::ForceUninstall);
+				MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("ForceUninstall", "Force Uninstall")},
+											  FModioUIAction {ForceUninstallDelegate});
+			}
+			MoreOptionsMenu->SetMenuEntries(MenuEntries);
 		}
 	}
 }
@@ -158,6 +182,21 @@ void UModioModCollectionTile::SubmitModReport()
 	}
 }
 
+void UModioModCollectionTile::ForceUninstall()
+{
+	UModioModCollectionEntryUI* ModInfo = Cast<UModioModCollectionEntryUI>(DataSource);
+	if (ModInfo)
+	{
+		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		{
+			if (Subsystem)
+			{
+				Subsystem->ShowUninstallConfirmationDialog(ModInfo);
+			}
+		}
+	}
+}
+
 void UModioModCollectionTile::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -171,24 +210,6 @@ void UModioModCollectionTile::NativeOnInitialized()
 	if (TileBorder)
 	{
 		// TileBorder->SetHoveredState();
-	}
-
-	if (MoreOptionsMenu)
-	{
-		FModioUIMenuCommandList MenuEntries;
-		FModioUIExecuteAction PositiveRatingDelegate;
-		PositiveRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitPositiveRating);
-		FModioUIExecuteAction NegativeRatingDelegate;
-		NegativeRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitNegativeRating);
-		FModioUIExecuteAction ReportDelegate;
-		ReportDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitModReport);
-		MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateUp", "Rate Up")},
-									  FModioUIAction {PositiveRatingDelegate});
-		MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateDown", "Rate Down")},
-									  FModioUIAction {NegativeRatingDelegate});
-		MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("Report", "Report")}, FModioUIAction {ReportDelegate});
-
-		MoreOptionsMenu->SetMenuEntries(MenuEntries);
 	}
 }
 

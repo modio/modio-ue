@@ -815,6 +815,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_mod_io_mod_browser_ui">mod.io Mod Browser UI</a>
 <ul class="sectlevel2">
 <li><a href="#_ui_specific_plugin_modules">UI-Specific Plugin Modules</a></li>
+<li><a href="#_displaying_the_mod_browser">Displaying the Mod Browser</a></li>
 <li><a href="#_configuration_2">Configuration</a>
 <ul class="sectlevel3">
 <li><a href="#_input_mappings">Input Mappings</a></li>
@@ -826,7 +827,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_background_customization">Background Customization</a></li>
 </ul>
 </li>
-<li><a href="#_displaying_the_mod_browser">Displaying the Mod Browser</a></li>
 <li><a href="#_styling_and_customization">Styling and Customization</a>
 <ul class="sectlevel3">
 <li><a href="#_color_material_style_references">Color, Material, Style References</a></li>
@@ -2625,6 +2625,67 @@ Support for editing the details of an existing mod is currently not available bu
 </div>
 </div>
 <div class="sect2">
+<h3 id="_displaying_the_mod_browser">Displaying the Mod Browser</h3>
+<div class="paragraph">
+<p>The main Mod Browser widget is located at /Modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget. Once the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem, <code>UModioUISubsystem</code>.
+Currently the mod browser does not support being embedded inside your own UI hierarchy, so you must load it directly (for instance, from a button on your main menu).</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>From Blueprint, you can use the <a href="#ShowModBrowserUIForPlayer">Show Mod Browser UIFor Player</a> node.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_showforplayer.png" alt="plugin ui showforplayer">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="c1">// After you've called <a href="#K2_InitializeAsync">InitializeAsync</a> and the plugin is initialized successfully:</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">UModioUISubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioUISubsystem</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">UWorld</span><span class="o">*</span> <span class="n">CurrentWorld</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PC</span> <span class="o">=</span> <span class="n">CurrentWorld</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">())</span>
+        <span class="p">{</span>
+            <span class="c1">// Create and bind a delegate to be invoked when the browser is closed</span>
+            <span class="n">FOnModBrowserClosed</span> <span class="n">BrowserClosedDelegate</span><span class="p">;</span>
+            <span class="c1">// OnModBrowserClosed needs to be marked UFUNCTION()</span>
+            <span class="n">BrowserClosedDelegate</span><span class="p">.</span><span class="n">BindDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ASomeActor</span><span class="o">::</span><span class="n">OnModBrowserClosed</span><span class="p">);</span>
+
+            <span class="c1">// Get a reference to the mod browser implementation (this will be exposed in the UI Settings object</span>
+            <span class="c1">// in a future release)</span>
+            <span class="n">FSoftClassPath</span> <span class="n">MenuClassReference</span> <span class="o">=</span>
+                <span class="s">"/modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget_C"</span><span class="p">;</span>
+            <span class="n">UClass</span><span class="o">*</span> <span class="n">ReferencedClass</span> <span class="o">=</span> <span class="n">MenuClassReference</span><span class="p">.</span><span class="n">ResolveClass</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">ReferencedClass</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="c1">// Request the browser widget be instantiated and displayed</span>
+                <span class="n">UModioMenu</span><span class="o">*</span> <span class="n">MenuWidget</span> <span class="o">=</span>
+                    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">ReferencedClass</span><span class="p">,</span> <span class="n">PC</span><span class="p">,</span> <span class="n">BrowserClosedDelegate</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">MenuWidget</span><span class="p">)</span>
+                <span class="p">{</span>
+                    <span class="c1">// Focus the user on the browser</span>
+                    <span class="n">UWidgetBlueprintLibrary</span><span class="o">::</span><span class="n">SetInputMode_UIOnlyEx</span><span class="p">(</span><span class="n">PC</span><span class="p">,</span> <span class="n">MenuWidget</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+<div class="sect2">
 <h3 id="_configuration_2">Configuration</h3>
 <div class="paragraph">
 <p>The mod.io Mod Browser will utilise the configuration that you provided on the mod.io Plugin Settings page referenced above; however, there are a number of additional UI-specific settings you will need to update to match your project&#8217;s requirements. These are all accessible on the <code>mod.io UI</code> settings page in your project settings.</p>
@@ -2779,76 +2840,29 @@ If you either don&#8217;t specify an authentication data provider, or your data 
 </div>
 <div class="sect3">
 <h4 id="_featured_rows_categories">Featured Rows &amp; Categories</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_categories.png" alt="plugin ui categories">
+</div>
+</div>
 <div class="paragraph">
 <p>The mod.io Mod Browser allows you to customize the Featured row and secondary category rows with custom search criteria suitable for your game. By default, the browser uses the <code>Modio/UI/Browser/DefaultModBrowserParams</code> object, which you are free to modify to suit your needs. However, you can also create your own by creating a Data Asset inheriting from ModioModBrowserParams, and specifying that object as the <code>BrowserCategoryConfiguration</code> in the mod.io UI Settings.</p>
+</div>
+<div class="paragraph">
+<p>By default, the browser contains a single Featured Mods row (based off daily downloads), and additional rows of Highest Rated, Most Popular, Most Subscribers, Recently Added and Recently Updated.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_background_customization">Background Customization</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_backgroundprovider.png" alt="plugin ui backgroundprovider">
+</div>
+</div>
 <div class="paragraph">
 <p>The mod.io Mod Browser supports a custom background or removal of a background altogether. Classes implementing <code>IModioMenuBackgroundProvider</code> allow the UI to query your project for a specific material to be used for the background. This is configurable in the mod.io UI Settings.</p>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_displaying_the_mod_browser">Displaying the Mod Browser</h3>
-<div class="paragraph">
-<p>Once the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem, <code>UModioUISubsystem</code>.</p>
-</div>
-<details>
-<summary class="title">Blueprint Example</summary>
-<div class="content">
-<div class="paragraph">
-<p>From Blueprint, you can use the <a href="#ShowModBrowserUIForPlayer">Show Mod Browser UIFor Player</a> node.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_showforplayer.png" alt="plugin ui showforplayer">
-</div>
-</div>
-</div>
-</details>
-<details>
-<summary class="title">C++ Example</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="c1">// After you've called <a href="#K2_InitializeAsync">InitializeAsync</a> and the plugin is initialized successfully:</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="n">UModioUISubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioUISubsystem</span><span class="o">&gt;</span><span class="p">())</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">UWorld</span><span class="o">*</span> <span class="n">CurrentWorld</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">())</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PC</span> <span class="o">=</span> <span class="n">CurrentWorld</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">())</span>
-        <span class="p">{</span>
-            <span class="c1">// Create and bind a delegate to be invoked when the browser is closed</span>
-            <span class="n">FOnModBrowserClosed</span> <span class="n">BrowserClosedDelegate</span><span class="p">;</span>
-            <span class="c1">// OnModBrowserClosed needs to be marked UFUNCTION()</span>
-            <span class="n">BrowserClosedDelegate</span><span class="p">.</span><span class="n">BindDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ASomeActor</span><span class="o">::</span><span class="n">OnModBrowserClosed</span><span class="p">);</span>
-
-            <span class="c1">// Get a reference to the mod browser implementation (this will be exposed in the UI Settings object</span>
-            <span class="c1">// in a future release)</span>
-            <span class="n">FSoftClassPath</span> <span class="n">MenuClassReference</span> <span class="o">=</span>
-                <span class="s">"/modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget_C"</span><span class="p">;</span>
-            <span class="n">UClass</span><span class="o">*</span> <span class="n">ReferencedClass</span> <span class="o">=</span> <span class="n">MenuClassReference</span><span class="p">.</span><span class="n">ResolveClass</span><span class="p">();</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">ReferencedClass</span><span class="p">)</span>
-            <span class="p">{</span>
-                <span class="c1">// Request the browser widget be instantiated and displayed</span>
-                <span class="n">UModioMenu</span><span class="o">*</span> <span class="n">MenuWidget</span> <span class="o">=</span>
-                    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">ReferencedClass</span><span class="p">,</span> <span class="n">PC</span><span class="p">,</span> <span class="n">BrowserClosedDelegate</span><span class="p">);</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">MenuWidget</span><span class="p">)</span>
-                <span class="p">{</span>
-                    <span class="c1">// Focus the user on the browser</span>
-                    <span class="n">UWidgetBlueprintLibrary</span><span class="o">::</span><span class="n">SetInputMode_UIOnlyEx</span><span class="p">(</span><span class="n">PC</span><span class="p">,</span> <span class="n">MenuWidget</span><span class="p">);</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span></code></pre>
-</div>
-</div>
-</div>
-</details>
 </div>
 <div class="sect2">
 <h3 id="_styling_and_customization">Styling and Customization</h3>
@@ -12346,7 +12360,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-08-05 16:58:47 +1000
+Last updated 2022-08-12 17:02:49 +1000
 </div>
 </div>
 </body>

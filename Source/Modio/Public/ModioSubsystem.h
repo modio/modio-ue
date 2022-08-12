@@ -556,6 +556,19 @@ public:
 	*/
 	MODIO_API void ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegateFast Callback);
 
+	/**
+	 * @brief Forcibly uninstalls a mod from the system. This is intended for use when a host application requires more
+	 * room for a mod that the user wants to install, and as such will return an error if the current user is
+	 * subscribed to the mod. To remove a mod the current user is subscribed to, use
+	 * xref:UnsubscribeFromModAsync[].
+	 * @param Callback Callback invoked when the uninstallation is successful, or if it failed because the current user
+	 * remains subscribed.
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @error ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
+	 */
+	MODIO_API void ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegateFast Callback);
+
 private:
 	TUniquePtr<struct FModioImageCache> ImageCache;
 
@@ -646,12 +659,9 @@ public:
 	 * xref:UnsubscribeFromModAsync[].
 	 * @param Callback Callback invoked when the uninstallation is successful, or if it failed because the current user
 	 * remains subscribed.
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ForceUninstallModAsync", Category = "mod.io|Mod Management")
-	MODIO_API void ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegate Callback);
+	MODIO_API void K2_ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @brief Fetches the currently authenticated Mod.io user profile if there is one associated with the current

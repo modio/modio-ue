@@ -87,12 +87,15 @@ protected:
 	bool QueryIsModEnabled(FModioModID ID);
 
 	void RequestModEnabledState(FModioModID ID, bool bNewEnabledState);
-	
+
 	UFUNCTION()
 	void SubscriptionHandler(FModioErrorCode ec, FModioModID ID);
 
 	UFUNCTION()
 	void UnsubscribeHandler(FModioErrorCode ec, FModioModID ID);
+
+	UFUNCTION()
+	void UninstallHandler(FModioErrorCode ec, FModioModID ID);
 
 	TSharedPtr<FUICommandList> CommonUICommands = nullptr;
 	TSharedPtr<class FModioUIInputProcessor> Processor;
@@ -174,23 +177,23 @@ public:
 	void ShowLogoutDialog();
 	void ShowModReportDialog(UObject* DialogDataSource);
 
-	UFUNCTION(BlueprintCallable,  Category="ModioUISubsystem")
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestSubscriptionForModID(FModioModID ID);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestRemoveSubscriptionForModID(FModioModID ID);
 
 	void RequestRemoveSubscriptionForModID(FModioModID ID, FOnErrorOnlyDelegateFast DedicatedCallback);
-
 	void OnRatingSubmissionComplete(FModioErrorCode ModioErrorCode, EModioRating ModioRating);
 	void RequestRateUpForModId(FModioModID ID, FOnErrorOnlyDelegateFast DedicatedCallback);
 	void RequestRateDownForModId(FModioModID ID, FOnErrorOnlyDelegateFast DedicatedCallback);
-
+	void RequestUninstallForModID(FModioModID ID, FOnErrorOnlyDelegateFast DedicatedCallback);
 	void SetActiveTabIndex(int TabIndex);
 	void OnLogoutComplete(FModioErrorCode ModioErrorCode);
 	void CloseSearchDrawer();
 	void LogOut(FOnErrorOnlyDelegateFast DedicatedCallback);
 	void ShowReportEmailDialog(UObject* DialogDataSource);
+	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
 
 	// Delegate for the subscription success or fail
 	FOnSubscriptionCompleted OnSubscriptionRequestCompleted;
@@ -209,7 +212,11 @@ public:
 	void RequestEmailAuthentication(FModioEmailAuthCode Code, FOnErrorOnlyDelegateFast DedicatedCallback);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	void RequestExternalAuthentication(FModioAuthenticationParams Params, EModioAuthenticationProvider Provider);
+	void RequestExternalAuthentication(EModioAuthenticationProvider Provider);
+	
+	/// @brief Special native-only overload for when we want direct notification of success or failure but still want to
+	/// broadcast UI events
+	void RequestExternalAuthentication(EModioAuthenticationProvider Provider, FOnErrorOnlyDelegateFast DedicatedCallback);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestGalleryImageDownloadForModID(FModioModID ID, int32 Index,

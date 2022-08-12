@@ -38,6 +38,8 @@ protected:
 	UFUNCTION()
 	void SubmitModReport();
 	UFUNCTION()
+	void ForceUninstall();
+	UFUNCTION()
 	void NativeMoreOptionsClicked();
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* SizeOnDiskLabel;

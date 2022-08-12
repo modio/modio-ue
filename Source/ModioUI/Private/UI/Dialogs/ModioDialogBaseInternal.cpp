@@ -48,7 +48,7 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 		if (!LoadingSpinner)
 		{
 			LoadingSpinner = NewObject<UWidget>(this, Controller->LoadingOverlay);
-			Cast<UModioUIAsyncLoadingOverlay>(LoadingSpinner)->SetOwningDialog(this);	
+			Cast<UModioUIAsyncLoadingOverlay>(LoadingSpinner)->SetOwningDialog(this);
 		}
 	}
 
@@ -289,6 +289,17 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 						}
 					}
 					break;
+					case EModioDialogAsyncCall::UninstallMod:
+						if (DataSource)
+						{
+							if (DataSource->Implements<UModioModInfoUIDetails>())
+							{
+								FModioModInfo ModInfo = IModioModInfoUIDetails::Execute_GetFullModInfo(DataSource);
+
+								Controller->RequestUninstall(ModInfo.ModId, Button->Destination);
+							}
+						}
+						break;
 					case EModioDialogAsyncCall::Logout:
 						Controller->LogOut();
 						break;
