@@ -3,7 +3,9 @@
 #include "UI/CommonComponents/ModioDrawer.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
+#include "Core/ModioUIHelpers.h"
 #include "Math/UnrealMathUtility.h"
+#include "Misc/EngineVersionComparison.h"
 #include "UI/BaseWidgets/ModioGridPanel.h"
 #include "UI/Styles/ModioDrawerWidgetStyle.h"
 #include "Widgets/Layout/SBorder.h"
@@ -152,21 +154,21 @@ void UModioDrawer::SynchronizeProperties()
 	MyGridPanel->SetRowFill(2, FooterFillOverride);
 
 	const FModioDrawerWidgetStyle* Style = DrawerStyle.FindStyle<FModioDrawerWidgetStyle>();
-
-	SGridPanel::FSlot& HeaderSlot = MyGridPanel->AddSlot(0, 0);
-	HeaderSlot.HAlign(HeaderHorizontalAlignment);
-	HeaderSlot.VAlign(HeaderVerticalAlignment);
+	SGridPanel::FSlot& HeaderSlot = *ModioUIHelpers::AddSlot(MyGridPanel.Get(), 0, 0);
+	ModioUIHelpers::SetHorizontalAlignment(HeaderSlot, HeaderHorizontalAlignment);
+	ModioUIHelpers::SetVerticalAlignment(HeaderSlot, HeaderVerticalAlignment);
 	HeaderSlot.AttachWidget(GetHeaderWidget());
 
-	SGridPanel::FSlot& ContentSlot = MyGridPanel->AddSlot(0, 1);
-	ContentSlot.HAlign(ContentHorizontalAlignment);
-	ContentSlot.VAlign(ContentVerticalAlignment);
+	SGridPanel::FSlot& ContentSlot = *ModioUIHelpers::AddSlot(MyGridPanel.Get(), 0, 1);
+	ModioUIHelpers::SetHorizontalAlignment(ContentSlot, ContentHorizontalAlignment);
+	ModioUIHelpers::SetVerticalAlignment(ContentSlot, ContentVerticalAlignment);
 	ContentSlot.AttachWidget(GetContentWidget());
-
-	SGridPanel::FSlot& FooterSlot = MyGridPanel->AddSlot(0, 2);
-	FooterSlot.HAlign(FooterHorizontalAlignment);
-	FooterSlot.VAlign(FooterVerticalAlignment);
+	
+	SGridPanel::FSlot& FooterSlot = *ModioUIHelpers::AddSlot(MyGridPanel.Get(), 0, 2);
+	ModioUIHelpers::SetHorizontalAlignment(FooterSlot, FooterHorizontalAlignment);
+	ModioUIHelpers::SetVerticalAlignment(FooterSlot, FooterVerticalAlignment);
 	FooterSlot.AttachWidget(GetFooterWidget());
+
 	MyGridPanel->Invalidate(EInvalidateWidgetReason::Layout);
 }
 

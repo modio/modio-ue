@@ -3,6 +3,7 @@
 #include "Algo/Transform.h"
 #include "Containers/Array.h"
 #include "Containers/UnrealString.h"
+#include "Core/ModioUIHelpers.h"
 #include "InputCoreTypes.h"
 #include "PropertyEditor/Public/DetailLayoutBuilder.h"
 #include "PropertyEditor/Public/DetailWidgetRow.h"
@@ -460,7 +461,12 @@ public:
 					.ValueContent()[SNew(SColorBlock)
 										.Color(this, &FModioLinearColorDetailsCustomization::GetUnderlyingColor)
 										.ShowBackgroundForAlpha(false)
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+										.AlphaDisplayMode(EColorBlockAlphaDisplayMode::Ignore)
+#else
 										.IgnoreAlpha(true)
+#endif
+
 										.OnMouseButtonDown(
 											this, &FModioLinearColorDetailsCustomization::OnMouseButtonDownColorBlock,
 											PropertyHandle)

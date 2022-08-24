@@ -48,7 +48,7 @@ void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
 	} else
 	{
 		// Disable input images when using Mouse/Keyboard as we do not have appropriate glyphs
-		if (InputDevice == EModioUIInputMode::Keyboard || InputDevice == EModioUIInputMode::Mouse)
+		if (InputDevice == EModioUIInputMode::Keyboard || InputDevice == EModioUIInputMode::Mouse || InputDevice == EModioUIInputMode::Unknown)
 		{
 			SetVisibility(ESlateVisibility::Collapsed);
 			InvalidateLayoutAndVolatility();

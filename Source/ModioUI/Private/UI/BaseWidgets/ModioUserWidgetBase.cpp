@@ -89,8 +89,11 @@ void UModioUserWidgetBase::FinishLoadExternalData(FModioErrorCode ec)
 		   TEXT("Please ensure you call Super::NativeFinishLoadExternalData in your overridden "
 				"implementation to route notifications to Blueprint"));
 }
-
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+void UModioUserWidgetBase::PreSave(FObjectPreSaveContext SaveContext)
+#else
 void UModioUserWidgetBase::PreSave(const class ITargetPlatform* TargetPlatform)
+#endif
 {
 	for (FPropertyValueIterator It = FPropertyValueIterator(FStructProperty::StaticClass(), GetClass(), this); It; ++It)
 	{
@@ -107,7 +110,11 @@ void UModioUserWidgetBase::PreSave(const class ITargetPlatform* TargetPlatform)
 		}
 	}
 
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	Super::PreSave(SaveContext);
+#else
 	Super::PreSave(TargetPlatform);
+#endif
 }
 
 void UModioUserWidgetBase::NativeFinishLoadExternalData(FModioErrorCode ec)

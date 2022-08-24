@@ -80,7 +80,7 @@ void UModioCodeInputWidget::NativeSetValidationError(FText ErrorText)
 			SAssignNew(MyErrorTextBlock, SModioRichTextBlock)
 			.Text(ErrorText)
 			.WrapTextAt(700)
-			.StyleReference(&ErrorTextBlockStyle)
+			.StyleReference(&TextStyle)
 			.TextStyle(ErrorTextBlockStyle)
 		];
 	} else

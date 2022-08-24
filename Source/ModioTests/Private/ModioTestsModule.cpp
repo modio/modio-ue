@@ -1,8 +1,8 @@
 #include "ModioTestsModule.h"
-#include "Core.h"
+#include "CoreMinimal.h"
 #include "Engine/Engine.h"
-#include "PropertyEditorModule.h"
 #include "ModioTestSettings.h"
+#include "PropertyEditorModule.h"
 
 #if WITH_EDITOR
 	#include "ISettingsModule.h"
@@ -25,16 +25,17 @@ void FModioTestsModule::RegisterSettings()
 #if WITH_EDITOR
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
-		SettingsModule->RegisterSettings("Project", "Plugins", "mod.io unit tests", LOCTEXT("UnitTestsSettingsName", "mod.io unit tests"),
-										 LOCTEXT("UnitTestsSettingsDescription", "Configure the mod.io plugin unit tests"),
-										 GetMutableDefault<UModioTestSettings>());
+		SettingsModule->RegisterSettings(
+			"Project", "Plugins", "mod.io unit tests", LOCTEXT("UnitTestsSettingsName", "mod.io unit tests"),
+			LOCTEXT("UnitTestsSettingsDescription", "Configure the mod.io plugin unit tests"),
+			GetMutableDefault<UModioTestSettings>());
 	}
 #endif
 }
 void FModioTestsModule::UnregisterSettings()
 {
-#if WITH_EDITOR 
-	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr <ISettingsModule>("Settings"))
+#if WITH_EDITOR
+	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
 		SettingsModule->UnregisterSettings("Project", "Plugins", "mod.io unit tests");
 	}

@@ -2,6 +2,7 @@
 
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueOpProgress.h"
 #include "Core/ModioModInfoUI.h"
+#include "Libraries/ModioSDKLibrary.h"
 #include "Types/ModioModProgressInfo.h"
 
 void UModioDownloadQueueOpProgress::UpdateSpeed(FModioUnsigned64 DeltaBytes, double DeltaTime)
@@ -13,6 +14,27 @@ void UModioDownloadQueueOpProgress::UpdateSpeed(FModioUnsigned64 DeltaBytes, dou
 		FText BytesPerSecondString = FText::AsMemory(BytesPerSecond, EMemoryUnitStandard::IEC);
 		OperationSpeedText->SetText(FText::Format(
 			SpeedFormatText, FFormatNamedArguments {{FString("Bytes"), FFormatArgumentValue(BytesPerSecondString)}}));
+	}
+}
+
+void UModioDownloadQueueOpProgress::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	if (UnsubscribeButton)
+	{
+		UnsubscribeButton->OnClicked.AddDynamic(this, &UModioDownloadQueueOpProgress::OnUnsubscribeClicked);
+	}
+}
+void UModioDownloadQueueOpProgress::OnUnsubscribeClicked()
+{
+	UModioModInfoUI* ActualData = Cast<UModioModInfoUI>(DataSource);
+	if (ActualData)
+	{
+		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		{
+			Subsystem->ShowModUnsubscribeDialog(ActualData);
+		}
 	}
 }
 
@@ -57,11 +79,19 @@ void UModioDownloadQueueOpProgress::UpdateProgress(const struct FModioModProgres
 		UpdateSpeed(ProgressInfo.CurrentlyDownloadedBytes - PreviousProgressValue, DeltaTime);
 
 		PreviousProgressValue = ProgressInfo.CurrentlyDownloadedBytes;
+
+		FFormatNamedArguments Args;
+		Args.Add("Progress", UModioSDKLibrary::Filesize_ToString(ProgressInfo.CurrentlyDownloadedBytes.Underlying, 1));
+		Args.Add("Total", UModioSDKLibrary::Filesize_ToString(ProgressInfo.TotalDownloadSize.Underlying, 1));
+							
+		OperationProgressText->SetText(FText::Format(FTextFormat::FromString(TEXT("{Progress} of {Total}")), Args));
 	}
 	else if (ProgressInfo.CurrentlyExtractedBytes < ProgressInfo.TotalExtractedSizeOnDisk)
 	{
 		SetPercent(ProgressInfo.CurrentlyExtractedBytes / (double) ProgressInfo.TotalExtractedSizeOnDisk);
-		UpdateSpeed(ProgressInfo.CurrentlyExtractedBytes - PreviousProgressValue, DeltaTime);
+
+		OperationProgressText->SetVisibility(ESlateVisibility::Collapsed);
+		OperationSpeedText->SetVisibility(ESlateVisibility::Collapsed);
 		PreviousProgressValue = ProgressInfo.CurrentlyExtractedBytes;
 	}
 	else

@@ -9,7 +9,8 @@
  */
 
 #include "ModioEx.h"
-#include "Engine.h"
+#include "CoreMinimal.h"
+#include "Engine/Engine.h"
 
 #define LOCTEXT_NAMESPACE "FModioExModule"
 

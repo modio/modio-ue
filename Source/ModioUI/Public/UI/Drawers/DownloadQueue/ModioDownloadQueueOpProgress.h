@@ -8,6 +8,7 @@
 #include "UI/BaseWidgets/ModioProgressBar.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/CommonComponents/ModioModManagementWidgetBase.h"
+#include "UI/CommonComponents/ModioRichTextButton.h"
 
 #include "ModioDownloadQueueOpProgress.generated.h"
 
@@ -21,12 +22,19 @@ UCLASS()
 class MODIOUI_API UModioDownloadQueueOpProgress : public UModioModManagementWidgetBase
 {
 	GENERATED_BODY()
+public:
+	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
+
 protected:
 	FModioUnsigned64 PreviousProgressValue = FModioUnsigned64(0);
 	FDateTime PreviousUpdateTime;
 
 	void UpdateSpeed(FModioUnsigned64 DeltaBytes, double DeltaTime);
 	void NativeOnSetDataSource() override;
+	void NativeOnInitialized() override;
+
+	UFUNCTION()
+	void OnUnsubscribeClicked();
 
 	void SetPercent(float InPercent);
 
@@ -42,10 +50,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* OperationProgressText;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UModioRichTextButton* UnsubscribeButton;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FText SpeedFormatText;
-
-	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
 
 	void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 

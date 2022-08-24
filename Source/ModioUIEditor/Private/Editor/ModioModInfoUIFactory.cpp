@@ -5,6 +5,7 @@
 	#include "Editor/ModioModInfoUIFactory.h"
 	#include "AssetRegistryModule.h"
 	#include "Core/ModioModInfoUI.h"
+	#include "Core/ModioUIHelpers.h"
 	#include "Widgets/DeclarativeSyntaxSupport.h"
 	#include "Widgets/SWindow.h"
 	#include "ModioSubsystem.h"
@@ -36,7 +37,7 @@ UObject* UModioModInfoUIFactory::FactoryCreateNew(UClass* InClass, UObject* InPa
 	UPackage* InPackage = Cast<UPackage>(InParent);
 
 	FString InPackagePath = FPackageName::GetLongPackagePath(InParent->GetOutermost()->GetName()) / InName.ToString();
-	UPackage::SavePackage(InPackage, NewModInfo, RF_Standalone | RF_Public, *InPackagePath);
+	ModioUIHelpers::SavePackage(InPackage, NewModInfo, RF_Standalone | RF_Public, *InPackagePath);
 	return NewModInfo;
 }
 

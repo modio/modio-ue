@@ -48,3 +48,5 @@ EActiveTimerReturnType SModioNotificationItem::HandleExpire(double, float)
 void SModioNotificationItem::Fadeout() {}
 
 void SModioNotificationItem::Pulse(const FLinearColor& GlowColor) {}
+
+void SModioNotificationItem::SetSubText(const TAttribute<FText>& InSubText) {}

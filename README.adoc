@@ -1,13 +1,13 @@
 ++++
 <a href="https://mod.io"><img src="https://static.mod.io/v1/images/branding/modio-color-dark.svg" alt="mod.io" width="360" align="right"/></a>
 ++++
-# mod.io Unreal Engine 4 Plugin
+# mod.io Unreal Engine Plugin
 
 image:https://img.shields.io/badge/license-MIT-brightgreen.svg[alt="License", link="https://github.com/modio/modio-sdk/blob/master/LICENSE"]
 image:https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=discord&color=7289DA&labelColor=2C2F33[alt="Discord", link="https://discord.mod.io"]
 image:https://img.shields.io/badge/Unreal-4.26%2B-dea309[alt="Unreal", link="https://www.unrealengine.com"]
 
-Welcome to the mod.io UE4 plugin public repository. It allows game developers to host and automatically install user-created mods in their games which use UE 4.26 or newer. It provides a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API]. We have a https://test.mod.io[test environment] available, and developers can create a game profile there to evaluate the plugin with. 
+Welcome to the mod.io Unreal Engine Plugin public repository. It allows game developers to host and automatically install user-created mods in their games which use UE 4.26 or newer. It provides a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API]. We have a https://test.mod.io[test environment] available, and developers can create a game profile there to evaluate the plugin with. 
 
 ++++
 <!--- <p align="center"><a href="https://www.unrealengine.com/marketplace/en-US/slug/mod-browser-manager"><img src="https://image.mod.io/members/c4ca/1/profileguides/unreal.png" alt="unreal" width="380" height="133"></a></p> --->

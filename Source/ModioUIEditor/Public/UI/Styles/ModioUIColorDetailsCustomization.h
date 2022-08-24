@@ -3,6 +3,7 @@
 #include "Algo/Transform.h"
 #include "Containers/Array.h"
 #include "Containers/UnrealString.h"
+#include "Core/ModioUIHelpers.h"
 #include "PropertyEditor/Public/DetailLayoutBuilder.h"
 #include "PropertyEditor/Public/DetailWidgetRow.h"
 #include "PropertyEditor/Public/IDetailChildrenBuilder.h"
@@ -46,8 +47,6 @@ public:
 	template<typename SourceType>
 	static FLinearColor GetUnderlyingColor(TSharedRef<IPropertyHandle> PropertyHandle)
 	{}
-
-	
 
 	template<typename SourceType>
 	static FReply ShowColorPicker(TSharedRef<IPropertyHandle> PropertyHandle)
@@ -135,7 +134,12 @@ public:
 										 .Color_Static(&FModioEditorWidgets::GetUnderlyingColor<FModioUIColor>,
 													   PropertyHandle)
 										 .ShowBackgroundForAlpha(false)
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+										 .AlphaDisplayMode(EColorBlockAlphaDisplayMode::Ignore)
+#else
 										 .IgnoreAlpha(true)
+#endif
+
 										 .OnMouseButtonDown(
 											 this, &FModioUIColorDetailsCustomization::OnMouseButtonDownColorBlock,
 											 PropertyHandle)

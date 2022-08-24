@@ -2,6 +2,7 @@
 
 #include "UI/BaseWidgets/ModioScrollBox.h"
 #include "Components/ScrollBoxSlot.h"
+#include "Core/ModioUIHelpers.h"
 #include "Widgets/Layout/SScrollBar.h"
 
 TSharedRef<SWidget> UModioScrollBox::RebuildWidget()
@@ -118,16 +119,16 @@ void UModioScrollBox::SynchronizeProperties()
 		switch (ScrollBarAlignment)
 		{
 			case EModioScrollBoxBarAlignment::Left:
-				ScrollbarSlot->Padding(0, 0, AdditionalPadding, 0);
+				ModioUIHelpers::SetPadding(*ScrollbarSlot, 0, 0, AdditionalPadding, 0);
 				break;
 			case EModioScrollBoxBarAlignment::Right:
-				ScrollbarSlot->Padding(AdditionalPadding, 0, 0, 0);
+				ModioUIHelpers::SetPadding(*ScrollbarSlot, AdditionalPadding, 0, 0, 0);
 				break;
 			case EModioScrollBoxBarAlignment::Top:
-				ScrollbarSlot->Padding(0, 0, 0, AdditionalPadding);
+				ModioUIHelpers::SetPadding(*ScrollbarSlot, 0, 0, 0, AdditionalPadding);
 				break;
 			case EModioScrollBoxBarAlignment::Bottom:
-				ScrollbarSlot->Padding(0, AdditionalPadding, 0, 0);
+				ModioUIHelpers::SetPadding(*ScrollbarSlot, 0, AdditionalPadding, 0, 0);
 				break;
 		}
 	}

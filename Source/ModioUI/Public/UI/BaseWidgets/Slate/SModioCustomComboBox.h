@@ -11,6 +11,8 @@
 #include "Widgets/Input/SButton.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Views/SListView.h"
+#include "Layout/WidgetPath.h"
+#include "Framework/Application/SlateApplication.h"
 
 template<typename DataType>
 class SModioCustomComboBox : public SCompoundWidget
@@ -73,7 +75,11 @@ protected:
 	virtual void OnFocusChanging(const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath,
 								 const FFocusEvent& InFocusEvent)
 	{
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+		const bool bDescendantNewlyFocused = NewWidgetPath.ContainsWidget(this);
+#else
 		const bool bDescendantNewlyFocused = NewWidgetPath.ContainsWidget(this->AsShared());
+#endif
 		if (!bDescendantNewlyFocused)
 		{
 			if (bIsOpen)

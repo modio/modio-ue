@@ -8,7 +8,7 @@
  *
  */
 
-#include "Engine.h"
+#include "Engine/Engine.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Misc/AutomationTest.h"
 #include "Tests/Commands/CreateModAsync.h"

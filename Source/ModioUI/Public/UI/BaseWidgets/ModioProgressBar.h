@@ -5,6 +5,11 @@
 #include "Components/ProgressBar.h"
 #include "CoreMinimal.h"
 #include "UI/Styles/ModioUIStyleRef.h"
+#include "Misc/EngineVersionComparison.h"
+
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	#include "UObject/ObjectSaveContext.h"
+#endif
 
 #include "ModioProgressBar.generated.h"
 
@@ -20,7 +25,11 @@ protected:
 	FModioUIStyleRef StyleRef;
 
 	virtual void SynchronizeProperties() override;
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+#else
 	virtual void PreSave(const class ITargetPlatform* TargetPlatform) override;
+#endif
 
 public:
 	UFUNCTION(BlueprintCallable, Category="ModioProgressBar")

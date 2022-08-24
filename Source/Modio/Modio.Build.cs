@@ -14,7 +14,11 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnrealBuildTool;
+#if UE_5_0_OR_LATER
+using EpicGames.Core;
+#else
 using Tools.DotNETCommon;
+#endif
 using System.Linq;
 
 
@@ -41,7 +45,56 @@ public class Modio : ModuleRules
         public List<string> PlatformSpecificDefines;
         public List<string> ModuleDependencies = new List<string>();
     };
+#if UE_5_0_OR_LATER
+    private ModioPlatformConfigFile.PlatformConfig ParseInnerPlatformConfig(JsonObject InnerPlatformObject)
+    {
+        ModioPlatformConfigFile.PlatformConfig ParsedInnerPlatform = new ModioPlatformConfigFile.PlatformConfig();
+        string[] ParsedIncludeDirectories;
+        if (InnerPlatformObject.TryGetStringArrayField("IncludeDirectories", out ParsedIncludeDirectories))
+        {
+            ParsedInnerPlatform.IncludeDirectories = new List<string>(ParsedIncludeDirectories);
+        }
+        string[] ParsedPlatformSpecificDefines;
+        if (InnerPlatformObject.TryGetStringArrayField("PlatformSpecificDefines", out ParsedPlatformSpecificDefines))
+        {
+            ParsedInnerPlatform.PlatformSpecificDefines = new List<string>(ParsedPlatformSpecificDefines);
+        }
+        string[] ParsedModuleDependencies;
+        if (InnerPlatformObject.TryGetStringArrayField("ModuleDependencies", out ParsedModuleDependencies))
+        {
+            ParsedInnerPlatform.ModuleDependencies = new List<string>(ParsedModuleDependencies);
+        }
+        string[] ParsedPlatformSourceFolderNames;
+        if (InnerPlatformObject.TryGetStringArrayField("PlatformSourceFolderNames", out ParsedPlatformSourceFolderNames))
+        {
+            ParsedInnerPlatform.PlatformSourceFolderNames = new List<string>(ParsedPlatformSourceFolderNames);
+        }
+        return ParsedInnerPlatform;
+    }
+#endif
 
+    private ModioPlatformConfigFile TryLoadPlatformConfig(string PlatformConfigPath)
+    {
+#if UE_5_0_OR_LATER
+        ModioPlatformConfigFile ParsedConfig = new ModioPlatformConfigFile();
+
+        JsonObject PlatformConfigObject = JsonObject.Read(new FileReference(PlatformConfigPath));
+        string[] ParsedModuleDependencies;
+        if (PlatformConfigObject.TryGetStringArrayField("ModuleDependencies", out ParsedModuleDependencies))
+        {
+            ParsedConfig.ModuleDependencies = new List<string>(ParsedModuleDependencies);
+        }
+        ParsedConfig.IncludeDirectories = new List<string>(PlatformConfigObject.GetStringArrayField("IncludeDirectories"));
+        ParsedConfig.PlatformSpecificDefines = new List<string>(PlatformConfigObject.GetStringArrayField("PlatformSpecificDefines"));
+        
+        JsonObject PlatformsInnerObject = PlatformConfigObject.GetObjectField("Platforms");
+        ParsedConfig.Platforms = PlatformsInnerObject.KeyNames.ToDictionary(x => x, x =>
+        ParseInnerPlatformConfig(PlatformsInnerObject.GetObjectField(x)), System.StringComparer.OrdinalIgnoreCase);
+        return ParsedConfig;
+#else
+        return Json.Load<ModioPlatformConfigFile>(new FileReference(PlatformConfigPath));
+#endif
+    }
     private void DumpNativePlatformConfig(ModioPlatformConfigFile.PlatformConfig Config)
     {
         foreach (string IncludeDirectory in Config.IncludeDirectories)
@@ -79,7 +132,7 @@ public class Modio : ModuleRules
                 //Ensure changes to the platform jsons result in a rebuild of the plugin
                 ExternalDependencies.Add(Path.Combine(PlatformDirectory, "ueplatform.json"));
 
-                ModioPlatformConfigFile CurrentConfig = Json.Load<ModioPlatformConfigFile>(new FileReference(Path.Combine(PlatformDirectory, "ueplatform.json")));
+                ModioPlatformConfigFile CurrentConfig = TryLoadPlatformConfig(Path.Combine(PlatformDirectory, "ueplatform.json"));
                 if (CurrentConfig != null)
                 {
                     bool bFoundPlatformConfig = false;
@@ -335,7 +388,7 @@ public class Modio : ModuleRules
             bEnableExceptions = true;
         }
 
-        
+
 
         ModioPlatformConfigFile.PlatformConfig PlatformConfig = LoadNativePlatformConfig();
 

@@ -47,6 +47,7 @@ public:
 	void ShowReportEmailDialog(UObject* DialogDataSource);
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
 	int32 GetPageIndex();
+	void RefreshDownloadQueue();
 
 private:
 	GENERATED_BODY()

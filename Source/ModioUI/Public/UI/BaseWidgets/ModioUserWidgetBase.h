@@ -4,8 +4,13 @@
 
 #include "Blueprint/UserWidget.h"
 #include "CoreMinimal.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Types/ModioErrorCode.h"
 #include "UI/Interfaces/IModioInputMappingAccessor.h"
+
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	#include "UObject/ObjectSaveContext.h"
+#endif
 
 #include "ModioUserWidgetBase.generated.h"
 
@@ -58,7 +63,13 @@ protected:
 
 	UFUNCTION()
 	void FinishLoadExternalData(FModioErrorCode ec);
+
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override;
+#else
 	virtual void PreSave(const class ITargetPlatform* TargetPlatform) override;
+#endif
+
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 public:

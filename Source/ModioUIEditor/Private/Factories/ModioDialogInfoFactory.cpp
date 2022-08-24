@@ -9,16 +9,17 @@
  */
 
 #include "Factories/ModioDialogInfoFactory.h"
-#include "AssetTypeCategories.h"
 #include "AssetRegistryModule.h"
+#include "AssetTypeCategories.h"
+#include "Core/ModioUIHelpers.h"
 #include "UI/Dialogs/ModioDialogInfo.h"
 
- UModioDialogInfoFactory::UModioDialogInfoFactory()
+UModioDialogInfoFactory::UModioDialogInfoFactory()
 {
 	SupportedClass = UModioDialogInfo::StaticClass();
 }
 
-FText UModioDialogInfoFactory::GetDisplayName() const 
+FText UModioDialogInfoFactory::GetDisplayName() const
 {
 	return FText::FromString("Modio Dialog Info");
 }
@@ -44,6 +45,6 @@ UObject* UModioDialogInfoFactory::FactoryCreateNew(UClass* InClass, UObject* InP
 	UPackage* InPackage = Cast<UPackage>(InParent);
 
 	FString InPackagePath = FPackageName::GetLongPackagePath(InParent->GetOutermost()->GetName()) / InName.ToString();
-	UPackage::SavePackage(InPackage, NewDialogInfo, RF_Standalone | RF_Public, *InPackagePath);
+	ModioUIHelpers::SavePackage(InPackage, NewDialogInfo, RF_Standalone | RF_Public, *InPackagePath);
 	return NewDialogInfo;
 }

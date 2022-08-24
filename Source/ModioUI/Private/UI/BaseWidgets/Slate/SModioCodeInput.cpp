@@ -1,10 +1,12 @@
 #include "UI/BaseWidgets/Slate/SModioCodeInput.h"
 #include "Brushes/SlateNoResource.h"
+#include "Core/ModioUIHelpers.h"
+#include "Materials/MaterialInterface.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SEditableText.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SUniformGridPanel.h"
-#include "Materials/MaterialInterface.h"
 
 TSharedRef<SWidget> SModioCodeInput::CreateCharacterWidget(int32 WidgetIndex)
 {
@@ -19,8 +21,7 @@ TSharedRef<SWidget> SModioCodeInput::CreateCharacterWidget(int32 WidgetIndex)
 }
 FReply SModioCodeInput::OnKeyDownHandler(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (InKeyEvent.GetKey() == EKeys::Left || InKeyEvent.GetKey() == EKeys::Right
-		||InKeyEvent.GetKey() == EKeys::Tab	)
+	if (InKeyEvent.GetKey() == EKeys::Left || InKeyEvent.GetKey() == EKeys::Right || InKeyEvent.GetKey() == EKeys::Tab)
 	{
 		return FReply::Handled();
 	}
@@ -83,7 +84,7 @@ FText SModioCodeInput::GetCharacterAtIndex(int32 Index) const
 {
 	if (Index < CurrentText.Len())
 	{
-		return FText::FromString(CurrentText.Mid(Index, 1)) ;
+		return FText::FromString(CurrentText.Mid(Index, 1));
 	}
 	return {};
 }
@@ -126,9 +127,9 @@ void SModioCodeInput::RebuildChildren(uint32 NumChildren)
 	{
 		for (int32 ChildIndex = NumChildren - 1; ChildIndex >= 0; ChildIndex--)
 		{
-			SUniformGridPanel::FSlot& CurrentSlot = MyCharacterGrid->AddSlot(ChildIndex, 0);
-			CurrentSlot.HAlign(HAlign_Center);
-			CurrentSlot.VAlign(VAlign_Center);
+			SUniformGridPanel::FSlot& CurrentSlot = *ModioUIHelpers::AddSlot(MyCharacterGrid.Get(), ChildIndex, 0);
+			ModioUIHelpers::SetHorizontalAlignment(CurrentSlot, HAlign_Center);
+			ModioUIHelpers::SetVerticalAlignment(CurrentSlot, VAlign_Center);
 			CurrentSlot.AttachWidget(SNew(SBorder).BorderImage(
 				this, &SModioCodeInput::GetCharacterBorder)[CreateCharacterWidget(ChildIndex)]);
 		}
@@ -137,9 +138,9 @@ void SModioCodeInput::RebuildChildren(uint32 NumChildren)
 	{
 		for (uint32 ChildIndex = 0; ChildIndex < NumChildren; ChildIndex++)
 		{
-			SUniformGridPanel::FSlot& CurrentSlot = MyCharacterGrid->AddSlot(ChildIndex, 0);
-			CurrentSlot.HAlign(HAlign_Center);
-			CurrentSlot.VAlign(VAlign_Center);
+			SUniformGridPanel::FSlot& CurrentSlot = *ModioUIHelpers::AddSlot(MyCharacterGrid.Get(), ChildIndex, 0);
+			ModioUIHelpers::SetHorizontalAlignment(CurrentSlot, HAlign_Center);
+			ModioUIHelpers::SetVerticalAlignment(CurrentSlot, VAlign_Center);
 			CurrentSlot.AttachWidget(
 				SNew(SBorder).BorderImage(this, &SModioCodeInput::GetCharacterBorder)
 					[SNew(SOverlay) +

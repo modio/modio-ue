@@ -2,11 +2,16 @@
 
 #include "Core/ModioNewPropertyHelpers.h"
 #include "Materials/MaterialInterface.h"
+#include "Misc/EngineVersionComparison.h"
 #include "ModioUI.h"
 #include "PropertyPathHelpers.h"
 #include "Styling/SlateWidgetStyleContainerBase.h"
 #include "UI/Styles/ModioUIBrushRef.h"
 #include "UI/Styles/ModioUIColorRef.h"
+
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	#include "UObject/ObjectSaveContext.h"
+#endif
 
 #include "ModioUIWidgetStyleContainer.generated.h"
 
@@ -31,16 +36,24 @@ class UModioUIWidgetStyleContainer : public USlateWidgetStyleContainerBase
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(EditAnywhere, meta = (ReadOnlyKeys, EditCondition = "true==false", EditConditionHides,
-									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder), Category="Widgets")
+	UPROPERTY(EditAnywhere,
+			  meta = (ReadOnlyKeys, EditCondition = "true==false", EditConditionHides, ShowOnlyInnerProperties,
+					  EditFixedSize, EditFixedOrder),
+			  Category = "Widgets")
 	TMap<FName, FModioUIColorRef> SerializedColors;
 
-	UPROPERTY(EditAnywhere, meta = (ReadOnlyKeys, EditCondition = "true==false", EditConditionHides,
-									ShowOnlyInnerProperties, EditFixedSize, EditFixedOrder), Category="Widgets")
+	UPROPERTY(EditAnywhere,
+			  meta = (ReadOnlyKeys, EditCondition = "true==false", EditConditionHides, ShowOnlyInnerProperties,
+					  EditFixedSize, EditFixedOrder),
+			  Category = "Widgets")
 	TMap<FName, FModioUIMaterialRef> SerializedMaterials;
 
 public:
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	virtual void PreSave(FObjectPreSaveContext SaveContext) override
+#else
 	virtual void PreSave(const class ITargetPlatform* TargetPlatform) override
+#endif
 	{
 		for (FPropertyValueIterator It = FPropertyValueIterator(FStructProperty::StaticClass(), GetClass(), this); It;
 			 ++It)
@@ -59,9 +72,13 @@ public:
 				}
 			}
 		}
-
+	#if UE_VERSION_NEWER_THAN(5, 0, 0)
+		Super::PreSave(SaveContext);
+	#else
 		Super::PreSave(TargetPlatform);
-	}
+	#endif
+	};
+
 	virtual void PostLoad() override
 	{
 		Super::PostLoad();
@@ -83,7 +100,6 @@ public:
 				}
 			}
 		}
-
 		SerializedColors.Remove(NAME_None);
 
 		for (const TPair<FName, FModioUIColorRef>& SerializedColor : SerializedColors)

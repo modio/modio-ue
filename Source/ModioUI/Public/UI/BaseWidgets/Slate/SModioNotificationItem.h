@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Misc/EngineVersionComparison.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 class MODIOUI_API SModioNotificationItem : public SNotificationItem
@@ -41,4 +42,10 @@ public:
 	void Fadeout() override;
 
 	void Pulse(const FLinearColor& GlowColor) override;
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	virtual void SetSubText(const TAttribute<FText>& InSubText) override;
+#else
+	virtual void SetSubText(const TAttribute<FText>& InSubText);
+#endif
+	
 };

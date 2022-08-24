@@ -31,9 +31,17 @@ public:
 										   InArgs._ShowSelection)[InArgs._Content.Widget],
 									   InOwnerTableView);
 		// override the delegates for text color etc here
+
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+		STableRow<ItemType>::SetBorderImage(
+			TAttribute<const FSlateBrush*>(
+			this, &SModioTableRowBase::GetBackgroundColor));
+		STableRow<ItemType>::SetForegroundColor(TAttribute<FSlateColor>(this, &SModioTableRowBase::GetTextColor));
+#else
 		STableRow<ItemType>::BorderImage =
 			FInvalidatableBrushAttribute(TAttribute<const FSlateBrush*>(this, &SModioTableRowBase::GetBackgroundColor));
 		STableRow<ItemType>::ForegroundColor = TAttribute<FSlateColor>(this, &SModioTableRowBase::GetTextColor);
+#endif
 	}
 
 	void SetStyle(FModioUIStyleRef NewStyle)

@@ -2,6 +2,7 @@
 
 #include "Engine/DataAsset.h"
 #include "IModioUIStyleRefSerializer.h"
+#include "Misc/EngineVersionComparison.h"
 #include "PropertyPathHelpers.h"
 #include "Styling/ISlateStyle.h"
 #include "Styling/SlateStyle.h"
@@ -21,13 +22,26 @@ struct FModioLinearColor : public FLinearColor
 	GENERATED_BODY()
 };
 
-// TODO : an interface for loading/resolving colours from the presets?
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	#define MODIO_UE5_REQUESTING_STYLE , const ISlateStyle* RequestingStyle 
+	#define MODIO_UE5_REQUESTING_STYLE_PARAM MODIO_UE5_REQUESTING_STYLE = nullptr
+	#define MODIO_UE5_CONST const
+	#define MODIO_UE5_OVERRIDE override
+#else
+	#define MODIO_UE5_REQUESTING_STYLE
+	#define MODIO_UE5_REQUESTING_STYLE_PARAM
+	#define MODIO_UE5_CONST
+	#define MODIO_UE5_OVERRIDE
+#endif
 
 UCLASS(BlueprintType, meta = (MaterialSerialize = "SerializedMaterials", ColorSerialize = "SerializedColors"))
 class MODIOUI_API UModioUIStyleSet : public UDataAsset, public ISlateStyle, public IModioUIStyleRefSerializer
 {
 	GENERATED_BODY()
 protected:
+
+	mutable TSet<FName> MissingResources;
+
 	UPROPERTY(meta = (ShowOnlyInnerProperties))
 	TMap<FName, FModioUIColorRef> SerializedColors;
 
@@ -63,7 +77,13 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Style")
 	UMaterialInterface* DefaultGlyphMaterial;
 
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	const FSlateWidgetStyle* GetWidgetStyleInternal(const FName DesiredTypeName, const FName StyleName,
+													const FSlateWidgetStyle* DefaultStyle,
+													bool bWarnIfNotFound) const override;
+#else
 	const FSlateWidgetStyle* GetWidgetStyleInternal(const FName DesiredTypeName, const FName StyleName) const override;
+#endif
 
 	void Log(EStyleMessageSeverity Severity, const FText& Message) const override;
 
@@ -74,6 +94,11 @@ protected:
 	friend class FModioUIStyleRefDetailsCustomization;
 
 	void ResetInputMappingGlyphs();
+	
+	virtual TSet<FName> GetStyleKeys () const MODIO_UE5_OVERRIDE;
+	virtual FString GetContentRootDir() const MODIO_UE5_OVERRIDE;
+
+	virtual void LogMissingResource(EStyleMessageSeverity Severity, const FText& Message, const FName& MissingResource) const MODIO_UE5_OVERRIDE;
 
 public:
 	UModioUIStyleSet(const FObjectInitializer& Initializer);
@@ -94,23 +119,27 @@ public:
 	TArray<FName> GetEntriesUsingBrush(const FName BrushName) const override;
 
 	float GetFloat(const FName PropertyName, const ANSICHAR* Specifier = nullptr,
-				   float DefaultValue = FStyleDefaults::GetFloat()) const override;
+				   float DefaultValue = FStyleDefaults::GetFloat() MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 
 	FVector2D GetVector(const FName PropertyName, const ANSICHAR* Specifier = nullptr,
-						FVector2D DefaultValue = FStyleDefaults::GetVector2D()) const override;
+						FVector2D DefaultValue = FStyleDefaults::GetVector2D() MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 
 	const FLinearColor& GetColor(const FName PropertyName, const ANSICHAR* Specifier = nullptr,
-								 const FLinearColor& DefaultValue = FStyleDefaults::GetColor()) const override;
+								 const FLinearColor& DefaultValue = FStyleDefaults::GetColor()
+									 MODIO_UE5_REQUESTING_STYLE_PARAM ) const override;
 
 	const FSlateColor GetSlateColor(const FName PropertyName, const ANSICHAR* Specifier = nullptr,
-									const FSlateColor& DefaultValue = FStyleDefaults::GetSlateColor()) const override;
+									const FSlateColor& DefaultValue = FStyleDefaults::GetSlateColor()
+										MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 
 	const FMargin& GetMargin(const FName PropertyName, const ANSICHAR* Specifier = nullptr,
-							 const FMargin& DefaultValue = FStyleDefaults::GetMargin()) const override;
+							 const FMargin& DefaultValue = FStyleDefaults::GetMargin()
+								 MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 
 	UMaterialInterface* GetNamedMaterial(const FName PropertyName, TOptional<FString> Specifier);
 	UMaterialInterface* GetGlyphMaterial(const FName PropertyName);
-	const FSlateBrush* GetBrush(const FName PropertyName, const ANSICHAR* Specifier = nullptr) const override;
+	const FSlateBrush* GetBrush(const FName PropertyName,
+								const ANSICHAR* Specifier = nullptr MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 
 	const TSharedPtr<FSlateBrush> GetGlyphBrush(const FName PropertyName, const FVector2D& Size);
 
@@ -128,25 +157,29 @@ public:
 		const FSlateBrush* const DefaultBrush = FStyleDefaults::GetNoBrush()) const override;
 
 	const TSharedPtr<FSlateDynamicImageBrush> GetDynamicImageBrush(const FName BrushTemplate, const FName TextureName,
-																   const ANSICHAR* Specifier = nullptr) override;
+		const ANSICHAR* Specifier = nullptr MODIO_UE5_REQUESTING_STYLE_PARAM) MODIO_UE5_CONST override;
 
 	const TSharedPtr<FSlateDynamicImageBrush> GetDynamicImageBrush(const FName BrushTemplate, const ANSICHAR* Specifier,
 																   UTexture2D* TextureResource,
-																   const FName TextureName) override;
+		const FName TextureName MODIO_UE5_REQUESTING_STYLE_PARAM) MODIO_UE5_CONST override;
 
 	const TSharedPtr<FSlateDynamicImageBrush> GetDynamicImageBrush(const FName BrushTemplate,
 																   UTexture2D* TextureResource,
-																   const FName TextureName) override;
+		const FName TextureName MODIO_UE5_REQUESTING_STYLE_PARAM) MODIO_UE5_CONST override;
+
+	virtual const TSharedPtr<FSlateDynamicImageBrush> MakeDynamicImageBrush(const FName BrushTemplate,
+																			UTexture2D* TextureResource,
+																			const FName TextureName) const MODIO_UE5_OVERRIDE;
 
 	FSlateBrush* GetDefaultBrush() const override;
 
-	const FSlateSound& GetSound(const FName PropertyName, const ANSICHAR* Specifier = nullptr) const override;
+	const FSlateSound& GetSound(const FName PropertyName, const ANSICHAR* Specifier = nullptr MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 
 	FSlateFontInfo GetFontStyle(const FName PropertyName, const ANSICHAR* Specifier = nullptr) const override;
 
 	void NativeSerializeStyleReference(FString PathToProperty, FName StyleElementReference) override;
 
-	TArray<FName> GetAllStyleNames();
+	TArray<FName> GetAllStyleNames() const;
 
 	TArray<FName> GetNamedBrushNames();
 

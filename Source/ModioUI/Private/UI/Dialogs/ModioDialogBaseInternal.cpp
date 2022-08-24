@@ -5,6 +5,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Core/ModioModInfoUI.h"
 #include "Core/ModioReportInfoUI.h"
+#include "Core/ModioUIHelpers.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Styling/SlateStyle.h"
 #include "UI/BaseWidgets/ModioLoadingSpinner.h"
 #include "UI/BaseWidgets/ModioUIAsyncLoadingOverlay.h"
@@ -201,7 +203,7 @@ void UModioDialogBaseInternal::ApplyStyling()
 		}
 		if (DialogContentOverlaySlot)
 		{
-			DialogContentOverlaySlot->Padding(ResolvedStyle->ContentPadding);
+			ModioUIHelpers::SetPadding(*DialogContentOverlaySlot, ResolvedStyle->ContentPadding);
 		}
 	}
 }
@@ -427,7 +429,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 		{
 			if (DialogDescriptor->DialogText.IsEmptyOrWhitespace())
 			{
-				DialogTextBlockSlot->Padding(0);
+				ModioUIHelpers::SetPadding(*DialogTextBlockSlot, 0);
 				DialogTextBlock->SetText(FText::FromString(FString()));
 			}
 			else
@@ -440,19 +442,19 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 		{
 			ContentPanel->RemoveSlot(SubHeaderWidgetSlot->GetWidget());
 		}
-		SubHeaderWidgetSlot = &ContentPanel->AddSlot(0, 1);
+		SubHeaderWidgetSlot = ModioUIHelpers::AddSlot(ContentPanel.Get(), 0, 1);
 
 		if (InputWidgetSlot)
 		{
 			ContentPanel->RemoveSlot(InputWidgetSlot->GetWidget());
 		}
-		InputWidgetSlot = &ContentPanel->AddSlot(0, 3);
+		InputWidgetSlot = ModioUIHelpers::AddSlot(ContentPanel.Get(), 0,3);
 
 		if (ButtonWidgetSlot)
 		{
 			ContentPanel->RemoveSlot(ButtonWidgetSlot->GetWidget());
 		}
-		ButtonWidgetSlot = &ContentPanel->AddSlot(0, 5);
+		ButtonWidgetSlot = ModioUIHelpers::AddSlot(ContentPanel.Get(), 0, 5);
 
 		if (SubHeaderWidgetSlot)
 		{
@@ -482,8 +484,9 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 														.VAlign(DialogDescriptor->SubHeaderWidgetVAlign)
 														.StretchDirection(EStretchDirection::Both)
 														.Stretch(EStretch::ScaleToFit)[SubHeaderWidget->TakeWidget()]]);
-
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
 					SubHeaderWidgetSlot->NotifySlotChanged(false);
+#endif
 				}
 			}
 			else
@@ -527,13 +530,17 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 					{
 						MySizeBox->SetHeightOverride(DialogDescriptor->InputWidgetHeightOverride);
 					}
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
 
 					InputWidgetSlot->NotifySlotChanged(false);
+#endif
 				}
 				else
 				{
-					InputWidgetSlot->Padding(0);
+					ModioUIHelpers::SetPadding(*InputWidgetSlot, 0);
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
 					InputWidgetSlot->NotifySlotChanged(false);
+#endif
 				}
 			}
 			else
@@ -541,8 +548,10 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 				InputWidgetSlot->AttachWidget(SNullWidget::NullWidget);
 				ContentPanel->SetRowFill(2, 0);
 
-				InputWidgetSlot->Padding(0);
+				ModioUIHelpers::SetPadding(*InputWidgetSlot, 0);
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
 				InputWidgetSlot->NotifySlotChanged(false);
+#endif
 			}
 		}
 
@@ -569,10 +578,14 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 					}
 
 					// Calling TakeWidget before setting the style so that we're guaranteed to have underlying SWidgets
-					ButtonWidgetSlot->HAlign(DialogDescriptor->ButtonAreaWidgetHAlign);
-					ButtonWidgetSlot->VAlign(DialogDescriptor->ButtonAreaWidgetVAlign);
+					ModioUIHelpers::SetHorizontalAlignment(*ButtonWidgetSlot, DialogDescriptor->ButtonAreaWidgetHAlign);
+					ModioUIHelpers::SetVerticalAlignment(*ButtonWidgetSlot, DialogDescriptor->ButtonAreaWidgetVAlign);
+
 					ButtonWidgetSlot->AttachWidget(ButtonWidget->TakeWidget());
+
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
 					ButtonWidgetSlot->NotifySlotChanged(false);
+#endif
 
 					IModioUIDialogButtonWidget::Execute_SetDialogController(ButtonWidget, Controller.Get());
 
@@ -586,8 +599,10 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 				else
 				{
 					bUsingCustomButtons = false;
-					InputWidgetSlot->Padding(0);
+					ModioUIHelpers::SetPadding(*InputWidgetSlot, 0);
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
 					InputWidgetSlot->NotifySlotChanged(false);
+#endif
 				}
 			}
 			else
@@ -596,9 +611,10 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 				UpdateBoundValues(DialogDescriptor);
 				ButtonWidgetSlot->AttachWidget(SNullWidget::NullWidget);
 				ContentPanel->SetRowFill(4, 0);
-
-				InputWidgetSlot->Padding(0);
+				ModioUIHelpers::SetPadding(*InputWidgetSlot, 0);
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
 				InputWidgetSlot->NotifySlotChanged(false);
+#endif
 			}
 		}
 	}

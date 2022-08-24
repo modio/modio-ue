@@ -4,6 +4,7 @@
 #include "IDetailGroup.h"
 #include "IDetailPropertyRow.h"
 #include "Internationalization/Text.h"
+#include "Misc/EngineVersionComparison.h"
 #include "PropertyHandle.h"
 #include "Templates/SharedPointer.h"
 #include "UObject/NameTypes.h"
@@ -11,8 +12,7 @@
 
 /// @brief base class for children builders that hook or otherwise modify the behaviour of an existing builder
 template<typename Derived>
-class FModioDetailChildrenBuilderBase : public IDetailChildrenBuilder,
-										public TSharedFromThis<Derived>
+class FModioDetailChildrenBuilderBase : public IDetailChildrenBuilder, public TSharedFromThis<Derived>
 {
 protected:
 	IDetailChildrenBuilder& ParentBuilder;
@@ -85,10 +85,5 @@ public:
 	virtual IDetailGroup* GetParentGroup() const override
 	{
 		return ParentBuilder.GetParentGroup();
-	}
-
-	virtual TArray<TSharedPtr<IPropertyHandle>> AddStructure(TSharedRef<FStructOnScope> ChildStructure) override
-	{
-		return ParentBuilder.AddAllExternalStructureProperties(ChildStructure);
 	}
 };

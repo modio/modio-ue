@@ -2,6 +2,7 @@
 
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueEntry.h"
 #include "Core/ModioModInfoUI.h"
+#include "Libraries/ModioSDKLibrary.h"
 #include "UI/Styles/ModioButtonStyle.h"
 #include "UI/Styles/ModioDownloadQueueEntryStyle.h"
 
@@ -14,6 +15,10 @@ void UModioDownloadQueueEntry::NativeOnSetDataSource()
 		if (ModNameLabel)
 		{
 			ModNameLabel->SetText(FText::FromString(ActualData->Underlying.ProfileName));
+		}
+		if (ModSizeLabel)
+		{
+			ModSizeLabel->SetText(UModioSDKLibrary::Filesize_ToString(ActualData->Underlying.FileInfo.Filesize));
 		}
 		if (ModStatusLabel)
 		{
@@ -34,7 +39,10 @@ void UModioDownloadQueueEntry::OnUnsubClicked()
 	UModioModInfoUI* ActualData = Cast<UModioModInfoUI>(DataSource);
 	if (ActualData)
 	{
-		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>()) {}
+		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		{
+			Subsystem->ShowModUnsubscribeDialog(ActualData);
+		}
 	}
 }
 

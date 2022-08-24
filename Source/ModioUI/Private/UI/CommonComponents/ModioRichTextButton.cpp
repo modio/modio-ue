@@ -2,7 +2,8 @@
 
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "Components/ButtonSlot.h"
-#include "Engine.h"
+#include "Engine/Engine.h"
+#include "Misc/EngineVersionComparison.h"
 #include "ModioUISubsystem.h"
 #include "UI/BaseWidgets/ModioRichTextBlockDecorator.h"
 #include "UI/Styles/ModioButtonStyle.h"
@@ -31,7 +32,11 @@ TSharedRef<SWidget> UModioRichTextButton::RebuildWidget()
 	if (!InputHintImage)
 	{
 		InputHintImage = NewObject<UModioInputBindingImage>(this);
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+		InputHintImage->SetDesiredSizeOverride(FVector2D(20));
+#else
 		InputHintImage->SetBrushSize(FVector2D(20));
+#endif
 		InputHintImage->SetVisibility(ESlateVisibility::Collapsed);
 		InputHintImage->GetInputModeVisibilityDelegate().BindDynamic(this,
 																	 &UModioRichTextButton::GetInputHintVisibility);
@@ -55,7 +60,7 @@ TSharedRef<SWidget> UModioRichTextButton::RebuildWidget()
 		InputHintImage->TakeWidget()
 	];
 	// clang-format on
-	MyContentGrid->SetColumnFill(0,1);
+	MyContentGrid->SetColumnFill(0, 1);
 
 	MyButton->SetContent(MyContentGrid.ToSharedRef());
 	MyButton->SetHAlign(HAlign_Fill);
@@ -93,7 +98,8 @@ void UModioRichTextButton::NativeDisplayHintForInput(FKey VirtualKey)
 
 ESlateVisibility UModioRichTextButton::GetInputHintVisibility(EModioUIInputMode InputMode)
 {
-	if (InputMode == EModioUIInputMode::Mouse || InputMode == EModioUIInputMode::Unknown || InputMode == EModioUIInputMode::Keyboard)
+	if (InputMode == EModioUIInputMode::Mouse || InputMode == EModioUIInputMode::Unknown ||
+		InputMode == EModioUIInputMode::Keyboard)
 	{
 		return ESlateVisibility::Collapsed;
 	}

@@ -11,8 +11,8 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "ModioUIModule.h"
-#include "Core.h"
 #include "Core/Input/ModioInputKeys.h"
+#include "CoreMinimal.h"
 #include "Engine/Engine.h"
 #include "Logging/LogVerbosity.h"
 #include "UI/Commands/ModioCommonUICommands.h"

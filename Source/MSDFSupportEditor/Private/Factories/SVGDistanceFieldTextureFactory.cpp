@@ -15,10 +15,12 @@
 #include "HAL/ThreadManager.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "MSDFAssetData.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Misc/FeedbackContext.h"
 #include "Misc/ScopedSlowTask.h"
 #include "SVGToSDF.h"
 #include "Slate/SImportSVGOptionsWidget.h"
+#include "UObject/SavePackage.h"
 
 bool USVGDistanceFieldTextureFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames)
 {
@@ -111,7 +113,11 @@ bool USVGDistanceFieldTextureFactory::ShouldShowInNewMenu() const
 
 uint32 USVGDistanceFieldTextureFactory::GetMenuCategories() const
 {
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	return EAssetTypeCategories::Textures;
+#else
 	return EAssetTypeCategories::MaterialsAndTextures;
+#endif
 }
 
 bool USVGDistanceFieldTextureFactory::FactoryCanImport(const FString& Filename)
@@ -212,7 +218,14 @@ UObject* USVGDistanceFieldTextureFactory::FactoryCreateFile(UClass* InClass, UOb
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	FSavePackageArgs Args;
+	Args.TopLevelFlags = RF_Standalone | RF_Public;
+	UPackage::SavePackage(InPackage, SVGTextureAsset, *InPackagePath, Args);
+#else
 	UPackage::SavePackage(InPackage, SVGTextureAsset, RF_Standalone | RF_Public, *InPackagePath);
+#endif
+
 	FAssetRegistryModule::AssetCreated(SVGTextureAsset);
 
 	return SVGTextureAsset;
@@ -245,7 +258,11 @@ void USVGDistanceFieldTextureFactory::UpdateTextureData(UTexture2DDynamic* Targe
 														const TArray<uint8>& SourceData)
 {
 	FRenderCommandFence InitializationFence;
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	FTexture2DDynamicResource* TextureResource = static_cast<FTexture2DDynamicResource*>(TargetTexture->GetResource());
+#else
 	FTexture2DDynamicResource* TextureResource = static_cast<FTexture2DDynamicResource*>(TargetTexture->Resource);
+#endif
 	bool bDone = false;
 	ENQUEUE_RENDER_COMMAND(FWriteRawDataToTexture)
 	([&bDone, TextureResource, SourceData](FRHICommandListImmediate& RHICmdList) {

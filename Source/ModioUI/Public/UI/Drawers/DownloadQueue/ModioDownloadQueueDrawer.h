@@ -2,9 +2,11 @@
 
 #include "Algo/Transform.h"
 #include "Core/ModioModInfoUI.h"
+#include "Libraries/ModioSDKLibrary.h"
 #include "UI/BaseWidgets/ModioListView.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
+#include "UI/CommonComponents/ModioDownloadListWidgetBase.h"
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/CommonComponents/ModioUserProfileButton.h"
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueOpProgress.h"
@@ -25,7 +27,7 @@ protected:
 		IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
 		IModioUIDownloadQueueWidget::Execute_DisplayUserInfo(this, FModioOptionalUser {NewUser});
 	}
-
+	
 	virtual void NativeOnInitialized()
 	{
 		IModioUIUserChangedReceiver::Register<UModioDownloadQueueDrawer>();
@@ -33,6 +35,7 @@ protected:
 		{
 			LogOutButton->OnClicked.AddDynamic(this, &UModioDownloadQueueDrawer::OnLogoutClicked);
 		}
+		
 		if (CurrentOpProgress)
 		{
 			CurrentOpProgress->OperationCompletedDelegate().BindDynamic(
@@ -44,18 +47,17 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	{
 		Super::NativeTick(MyGeometry, InDeltaTime);
+		
 		// We might want to move this into the actual Download progress widget itself?
-		if (PendingDownloads.Num() == 0)
+		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
-			if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+			if (TOptional<FModioModProgressInfo> CurrentProgress = Subsystem->QueryCurrentModUpdate())
 			{
-				if (TOptional<FModioModProgressInfo> CurrentProgress = Subsystem->QueryCurrentModUpdate())
-				{
-					Execute_RefreshDownloadQueue(this);
-				}
+				Execute_RefreshDownloadQueue(this);
 			}
 		}
 	}
+	
 	UFUNCTION()
 	void OnLogoutClicked()
 	{
@@ -72,6 +74,7 @@ protected:
 	}
 
 	TArray<UModioModInfoUI*> PendingDownloads;
+	TArray<UModioModInfoUI*> CompletedDownloads;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioUserProfileButton* ProfileIcon;
@@ -81,6 +84,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ActivityText;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UModioRichTextBlock* StatusText;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioRichTextButton* LogOutButton;
@@ -89,10 +95,10 @@ protected:
 	UModioDownloadQueueOpProgress* CurrentOpProgress;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
-	UModioRichTextButton* UnsubscribeButton;
-
+	UModioDownloadListWidgetBase* OperationQueue;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
-	UModioListView* OperationQueue;
+	UModioDownloadListWidgetBase* CompletedQueue;
 
 	/// @brief Shows the newly updated user as the profile badge, name etc
 	/// @param NewUser The new user to display, will be empty if no user is yet logged in
@@ -128,38 +134,60 @@ protected:
 					{
 						NewModInfoWrapper->Underlying = UserSubscriptions[CurrentProgress->ID].GetModProfile();
 						CurrentOpProgress->SetDataSource(NewModInfoWrapper);
-						// CurrentOpProgress->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+						CurrentOpProgress->SetVisibility(ESlateVisibility::Visible);
 					}
+				}
+				if (StatusText)
+				{
+					StatusText->SetVisibility(ESlateVisibility::Collapsed);
 				}
 				if (ActivityText)
 				{
-					if (CurrentProgress->CurrentlyDownloadedBytes < CurrentProgress->TotalDownloadSize) {}
-					if (CurrentProgress->CurrentlyExtractedBytes < CurrentProgress->TotalExtractedSizeOnDisk) {}
+					if (CurrentProgress->CurrentlyDownloadedBytes < CurrentProgress->TotalDownloadSize)
+					{
+						ActivityText->SetText(FText::FromString("Downloading..."));
+
+						CurrentOpProgress->UpdateProgress(CurrentProgress.GetValue());
+					}
+					if (CurrentProgress->CurrentlyExtractedBytes < CurrentProgress->TotalExtractedSizeOnDisk)
+					{
+						ActivityText->SetText(FText::FromString("Installing..."));
+						CurrentOpProgress->UpdateProgress(CurrentProgress.GetValue());
+					}
 				}
 			}
 			else
 			{
+				if (ActivityText)
+				{
+					ActivityText->SetText(FText::FromString("Downloading"));
+				}
+				if (StatusText)
+				{
+					StatusText->SetVisibility(ESlateVisibility::Visible);
+					StatusText->SetText(FText::FromString("There is no mod being downloaded"));
+				}
 				if (CurrentOpProgress)
 				{
-					CurrentOpProgress->SetVisibility(ESlateVisibility::Hidden);
+					CurrentOpProgress->SetVisibility(ESlateVisibility::Collapsed);
 				}
 			}
 
-			if (UnsubscribeButton)
-			{
-				UnsubscribeButton->SetVisibility(CurrentOpProgress->GetVisibility());
-			}
 			if (OperationQueue)
 			{
+				// Rebuild the Pending Downloads list
 				PendingDownloads.Empty();
 				TArray<FModioModCollectionEntry> Entries;
 				UserSubscriptions.GenerateValueArray(Entries);
 				Algo::TransformIf(
 					Entries, PendingDownloads,
 					[](const FModioModCollectionEntry& Entry) {
-						// Filter all mods that are either installed or have uninstallations pending
+						// Filter all mods that are either installed, have uninstallations pending
+						// or currently being downloaded
 						return ((Entry.GetModState() != EModioModState::Installed) &&
-								(Entry.GetModState() != EModioModState::UninstallPending));
+								(Entry.GetModState() != EModioModState::UninstallPending) &&
+								(Entry.GetModState() != EModioModState::Downloading) &&
+								(Entry.GetModState() != EModioModState::Extracting));
 					},
 					[](FModioModCollectionEntry Entry) {
 						UModioModInfoUI* EntryWrapper = NewObject<UModioModInfoUI>();
@@ -169,8 +197,37 @@ protected:
 						}
 						return EntryWrapper;
 					});
-				OperationQueue->SetListItems(PendingDownloads);
-				OperationQueue->RequestRefresh();
+
+				OperationQueue->UpdateListItems(PendingDownloads);
+				
+				// Rebuild the Completed Downloads list
+				CompletedDownloads.Empty();
+
+				TArray<FModioModCollectionEntry> CompletedDownloadEntries;
+				UserSubscriptions.GenerateValueArray(Entries);
+				Algo::TransformIf(
+					Entries, CompletedDownloads,
+					[](const FModioModCollectionEntry& Entry) {
+						// Filter all mods that were installed this session
+						if (UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+						{
+							return ((Entry.GetModState() == EModioModState::Installed) &&
+								UISubsystem->ModsDownloadedThisSession.Contains(Entry.GetID()));
+						}
+						return false;
+					},
+					[](FModioModCollectionEntry Entry) {
+						
+						UModioModInfoUI* EntryWrapper = NewObject<UModioModInfoUI>();
+						if (EntryWrapper)
+						{
+							EntryWrapper->Underlying = Entry.GetModProfile();
+						}
+						return EntryWrapper;
+					});
+
+				
+				CompletedQueue->UpdateListItems(CompletedDownloads);
 			}
 		}
 	}

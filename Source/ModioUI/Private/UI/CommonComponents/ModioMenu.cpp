@@ -108,6 +108,23 @@ void UModioMenu::ToggleRefineSearchDrawer()
 	}
 }
 
+void UModioMenu::RefreshDownloadQueue()
+{
+	if (DrawerController)
+	{
+		if (DrawerController)
+		{
+			for (UWidget* Child : DrawerController->GetAllChildren())
+			{
+				if (Child->Implements<UModioUIDownloadQueueWidget>())
+				{
+					IModioUIDownloadQueueWidget::Execute_RefreshDownloadQueue(Child);
+				}
+			}
+		}
+	}
+}
+
 void UModioMenu::ToggleDownloadQueueDrawer()
 {
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())

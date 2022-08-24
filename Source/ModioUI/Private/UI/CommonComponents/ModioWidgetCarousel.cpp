@@ -30,6 +30,7 @@ TSharedRef<SWidget> UModioWidgetCarousel::RebuildWidget()
 {
 	if (IsDesignTime() || ItemsSource.Num() == 0)
 	{
+		ItemsSource.Empty();
 		ItemsSource.Add(nullptr);
 		ItemsSource.Add(nullptr);
 		ItemsSource.Add(nullptr);

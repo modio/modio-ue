@@ -4,6 +4,7 @@
 #include "UObject/WeakInterfacePtr.h"
 #include "Widgets/Notifications/SErrorText.h"
 #include "Types/ModioErrorCode.h"
+#include "Misc/EngineVersionComparison.h"
 
 #include "IModioUIErrorDisplayWidget.generated.h"
 
@@ -50,7 +51,7 @@ protected:
 		TWeakInterfacePtr<IModioUIErrorDisplayWidget> ReferencedWidget;
 
 	public:
-#if UE_4_27_OR_LATER
+#if UE_VERSION_NEWER_THAN(4, 27, 0)
 		ModioErrorReportingWidgetWrapper(IModioUIErrorDisplayWidget* WrappedObject) 
 		{
 			ReferencedWidget = TWeakInterfacePtr<IModioUIErrorDisplayWidget>(WrappedObject);

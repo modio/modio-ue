@@ -1,10 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "UI/BaseWidgets/ModioProgressBar.h"
-#include "UI/Styles/ModioProgressBarStyle.h"
 #include "Core/ModioNewPropertyHelpers.h"
 #include "ModioUI.h"
 #include "PropertyPathHelpers.h"
+#include "UI/Styles/ModioProgressBarStyle.h"
+
 
 void UModioProgressBar::SynchronizeProperties()
 {
@@ -19,8 +20,11 @@ void UModioProgressBar::SynchronizeProperties()
 	}
 }
 
-
-void UModioProgressBar::PreSave(const class ITargetPlatform* TargetPlatform) 
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+void UModioProgressBar::PreSave(FObjectPreSaveContext SaveContext)
+#else
+void UModioProgressBar::PreSave(const class ITargetPlatform* TargetPlatform)
+#endif
 {
 	for (FPropertyValueIterator It = FPropertyValueIterator(FStructProperty::StaticClass(), GetClass(), this); It; ++It)
 	{
@@ -38,7 +42,11 @@ void UModioProgressBar::PreSave(const class ITargetPlatform* TargetPlatform)
 			}
 		}
 	}
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	Super::PreSave(SaveContext);
+#else
 	Super::PreSave(TargetPlatform);
+#endif
 }
 
 void UModioProgressBar::SetStyleRef(FModioUIStyleRef NewStyle)

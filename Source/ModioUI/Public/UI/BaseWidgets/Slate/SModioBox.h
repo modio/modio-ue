@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/ModioUIHelpers.h"
 #include "Layout/LayoutUtils.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Layout/SBox.h"
@@ -35,7 +36,9 @@ protected:
 		{
 			const FOptionalSize CurrentMinAspectRatio = ModioBoxMinAspectRatio.Get();
 			const FOptionalSize CurrentMaxAspectRatio = ModioBoxMaxAspectRatio.Get();
-			const FMargin SlotPadding(ChildSlot.SlotPadding.Get());
+
+			const FMargin SlotPadding = ModioUIHelpers::GetPadding(ChildSlot);
+
 			bool bAlignChildren = true;
 
 			AlignmentArrangeResult XAlignmentResult(0, 0);
@@ -114,11 +117,12 @@ protected:
 
 			const float AlignedSizeX = XAlignmentResult.Size;
 			const float AlignedSizeY = YAlignmentResult.Size;
-			if (ChildSlot.VAlignment == VAlign_Center)
+
+			if (ModioUIHelpers::GetVerticalAlignment(ChildSlot) == VAlign_Center)
 			{
 				YAlignmentResult.Offset = (AllottedGeometry.GetLocalSize().Y - AlignedSizeY) / 2;
 			}
-			if (ChildSlot.HAlignment == HAlign_Center)
+			if (ModioUIHelpers::GetHorizontalAlignment(ChildSlot) == HAlign_Center)
 			{
 				XAlignmentResult.Offset = (AllottedGeometry.GetLocalSize().X - AlignedSizeX) / 2;
 			}

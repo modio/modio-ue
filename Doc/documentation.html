@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.16">
-<title>mod.io UE4 Plugin Documentation</title>
+<title>mod.io Unreal Engine Plugin Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -762,7 +762,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>mod.io UE4 Plugin Documentation</h1>
+<h1>mod.io Unreal Engine Plugin Documentation</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
@@ -1455,7 +1455,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <div class="sect3">
 <h4 id="modio_subsystem">ModioSubsystem</h4>
 <div class="paragraph">
-<p>The mod.io UE4 plugin consumes our native SDK internally, and it&#8217;s public API is similar. Where the native SDK exposes a number of free functions within the <code>Modio</code> namespace, for ease of integration we have wrapped those in a <a href="https://docs.unrealengine.com/4.26/en-US/ProgrammingAndScripting/Subsystems/">Subsystem</a>.</p>
+<p>The mod.io Unreal Engine Plugin consumes our Native SDK internally, and its public API is similar. Where the Native SDK exposes a number of free functions within the <code>Modio</code> namespace, for ease of integration we have wrapped those in a <a href="https://docs.unrealengine.com/4.26/en-US/ProgrammingAndScripting/Subsystems/">Subsystem</a>.</p>
 </div>
 <div class="paragraph">
 <p>The <a href="#modio_subsystem">ModioSubsystem&#8217;s</a> lifetime is automatically managed by the engine for you, and provides a convenient way to access the plugin functionality, which is broadly grouped into the following categories:</p>
@@ -1606,7 +1606,7 @@ This means that if you stop calling <a href="#RunPendingHandlers">Run Pending Ha
 <div class="sect3">
 <h4 id="_user_sessions">User Sessions</h4>
 <div class="paragraph">
-<p>The mod.io plugin runs on a per-platform-user basis. If you are using the plugin on a platform that requires user switching support, it is a requirement that you call <a href="#K2_ShutdownAsync">ShutdownAsync</a> and then re-initialize the plugin with <a href="#K2_InitializeAsync">InitializeAsync</a> with the new platform-specific user handle.</p>
+<p>The mod.io plugin runs on a per-platform-user basis. If you are using the plugin on a platform that requires user switching support, it is a requirement that you call <a href="#K2_ShutdownAsync">ShutdownAsync</a> and then re-initialize the plugin with <a href="#K2_InitializeAsync">InitializeAsync</a> with a different User Session. Generating a stable User Session ID per platform-specific user will ensure that if the incoming user has already authenticated to mod.io on this device for this game, they won&#8217;t need to do so again unless their authentication token has expired.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1656,7 +1656,7 @@ This means that if you stop calling <a href="#RunPendingHandlers">Run Pending Ha
 <p>On first run of a game using the plugin, <code>${FOLDERID_LocalAppData}/mod.io/globalsettings.json</code> will be created.</p>
 </div>
 <div class="paragraph">
-<p>This JSON object contains a <code>RootLocalDataPath</code> element - changing the string here to a valid path on disk will globally redirect the mod installation directory for <strong>ALL</strong> games using the mod.io UE4 plugin or native SDK for the current system account.</p>
+<p>This JSON object contains a <code>RootLocalDataPath</code> element - changing the string here to a valid path on disk will globally redirect the mod installation directory for <strong>ALL</strong> games using the mod.io Unreal Engine Plugin or Native SDK for the current system account.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -12360,7 +12360,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-08-12 17:02:49 +1000
+Last updated 2022-08-24 16:34:38 +1000
 </div>
 </div>
 </body>

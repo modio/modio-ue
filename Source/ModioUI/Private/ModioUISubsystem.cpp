@@ -102,6 +102,23 @@ void UModioUISubsystem::UninstallHandler(FModioErrorCode ec, FModioModID ID)
 void UModioUISubsystem::ModManagementEventHandler(FModioModManagementEvent Event)
 {
 	OnModManagementEvent.Broadcast(Event);
+
+	// If we've installed a mod, add it to the session downloads for the download queue panel
+	if (Event.Event == EModioModManagementEventType::Installed)
+	{
+		ModsDownloadedThisSession.Add(Event.ID);
+	}
+
+	// If we're uninstalled a mod, remove it from the session details
+	if (Event.Event == EModioModManagementEventType::Uninstalled)
+	{
+		if (ModsDownloadedThisSession.Contains(Event.ID))
+		{
+			ModsDownloadedThisSession.Remove(Event.ID);	
+		}
+	}
+	
+	ModBrowserInstance->RefreshDownloadQueue();
 }
 
 void UModioUISubsystem::Initialize(FSubsystemCollectionBase& Collection)

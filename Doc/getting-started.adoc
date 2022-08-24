@@ -37,7 +37,7 @@ You can find your Game ID and API Key by going to the applicable mod.io environm
 
 [[modio_subsystem,ModioSubsystem]]
 ==== ModioSubsystem
-The mod.io UE4 plugin consumes our native SDK internally, and it's public API is similar. Where the native SDK exposes a number of free functions within the `Modio` namespace, for ease of integration we have wrapped those in a https://docs.unrealengine.com/4.26/en-US/ProgrammingAndScripting/Subsystems/[Subsystem].
+The mod.io Unreal Engine Plugin consumes our Native SDK internally, and its public API is similar. Where the Native SDK exposes a number of free functions within the `Modio` namespace, for ease of integration we have wrapped those in a https://docs.unrealengine.com/4.26/en-US/ProgrammingAndScripting/Subsystems/[Subsystem].
 
 The <<ModioSubsystem,ModioSubsystem's>> lifetime is automatically managed by the engine for you, and provides a convenient way to access the plugin functionality, which is broadly grouped into the following categories:
 
@@ -94,7 +94,7 @@ NOTE: This means that if you stop calling <<RunPendingHandlers>>, any pending as
 
 ==== User Sessions
 
-The mod.io plugin runs on a per-platform-user basis. If you are using the plugin on a platform that requires user switching support, it is a requirement that you call <<K2_ShutdownAsync>> and then re-initialize the plugin with <<K2_InitializeAsync>> with the new platform-specific user handle.
+The mod.io plugin runs on a per-platform-user basis. If you are using the plugin on a platform that requires user switching support, it is a requirement that you call <<K2_ShutdownAsync>> and then re-initialize the plugin with <<K2_InitializeAsync>> with a different User Session. Generating a stable User Session ID per platform-specific user will ensure that if the incoming user has already authenticated to mod.io on this device for this game, they won't need to do so again unless their authentication token has expired.
 
 ==== Error handling
 
@@ -120,7 +120,7 @@ However, this value can be overridden in one of two ways:
 +
 On first run of a game using the plugin, `${FOLDERID_LocalAppData}/mod.io/globalsettings.json` will be created. 
 +
-This JSON object contains a `RootLocalDataPath` element - changing the string here to a valid path on disk will globally redirect the mod installation directory for *ALL* games using the mod.io UE4 plugin or native SDK for the current system account. 
+This JSON object contains a `RootLocalDataPath` element - changing the string here to a valid path on disk will globally redirect the mod installation directory for *ALL* games using the mod.io Unreal Engine Plugin or Native SDK for the current system account. 
 +
 NOTE: Changing this value while the SDK is initialized is not supported and behaviour is undefined.
 

@@ -271,4 +271,6 @@ public:
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
 
 	void ExecuteOnModBrowserClosedDelegate();
+
+	TArray<FModioModID> ModsDownloadedThisSession;
 };

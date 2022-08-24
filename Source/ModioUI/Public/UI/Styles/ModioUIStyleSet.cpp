@@ -5,8 +5,14 @@
 #include "PropertyPathHelpers.h"
 #include "SlateMaterialBrush.h"
 
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+const FSlateWidgetStyle* UModioUIStyleSet::GetWidgetStyleInternal(const FName DesiredTypeName, const FName StyleName,
+																  const FSlateWidgetStyle* DefaultStyle,
+																  bool bWarnIfNotFound) const
+#else
 const FSlateWidgetStyle* UModioUIStyleSet::GetWidgetStyleInternal(const FName DesiredTypeName,
 																  const FName StyleName) const
+#endif
 {
 	USlateWidgetStyleContainerBase* const* FoundStyle = WidgetStyles.Find(StyleName);
 	if (FoundStyle)
@@ -69,6 +75,31 @@ void UModioUIStyleSet::ResetInputMappingGlyphs()
 	}
 }
 
+TSet<FName> UModioUIStyleSet::GetStyleKeys() const
+{
+	return TSet<FName>(GetAllStyleNames());
+}
+
+FString UModioUIStyleSet::GetContentRootDir() const
+{
+	return "";
+}
+
+
+void UModioUIStyleSet::LogMissingResource(EStyleMessageSeverity Severity, const FText& Message,
+										  const FName& MissingResource) const
+{
+	if (!MissingResources.Contains(MissingResource))
+	{
+		FText StyleAndMessage = FText::Format(
+			NSLOCTEXT("SlateStyleSet", "SlateSetResourceMissing", "Missing Resource from '{0}' Style: '{1}'"),
+			FText::FromName(GetStyleSetName()), Message);
+
+		MissingResources.Add(MissingResource);
+		Log(Severity, StyleAndMessage);
+	}
+}
+
 UModioUIStyleSet::UModioUIStyleSet(const FObjectInitializer& Initializer) : UDataAsset(Initializer)
 {
 	ResetInputMappingGlyphs();
@@ -88,19 +119,21 @@ TArray<FName> UModioUIStyleSet::GetEntriesUsingBrush(const FName BrushName) cons
 }
 
 float UModioUIStyleSet::GetFloat(const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
-								 float DefaultValue /*= FStyleDefaults::GetFloat()*/) const
+								 float DefaultValue /*= FStyleDefaults::GetFloat()*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	return {};
 }
 
-FVector2D UModioUIStyleSet::GetVector(const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
-									  FVector2D DefaultValue /*= FStyleDefaults::GetVector2D()*/) const
+FVector2D UModioUIStyleSet::GetVector(
+	const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
+	FVector2D DefaultValue /*= FStyleDefaults::GetVector2D()*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	return {};
 }
 
-const FLinearColor& UModioUIStyleSet::GetColor(const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
-											   const FLinearColor& DefaultValue /*= FStyleDefaults::GetColor()*/) const
+const FLinearColor& UModioUIStyleSet::GetColor(
+	const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
+	const FLinearColor& DefaultValue /*= FStyleDefaults::GetColor()*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	static FLinearColor DefaultColor = FLinearColor::White;
 	return DefaultColor;
@@ -108,7 +141,7 @@ const FLinearColor& UModioUIStyleSet::GetColor(const FName PropertyName, const A
 
 const FSlateColor UModioUIStyleSet::GetSlateColor(
 	const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
-	const FSlateColor& DefaultValue /*= FStyleDefaults::GetSlateColor()*/) const
+	const FSlateColor& DefaultValue /*= FStyleDefaults::GetSlateColor()*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	const FName ColorName = Join(PropertyName, Specifier);
 	if (ColorPresets.Contains(ColorName))
@@ -118,8 +151,9 @@ const FSlateColor UModioUIStyleSet::GetSlateColor(
 	return DefaultValue;
 }
 
-const FMargin& UModioUIStyleSet::GetMargin(const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
-										   const FMargin& DefaultValue /*= FStyleDefaults::GetMargin()*/) const
+const FMargin& UModioUIStyleSet::GetMargin(
+	const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/,
+	const FMargin& DefaultValue /*= FStyleDefaults::GetMargin()*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	static FMargin DefaultMargin;
 	return DefaultMargin;
@@ -143,7 +177,8 @@ UMaterialInterface* UModioUIStyleSet::GetNamedMaterial(const FName PropertyName,
 		{
 			if (UMaterialInstanceDynamic* AsDynamicMaterial = Cast<UMaterialInstanceDynamic>(NamedMaterial))
 			{
-				UMaterialInstanceDynamic* NewInstance = UMaterialInstanceDynamic::Create(AsDynamicMaterial->Parent, this);
+				UMaterialInstanceDynamic* NewInstance =
+					UMaterialInstanceDynamic::Create(AsDynamicMaterial->Parent, this);
 				NewInstance->CopyInterpParameters(AsDynamicMaterial);
 				MaterialInstanceCache.Add(ActualName, NewInstance);
 				return NewInstance;
@@ -177,7 +212,8 @@ UMaterialInterface* UModioUIStyleSet::GetGlyphMaterial(const FName PropertyName)
 	return GlyphMaterial;
 }
 
-const FSlateBrush* UModioUIStyleSet::GetBrush(const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/) const
+const FSlateBrush* UModioUIStyleSet::GetBrush(const FName PropertyName,
+											  const ANSICHAR* Specifier /*= nullptr*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	const FName StyleName = Join(PropertyName, Specifier);
 	const FSlateBrush* Result = NamedBrushes.Find(StyleName);
@@ -266,22 +302,29 @@ const FSlateBrush* UModioUIStyleSet::GetOptionalBrush(
 }
 
 const TSharedPtr<FSlateDynamicImageBrush> UModioUIStyleSet::GetDynamicImageBrush(
-	const FName BrushTemplate, const FName TextureName, const ANSICHAR* Specifier /*= nullptr*/)
+	const FName BrushTemplate, const FName TextureName,
+	const ANSICHAR* Specifier /*= nullptr*/ MODIO_UE5_REQUESTING_STYLE) MODIO_UE5_CONST
 {
 	return nullptr;
 }
 
-const TSharedPtr<FSlateDynamicImageBrush> UModioUIStyleSet::GetDynamicImageBrush(const FName BrushTemplate,
-																				 const ANSICHAR* Specifier,
-																				 UTexture2D* TextureResource,
-																				 const FName TextureName)
+const TSharedPtr<FSlateDynamicImageBrush> UModioUIStyleSet::GetDynamicImageBrush(
+	const FName BrushTemplate, const ANSICHAR* Specifier, UTexture2D* TextureResource,
+	const FName TextureName MODIO_UE5_REQUESTING_STYLE) MODIO_UE5_CONST
 {
 	return nullptr;
 }
 
-const TSharedPtr<FSlateDynamicImageBrush> UModioUIStyleSet::GetDynamicImageBrush(const FName BrushTemplate,
-																				 UTexture2D* TextureResource,
-																				 const FName TextureName)
+const TSharedPtr<FSlateDynamicImageBrush> UModioUIStyleSet::GetDynamicImageBrush(
+	const FName BrushTemplate, UTexture2D* TextureResource,
+	const FName TextureName MODIO_UE5_REQUESTING_STYLE) MODIO_UE5_CONST
+{
+	return nullptr;
+}
+
+const TSharedPtr<FSlateDynamicImageBrush> UModioUIStyleSet::MakeDynamicImageBrush(const FName BrushTemplate,
+																				  UTexture2D* TextureResource,
+																				  const FName TextureName) const
 {
 	return nullptr;
 }
@@ -291,7 +334,8 @@ FSlateBrush* UModioUIStyleSet::GetDefaultBrush() const
 	return nullptr;
 }
 
-const FSlateSound& UModioUIStyleSet::GetSound(const FName PropertyName, const ANSICHAR* Specifier /*= nullptr*/) const
+const FSlateSound& UModioUIStyleSet::GetSound(const FName PropertyName,
+											  const ANSICHAR* Specifier /*= nullptr*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	static FSlateSound DefaultSound;
 	return DefaultSound;
@@ -307,7 +351,7 @@ void UModioUIStyleSet::NativeSerializeStyleReference(FString PathToProperty, FNa
 	PropertyPathToColorPresetMap.Add(PathToProperty, StyleElementReference);
 }
 
-TArray<FName> UModioUIStyleSet::GetAllStyleNames()
+TArray<FName> UModioUIStyleSet::GetAllStyleNames() const
 {
 	TArray<FName> StyleNames;
 	WidgetStyles.GetKeys(StyleNames);
@@ -335,16 +379,16 @@ TArray<FName> UModioUIStyleSet::GetGlyphNames()
 	return GlyphNames;
 }
 
-
 UMaterialInterface* UModioUIStyleSet::GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType)
 {
-	UMaterialInterface* GlyphMaterial = GetNamedMaterial(FName("DefaultGlyphMaterial"), FString::Printf(TEXT("%s%d"), *VirtualInput.GetFName().ToString(), static_cast<uint8>(InputType)));
+	UMaterialInterface* GlyphMaterial = GetNamedMaterial(
+		FName("DefaultGlyphMaterial"),
+		FString::Printf(TEXT("%s%d"), *VirtualInput.GetFName().ToString(), static_cast<uint8>(InputType)));
 	if (GlyphMaterial)
 	{
 		UMaterialInstanceDynamic* GlyphMaterialInstance = Cast<UMaterialInstanceDynamic>(GlyphMaterial);
 		if (GlyphMaterialInstance)
 		{
-
 			if (UTexture2D* InputGlyphTexture = GetInputGlyphForInputType(VirtualInput, InputType))
 			{
 				GlyphMaterialInstance->SetTextureParameterValue(FName("Texture"), InputGlyphTexture);

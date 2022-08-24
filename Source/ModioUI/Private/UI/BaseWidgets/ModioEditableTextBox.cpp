@@ -157,7 +157,7 @@ void UModioEditableTextBox::NativeSetValidationError(FText ErrorText)
 			.Padding(0, 8, 0, 0)[SAssignNew(MyErrorTextBlock, SModioRichTextBlock)
 									 .Text(ErrorText)
 									 .WrapTextAt(700)
-									 .StyleReference(&ErrorTextBlockStyle)
+									 .StyleReference(&TextStyle)
 									 .TextStyle(ErrorTextBlockStyle)];
 	}
 	else

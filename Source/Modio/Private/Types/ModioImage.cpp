@@ -131,9 +131,13 @@ void FModioImageWrapper::LoadAsync(FOnLoadImageDelegateFast Callback) const
 					Texture->RemoveFromRoot();
 
 					Texture->UpdateResource();
+	#if UE_VERSION_NEWER_THAN(5, 0, 0)
+					FTexture2DDynamicResource* TextureResource =
+						static_cast<FTexture2DDynamicResource*>(Texture->GetResource());
+	#else
 					FTexture2DDynamicResource* TextureResource =
 						static_cast<FTexture2DDynamicResource*>(Texture->Resource);
-
+	#endif
 					ENQUEUE_RENDER_COMMAND(FWriteRawDataToTexture)
 					([TextureResource,
 					  RawDataRenderingThread = MoveTemp(RawData)](FRHICommandListImmediate& RHICmdList) {
