@@ -35,7 +35,7 @@ In the directory with your .uproject file: `git submodule add https://github.com
 
 ==== In a non-git project, or without submodules
 
-. Grab the latest release zip from this page, and extract the contents to your project's `Plugins/Modio` directory
+. Grab the latest release zip from this page, and extract the contents to your project's `Plugins/Modio` directory. You will need to manually download submodules inside `Source/ThirdParty/`
 
 === Enabling the plugin
 
