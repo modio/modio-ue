@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -23,8 +31,9 @@
 #include "ModioModDetailsView.generated.h"
 
 /**
- *
- */
+* Base class that displays a mod details, like title, summary, and images. It
+* also includes buttons to provide feedback to the system
+**/
 UCLASS()
 class MODIOUI_API UModioModDetailsView : public UModioMenuView,
 										 public IModioUIModInfoReceiver,
@@ -50,26 +59,27 @@ protected:
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets",
+			  meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
 	UWidget* DetailsLoader;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioAsyncOpWrapperWidget* DetailsViewContent;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* SubscribeButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* RateUpButton;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* RateDownButton;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* ReportButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioUserWidgetBase* ModPropertiesInspector;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioModManagementWidgetBase* ProgressWidget;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioModDetailsView")
@@ -84,19 +94,19 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioModDetailsView")
 	FText ReportTextFormat;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModTitleTextBlock;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModSummaryTextBlock;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModFullDescriptionTextBlock;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioTagList* ModTags;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModChangelog;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
@@ -104,10 +114,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText UnsubscribeLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioModDetailsImageGallery* ImageGallery;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioSubscriptionBadge* SubscriptionBadge;
 
 #if WITH_EDITORONLY_DATA
@@ -129,6 +139,17 @@ protected:
 	FModioModID CurrentModID;
 	void NativeOnModInfoRequestCompleted(FModioModID ModID, FModioErrorCode ec, TOptional<FModioModInfo> Info);
 
+	
+	FTimerHandle SetFocusTimerHandle;
+
+	UFUNCTION()
+	void SetInitialFocus();
+
+
 public:
+	/**
+	* Display the mod details for a corresponding ModID
+	* @param ID The ModID to bring forward
+	**/
 	void ShowDetailsForMod(FModioModID ID);
 };

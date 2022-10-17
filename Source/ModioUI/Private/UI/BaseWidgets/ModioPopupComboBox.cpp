@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioPopupComboBox.h"
 #include "Algo/Transform.h"
@@ -28,7 +36,7 @@ void UModioPopupComboBox::SynchronizeProperties()
 			}
 		}
 
-		//TODO: @modio-ue4 support alternative placement modes
+		// TODO: @modio-ue4 support alternative placement modes
 		if (PopupPlacement == EModioPopupPlacement::AlignBottomLeft)
 		{
 			MyComboBox->SetMenuPlacement(EMenuPlacement::MenuPlacement_MatchBottomLeft);
@@ -53,6 +61,7 @@ void UModioPopupComboBox::ReleaseSlateResources(bool bReleaseChildren)
 TSharedRef<ITableRow> UModioPopupComboBox::GenerateOptionWidget(TSharedPtr<FText> Item,
 																const TSharedRef<STableViewBase>& OwnerTable)
 {
+	const FModioCustomComboBoxStyle* ComboStyle = ComboBoxStyle.FindStyle<FModioCustomComboBoxStyle>();
 	FFormatNamedArguments Args;
 	if (BoundValues.Num() && BoundValues[0]->EqualTo(*Item))
 	{
@@ -73,7 +82,10 @@ TSharedRef<ITableRow> UModioPopupComboBox::GenerateOptionWidget(TSharedPtr<FText
 			.VAlign(VAlign_Center)
 			.HeightOverride(32)
 			[
-				SNew(SModioRichTextBlock).Text(FText::Format(ValueFormatText, Args)).StyleReference_UObject(this, &UModioPopupComboBox::GetTextStyle)
+				SNew(SModioRichTextBlock)
+				.Text(FText::Format(ValueFormatText, Args))
+				.StyleReference_UObject(this, &UModioPopupComboBox::GetTextStyle)
+				.HoveredSound(ComboStyle->HoveredSound)
 			]
 		];
 	// clang-format on
@@ -101,6 +113,7 @@ const FModioUIStyleRef* UModioPopupComboBox::GetTextStyle() const
 // TODO: use Rich Text and set the style from the ComboBoxStyle
 TSharedRef<SWidget> UModioPopupComboBox::GenerateButtonContent(TSharedPtr<FText> Item)
 {
+	const FModioCustomComboBoxStyle* ComboStyle = ComboBoxStyle.FindStyle<FModioCustomComboBoxStyle>();
 	FFormatNamedArguments Args;
 	Args.Add("Description", Description);
 	Args.Add("Value", *Item);
@@ -110,7 +123,10 @@ TSharedRef<SWidget> UModioPopupComboBox::GenerateButtonContent(TSharedPtr<FText>
 		.VAlign(VAlign_Center)
 		.HeightOverride(32)
 		[
-			SNew(SModioRichTextBlock).Text(FText::Format(LabelFormatText, Args)).StyleReference_UObject(this, &UModioPopupComboBox::GetTextStyle)
+			SNew(SModioRichTextBlock)
+			.Text(FText::Format(LabelFormatText, Args))
+			.StyleReference_UObject(this, &UModioPopupComboBox::GetTextStyle)
+			.HoveredSound(ComboStyle->HoveredSound)
 		];
 	//TODO: @modio-ue4 bind the font delegate here too so we can actually change the size of the text etc
 	// clang-format on
@@ -130,23 +146,26 @@ TSharedRef<SWidget> UModioPopupComboBox::RebuildWidget()
 		.OnSelectionChanged_UObject(this, &UModioPopupComboBox::OnSelectionChangedHandler)
 		.ItemsSource(&BoundValues)
 		.BackgroundColor(ComboStyle ? ComboStyle->BackgroundColor : FModioUIColorRef())
-		.MenuBorderStyle(ActualStyle ? *ActualStyle : TOptional<FModioWidgetBorderStyle> {});
+		.MenuBorderStyle(ActualStyle ? *ActualStyle : TOptional<FModioWidgetBorderStyle> {})
+		.HoveredSound(ComboStyle->HoveredSound)
+		.PressedSound(ComboStyle->PressedSound);
 }
 
 void UModioPopupComboBox::UpdateBoundValues()
 {
 	BoundValues.Empty();
-	
+
 	// Only bind values in this way if we are using a Command List
 	if (CurrentEntries.MappedActions.Num() > 0)
 	{
-		Algo::Transform(
-		CurrentEntries.MappedActions, BoundValues,
-		[](const TPair<FModioUIMenuEntry, FModioUIAction> Elem) { return MakeShared<FText>(Elem.Key.MenuEntryLabel); });
+		Algo::Transform(CurrentEntries.MappedActions, BoundValues,
+						[](const TPair<FModioUIMenuEntry, FModioUIAction> Elem) {
+							return MakeShared<FText>(Elem.Key.MenuEntryLabel);
+						});
 	}
 	else
 	{
-		Algo::Transform(OptionValues, BoundValues, [](const FText& InValue) { return MakeShared<FText>(InValue); });	
+		Algo::Transform(OptionValues, BoundValues, [](const FText& InValue) { return MakeShared<FText>(InValue); });
 	}
 }
 
@@ -169,13 +188,15 @@ void UModioPopupComboBox::OnSelectionChangedHandler(TSharedPtr<FText> NewSelecti
 
 	if (OnSelectionChangedWithDelegate.IsBound())
 	{
-		for(auto &Entry : CurrentEntries.MappedActions)
+		for (auto& Entry : CurrentEntries.MappedActions)
 		{
 			if (Entry.Key.MenuEntryLabel.EqualTo(*NewSelection))
 			{
-				OnSelectionChangedWithDelegate.Execute(Entry.Value, SelectionType);		
-			}
+				OnSelectionChangedWithDelegate.Execute(Entry.Value, SelectionType);
+
+				const FModioCustomComboBoxStyle* ComboStyle = ComboBoxStyle.FindStyle<FModioCustomComboBoxStyle>();
+				FSlateApplication::Get().PlaySound(ComboStyle->PressedSound);
+			};
 		}
-		
 	}
 }

@@ -26,7 +26,6 @@ double ToUnreal(double Value);
 bool ToUnreal(bool Value);
 uint64 ToUnreal(std::size_t Value);
 FString ToUnreal(const std::string& String);
-FString ToUnreal(const Modio::filesystem::path& Path);
 FDateTime ToUnrealDateTime(std::int64_t UnixTimestamp);
 
 struct FModioModID ToUnreal(Modio::ModID Value);

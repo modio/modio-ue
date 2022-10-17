@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "UI/Styles/ModioRoundedRectangleMaterialParams.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
@@ -30,14 +40,13 @@ UMaterialInterface* UModioRoundedRectangleMaterialParams::GetMaterialInstance()
 				NewInstance->SetScalarParameterValue(FName("UseRenderTarget"), 0);
 				NewInstance->SetVectorParameterValue(FName("InnerColor"),
 													 InnerColor.ResolveReference().GetSpecifiedColor());
-				NewInstance->SetScalarParameterValue(FName("EnableButtonGradients"), bEnableButtonGradients? 1 : 0);
+				NewInstance->SetScalarParameterValue(FName("EnableButtonGradients"), bEnableButtonGradients ? 1 : 0);
 				NewInstance->SetScalarParameterValue(FName("BorderGradientOpacity"), BorderGradientOpacity);
 				NewInstance->SetScalarParameterValue(FName("InnerGradientOpacity"), InnerGradientOpacity);
 				NewInstance->SetVectorParameterValue(FName("BorderGradientColor"),
 													 BorderGradientColor.ResolveReference().GetSpecifiedColor());
 				NewInstance->SetVectorParameterValue(FName("InnerGradientColor"),
 													 InnerGradientColor.ResolveReference().GetSpecifiedColor());
-
 
 				return NewInstance;
 			}
@@ -46,7 +55,7 @@ UMaterialInterface* UModioRoundedRectangleMaterialParams::GetMaterialInstance()
 	return nullptr;
 }
 #if WITH_EDITOR
-void UModioRoundedRectangleMaterialParams::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) 
+void UModioRoundedRectangleMaterialParams::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	GetMaterialInstance();

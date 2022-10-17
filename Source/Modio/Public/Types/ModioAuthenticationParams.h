@@ -31,10 +31,23 @@ USTRUCT(BlueprintType)
 struct MODIO_API FModioAuthenticationParams
 {
 	GENERATED_BODY();
+
+	/**
+	* Stored property of the authentication token
+	**/
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	FString AuthToken;
+	
+	/**
+	* Stored property of the user email
+	**/
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	FString UserEmail;
+
+	/**
+	* Stored property boolean that signals if the user has accepted the terms of service,
+	* true when that has occurred, false by default otherwise
+	**/
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	bool bUserHasAcceptedTerms = false;
 };

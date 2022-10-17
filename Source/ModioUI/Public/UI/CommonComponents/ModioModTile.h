@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -25,8 +33,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnModTileDetailsClicked, UModioModI
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnModTileReportClicked, UModioModInfoUI*, ModInfo);
 
 /**
- *
- */
+* Base class that displays an image and a label, and performs rating operations
+**/
 UCLASS()
 class MODIOUI_API UModioModTile : public UModioModTileBase
 {
@@ -55,7 +63,7 @@ protected:
 	UFUNCTION()
 	void NativeReportClicked();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioPopupMenu* MoreOptionsMenu;
 
 	UFUNCTION()
@@ -66,7 +74,7 @@ protected:
 
 	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileActiveFrame;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
@@ -78,6 +86,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnModTileReportClicked OnReportClicked;
 
+	/**
+	* Update the widget size
+	* @param NewSize 2D vector with the new expected size
+	**/
 	UFUNCTION()
 	void SetSizeOverride(FVector2D NewSize);
 };

@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -16,6 +24,7 @@
 #include "UI/EventHandlers/IModioUIAuthenticationChangedReceiver.h"
 #include "UI/EventHandlers/IModioUIMediaDownloadCompletedReceiver.h"
 #include "UI/Interfaces/IModioUIAsyncOperationWidget.h"
+#include "UI/Styles/ModioModTileStyle.h"
 
 #include "ModioModTileBase.generated.h"
 
@@ -40,7 +49,7 @@ protected:
 
 	TWeakObjectPtr<UWidget> WeakExpandedWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category = "Widgets")
 	bool bCurrentExpandedState = false;
 	virtual void NativeConstruct() override;
 
@@ -65,31 +74,37 @@ protected:
 							  const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId,
 							  const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FModioUIMaterialRef LoadingMaterial = FModioUIMaterialRef {"Loading"};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FModioUIMaterialRef ErrorMaterial = FModioUIMaterialRef {"ImageError"};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget)) UModioImage* Thumbnail;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget)) UModioImage* Thumbnail;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioUserWidgetBase* SubscriptionIndicator;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModName;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetAnim), Transient)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* FocusTransition;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioRoundedBorder* TileBorder;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileFrame;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* SubscribeButton;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioModTileStyle"), Category = "Widgets")
+	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultModTileStyle"};
+
+	FSlateSound HoveredSound;
+	FSlateSound PressedSound;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnSetExpandedState(bool bExpanded);
@@ -118,7 +133,7 @@ public:
 	FOnModTileSubscribeClicked OnSubscribeClicked;
 
 public:
-	UFUNCTION(BlueprintCallable, Category="ModioModTileBase")
+	UFUNCTION(BlueprintCallable, Category = "ModioModTileBase")
 	void SetExpandedState(bool bExpanded);
 
 	UFUNCTION()

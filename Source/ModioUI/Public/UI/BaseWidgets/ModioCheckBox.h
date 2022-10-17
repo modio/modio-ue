@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -9,8 +17,9 @@
 #include "ModioCheckBox.generated.h"
 
 /**
- *
- */
+* Modio UI element that provides a check box functionality, in other words
+* the capacity to receive boolean input along a text label
+**/
 UCLASS()
 class MODIOUI_API UModioCheckBox : public UCheckBox
 {
@@ -26,12 +35,16 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 	/// Will be used to generate a text label if not overridden by adding a child widget to this checkbox
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText LabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCheckBoxStyle"), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCheckBoxStyle"), Category = "Widgets")
 	FModioUIStyleRef CheckBoxStyle;
 
-	public:
+public:
+	/**
+	* Change the label for this Check Box
+	* @param InText The new string to display
+	**/
 	void SetLabelText(FText InText);
 };

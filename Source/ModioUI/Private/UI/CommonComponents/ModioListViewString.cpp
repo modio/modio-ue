@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/CommonComponents/ModioListViewString.h"
 #include "UI/BaseWidgets/Slate/SModioListView.h"
@@ -20,7 +28,8 @@ TSharedRef<STableViewBase> UModioListViewString::RebuildListWidget()
 	Args.ConsumeMouseWheel = EConsumeMouseWheel::Never;
 	Args.bReturnFocusToSelection = false;
 	Args.Orientation = Orientation;
-	MyListView = StaticCastSharedRef<SListView<TSharedPtr<FString>>>(ITypedUMGListView<TSharedPtr<FString>>::ConstructListView<SModioListView>(this, ListItems, Args));
+	MyListView = StaticCastSharedRef<SListView<TSharedPtr<FString>>>(
+		ITypedUMGListView<TSharedPtr<FString>>::ConstructListView<SModioListView>(this, ListItems, Args));
 	if (bOverrideItemSize)
 	{
 		MyListView->SetItemHeight(EntrySpacing * 0.5f + ItemSize.Y);

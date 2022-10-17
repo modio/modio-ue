@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -17,8 +25,10 @@
 #include "ModioModCollectionTile.generated.h"
 
 /**
- *
- */
+* Base class that represents a mod collection tile, which has a popup menu, 
+* collection tile status, and a text block. It also stores the subscribed 
+* or installed status of a mod
+**/
 UCLASS()
 class MODIOUI_API UModioModCollectionTile : public UModioModTileBase,
 											public IModioUIModEnableWidget,
@@ -41,16 +51,16 @@ protected:
 	void ForceUninstall();
 	UFUNCTION()
 	void NativeMoreOptionsClicked();
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* SizeOnDiskLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioPopupMenu* MoreOptionsMenu;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioCollectionTileStatus* StatusWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* StatusLine;
 
 	// We don't need a text for any other status because all mods are either subscribed for the local user or installed

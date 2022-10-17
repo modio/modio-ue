@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -10,9 +18,11 @@
 #include "Widgets/Views/STileView.h"
 
 #include "ModioTabBar.generated.h"
+
 /**
- *
- */
+* Modio UI element that represents a tab bar, in other words,
+* a list of horizontal elements with names and selected properties
+**/
 UCLASS(meta = (ColorSerialize = "SerializedColors"))
 class MODIOUI_API UModioTabBar : public UWidget
 {
@@ -33,29 +43,37 @@ protected:
 
 	TArray<TSharedPtr<FText>> BoundValues;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TArray<FText> TabNames;
 	TSharedPtr<STileView<TSharedPtr<FText>>> MyListView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FTableRowStyle TEMP_TableRowStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category = "Widgets")
 	FModioUIStyleRef TabButtonStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioButtonStyle"), Category = "Widgets")
 	FModioUIStyleRef InactiveTabButtonStyle;
 
 	/// @brief Style for the tab which is selected but not hovered/focused
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FSlateBrush SelectedButtonBrush;
 
-	UPROPERTY(EditAnywhere, meta = (ReadOnlyKeys, EditCondition = "1==0", EditConditionHides, ShowOnlyInnerProperties,
-									EditFixedSize, EditFixedOrder, NoResetToDefault), Category="Widgets")
+	UPROPERTY(EditAnywhere,
+			  meta = (ReadOnlyKeys, EditCondition = "1==0", EditConditionHides, ShowOnlyInnerProperties, EditFixedSize,
+					  EditFixedOrder, NoResetToDefault),
+			  Category = "Widgets")
 	TMap<FName, FModioUIColorRef> SerializedColors;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FVector2D ItemSize;
 
 	virtual void PostLoad() override;
+
+	
+	bool NativeSupportsKeyboardFocus() const
+	{
+		return false;
+	}
 };

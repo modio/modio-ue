@@ -1,5 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 #include "UI/CommonComponents/ModioMenu.h"
 #include "Algo/Transform.h"
 #include "Core/ModioFilterParamsUI.h"
@@ -206,7 +213,6 @@ void UModioMenu::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 									 FCanExecuteAction::CreateUObject(this, &UModioMenu::CanGoToPreviousSubmenu)));
 }
 
-
 void UModioMenu::NativePreConstruct()
 {
 	Super::NativePreConstruct();
@@ -294,6 +300,10 @@ void UModioMenu::NativeConstruct()
 void UModioMenu::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
+	// Listen for UserChanged events to reset view on log in/out
+	IModioUIUserChangedReceiver::Register<UModioMenu>();
+
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		Subsystem->EnableModManagement();
@@ -328,7 +338,8 @@ void UModioMenu::NativeOnInitialized()
 			{
 				if (UObject* TmpBackgroundProvider = NewObject<UObject>(this, BackgroundImageProviderClass))
 				{
-					if (UMaterialInterface *BackgroundMaterial = IModioMenuBackgroundProvider::Execute_GetBackgroundMaterial(TmpBackgroundProvider))
+					if (UMaterialInterface* BackgroundMaterial =
+							IModioMenuBackgroundProvider::Execute_GetBackgroundMaterial(TmpBackgroundProvider))
 					{
 						Background->SetBrushFromMaterial(BackgroundMaterial);
 						bHasSetBackground = true;
@@ -428,7 +439,7 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 				{
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
 				}
-				FSlateApplication::Get().SetKeyboardFocus(MenuView->TakeWidget(), EFocusCause::Navigation);
+				FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
 			}
 		}
 		UWidget* ActiveWidget = ViewController->GetActiveWidget();
@@ -442,7 +453,7 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
 				}
 
-				FSlateApplication::Get().SetKeyboardFocus(MenuView->TakeWidget(), EFocusCause::Navigation);
+				FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
 			}
 		}
 	}
@@ -459,10 +470,27 @@ FReply UModioMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent&
 
 FReply UModioMenu::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	return FReply::Handled()
-		.SetNavigation(ViewController->GetActiveWidget()->TakeWidget(), ENavigationGenesis::User)
-		.SetUserFocus(ViewController->GetActiveWidget()->TakeWidget(), EFocusCause::SetDirectly);
+	// If we ever receive full focus on the Menu, forward it to the correct menu
+	UModioScrollBox* OuterScrollBox = Cast<UModioScrollBox>(ViewController->GetActiveWidget());
+	if (OuterScrollBox)
+	{
+		if (UModioMenuView* MenuView = Cast<UModioMenuView>(OuterScrollBox->GetChildAt(0)))
+		{
+			FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
+		}
+	}
+	UWidget* ActiveWidget = ViewController->GetActiveWidget();
+	if (ActiveWidget)
+	{
+		if (UModioMenuView* MenuView = Cast<UModioMenuView>(ActiveWidget))
+		{
+			FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
+		}
+	}
+
+	return FReply::Handled();
 }
+
 
 void UModioMenu::ShowAuthenticationChoiceDialog()
 {
@@ -510,4 +538,26 @@ void UModioMenu::ShowUninstallConfirmationDialog(UObject* DialogDataSource)
 	{
 		DialogController->ShowUninstallConfirmationDialog(DialogDataSource);
 	}
+}
+
+void UModioMenu::NativeUserChanged(TOptional<FModioUser> NewUser)
+{
+	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
+
+	// Reset view to Featured when a user logs out
+	if (GetPageIndex() > 0)
+	{
+		if (DrawerController)
+		{
+			if (DrawerController->IsAnyDrawerExpanded())
+			{
+				DrawerController->CollapseAllDrawers();
+			}
+		}
+		if (ViewController)
+		{
+			ViewController->SetActiveWidgetIndex(0);
+		}
+	}
+	return;
 }

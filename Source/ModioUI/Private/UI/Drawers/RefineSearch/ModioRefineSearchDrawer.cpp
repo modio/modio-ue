@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "UI/Drawers/RefineSearch/ModioRefineSearchDrawer.h"
 #include "Types/ModioFilterParams.h"
 
@@ -21,15 +31,16 @@ FReply UModioRefineSearchDrawer::NativeOnFocusReceived(const FGeometry& InGeomet
 	{
 		TagSelector->InvalidateLayoutAndVolatility();
 	}
-	if (SearchInput)
+	if (ApplyButton)
 	{
-		return FReply::Handled().SetUserFocus(SearchInput->TakeWidget(), EFocusCause::Navigation);
+		FSlateApplication::Get().SetUserFocus(0, ApplyButton->TakeWidget(), EFocusCause::Navigation);
+
+		return FReply::Handled();
 	}
 	else
 	{
 		return FReply::Handled();
 	}
-
 }
 
 void UModioRefineSearchDrawer::OnClearClicked()
@@ -59,6 +70,13 @@ FReply UModioRefineSearchDrawer::NativeOnKeyDown(const FGeometry& MyGeometry, co
 	{
 		return FReply::Handled();
 	}
+
+	auto CurrentFocus = FSlateApplication::Get().GetUserFocusedWidget(0);
+	if (CurrentFocus == this->TakeWidget()) 
+	{
+		FSlateApplication::Get().SetUserFocus(0, ApplyButton->TakeWidget(), EFocusCause::Navigation);
+	}
+
 	return Super::NativeOnKeyDown(MyGeometry, InKeyEvent);
 }
 

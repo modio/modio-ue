@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -12,8 +20,9 @@
 #include "ModioRichTextButton.generated.h"
 
 /**
- *
- */
+* Class definition for a rich text button that contains an image, 
+* a function key, and a button label
+**/
 UCLASS()
 class MODIOUI_API UModioRichTextButton : public UModioButton, public IModioUIInputHintDisplayWidget
 {
@@ -30,24 +39,24 @@ protected:
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	UModioRichTextBlock* ButtonContent;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	UModioInputBindingImage* InputHintImage;
 
 	TOptional<FKey> KeyForInputHint;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText ButtonLabel;
 
 	UFUNCTION()
 	TArray<FString> GetStyleNames() const;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (GetOptions = "GetStyleNames"), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (GetOptions = "GetStyleNames"), Category = "Widgets")
 	FName DefaultStyleName = FName("default");
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TEnumAsByte<ETextJustify::Type> Justification;
 
 	virtual void NativeDisplayHintForInput(FKey VirtualKey) override;
@@ -56,10 +65,22 @@ protected:
 	ESlateVisibility GetInputHintVisibility(EModioUIInputMode InputMode);
 
 public:
+	/**
+	* Retrieve the rich text style in use for this instance
+	* @return The text style used
+	**/
 	UFUNCTION()
 	const FModioRichTextStyle& GetRichTextStyle() const;
 
+	/**
+	* Change the label displayed in this button
+	* @param NewLabel Update text to display
+	**/
 	void SetLabel(FText NewLabel);
 
+	/**
+	* Change the text orientation in this button
+	* @param NewJustification Update text orientation
+	**/
 	void SetJustification(ETextJustify::Type NewJustification);
 };

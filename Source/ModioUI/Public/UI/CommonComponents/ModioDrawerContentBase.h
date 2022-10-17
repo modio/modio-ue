@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -8,9 +16,11 @@
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
 
 #include "ModioDrawerContentBase.generated.h"
+
 /**
- *
- */
+* Modio UI element that wraps what content is displayed using background images
+* either within its header or main content
+**/
 UCLASS()
 class MODIOUI_API UModioDrawerContentBase : public UModioUserWidgetBase
 {
@@ -36,22 +46,22 @@ protected:
 	virtual TSharedRef<SWidget> NativeGetContentWidget();
 	virtual TSharedRef<SWidget> NativeGetOptionalContentWidget();
 
-	UFUNCTION(BlueprintImplementableEvent, Category="ModioDrawerContentBase")
+	UFUNCTION(BlueprintImplementableEvent, Category = "ModioDrawerContentBase")
 	UWidget* GetHeaderWidget();
 
-	UFUNCTION(BlueprintImplementableEvent, Category="ModioDrawerContentBase")
+	UFUNCTION(BlueprintImplementableEvent, Category = "ModioDrawerContentBase")
 	UWidget* GetContentWidget();
 
-	UFUNCTION(BlueprintImplementableEvent, Category="ModioDrawerContentBase")
+	UFUNCTION(BlueprintImplementableEvent, Category = "ModioDrawerContentBase")
 	UWidget* GetOptionalContentWidget();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	UNamedSlot* HeaderSlot;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	UNamedSlot* ContentSlot;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	UNamedSlot* OptionalContentSlot;
 
 public:

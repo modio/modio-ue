@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -25,14 +33,14 @@ protected:
 	virtual void UpdateVisibility();
 
 public:
-	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
+	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	bool ToggleDrawerExpanded(int32 SlotIndex, bool bCloseOtherDrawers = true);
-	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
+	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	void SetDrawerExpanded(int32 SlotIndex, bool bExpandedState, bool bCloseOtherDrawers = true);
 
-	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
+	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	bool IsAnyDrawerExpanded() const;
 
-	UFUNCTION(BlueprintCallable, Category="ModioDrawerController")
+	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	void CollapseAllDrawers();
 };

@@ -10,6 +10,7 @@
 
 #include "Libraries/ModioSDKLibrary.h"
 #include "Internationalization/Regex.h"
+#include "Modio.h"
 #include "ModioSettings.h"
 #include "ModioTestSettings.h"
 
@@ -37,6 +38,22 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptions()
 	Options.GameEnvironment = Settings->Environment;
 	Options.GameId = FModioGameID(Settings->GameId);
 
+	return Options;
+}
+
+FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(const FString SessionId)
+{
+	const UModioSettings* Settings = GetDefault<UModioSettings>();
+
+	FModioInitializeOptions Options;
+	Options.ApiKey = FModioApiKey(Settings->ApiKey);
+	Options.GameEnvironment = Settings->Environment;
+	Options.GameId = FModioGameID(Settings->GameId);
+	Options.LocalSessionIdentifier = SessionId;
+	if (SessionId.IsEmpty())
+	{
+		UE_LOG(LogModio, Error, TEXT("SessionID cannot be empty for GetProjectInitializeOptions"));
+	}
 	return Options;
 }
 

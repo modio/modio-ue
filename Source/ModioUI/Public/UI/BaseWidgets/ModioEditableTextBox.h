@@ -1,11 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
 #include "Components/EditableTextBox.h"
 #include "CoreMinimal.h"
-#include "ModioRichTextBlock.h"
 #include "Delegates/DelegateCombinations.h"
+#include "ModioRichTextBlock.h"
 #include "UI/Interfaces/IModioUIErrorDisplayWidget.h"
 #include "UI/Interfaces/IModioUIStringInputWidget.h"
 #include "UI/Interfaces/IModioUITextValidator.h"
@@ -17,19 +25,29 @@
 DECLARE_DYNAMIC_DELEGATE_RetVal_TwoParams(bool, FOnValidateTextPostChange, const FText&, ChangedText, FText&,
 										  ErrorText);
 
+/**
+* Enumerator with the validation types to perform on input
+**/
 UENUM(BlueprintType)
 enum class EModioInputValidationType : uint8
 {
+	/** Validate email **/
 	Email,
+
+	/** Validate content has some lenght **/
 	NotEmpty,
+
+	/** Run a custom validation **/
 	Custom
 };
 
 /**
- *
- */
+* Modio UI element that provides an editable text functionality combining input and text validation
+**/
 UCLASS()
-class MODIOUI_API UModioEditableTextBox : public UEditableTextBox, public IModioUIStringInputWidget, public IModioUITextValidator
+class MODIOUI_API UModioEditableTextBox : public UEditableTextBox,
+										  public IModioUIStringInputWidget,
+										  public IModioUITextValidator
 {
 	GENERATED_BODY()
 
@@ -52,7 +70,7 @@ protected:
 	}
 
 	virtual void NativeSetValidationError(FText ErrorText) override;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Data Validation")
 	bool bValidateInput = false;
 
@@ -63,14 +81,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Data Validation",
 			  meta = (EditCondition = "bValidateInput", EditConditionHides))
 	bool bDisplayValidationErrors = false;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioEditableTextBoxStyle"), Category="Widgets")
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioEditableTextBoxStyle"), Category = "Widgets")
 	FModioUIStyleRef TextBoxStyle = FModioUIStyleRef {"DefaultEditableTextBoxStyle"};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category = "Widgets")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 
 	TSharedPtr<SVerticalBox> MyVerticalBox;
 	TSharedPtr<SModioRichTextBlock> MyErrorTextBlock;
-
 };

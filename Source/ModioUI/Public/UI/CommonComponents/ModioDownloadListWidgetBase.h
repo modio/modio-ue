@@ -8,15 +8,24 @@
 
 #include "ModioDownloadListWidgetBase.generated.h"
 
+/**
+* Modio UI element that wraps a list of elements to download in a queue
+**/
 UCLASS()
 class MODIOUI_API UModioDownloadListWidgetBase : public UModioUserWidgetBase, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 	
 public:
+	/**
+	* Stored property pointer to a list of views to use as a queue
+	**/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
 	UModioListView* QueueList;
-
+	
+	/**
+	* Change the visibility status of the Modio Dialog
+	**/
 	void SetStatusLabelVisibility(ESlateVisibility StatusLabelVisibility)
 	{
 		if (StatusString)
@@ -25,6 +34,9 @@ public:
 		}
 	}
 
+	/**
+	* Update the elements contained in the Modio Dialog
+	**/
 	void UpdateListItems(TArray<UModioModInfoUI*> ModInfoList)
 	{
 		QueueList->SetListItems(ModInfoList);

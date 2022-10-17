@@ -157,6 +157,12 @@ public:
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
 	static FModioInitializeOptions SetPortal(const FModioInitializeOptions& Options, EModioPortal PortalToUse);
 
+	/**
+	 * @brief Changes the session identifier for the provided set of initialization options
+	 * @param Options - The template initialization options
+	 * @param SessionIdentifier - The new session id to use
+	 * @return New Initialization Options object with the session identifier set to the desired value
+	**/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options,
 														const FString& SessionIdentifier);

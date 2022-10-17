@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -19,10 +27,10 @@ protected:
 	UWidget* CachedMenuTitleContentWidget;
 
 	/// @brief Displayed on the associated menu bar
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText MenuName;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UUserWidget> TitleContentClass;
 
 public:

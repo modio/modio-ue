@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -8,8 +16,9 @@
 #include "ModioNamedGlyphMaterialParams.generated.h"
 
 /**
- * 
- */
+* Class definition that stores a glyph name and provides a material interface associated
+* to that property
+**/
 UCLASS()
 class MODIOUI_API UModioNamedGlyphMaterialParams : public UModioProceduralBrushParams
 {
@@ -19,8 +28,15 @@ protected:
 	TArray<FString> GetValidGlyphNames();
 
 public:
+	/**
+	* Retrieve the material for this glyph 
+	* @return UMaterialInterface glyph instance used
+	**/
 	UMaterialInterface* GetMaterialInstance() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (GetOptions = "GetValidGlyphNames"), Category="Widget")
+	/**
+	* Stored property of the glyph name
+	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (GetOptions = "GetValidGlyphNames"), Category = "Widget")
 	FName GlyphName;
 };

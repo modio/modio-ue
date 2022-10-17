@@ -1,9 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/CommonComponents/ModioTabBar.h"
 #include "Algo/Transform.h"
-#include "PropertyPathHelpers.h"
 #include "Blueprint/WidgetTree.h"
+#include "PropertyPathHelpers.h"
 #include "UI/BaseWidgets/Slate/SModioRichTextBlock.h"
 #include "UI/BaseWidgets/Slate/SModioTileView.h"
 #include "UI/Styles/ModioButtonStyle.h"
@@ -29,7 +37,7 @@ TSharedRef<SWidget> UModioTabBar::RebuildWidget()
 void UModioTabBar::ReleaseSlateResources(bool bReleaseChildren)
 {
 	MyListView.Reset();
-	
+
 	Super::ReleaseSlateResources(bReleaseChildren);
 }
 
@@ -66,31 +74,30 @@ TSharedRef<ITableRow> UModioTabBar::OnGenerateTabButton(TSharedPtr<FText> TabNam
 	{
 		int ActiveTabIndex = GEngine->GetEngineSubsystem<UModioUISubsystem>()->GetActiveTabIndex();
 
-		for(int i = 0; i < TabNames.Num(); i++)
+		for (int i = 0; i < TabNames.Num(); i++)
 		{
 			if (!TabNames[i].EqualTo(*TabName.Get()))
 				continue;
-			
+
 			if (i == ActiveTabIndex)
 			{
-				ApplyStyle(TabButtonStyle,RowTextBlock, RowButton);
+				ApplyStyle(TabButtonStyle, RowTextBlock, RowButton);
 				break;
 			}
 
-			ApplyStyle(InactiveTabButtonStyle,RowTextBlock, RowButton);
+			ApplyStyle(InactiveTabButtonStyle, RowTextBlock, RowButton);
 		}
-		
 	}
-	TableRow->SetPadding(FMargin(24,24,24,24));
-	
+	TableRow->SetPadding(FMargin(24, 24, 24, 24));
+
 	return TableRow;
 }
 
 FReply UModioTabBar::OnTabClicked(TSharedPtr<FText> TabName)
 {
-	const FText Tab = TabName.IsValid() ? *TabName: FText::GetEmpty();
+	const FText Tab = TabName.IsValid() ? *TabName : FText::GetEmpty();
 
-	for(int i = 0; i < TabNames.Num(); i++)
+	for (int i = 0; i < TabNames.Num(); i++)
 	{
 		if (TabNames[i].EqualTo(Tab))
 		{
@@ -102,11 +109,12 @@ FReply UModioTabBar::OnTabClicked(TSharedPtr<FText> TabName)
 			}
 		}
 	}
-	
+
 	return FReply::Handled();
 }
 
-void UModioTabBar::ApplyStyle(const FModioUIStyleRef& Style, TSharedPtr<SModioRichTextBlock> RichTextBox, TSharedPtr<SButton> RowButton)
+void UModioTabBar::ApplyStyle(const FModioUIStyleRef& Style, TSharedPtr<SModioRichTextBlock> RichTextBox,
+							  TSharedPtr<SButton> RowButton)
 {
 	const FModioButtonStyle* ResolvedButtonStyle = Style.FindStyle<FModioButtonStyle>();
 	if (ResolvedButtonStyle)
@@ -119,15 +127,15 @@ void UModioTabBar::ApplyStyle(const FModioUIStyleRef& Style, TSharedPtr<SModioRi
 			RichTextBox.Get()->SetDecoratorStyleSet(ResolvedRichTextStyleSet);
 			if (ResolvedRichTextStyleSet->HasWidgetStyle<FTextBlockStyle>(FName("Default")))
 			{
-				RichTextBox.Get()->SetTextStyle(ResolvedRichTextStyleSet->GetWidgetStyle<FTextBlockStyle>(FName("Default")));
+				RichTextBox.Get()->SetTextStyle(
+					ResolvedRichTextStyleSet->GetWidgetStyle<FTextBlockStyle>(FName("Default")));
 			}
 			RichTextBox.Get()->ReapplyStyle();
 		}
-		
+
 		RowButton->SetButtonStyle(&ResolvedButtonStyle->ButtonStyle);
 	}
 }
-
 
 void UModioTabBar::UpdateBoundValues()
 {

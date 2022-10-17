@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "UI/Interfaces/IModioUINotification.h"
 
 #include "Loc/BeginModioLocNamespace.h"
@@ -5,8 +15,8 @@
 #include "UI/Interfaces/IModioModInfoUIDetails.h"
 
 FModioNotificationParams UModioNotificationParamsLibrary::CreateErrorNotificationParams(FModioErrorCode StatusCode,
-                                                                                        const FText& SuccessText,
-                                                                                        const FText& ErrorText)
+																						const FText& SuccessText,
+																						const FText& ErrorText)
 {
 	FModioNotificationParams NewParams;
 	NewParams.ErrorCode = StatusCode;
@@ -23,13 +33,13 @@ FModioNotificationParams UModioNotificationParamsLibrary::CreateRatingNotificati
 									  LOCTEXT("RatingSubmissionFailed", "Rating submission failed."));
 	if (ModInfo.GetObject())
 	{
-		NewParams.NamedTextFormats.Add("MessageText") = FText::FromString(ModInfo->Execute_GetFullModInfo(ModInfo.GetObject()).ProfileName);
+		NewParams.NamedTextFormats.Add("MessageText") =
+			FText::FromString(ModInfo->Execute_GetFullModInfo(ModInfo.GetObject()).ProfileName);
 	}
 	return NewParams;
 }
 
-FModioNotificationParams UModioNotificationParamsLibrary::CreateSubscriptionNotification(
-	FModioErrorCode StatusCode)
+FModioNotificationParams UModioNotificationParamsLibrary::CreateSubscriptionNotification(FModioErrorCode StatusCode)
 {
 	FModioNotificationParams NewParams =
 		CreateErrorNotificationParams(StatusCode, LOCTEXT("SubscriptionSuccess", "Subscription Added!"),

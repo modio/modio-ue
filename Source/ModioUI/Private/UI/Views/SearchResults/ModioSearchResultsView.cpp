@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "UI/Views/SearchResults/ModioSearchResultsView.h"
 #include "Algo/Accumulate.h"
 #include "Core/Input/ModioInputKeys.h"
@@ -11,6 +21,7 @@ void UModioSearchResultsView::NativeOnInitialized()
 
 	Super::NativeOnInitialized();
 	IModioUIModInfoReceiver::Register<UModioSearchResultsView>(EModioUIModInfoEventType::ListAllMods);
+	
 	if (RefineSearchButton)
 	{
 		RefineSearchButton->OnClicked.AddDynamic(this, &UModioSearchResultsView::OnRefineSearchButtonClicked);
@@ -63,6 +74,15 @@ void UModioSearchResultsView::NativeOnInitialized()
 		SortBy->SetComboBoxEntries(MenuEntries);
 	}
 }
+
+FReply UModioSearchResultsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+	FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(), EFocusCause::Navigation);
+
+
+	return FReply::Handled();
+}
+
 
 void UModioSearchResultsView::OnSelectionChanged(FModioUIAction ModioUIAction, ESelectInfo::Type Arg)
 {

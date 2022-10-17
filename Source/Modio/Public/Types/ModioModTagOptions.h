@@ -22,35 +22,66 @@ namespace Modio
 }
 
 #if CPP
-// Native version of FModioModTagOptions
+/**
+* Strong type struct to wrap multiple ModTagInfo indexed by a paged result
+**/
 struct MODIO_API FModioModTagOptions : public FModioPagedResult, public FModioList<TArray, FModioModTagInfo>
 {
+	/**
+	* Default constructor without parameters
+	**/
 	FModioModTagOptions() = default;
+	
+	/**
+	* Copy constructor with a mod tag options parameter
+	* @param ModTagOptions Value that has mod tag options
+	**/
 	FModioModTagOptions(const Modio::ModTagOptions& ModInfoList);
 };
 
 #else
-// Blueprint mirror of FModioModTagOptions that's flattened as blueprints don't understand either template classes or
-// multiple inheritance
+/** 
+* Strong type struct to wrap multiple ModTagInfo indexed by a paged result
+**/
 USTRUCT(NoExport, BlueprintType)
 struct MODIO_API FModioModTagOptions
 {
+	/**
+	* Stored property to a paged result that indexes the current list of tag info
+	**/
 	UPROPERTY()
 	FModioPagedResult PagedResult;
 
+	/**
+	* List wrapping multiple mod tag info 
+	**/
 	UPROPERTY()
 	TArray<FModioModTagInfo> InternalList;
 };
 
 #endif
 
+/**
+* Strong type struct that wraps mod tag options in a optional value
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModTagOptions
 {
 	GENERATED_BODY()
 
+	/**
+	* Default constructor without parameters
+	**/
 	FModioOptionalModTagOptions() = default;
+	
+	/**
+	* Constructor with mod tag options parameter
+	* @param ModTagOptions An optional value that has mod tag options
+	**/
 	FModioOptionalModTagOptions(TOptional<FModioModTagOptions>&& ModTagOptions);
 
+	/**
+	* The stored property of mod tag options
+	**/
 	TOptional<FModioModTagOptions> Internal;
 };

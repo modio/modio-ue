@@ -1,10 +1,19 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioPopupMenu.h"
 #include "Core/Input/ModioInputKeys.h"
 #include "UI/BaseWidgets/ModioDefaultPopupMenuContent.h"
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/Interfaces/IModioUIPopupMenuContentWidget.h"
+#include "UI/Styles/ModioPopupMenuStyle.h"
 
 void UModioPopupMenu::SynchronizeProperties()
 {
@@ -25,7 +34,7 @@ UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 		{
 			IModioUIPopupMenuContentWidget::Execute_SetMenuEntries(ConcreteWidget, CurrentEntries);
 			IModioUIPopupMenuContentWidget::Execute_SetDesiredSize(ConcreteWidget, ActualSize);
-			
+			IModioUIPopupMenuContentWidget::Execute_SetStyle(ConcreteWidget, PopupMenuStyle);
 			
 			if (IModioUIPopupMenuContentWidget* Interface = Cast<IModioUIPopupMenuContentWidget>(ConcreteWidget))
 			{
@@ -43,12 +52,15 @@ UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 		{
 			IModioUIPopupMenuContentWidget::Execute_SetMenuEntries(ConcreteWidget, CurrentEntries);
 			IModioUIPopupMenuContentWidget::Execute_SetDesiredSize(ConcreteWidget, ActualSize);
+			IModioUIPopupMenuContentWidget::Execute_SetStyle(ConcreteWidget, PopupMenuStyle);
+
 			// This below function isn't part of the UInterface so doesn't use the Execute_ method
 			if (IModioUIPopupMenuContentWidget* Interface = Cast<IModioUIPopupMenuContentWidget>(ConcreteWidget))
 			{
 				Interface->GetContentCloseDelegate().BindUObject(this, &UModioPopupMenu::OnContentClose);
 			}
 		}
+
 		return ConcreteWidget;
 	}
 }

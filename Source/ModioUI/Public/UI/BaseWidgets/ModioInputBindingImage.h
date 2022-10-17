@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -16,8 +24,8 @@ DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(ESlateVisibility, FGetVisibilityForInpu
 										 InputMode);
 
 /**
- *
- */
+* Class definition that links images to a binding input
+**/
 UCLASS()
 class MODIOUI_API UModioInputBindingImage : public UModioImage,
 											public IModioInputMappingAccessor,
@@ -32,7 +40,7 @@ protected:
 
 	void UpdateBrushImage(EModioUIInputMode InputDevice);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FKey KeyToShow;
 
 	EModioUIInputMode LastDeviceType = EModioUIInputMode::Unknown;
@@ -41,13 +49,24 @@ protected:
 
 public:
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	/**
+	* Stored property to the input mode to use
+	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	EModioUIInputMode PreviewMode;
 #endif
 
-	UFUNCTION(BlueprintCallable, Category="ModioInputBindingImage")
+	/**
+	* Update the input key binding
+	* @param NewKey Update key to store in this class
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioInputBindingImage")
 	void SetKeyToShow(FKey NewKey);
-	
-	UFUNCTION(BlueprintCallable, Category="ModioInputBindingImage")
+
+	/**
+	* Retrieve the delegate to the input mode
+	* @return The delegate used as input mode
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioInputBindingImage")
 	FGetVisibilityForInputModeDelegate& GetInputModeVisibilityDelegate();
 };

@@ -1,5 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 #pragma once
 
 #include "Components/MenuAnchor.h"
@@ -30,27 +37,32 @@ protected:
 
 	void OnContentClose();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText ButtonLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TEnumAsByte<ETextJustify::Type> ButtonLabelJustification = ETextJustify::Center;
 
 	UPROPERTY(Transient)
 	class UModioRichTextButton* MenuButton;
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild),
+			  Category = "Widgets")
 	FModioUIStyleRef ButtonStyle = FModioUIStyleRef {"DefaultButtonStyle"};
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioPopupMenuStyle", DesignerRebuild),Category = "Widgets")
+	FModioUIStyleRef PopupMenuStyle = FModioUIStyleRef {"DefaultPopupMenuStyle"};
 
 	UFUNCTION(BlueprintCallable, Category="ModioPopupMenu")
 	void SetMenuEntries(FModioUIMenuCommandList Entries);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUIPopupMenuContentWidget"), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUIPopupMenuContentWidget"),
+			  Category = "Widgets")
 	TSubclassOf<UUserWidget> MenuContentWidgetClass;
 
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool bPreviewOpened = false;
 #endif
 };

@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioComboBoxString.h"
 
@@ -52,7 +60,7 @@ TSharedRef<SWidget> UModioComboBoxString::RebuildWidget()
 							  SModioComboBox<TSharedPtr<FString>>::FOnSelectionChanged, HandleSelectionChanged))
 						  .OnComboBoxOpening(BIND_UOBJECT_DELEGATE(FOnComboBoxOpening, HandleOpening))
 						  .Placement(Placement)
-							.Method(bCreateNewWindow? EPopupMethod::CreateNewWindow : EPopupMethod::UseCurrentWindow)
+						  .Method(bCreateNewWindow ? EPopupMethod::CreateNewWindow : EPopupMethod::UseCurrentWindow)
 						  .IsFocusable(bIsFocusable)[SAssignNew(ComboBoxContent, SBox)];
 	MyComboBox = MyModioComboBox;
 	if (InitialIndex != -1)
@@ -90,19 +98,19 @@ void UModioComboBoxString::SynchronizeProperties()
 
 	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
 	// Could we load the default style set?
-	//FComboBoxStyle* ResolvedComboBoxStyle = nullptr;
+	// FComboBoxStyle* ResolvedComboBoxStyle = nullptr;
 	FModioWidgetBorderStyle* ResolvedMenuBorderStyle = nullptr;
 	FModioWidgetBorderStyle* ResolvedButtonBorderStyle = nullptr;
 	if (Settings && !Settings->DefaultStyleSet.IsNull())
 	{
 		UModioUIStyleSet* DefaultStyle = Settings->DefaultStyleSet.LoadSynchronous();
-		//ResolvedComboBoxStyle = &DefaultStyle->DefaultComboBoxStyle.ComboBoxStyle;
+		// ResolvedComboBoxStyle = &DefaultStyle->DefaultComboBoxStyle.ComboBoxStyle;
 		ResolvedMenuBorderStyle = &DefaultStyle->DefaultComboBoxStyle.MenuBorderStyle;
 		ResolvedButtonBorderStyle = &DefaultStyle->DefaultComboBoxStyle.ButtonBorderStyle;
 	}
 	else
 	{
-		//ResolvedComboBoxStyle = &WidgetStyle;
+		// ResolvedComboBoxStyle = &WidgetStyle;
 	}
 
 	if (ResolvedMenuBorderStyle && ResolvedMenuBorderStyle->bMaskWithMaterial)

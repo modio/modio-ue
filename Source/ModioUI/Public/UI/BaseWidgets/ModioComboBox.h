@@ -1,24 +1,32 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/ComboBox.h"
+#include "CoreMinimal.h"
 
 #include "ModioComboBox.generated.h"
 
 /**
- * 
- */
+* Modio UI element that represents a combo box, in other words
+* a menu of elements with a certain placement
+**/
 UCLASS()
 class MODIOUI_API UModioComboBox : public UComboBox
 {
 	GENERATED_BODY()
-	
-	protected:
 
+protected:
 	virtual void SynchronizeProperties() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TEnumAsByte<EMenuPlacement> MenuPlacement;
 };

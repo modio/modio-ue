@@ -22,9 +22,9 @@ FModioFilterParams& UModioFilterParamsLibrary::NameContains(FModioFilterParams& 
 }
 
 FModioFilterParams& UModioFilterParamsLibrary::NameContainsStrings(FModioFilterParams& Filter,
-																   const FString& SearchString)
+																   const TArray<FString>& SearchStrings)
 {
-	return Filter.NameContains(SearchString);
+	return Filter.NameContains(SearchStrings);
 }
 
 FModioFilterParams& UModioFilterParamsLibrary::MarkedLiveAfter(FModioFilterParams& Filter, FDateTime LiveAfter)

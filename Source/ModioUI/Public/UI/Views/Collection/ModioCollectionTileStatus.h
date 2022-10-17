@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -10,9 +18,11 @@
 #include "UI/CommonComponents/ModioModManagementWidgetBase.h"
 
 #include "ModioCollectionTileStatus.generated.h"
+
 /**
- *
- */
+* Modio derived ModioModManagement class that provides a progress status for an operation
+* with different labels according to the updates received
+**/
 UCLASS()
 class MODIOUI_API UModioCollectionTileStatus : public UModioModManagementWidgetBase
 {
@@ -24,24 +34,24 @@ protected:
 	void NativeOnSetDataSource() override;
 
 	void SetPercent(float InPercent);
-	
+
 	// These could possibly be moved into the global style
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText PendingLabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText DownloadingLabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText ExtractingLabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText SubscribedLabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* StatusText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioProgressBar* ProgressBar;
 
 	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;

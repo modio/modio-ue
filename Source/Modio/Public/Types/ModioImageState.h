@@ -12,12 +12,22 @@
 
 #include "ModioImageState.generated.h"
 
-
+/**
+* Enumerator to represent the possible states the image data
+* can be, from hard drive to corrupted
+**/
 UENUM(BlueprintType)
 enum class EModioImageState : uint8
 {
+	/** Image data is located on hard drive **/
 	OnDisc,
+
+	/** Image data is transferring to a memory location **/
 	LoadingIntoMemory,
+
+	/** Image data is located in memory **/
 	InMemory,
+
+	/** Image data is not readable **/
 	Corrupted
 };

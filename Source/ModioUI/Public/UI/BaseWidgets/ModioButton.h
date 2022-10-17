@@ -1,13 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
 #include "Components/Button.h"
 #include "CoreMinimal.h"
 #include "Delegates/DelegateCombinations.h"
+#include "UI/Styles/ModioUIStyleRef.h"
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "UI/Styles/ModioWidgetBorderStyle.h"
-#include "UI/Styles/ModioUIStyleRef.h"
 
 #include "ModioButton.generated.h"
 
@@ -30,7 +38,8 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category = "Data Binding")
 	FOnSetLabel OnSetLabel;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere, meta=(StyleClass="ModioButtonStyle", DesignerRebuild), Category="Appearance")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild),
+			  Category = "Appearance")
 	FModioUIStyleRef ButtonStyle = FModioUIStyleRef {"DefaultButtonStyle"};
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Appearance",
@@ -42,19 +51,18 @@ protected:
 
 
 	virtual void ApplyStyle();
-	#if WITH_EDITOR
+#if WITH_EDITOR
 	virtual void PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent) override;
-	#endif
+#endif
 public:
-	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Appearance")
 	bool bOverrideGlobalStyle = false;
 
 	// this should be a container of styles, and we store one of those globally
 
-	UFUNCTION(BlueprintCallable, Category="ModioButton")
+	UFUNCTION(BlueprintCallable, Category = "ModioButton")
 	void SetLabel(FText NewLabel);
 
-	UFUNCTION(BlueprintCallable, Category="ModioButton")
+	UFUNCTION(BlueprintCallable, Category = "ModioButton")
 	void SetButtonStyle(FModioUIStyleRef ButtonStyleRef, bool bApplyStyle = false);
 };

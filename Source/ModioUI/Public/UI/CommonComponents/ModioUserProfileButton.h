@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -14,10 +22,11 @@
 
 #include "ModioUserProfileButton.generated.h"
 
+// TODO: Needs to know about login/logout events
 /**
- *
- */
-// Needs to know about login/logout events
+* Class definition of a Modio user profile button, which contains references 
+* to a profile image, a progress bar, and the associated user
+**/
 UCLASS()
 class MODIOUI_API UModioUserProfileButton : public UModioModManagementWidgetBase,
 											public IModioUIUserChangedReceiver,
@@ -34,26 +43,26 @@ protected:
 	virtual void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
 	TOptional<FModioUser> CurrentUser;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioCircularProgressBar* DownloadProgressIndicator;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioButton* ProfileButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioImage* ProfileImage;
 
 	// To stop the material being GC'd while in use
 	UPROPERTY(Transient)
 	UMaterialInterface* GCMaterial;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UMaterialInterface> UserBrushMaterial;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UMaterialInterface> NoUserBrushMaterial;
 
-	UPROPERTY(EditAnywhere, Category="Widgets")
+	UPROPERTY(EditAnywhere, Category = "Widgets")
 	FName ProfileTextureParameterName = "WidgetTexture";
 
 	void NativeDestruct() override;

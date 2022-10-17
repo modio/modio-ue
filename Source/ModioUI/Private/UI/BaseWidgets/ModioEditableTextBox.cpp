@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioEditableTextBox.h"
 #include "Libraries/ModioSDKLibrary.h"
@@ -157,7 +165,7 @@ void UModioEditableTextBox::NativeSetValidationError(FText ErrorText)
 			.Padding(0, 8, 0, 0)[SAssignNew(MyErrorTextBlock, SModioRichTextBlock)
 									 .Text(ErrorText)
 									 .WrapTextAt(700)
-									 .StyleReference(&TextStyle)
+									 //.StyleReference(&TextStyle)
 									 .TextStyle(ErrorTextBlockStyle)];
 	}
 	else

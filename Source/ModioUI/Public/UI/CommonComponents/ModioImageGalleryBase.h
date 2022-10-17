@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -40,28 +48,28 @@ protected:
 
 	virtual UWidget* GenerateContentWidget();
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category = "Widgets")
 	FOnDisplayImage OnDisplayImage;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category = "Widgets")
 	FGetWidget OnConstructWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (IsBindableEvent = "True"), Category = "Widgets")
 	FGetInt32 OnGetItemCount;
 
 	/// @brief Widget class to wrap as the images in this gallery. Bind OnConstructWidget if you want to do something
 	/// else
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = ModioUIImageDisplay), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = ModioUIImageDisplay), Category = "Widgets")
 	TSubclassOf<UUserWidget> ImageWidgetClass;
 	int32 CurrentImageIndex = 0;
 
 public:
-	UFUNCTION(BlueprintCallable, Category="ModioImageGalleryBase")
+	UFUNCTION(BlueprintCallable, Category = "ModioImageGalleryBase")
 	void DisplayGalleryImageAtIndex(EModioUIDirection Direction, int32 DirectIndex = -1);
-	UFUNCTION(BlueprintCallable, Category="ModioImageGalleryBase")
+	UFUNCTION(BlueprintCallable, Category = "ModioImageGalleryBase")
 	void ResetGallery();
 
-	UFUNCTION(BlueprintCallable, Category="ModioImageGalleryBase")
+	UFUNCTION(BlueprintCallable, Category = "ModioImageGalleryBase")
 	void RefreshCurrentImage();
 
 	virtual FOnDisplayImage& GetImageDisplayDelegate()

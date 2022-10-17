@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "UI/Views/Collection/ModioCollectionView.h"
 #include "Algo/Transform.h"
 #include "Core/ModioModCollectionEntryUI.h"
@@ -246,6 +256,13 @@ void UModioCollectionView::OnSearchTextUpdated(const FText& NewText)
 void UModioCollectionView::OnModGroupChanged(FText SelectedItem, ESelectInfo::Type SelectionType)
 {
 	ApplyFiltersToCollection();
+}
+
+FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+	return FReply::Handled()
+		.SetNavigation(CollectionList->TakeWidget(), ENavigationGenesis::User)
+		.SetUserFocus(CollectionList->TakeWidget(), EFocusCause::SetDirectly);
 }
 
 #include "Loc/EndModioLocNamespace.h"

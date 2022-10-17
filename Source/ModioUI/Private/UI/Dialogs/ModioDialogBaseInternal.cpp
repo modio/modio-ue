@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
 
@@ -119,6 +127,7 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 					.ListItemsSource(&ButtonParams)
 					.ItemHeight(0)
 					.ItemWidth(0)
+					.IsFocusable(true)
 					.Visibility_UObject(this, &UModioDialogBaseInternal::GetButtonListVisibility)
 					.OnGenerateTile_UObject(this, &UModioDialogBaseInternal::OnGenerateButton)
 				]
@@ -137,6 +146,13 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 		[
 			SNullWidget::NullWidget
 		];
+
+		
+	if (!bUsingCustomButtons) {
+		auto Button = DialogButtons->GetChildren()->GetChildAt(0);
+		FSlateApplication::Get().SetUserFocus(0, Button, EFocusCause::SetDirectly);
+	}
+
 
 	return DialogInternalRoot.ToSharedRef();
 	// clang-format on
@@ -363,17 +379,31 @@ TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 {
 	TSharedPtr<SButton> RowButton;
 	TSharedPtr<SModioRichTextBlock> RowTextBlock;
+	#if UE_VERSION_NEWER_THAN(5,0,0)
+	// UE5 changes the default FTableRowStyle to have a black background, grr
+	static FTableRowStyle StyleOverride = FCoreStyle::Get().GetWidgetStyle<FTableRowStyle>("TableView.Row");
+	StyleOverride.SetEvenRowBackgroundBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
+		.SetOddRowBackgroundBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
+		.SetEvenRowBackgroundHoveredBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
+		.SetOddRowBackgroundHoveredBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)));
+	#endif
 	// clang-format off
 	TSharedRef<STableRow<TSharedPtr<FText>>> TableRow = SNew(STableRow<TSharedPtr<FText>>, OwnerTableView)
+	#if UE_VERSION_NEWER_THAN(5,0,0) 
+		// Hacky, but Epic don't let you set a style on an STableRow post-construction, extra grr
+		.Style(&StyleOverride)
+	#endif 
 		.Content()
 		[
 			SAssignNew(RowButton, SButton)
 			.OnClicked_UObject(this, &UModioDialogBaseInternal::OnButtonClicked, ButtonInfo)
 			.HAlign(HAlign_Center)
 			.VAlign(VAlign_Center)
+			.IsFocusable(true)
 			.ContentPadding(FMargin(16, 4,16, 2))
 			[
-				SAssignNew(RowTextBlock, SModioRichTextBlock).Text(ButtonInfo->ButtonLabel).StyleReference_UObject(this, &UModioDialogBaseInternal::GetButtonTextStyle)
+				SAssignNew(RowTextBlock, SModioRichTextBlock).Text(ButtonInfo->ButtonLabel)
+				.StyleReference_UObject(this, &UModioDialogBaseInternal::GetButtonTextStyle)
 			]
 		];
 	// clang-format on
@@ -388,6 +418,7 @@ TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 		}
 	}
 	TableRow->SetPadding(16.f);
+
 	return TableRow;
 }
 
@@ -618,6 +649,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 			}
 		}
 	}
+
 	ApplyStyling();
 }
 

@@ -1,4 +1,15 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
+
 #include "Delegates/DelegateCombinations.h"
 #include "Types/ModioFilterParams.h"
 #include "UObject/Interface.h"
@@ -36,7 +47,7 @@ protected:
 
 	bool bRoutedSearchSettingsChanged = false;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIRefineSearchWidget")
 	void NotifySettingsChanged(const FModioFilterParams& SearchSettings);
 
 	void NotifySettingsChanged_Implementation(const FModioFilterParams& SearchSettings)
@@ -50,7 +61,7 @@ protected:
 	virtual FOnSearchSettingsChanged& NativeGetOnSettingsChangedDelegate() = 0;
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIRefineSearchWidget")
 	FString GetSearchString();
 
 	FString GetSearchString_Implementation()
@@ -58,7 +69,7 @@ public:
 		return NativeGetSearchString();
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIRefineSearchWidget")
 	TArray<FString> GetSelectedTagValues();
 
 	TArray<FString> GetSelectedTagValues_Implementation()
@@ -66,7 +77,7 @@ public:
 		return NativeGetSelectedTagValues();
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIRefineSearchWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIRefineSearchWidget")
 	void RefreshTags();
 
 	void RefreshTags_Implementation()

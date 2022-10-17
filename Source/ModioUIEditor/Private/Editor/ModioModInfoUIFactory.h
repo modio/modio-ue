@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 #if WITH_EDITOR
@@ -41,9 +49,10 @@ protected:
 	bool bRequiresSDKShutdown = false;
 	TArray<TSharedPtr<FModioModInfo>> ModInfos;
 	TSharedPtr<SWindow> ImportWindow;
-	TSharedPtr<SListView<TSharedPtr<FModioModInfo> > > AvailableModInfoList;
+	TSharedPtr<SListView<TSharedPtr<FModioModInfo>>> AvailableModInfoList;
 	TSharedPtr<FModioModInfo> SelectedItem;
 	bool bConfirmClicked = false;
+
 public:
 	UModioModInfoUIFactory(const FObjectInitializer& ObjectInitializer);
 
@@ -63,7 +72,8 @@ public:
 	EVisibility IsListVisible() const;
 	bool IsModInfoSelected() const;
 	void OnSelectionChanged(TSharedPtr<FModioModInfo> Item, ESelectInfo::Type);
-	TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FModioModInfo> Item, const TSharedRef<class STableViewBase>& OwnerTable);
+	TSharedRef<ITableRow> OnGenerateRowForList(TSharedPtr<FModioModInfo> Item,
+											   const TSharedRef<class STableViewBase>& OwnerTable);
 };
 
 #endif

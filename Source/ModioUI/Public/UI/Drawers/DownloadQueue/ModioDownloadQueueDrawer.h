@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Algo/Transform.h"
@@ -15,6 +25,10 @@
 
 #include "ModioDownloadQueueDrawer.generated.h"
 
+/**
+* Modio UI element that represents a download queue, which displays 
+* the current mods being processed
+**/
 UCLASS()
 class MODIOUI_API UModioDownloadQueueDrawer : public UModioUserWidgetBase,
 											  public IModioUIUserChangedReceiver,
@@ -27,7 +41,7 @@ protected:
 		IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
 		IModioUIDownloadQueueWidget::Execute_DisplayUserInfo(this, FModioOptionalUser {NewUser});
 	}
-	
+
 	virtual void NativeOnInitialized()
 	{
 		IModioUIUserChangedReceiver::Register<UModioDownloadQueueDrawer>();
@@ -35,7 +49,7 @@ protected:
 		{
 			LogOutButton->OnClicked.AddDynamic(this, &UModioDownloadQueueDrawer::OnLogoutClicked);
 		}
-		
+
 		if (CurrentOpProgress)
 		{
 			CurrentOpProgress->OperationCompletedDelegate().BindDynamic(
@@ -47,7 +61,7 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	{
 		Super::NativeTick(MyGeometry, InDeltaTime);
-		
+
 		// We might want to move this into the actual Download progress widget itself?
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
@@ -57,7 +71,7 @@ protected:
 			}
 		}
 	}
-	
+
 	UFUNCTION()
 	void OnLogoutClicked()
 	{
@@ -76,28 +90,28 @@ protected:
 	TArray<UModioModInfoUI*> PendingDownloads;
 	TArray<UModioModInfoUI*> CompletedDownloads;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioUserProfileButton* ProfileIcon;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* UserLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ActivityText;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* StatusText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* LogOutButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioDownloadQueueOpProgress* CurrentOpProgress;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioDownloadListWidgetBase* OperationQueue;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioDownloadListWidgetBase* CompletedQueue;
 
 	/// @brief Shows the newly updated user as the profile badge, name etc
@@ -119,12 +133,24 @@ protected:
 			// ProfileIcon->NativeUserChanged(NewUser.Internal);
 		}
 	}
+
+	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override 
+	{
+		FSlateApplication::Get().SetUserFocus(0, LogOutButton->TakeWidget(), EFocusCause::SetDirectly);
+		return FReply::Handled();
+	}
+
 	/// @brief Notifies the widget to fetch the current op and any queued ops for display, is this necessary?
 	virtual void NativeRefreshDownloadQueue() override
 	{
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
 			TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+
+			// Early out if we do not find any subscriptions
+			if (UserSubscriptions.Num() == 0) {
+				return;
+			}
 
 			if (TOptional<FModioModProgressInfo> CurrentProgress = Subsystem->QueryCurrentModUpdate())
 			{
@@ -199,7 +225,7 @@ protected:
 					});
 
 				OperationQueue->UpdateListItems(PendingDownloads);
-				
+
 				// Rebuild the Completed Downloads list
 				CompletedDownloads.Empty();
 
@@ -212,12 +238,11 @@ protected:
 						if (UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 						{
 							return ((Entry.GetModState() == EModioModState::Installed) &&
-								UISubsystem->ModsDownloadedThisSession.Contains(Entry.GetID()));
+									UISubsystem->ModsDownloadedThisSession.Contains(Entry.GetID()));
 						}
 						return false;
 					},
 					[](FModioModCollectionEntry Entry) {
-						
 						UModioModInfoUI* EntryWrapper = NewObject<UModioModInfoUI>();
 						if (EntryWrapper)
 						{
@@ -226,7 +251,6 @@ protected:
 						return EntryWrapper;
 					});
 
-				
 				CompletedQueue->UpdateListItems(CompletedDownloads);
 			}
 		}

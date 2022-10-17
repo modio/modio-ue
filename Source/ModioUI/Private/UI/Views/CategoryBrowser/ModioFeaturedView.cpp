@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/Views/CategoryBrowser/ModioFeaturedView.h"
 #include "Algo/Transform.h"
@@ -26,7 +34,7 @@ void UModioFeaturedView::NativeBeginLoadExternalData()
 void UModioFeaturedView::OnAdditionalCategoryCreated(UUserWidget& CategoryWidget)
 {
 	UModioFeaturedCategory* RealCategory = Cast<UModioFeaturedCategory>(&CategoryWidget);
-	RealCategory->OnCategorySelectionChanged().AddDynamic(this, &UModioFeaturedView::CategorySelectionChanged);
+	RealCategory->OnCategorySelectionChanged().AddUniqueDynamic(this, &UModioFeaturedView::CategorySelectionChanged);
 	FOnGetSelectionIndex SelectionIndexDelegate;
 	SelectionIndexDelegate.BindDynamic(this, &UModioFeaturedView::GetSelectionIndex);
 	RealCategory->SetSelectionIndexDelegate(SelectionIndexDelegate);
@@ -42,6 +50,7 @@ void UModioFeaturedView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	IModioUIModInfoReceiver::Register<UModioFeaturedView>(EModioUIModInfoEventType::ListAllMods);
+	IModioUIUserChangedReceiver::Register<UModioFeaturedView>();
 
 	if (PrimaryFeaturedCategoryLoader)
 	{
@@ -49,7 +58,7 @@ void UModioFeaturedView::NativeOnInitialized()
 			TScriptInterface<IModioUIAsyncOperationWidget>(this);
 		IModioUIAsyncHandlerWidget::Execute_LinkAsyncOperationWidget(PrimaryFeaturedCategoryLoader, InterfaceWrapper);
 	}
-	
+
 	if (FeaturedViewContent)
 	{
 		FeaturedViewContent->SetActualAsyncOperationWidget(TScriptInterface<IModioUIAsyncOperationWidget>(this));
@@ -75,16 +84,14 @@ void UModioFeaturedView::FetchPrimaryCategoryMods()
 				if (UModioModBrowserParams* ModBrowserParams = Settings->BrowserCategoryConfiguration.LoadSynchronous())
 				{
 					FModioFilterParams Filter = FModioFilterParams()
-												.WithTags(ModBrowserParams->PrimaryCategoryParams->Tags)
-												.WithoutTags(ModBrowserParams->PrimaryCategoryParams->ExcludedTags)
-												.SortBy(ModBrowserParams->PrimaryCategoryParams->SortField,
-														ModBrowserParams->PrimaryCategoryParams->Direction)
-												.IndexedResults(0, ModBrowserParams->PrimaryCategoryParams->Count);
-					Subsystem->RequestListAllMods(Filter, GetName().ToString());	
+													.WithTags(ModBrowserParams->PrimaryCategoryParams->Tags)
+													.WithoutTags(ModBrowserParams->PrimaryCategoryParams->ExcludedTags)
+													.SortBy(ModBrowserParams->PrimaryCategoryParams->SortField,
+															ModBrowserParams->PrimaryCategoryParams->Direction)
+													.IndexedResults(0, ModBrowserParams->PrimaryCategoryParams->Count);
+					Subsystem->RequestListAllMods(Filter, GetName().ToString());
 				}
-				
 			}
-			
 		}
 		else
 		{
@@ -102,7 +109,9 @@ FNavigationReply UModioFeaturedView::NativeOnNavigation(const FGeometry& InGeome
 
 FReply UModioFeaturedView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	return FReply::Handled().SetUserFocus(PrimaryFeaturedCategory->TakeWidget());
+	return FReply::Handled()
+		.SetNavigation(PrimaryFeaturedCategory->TakeWidget(), ENavigationGenesis::User)
+		.SetUserFocus(PrimaryFeaturedCategory->TakeWidget(), EFocusCause::SetDirectly);
 }
 
 int32 UModioFeaturedView::GetSelectionIndex()
@@ -133,6 +142,9 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 				return WrappedMod;
 			});
 			PrimaryFeaturedCategory->SetItems(CachedFeaturedItems);
+
+			FSlateApplication::Get().SetUserFocus(0, PrimaryFeaturedCategory->TakeWidget(), EFocusCause::SetDirectly);
+
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																	   EModioUIAsyncOperationWidgetState::Success);
 		}
@@ -162,4 +174,13 @@ void UModioFeaturedView::SynchronizeProperties()
 			}
 		}
 	}
+}
+
+// Regenerates mod tiles on log in / out to update subscribe button and subscription indicators
+void UModioFeaturedView::NativeUserChanged(TOptional<FModioUser> NewUser)
+{
+	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
+	FetchPrimaryCategoryMods();
+	AdditionalCategories->RegenerateAllEntries();
+	SynchronizeProperties();
 }

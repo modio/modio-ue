@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Engine/Engine.h"
@@ -46,12 +56,12 @@ protected:
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
 			Subsystem->OnDisplayModDetails.AddUObject(Cast<ImplementingType>(this),
-															&IModioUIModDetailsDisplay::HandleDisplayModDetails);
+													  &IModioUIModDetailsDisplay::HandleDisplayModDetails);
 			Subsystem->OnDisplayModDetailsForID.AddUObject(Cast<ImplementingType>(this),
-															&IModioUIModDetailsDisplay::HandleDisplayModDetailsForID);
+														   &IModioUIModDetailsDisplay::HandleDisplayModDetailsForID);
 		}
 	}
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIModDetailsDisplay")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIModDetailsDisplay")
 	void RegisterUserWidget(const TScriptInterface<IModioUIModDetailsDisplay>& DisplayWidget);
 	void RegisterUserWidget_Implementation(const TScriptInterface<IModioUIModDetailsDisplay>& DisplayWidget)
 	{
@@ -59,14 +69,14 @@ protected:
 		{
 			Subsystem->OnDisplayModDetails.AddUFunction(DisplayWidget.GetObject(), FName("HandleDisplayModDetails"));
 			Subsystem->OnDisplayModDetailsForID.AddUFunction(DisplayWidget.GetObject(),
-														FName("HandleDisplayModDetailsForID"));
+															 FName("HandleDisplayModDetailsForID"));
 		}
 	}
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIModDetailsDisplay")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIModDetailsDisplay")
 	void DisplayModDetails(const TScriptInterface<IModioModInfoUIDetails>& Details);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIModDetailsDisplay")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIModDetailsDisplay")
 	void DisplayModDetailsForID(const FModioModID& ModID);
 };

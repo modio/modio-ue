@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Algo/Transform.h"
@@ -26,7 +36,8 @@ struct MODIOUI_API FModioInputNames
 
 	static TArray<FName> GetAll()
 	{
-		return {Up, Down, Left, Right, Previous, Next, MoreOptions, RefineSearch, Confirm, Back, Subscribe, DownloadQueue};
+		return {Up,          Down,         Left,    Right, Previous,  Next,
+				MoreOptions, RefineSearch, Confirm, Back,  Subscribe, DownloadQueue};
 	}
 	static TArray<FString> GetAllStrings()
 	{
@@ -53,6 +64,7 @@ struct MODIOUI_API FModioInputKeys
 
 	static TArray<FKey> GetAll()
 	{
-		return {Up, Down, Left, Right, Previous, Next, MoreOptions, RefineSearch, Confirm, Back, Subscribe, DownloadQueue};
+		return {Up,          Down,         Left,    Right, Previous,  Next,
+				MoreOptions, RefineSearch, Confirm, Back,  Subscribe, DownloadQueue};
 	}
 };

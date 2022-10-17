@@ -1,39 +1,46 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
 
-void UModioDrawerControllerSlot::SynchronizeProperties() 
+void UModioDrawerControllerSlot::SynchronizeProperties()
 {
 	switch (Edge)
 	{
-	case EModioDrawerControllerSlotEdge::Top:
-		VerticalAlignment = VAlign_Top;
-		HorizontalAlignment = DrawerHorizontalAlignment;
-		break;
-	case EModioDrawerControllerSlotEdge::Bottom:
-		VerticalAlignment = VAlign_Bottom;
-		HorizontalAlignment = DrawerHorizontalAlignment;
-		break;
-	case EModioDrawerControllerSlotEdge::Left:
-		HorizontalAlignment = HAlign_Left;
-		VerticalAlignment = DrawerVerticalAlignment;
-		break;
-	case EModioDrawerControllerSlotEdge::Right:
-		HorizontalAlignment = HAlign_Right;
-		VerticalAlignment = DrawerVerticalAlignment;
-		break;
+		case EModioDrawerControllerSlotEdge::Top:
+			VerticalAlignment = VAlign_Top;
+			HorizontalAlignment = DrawerHorizontalAlignment;
+			break;
+		case EModioDrawerControllerSlotEdge::Bottom:
+			VerticalAlignment = VAlign_Bottom;
+			HorizontalAlignment = DrawerHorizontalAlignment;
+			break;
+		case EModioDrawerControllerSlotEdge::Left:
+			HorizontalAlignment = HAlign_Left;
+			VerticalAlignment = DrawerVerticalAlignment;
+			break;
+		case EModioDrawerControllerSlotEdge::Right:
+			HorizontalAlignment = HAlign_Right;
+			VerticalAlignment = DrawerVerticalAlignment;
+			break;
 	}
 
 	Super::SynchronizeProperties();
 	UpdateWidgetTransform();
 }
 
-
 #if WITH_EDITOR
 bool UModioDrawerControllerSlot::CanEditChange(const FProperty* InProperty) const
 {
-	if (InProperty && (InProperty->GetFName() == FName("HorizontalAlignment") || InProperty->GetFName() == FName("VerticalAlignment")))
+	if (InProperty && (InProperty->GetFName() == FName("HorizontalAlignment") ||
+					   InProperty->GetFName() == FName("VerticalAlignment")))
 	{
 		return false;
 	}
@@ -44,7 +51,7 @@ bool UModioDrawerControllerSlot::CanEditChange(const FProperty* InProperty) cons
 }
 
 PRAGMA_DISABLE_OPTIMIZATION
-void UModioDrawerControllerSlot::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) 
+void UModioDrawerControllerSlot::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	if (PropertyChangedEvent.GetPropertyName() == FName("bExpanded"))
@@ -63,7 +70,6 @@ PRAGMA_ENABLE_OPTIMIZATION
 
 #endif
 
-
 EActiveTimerReturnType UModioDrawerControllerSlot::TickAnimate(double InCurrentTime, float InDeltaTime, bool bAnimateIn)
 {
 	if (bAnimateIn)
@@ -81,7 +87,8 @@ EActiveTimerReturnType UModioDrawerControllerSlot::TickAnimate(double InCurrentT
 	// check for the animation finishing and kill the timer if we're done
 	if (bAnimateIn)
 	{
-		return FMath::IsNearlyEqual(CurrentAnimationProgress, 1) ? EActiveTimerReturnType::Stop : EActiveTimerReturnType::Continue;
+		return FMath::IsNearlyEqual(CurrentAnimationProgress, 1) ? EActiveTimerReturnType::Stop
+																 : EActiveTimerReturnType::Continue;
 	}
 	else
 	{
@@ -169,28 +176,28 @@ bool UModioDrawerControllerSlot::GetExpandedState()
 	return bExpanded;
 }
 
-void UModioDrawerControllerSlot::SetSlotLeftEdge(EVerticalAlignment NewVAlign) 
+void UModioDrawerControllerSlot::SetSlotLeftEdge(EVerticalAlignment NewVAlign)
 {
 	Edge = EModioDrawerControllerSlotEdge::Left;
 	DrawerVerticalAlignment = NewVAlign;
 	UpdateWidgetTransform();
 }
 
-void UModioDrawerControllerSlot::SetSlotRightEdge(EVerticalAlignment NewVAlign) 
+void UModioDrawerControllerSlot::SetSlotRightEdge(EVerticalAlignment NewVAlign)
 {
 	Edge = EModioDrawerControllerSlotEdge::Right;
 	DrawerVerticalAlignment = NewVAlign;
 	UpdateWidgetTransform();
 }
 
-void UModioDrawerControllerSlot::SetSlotTopEdge(EHorizontalAlignment NewHAlign) 
+void UModioDrawerControllerSlot::SetSlotTopEdge(EHorizontalAlignment NewHAlign)
 {
 	Edge = EModioDrawerControllerSlotEdge::Top;
 	DrawerHorizontalAlignment = NewHAlign;
 	UpdateWidgetTransform();
 }
 
-void UModioDrawerControllerSlot::SetSlotBottomEdge(EHorizontalAlignment NewHAlign) 
+void UModioDrawerControllerSlot::SetSlotBottomEdge(EHorizontalAlignment NewHAlign)
 {
 	Edge = EModioDrawerControllerSlotEdge::Bottom;
 	DrawerHorizontalAlignment = NewHAlign;

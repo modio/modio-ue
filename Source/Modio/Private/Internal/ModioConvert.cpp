@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "Internal/ModioConvert.h"
 #include "Types/ModioUnsigned64.h"
 
@@ -48,10 +58,6 @@ FString ToUnreal(const std::string& String)
 	return UTF8_TO_TCHAR(String.c_str());
 }
 
-FString ToUnreal(const Modio::filesystem::path& Path)
-{
-	return UTF8_TO_TCHAR(Path.generic_u8string().c_str());
-}
 
 FModioUnsigned64 ToUnreal(const Modio::FileSize& In)
 {

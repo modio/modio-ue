@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "UI/Styles/ModioTableRowStyle.h"
@@ -12,9 +22,7 @@ template<typename ItemType>
 class MODIOUI_API SModioTableRowBase : public STableRow<ItemType>
 {
 public:
-	SLATE_BEGIN_ARGS(SModioTableRowBase<ItemType>) 
-		:_Style(FName("DefaultTableRowStyle"))
-	{}
+	SLATE_BEGIN_ARGS(SModioTableRowBase<ItemType>) : _Style(FName("DefaultTableRowStyle")) {}
 
 	SLATE_ARGUMENT(FModioUIStyleRef, Style)
 	SLATE_DEFAULT_SLOT(typename SModioTableRowBase<ItemType>::FArguments, Content)
@@ -27,15 +35,15 @@ public:
 	{
 		Style = InArgs._Style;
 
-		STableRow<ItemType>::Construct(typename STableRow<ItemType>::FArguments().Padding(InArgs._Padding).ShowSelection(
-										   InArgs._ShowSelection)[InArgs._Content.Widget],
+		STableRow<ItemType>::Construct(typename STableRow<ItemType>::FArguments()
+										   .Padding(InArgs._Padding)
+										   .ShowSelection(InArgs._ShowSelection)[InArgs._Content.Widget],
 									   InOwnerTableView);
 		// override the delegates for text color etc here
 
 #if UE_VERSION_NEWER_THAN(5, 0, 0)
 		STableRow<ItemType>::SetBorderImage(
-			TAttribute<const FSlateBrush*>(
-			this, &SModioTableRowBase::GetBackgroundColor));
+			TAttribute<const FSlateBrush*>(this, &SModioTableRowBase::GetBackgroundColor));
 		STableRow<ItemType>::SetForegroundColor(TAttribute<FSlateColor>(this, &SModioTableRowBase::GetTextColor));
 #else
 		STableRow<ItemType>::BorderImage =
@@ -53,7 +61,7 @@ protected:
 	const FSlateBrush* GetBackgroundColor() const
 	{
 		const FModioTableRowStyle* ResolvedStyle = Style.FindStyle<FModioTableRowStyle>();
-		
+
 		if (!ResolvedStyle)
 		{
 			return FStyleDefaults::GetNoBrush();

@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -15,17 +23,26 @@
 
 #include "ModioDialogController.generated.h"
 
+/**
+* Enumerator with the possible replies to a dialog box
+**/
 UENUM(BlueprintType)
 enum class EModioDialogReply : uint8
 {
+	/** A neutral reply **/
 	Neutral,
+
+	/** Confirm an action **/
 	Confirm,
+
+	/** Cancel an action **/
 	Cancel
 };
 
 /**
- *
- */
+* Class definition of a dialog controller, which helps with authentication,
+* subscriptions, and mod report operations
+**/
 UCLASS()
 class MODIOUI_API UModioDialogController : public UModioWidgetBase
 {
@@ -42,7 +59,7 @@ protected:
 	/// not transitioning at all; positive, we are transitioning from collapsed ->visible
 	int32 AnimationDirection;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category = "Widgets")
 	bool bCurrentlyDisplayingDialog = false;
 
 	UPROPERTY(Transient)
@@ -53,7 +70,7 @@ protected:
 
 	float GetBlurStrength() const;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FInterpCurveFloat BlurCurve;
 
 	UFUNCTION()
@@ -61,32 +78,32 @@ protected:
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> AuthenticationChoiceDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> UnsubscribeConfirmationDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> EmailAuthenticationDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> ReportContentDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> ReportEmailDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> UninstallConfirmationDialog;
 
 	/// @brief Needs to implement error display interface I guess
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UWidget> ErrorDisplayWidget;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> LogoutConfirmationDialog;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UWidget> LoadingOverlay;
 
 	friend class UModioDialogBaseInternal;
@@ -107,10 +124,10 @@ public:
 	void ShowAuthenticationChoiceDialog();
 	void ShowEmailAuthenticationDialog();
 	void ShowLogoutDialog();
-	
-	//Does this require a destination parameter?
+
+	// Does this require a destination parameter?
 	void BeginExternalAuthentication(EModioAuthenticationProvider Provider);
-	
+
 	void ShowReportContentDialog();
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
 	void ShowErrorDialog(FModioErrorCode ec, bool bCloseDialogsOnOK = false);

@@ -1,8 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/Views/CategoryBrowser/ModioFeaturedMod.h"
 #include "Core/ModioModInfoUI.h"
 #include "Engine/Engine.h"
+#include "UI/Commands/ModioCommonUICommands.h"
 #include "ModioUISubsystem.h"
 
 #include "Loc/BeginModioLocNamespace.h"
@@ -122,6 +131,22 @@ void UModioFeaturedMod::NativeOnInitialized()
 
 		MoreOptionsMenu->SetMenuEntries(MenuEntries);
 	}
+}
+
+void UModioFeaturedMod::NativeMoreOptionsClicked()
+{
+	if (MoreOptionsMenu)
+	{
+		MoreOptionsMenu->ToggleOpen(true);
+	}
+}
+
+void UModioFeaturedMod::BuildCommandList(TSharedRef<FUICommandList> CommandList)
+{
+	Super::BuildCommandList(CommandList);
+
+	CommandList->MapAction(FModioCommonUICommands::Get().MoreOptions,
+		FUIAction(FExecuteAction::CreateUObject(this, &UModioFeaturedMod::NativeMoreOptionsClicked)));
 }
 
 // This should be 'while in the focus path'

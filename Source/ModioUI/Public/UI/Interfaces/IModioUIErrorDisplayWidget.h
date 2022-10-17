@@ -1,10 +1,20 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
+#include "Misc/EngineVersionComparison.h"
+#include "Types/ModioErrorCode.h"
 #include "UObject/Interface.h"
 #include "UObject/WeakInterfacePtr.h"
 #include "Widgets/Notifications/SErrorText.h"
-#include "Types/ModioErrorCode.h"
-#include "Misc/EngineVersionComparison.h"
 
 #include "IModioUIErrorDisplayWidget.generated.h"
 
@@ -52,14 +62,14 @@ protected:
 
 	public:
 #if UE_VERSION_NEWER_THAN(4, 27, 0)
-		ModioErrorReportingWidgetWrapper(IModioUIErrorDisplayWidget* WrappedObject) 
+		ModioErrorReportingWidgetWrapper(IModioUIErrorDisplayWidget* WrappedObject)
 		{
 			ReferencedWidget = TWeakInterfacePtr<IModioUIErrorDisplayWidget>(WrappedObject);
 		}
 #else
 		// 4.26 doesn't quite support what we need, so we'll just do it the old way
 		ModioErrorReportingWidgetWrapper(IModioUIErrorDisplayWidget* WrappedObject) : ReferencedWidget(*WrappedObject)
-			{}
+		{}
 #endif
 		virtual void SetError(const FString& InErrorString)
 		{
@@ -103,7 +113,7 @@ public:
 		return MakeShared<ModioErrorReportingWidgetWrapper>(this);
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIErrorDisplayWidget")
 	void SetErrorString(const FString& InErrorString);
 
 	void SetErrorString_Implementation(const FString& InErrorString)
@@ -111,7 +121,7 @@ public:
 		NativeSetErrorString(InErrorString);
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIErrorDisplayWidget")
 	void SetErrorText(const FText& InErrorText);
 
 	void SetErrorText_Implementation(const FText& InErrorText)
@@ -119,7 +129,7 @@ public:
 		NativeSetErrorText(InErrorText);
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIErrorDisplayWidget")
 	bool IsErrorSet() const;
 
 	bool IsErrorSet_Implementation() const
@@ -127,7 +137,7 @@ public:
 		return NativeIsErrorSet();
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIErrorDisplayWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIErrorDisplayWidget")
 	void DisplayError(const FModioErrorCode& ec);
 
 	void DisplayError_Implementation(const FModioErrorCode& ec)

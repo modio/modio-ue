@@ -1,10 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioDrawerController.h"
 #include "Input/Reply.h"
 #include "Layout/Visibility.h"
 #include "Misc/Attribute.h"
 #include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
+#include "ModioUISubsystem.h"
+#include "UI/CommonComponents/ModioMenu.h"
 
 UClass* UModioDrawerController::GetSlotClass() const
 {
@@ -107,6 +117,13 @@ void UModioDrawerController::SetDrawerExpanded(int32 SlotIndex, bool bExpandedSt
 		}
 	}
 	UpdateVisibility();
+
+	// If we're closing the drawers, make sure to reset controller focus
+	if (bExpandedState == false) 
+	{
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		FSlateApplication::Get().SetUserFocus(0, Subsystem->ModBrowserInstance->TakeWidget(), EFocusCause::SetDirectly);
+	}
 }
 
 bool UModioDrawerController::IsAnyDrawerExpanded() const

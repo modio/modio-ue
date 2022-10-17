@@ -17,25 +17,48 @@ namespace Modio
 	class ReportParams;
 }
 
+/**
+* Enumeration for the type of report that a mod can receive
+**/
 UENUM(BlueprintType)
 enum class EModioReportType : uint8
 {
+	/** A generic mod report **/
 	Generic = 0,
+	
+	/** Digital Millennium Copyright Act mod report **/
 	DMCA = 1,
+
+	/** Not working mod report **/
 	NotWorking = 2,
+
+	/** Rude content mod report **/
 	RudeContent = 3,
+
+	/** Illegal content mod report **/
 	IllegalContent = 4,
+
+	/** Stolen content mod report **/
 	StolenContent = 5,
+
+	/** False information mod report **/
 	FalseInformation = 6,
-	Other = 7
+
+	/** Other type of mod report **/
+	Other = 7            
 };
 
-
+/**
+* Struct type to store the parameters used to report a mod
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioReportParams
 {
 	GENERATED_BODY();
 	
+    /**
+    * Default constructor without parameters
+    **/
 	FModioReportParams();
 
 	/// @docpublic
@@ -77,28 +100,66 @@ struct MODIO_API FModioReportParams
 	FModioReportParams(struct FModioModID Mod, EModioReportType Type, FString ReportDescription,
 							TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
 	
-
+	/**
+	* Enumeration for a type of resource
+	**/
 	enum class ResourceType : uint8
 	{
+		/** Resource is a game **/
 		Game,
+
+		/** Resource is a mod **/
 		Mod,
+
+		/** Resource is a user **/
 		User
 	};
+
+	/**
+	* Stored property to the resource type this report contains
+	**/
 	ResourceType ReportedResourceType;
 	
+	/**
+	* Stored property for the resource ID
+	**/
 	int64 ResourceID;
 
+	/**
+	* Stored property for the report type 
+	**/
 	EModioReportType Type;
 	
+	/**
+	* Optional stored property of the reporter name
+	**/
 	TOptional<FString> ReporterName;
 
+	/**
+	* Optional stored property of the reporter contact email
+	**/
 	TOptional<FString> ReporterContact;
 
+	/**
+	* Stored property for the report description
+	**/
 	FString ReportDescription;
 
+	/**
+    * Convenience constructor with the basic parameters
+	* @param ResourceID The ID for the resource to report
+	* @param ReportedResourceType The type of the resource
+	* @param Type What kind of report is
+	* @param ReportDescription Details of the report
+	* @param ReporterName Who is reporting this resource
+	* @param ReportContact How to contact the reporter
+    **/
 	FModioReportParams(int64 ResourceID, ResourceType ReportedResourceType, EModioReportType Type,
 				 FString ReportDescription, TOptional<FString> ReporterName,
 				 TOptional<FString> ReporterContact);
 
+	/**
+	* Bridge method to transform between FModio and Modio:: Report Params
+	**/
 	friend Modio::ReportParams ToModio(const FModioReportParams& In);
 };

@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -150,13 +158,14 @@ protected:
 	FOnDisplayModDetails OnDisplayModDetails;
 	FOnDisplayModDetailsForID OnDisplayModDetailsForID;
 
-	UPROPERTY()
-	class UModioMenu* ModBrowserInstance;
-
 	TOptional<FModioModTagOptions> CachedModTags;
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+	UPROPERTY()
+	class UModioMenu* ModBrowserInstance;
+
 
 	void EnableModManagement();
 	void DisableModManagement();
@@ -213,10 +222,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestExternalAuthentication(EModioAuthenticationProvider Provider);
-	
+
 	/// @brief Special native-only overload for when we want direct notification of success or failure but still want to
 	/// broadcast UI events
-	void RequestExternalAuthentication(EModioAuthenticationProvider Provider, FOnErrorOnlyDelegateFast DedicatedCallback);
+	void RequestExternalAuthentication(EModioAuthenticationProvider Provider,
+									   FOnErrorOnlyDelegateFast DedicatedCallback);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestGalleryImageDownloadForModID(FModioModID ID, int32 Index,

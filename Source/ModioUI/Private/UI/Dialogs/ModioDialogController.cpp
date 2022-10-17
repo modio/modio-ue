@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/Dialogs/ModioDialogController.h"
 #include "Libraries/ModioErrorConditionLibrary.h"
@@ -274,7 +282,9 @@ void UModioDialogController::RequestUninstall(const FModioModID& ModId, UModioDi
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->RequestUninstallForModID(ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleUninstallError, Destination));
+		Subsystem->RequestUninstallForModID(
+			ModId,
+			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleUninstallError, Destination));
 	}
 }
 
@@ -304,14 +314,13 @@ void UModioDialogController::HandleUnsubscribe(FModioModID ec, bool IsSubscribe)
 	PopDialog();
 }
 
-
-void UModioDialogController::HandleExternalAuthenticationComplete(FModioErrorCode ec) 
+void UModioDialogController::HandleExternalAuthenticationComplete(FModioErrorCode ec)
 {
-	if (ec) {
+	if (ec)
+	{
 		ShowErrorDialog(ec);
 	}
 }
-
 
 void UModioDialogController::HandleUnsubscribeError(FModioErrorCode ec)
 {

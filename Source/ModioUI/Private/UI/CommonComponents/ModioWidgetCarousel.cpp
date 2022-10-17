@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/CommonComponents/ModioWidgetCarousel.h"
 #include "Blueprint/IUserObjectListEntry.h"
@@ -12,10 +20,10 @@ TSharedRef<SWidget> UModioWidgetCarousel::OnGenerateWidget(UObject* Item)
 		{
 			return SNew(SBox);
 		}
-		
+
 		// Do we need to hold a reference to the outer widget?
 		TSharedRef<SWidget> SlateWidget = NewWidget->TakeWidget();
-		//Doing this after TakeWidget because we should be definitely registered for events at that point
+		// Doing this after TakeWidget because we should be definitely registered for events at that point
 		NewWidget->SetClipping(EWidgetClipping::ClipToBoundsWithoutIntersecting);
 		NewWidget->SetDataSource(Item);
 		return SlateWidget;

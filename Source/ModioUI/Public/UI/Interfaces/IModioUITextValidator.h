@@ -16,44 +16,81 @@
 
 #include "IModioUITextValidator.generated.h"
 
+/**
+* Enumeration for the possible validation rules
+**/
 UENUM(BlueprintType)
 enum class EModioTextValidationRule : uint8
 {
+	/** Validate as an email  **/
 	ETVR_ValidateEmailAddress,
+
+	/** Validate that every character is a letter **/
 	ETVR_ValidateAllLetters,
-	ETVR_ValidateAllNumeric,
+
+	/** Validate that every character is a number **/
+	ETVR_ValidateAllNumeric, 
+
+	/** Validate characters as numbers or letters **/
 	ETVR_ValidateAlphanumeric,
+
+	/** Validate the lenght of the stream **/
 	ETVR_ValidateLength,
+
+	/** Validate that has some content **/
 	ETVR_ValidateNotEmpty,
+
+	/** Validate the lack of spaces **/
 	ETVR_ValidateNoWhitespace
 };
 
+/**
+* Strong type struct with the necessary details to create a text validation rule
+**/
 USTRUCT(BlueprintType)
 struct MODIOUI_API FModioTextValidationRule
 {
 	GENERATED_BODY()
-
+	/**
+	* The base rule to use in this instance. One of the many listed in EModioTextValidationRule
+	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Rules")
 	EModioTextValidationRule RuleToUse;
 
-	///@brief Message to display if validation fails. Use "{InputText} as a placeholder for the text being validated"
+	/**
+	* @brief Message to display if validation fails.Use "{InputText} as a placeholder for the text being validated"
+	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Rules")
 	FText ValidationMessage;
 
+	/**
+	* Apply the validation rule to at least minimum lenght
+	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "RuleToUse==EModioTextValidationRule::ETVR_ValidateLength", EditConditionHides), Category="Rules")
 	int32 MinimumLength;
 	
+	/**
+	* Apply the validation rule to a maximum lenght
+	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "RuleToUse==EModioTextValidationRule::ETVR_ValidateLength", EditConditionHides), Category="Rules")
 	int32 MaximumLength;
 };
 
+/**
+* Class with static functions to validate elements listed in the enum EModioTextValidationRule
+**/
 UCLASS()
 class MODIOUI_API UModioUIInputValidationLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
+	/**
+	* Confirm the text provided matches an email address
+	* @param TextToValidate String to check against email pattern
+	* @return True when string contains a valid email, false otherwise
+	**/
 	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
 	static bool ValidateEmailAddress(const FText& TextToValidate)
 	{
@@ -65,7 +102,12 @@ public:
 		return Matcher.FindNext();
 	};
 
-	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
+	/**
+	* Confirm the text provided matches an all letters rule
+	* @param TextToValidate String to check against all letters rule
+	* @return True when string validation passes, false otherwise
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioUIInputValidationLibrary")
 	static bool ValidateAllLetters(const FText& TextToValidate)
 	{
 		FString TmpString = TextToValidate.ToString();
@@ -79,13 +121,23 @@ public:
 		return true;
 	};
 
+	/**
+	* Confirm the text provided matches an all numeric rule
+	* @param TextToValidate String to check against all numeric rule
+	* @return True when string validation passes, false otherwise
+	**/
 	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
 	static bool ValidateAllNumeric(const FText& TextToValidate)
 	{
 		return TextToValidate.IsNumeric();
 	};
 
-	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
+	/**
+	* Confirm the text provided matches the alphanumeric rule
+	* @param TextToValidate String to check against the alphanumeric rule
+	* @return True when string validation passes, false otherwise
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioUIInputValidationLibrary")
 	static bool ValidateAlphanumeric(const FText& TextToValidate)
 	{
 		FString TmpString = TextToValidate.ToString();
@@ -99,6 +151,11 @@ public:
 		return true;
 	};
 
+	/**
+	* Confirm the text provided matches the length rule
+	* @param TextToValidate String to check against the length rule
+	* @return True when string validation passes, false otherwise
+	**/
 	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
 	static bool ValidateLength(const FText& TextToValidate, int32 DesiredMaximumLength, int32 DesiredMinimumLength)
 	{
@@ -106,11 +163,22 @@ public:
 			TextToValidate.ToString().Len() >= DesiredMinimumLength;
 	};
 
+	/**
+	* Confirm the text provided matches the not-empty rule
+	* @param TextToValidate String to check against the not-empty rule
+	* @return True when string validation passes, false otherwise
+	**/
 	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
 	static bool ValidateNotEmpty(const FText& TextToValidate)
 	{
 		return !TextToValidate.IsEmpty();
 	};
+	
+	/**
+	* Confirm the text provided matches the lack of whitespace rule
+	* @param TextToValidate String to check against the lack of whitespace rule
+	* @return True when string validation passes, false otherwise
+	**/
 	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
 	static bool ValidateNoWhitespace(const FText& TextToValidate)
 	{
@@ -125,6 +193,14 @@ public:
 		return true;
 	}
 
+	/**
+	* Convenience function to check a rule against a text and returns a validation text
+	* when the rule was not matched
+	* @param Rule The text validation rule to apply
+	* @param TextToValidate The string to apply a rule to
+	* @param ValidationMessageText A string that receives a formatted value when rule checks fail
+	* @return True when string validation passes, false otherwise
+	**/
 	UFUNCTION(BlueprintCallable, Category="ModioUIInputValidationLibrary")
 	static bool ValidateUsingRule(const FModioTextValidationRule& Rule, const FText& TextToValidate,
 								  FText& ValidationMessageText)
@@ -220,12 +296,18 @@ public:
 	}
 };
 
+/**
+* Modio UI interface that defines a validation actions over text, subclass of UInterface
+**/
 UINTERFACE(BlueprintType)
 class MODIOUI_API UModioUITextValidator : public UInterface
 {
 	GENERATED_BODY()
 };
 
+/**
+* Modio UI interface that defines a validation actions over text, subclass of IInterface
+**/
 class MODIOUI_API IModioUITextValidator : public IInterface
 {
 	GENERATED_BODY()
@@ -257,19 +339,30 @@ protected:
 	}
 
 public:
+	/**
+	* Change the validation error with new text
+	* @param ErrorText The new string to set on this instance
+	**/
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIInputValidationLibrary")
 	void SetValidationError(FText &ErrorText);
 
+	// SetValidationError_Implementation
 	void SetValidationError_Implementation(FText &ErrorText)
 	{
 		NativeSetValidationError(ErrorText);
 	}
 
+	// NativeSetValidationError
 	virtual void NativeSetValidationError(FText ErrorText) {};
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIInputValidationLibrary")
+	/**
+	* Retrieve the validation rules stored in this instance
+	* @param Rules Reference array where the rules will be stored
+	**/
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIInputValidationLibrary")
 	void GetTextValidationRules(TArray<FModioTextValidationRule>& Rules);
 
+	// GetTextValidationRules_Implementation
 	void GetTextValidationRules_Implementation(TArray<FModioTextValidationRule>& Rules)
 	{
 		NativeGetTextValidationRules(Rules);
@@ -283,6 +376,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUIInputValidationLibrary")
 	bool ValidateText(const FText& InputText, FText& ValidationMessageText);
 
+	// ValidateText_Implementation
 	bool ValidateText_Implementation(const FText& InputText, FText& ValidationMessageText)
 	{
 		return NativeValidateText(InputText, ValidationMessageText);

@@ -285,6 +285,10 @@ public class Modio : ModuleRules
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/httpparser/src"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/interface"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/modio"),
+
+                //These files are special vendored dependencies and should be removed when those dependencies are included in the public SDK
+                Path.Combine(ModuleDirectory,  "../ThirdParty/Vendor/function2/include"),
+                
                 Path.Combine(GeneratedHeaderPath, "Private"),
                 Path.Combine(GeneratedHeaderPath, "Public")
         });

@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Blueprint/IUserListEntry.h"
@@ -5,23 +15,35 @@
 #include "Delegates/DelegateCombinations.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/SlateDelegates.h"
+#include "Misc/EngineVersionComparison.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Layout/SBox.h"
-#include "Widgets/Layout/SFxWidget.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/SOverlay.h"
 #include "Widgets/SWidget.h"
+#include "Widgets/Layout/SFxWidget.h"
 
+/**
+* Enumerator to list a carousel possible dimensions
+**/
 UENUM()
 enum class EModioWidgetCarouselSizeOverrideType
 {
+	/** The carousel will use absolute size compared to the UI layout **/
 	AbsoluteDimensions,
+
+	/** The carousel will use relative size compared to the UI layout **/
 	RelativeLayoutScale,
+
+	/** The carousel will use default parameters **/
 	NoOverride
 };
 
+/**
+* Class definition of a single entry in a carousel 
+**/
 class MODIOUI_API SModioWidgetCarouselEntry : public SFxWidget
 {
 protected:
@@ -176,6 +198,56 @@ public:
 			Reply = OnClicked.Execute();
 		}
 		return Reply;
+	}
+
+	int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect,
+							 FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle,
+							 bool bParentEnabled) const override
+	{
+		// Convert the 0..1 origin into local space extents.
+		const FVector2D ScaleOrigin = RenderScaleOrigin.Get() * AllottedGeometry.GetLocalSize();
+		const FVector2D Offset = VisualOffset.Get() * AllottedGeometry.GetLocalSize();
+		// create the render transform as a scale around ScaleOrigin and offset it by Offset.
+		// NOTE: On MacOS, not casting to a FVector2D causes compiler errors, however this potentially results in the Carousel widgets not rendering correctly
+		// This is a temporary compiler fix
+#if PLATFORM_MAC
+		const auto SlateRenderTransform = Concatenate(Inverse(ScaleOrigin), FVector2D(RenderScale.Get()), ScaleOrigin, Offset);
+#else
+		const auto SlateRenderTransform = Concatenate(Inverse(ScaleOrigin), RenderScale.Get(), ScaleOrigin, Offset);
+#endif
+		// This will append the render transform to the layout transform, and we only use it for rendering.
+		FGeometry ModifiedGeometry = AllottedGeometry.MakeChild(AllottedGeometry.GetLocalSize(), SlateRenderTransform);
+
+		FArrangedChildren ArrangedChildren(EVisibility::Visible);
+		this->ArrangeChildren(ModifiedGeometry, ArrangedChildren);
+
+		// There may be zero elements in this array if our child collapsed/hidden
+		if (ArrangedChildren.Num() > 0)
+		{
+			const bool bShouldBeEnabled = ShouldBeEnabled(bParentEnabled);
+
+			// We can only have one direct descendant.
+			check(ArrangedChildren.Num() == 1);
+			const FArrangedWidget& TheChild = ArrangedChildren[0];
+
+			// SFxWidgets are able to ignore parent clipping.
+			const FSlateRect ChildClippingRect =
+				(bIgnoreClipping.Get()) ? ModifiedGeometry.GetLayoutBoundingRect()
+										: MyCullingRect.IntersectionWith(ModifiedGeometry.GetLayoutBoundingRect());
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+			FWidgetStyle CompoundedWidgetStyle =
+				FWidgetStyle(InWidgetStyle)
+					.BlendColorAndOpacityTint(GetColorAndOpacity())
+					.SetForegroundColor(bShouldBeEnabled ? GetForegroundColor() : GetDisabledForegroundColor());
+#else
+			FWidgetStyle CompoundedWidgetStyle = FWidgetStyle(InWidgetStyle)
+				.BlendColorAndOpacityTint(ColorAndOpacity.Get())
+				.SetForegroundColor( ForegroundColor );
+#endif
+			return TheChild.Widget->Paint(Args.WithNewParent(this), TheChild.Geometry, ChildClippingRect,
+										  OutDrawElements, LayerId + 1, CompoundedWidgetStyle, bShouldBeEnabled);
+		}
+		return LayerId;
 	}
 
 	FOnClicked OnClicked;

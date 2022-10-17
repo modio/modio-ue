@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -11,7 +19,6 @@
 #include "UI/CommonComponents/ModioRichTextButton.h"
 
 #include "ModioDownloadQueueOpProgress.generated.h"
-
 
 DECLARE_DYNAMIC_DELEGATE(FOnDownloadOpComplete);
 
@@ -38,22 +45,22 @@ protected:
 
 	void SetPercent(float InPercent);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioProgressBar* ProgressBar;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModNameLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* OperationSpeedText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* OperationProgressText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* UnsubscribeButton;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText SpeedFormatText;
 
 	void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
@@ -61,6 +68,6 @@ protected:
 	FOnDownloadOpComplete OnOperationCompleted;
 
 public:
-	UFUNCTION(BlueprintCallable, Category="ModioDownloadQueueOpProgress")
+	UFUNCTION(BlueprintCallable, Category = "ModioDownloadQueueOpProgress")
 	virtual FOnDownloadOpComplete& OperationCompletedDelegate();
 };

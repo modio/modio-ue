@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -9,16 +17,24 @@
 
 #include "ModioTagOptionsUI.generated.h"
 
-/// @brief Wrapper around FModioModTagInfo because UMG widgets expect UObjects for data sources or list items
+/**
+* Wrapper around FModioModTagInfo because UMG widgets expect UObjects for data sources or list items
+**/
 UCLASS(BlueprintType)
 class MODIOUI_API UModioTagInfoUI : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ModioTagInfoUI")
+	/**
+	* Stored property to the ModTagInfo to use in this class
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioTagInfoUI")
 	FModioModTagInfo Underlying;
 
+	/**
+	* Stored property array to string pointers of the selected tags
+	**/
 	TArray<TSharedPtr<FString>> SelectedTagValues;
 };
 
@@ -33,10 +49,17 @@ protected:
 	TArray<UModioTagInfoUI*> CachedUITagInfos;
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ModioTagOptionsUI")
+	/**
+	* Stored property of the ModioTagOptions to use in this class
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioTagOptionsUI")
 	FModioModTagOptions Underlying;
 
-	UFUNCTION(BlueprintCallable, Category="ModioTagOptionsUI")
+	/**
+	* Retrieve the tag categories stored in this tag options instance
+	* @return Array with its corresponding info tags 
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioTagOptionsUI")
 	TArray<class UModioTagInfoUI*> GetTagCategoriesForUI()
 	{
 		if (CachedUITagInfos.Num() != Underlying.GetRawList().Num())

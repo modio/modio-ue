@@ -33,7 +33,9 @@ enum class EModioModState : uint8
 	UninstallPending, // saved as installed
 };
 
-/** @brief Class representing a mod which is installed locally */
+/**
+* Struct representing a mod which is installed locally 
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModCollectionEntry
 {

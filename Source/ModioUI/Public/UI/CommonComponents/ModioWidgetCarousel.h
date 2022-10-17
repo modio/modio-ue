@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -9,6 +17,9 @@
 
 #include "ModioWidgetCarousel.generated.h"
 
+/**
+* Base class definition of a Modio carousel entry wrapper
+**/
 UCLASS()
 class MODIOUI_API UModioWidgetCarouselEntryWrapper : public UWidget
 {
@@ -19,8 +30,8 @@ protected:
 };
 
 /**
- *
- */
+* Base class definition of a Modio carousel that references multiple widgets
+**/
 UCLASS()
 class MODIOUI_API UModioWidgetCarousel : public UWidget
 {
@@ -125,16 +136,26 @@ protected:
 	}
 
 public:
-	UFUNCTION(BlueprintCallable, Category="ModioWidgetCarousel")
+	/**
+	* Update the object elements contained in the carousel
+	* @param Items Array of objects to update the carousel 
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioWidgetCarousel")
 	void SetItems(TArray<UObject*> Items);
 
-	UFUNCTION(BlueprintCallable, Category="ModioWidgetCarousel")
+	/**
+	* Move the focus to the left
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioWidgetCarousel")
 	void ScrollLeft()
 	{
 		MyCarousel->ScrollLeft();
 	}
 
-	UFUNCTION(BlueprintCallable, Category="ModioWidgetCarousel")
+	/**
+	* Move the focus to the right
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioWidgetCarousel")
 	void ScrollRight()
 	{
 		MyCarousel->ScrollRight();

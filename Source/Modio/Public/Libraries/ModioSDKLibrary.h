@@ -1,29 +1,40 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "Types/ModioInitializeOptions.h"
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioInitializeOptions.h"
 
 #include "ModioSDKLibrary.generated.h"
 
-
+/**
+* Enumerator with the possible memory measurement units
+**/
 UENUM(BlueprintType)
 enum EFileSizeUnit
 {
-	Largest = 0, // Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb)
+	/** Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb) **/
+	Largest = 0,
+
+	/** A single byte **/
 	B = 1,
+
+	/** Kilo bytes **/
 	KB = 1024,
+
+	/** Mega bytes **/
 	MB = 1024 * 1024,
+
+	/** Giga bytes **/
 	GB = 1024 * 1024 * 1024
 };
 
@@ -39,7 +50,7 @@ public:
 	static MODIO_API FModioGameID GetProjectGameId();
 
 	/**
-	 * Get hte api key specified in the mod.io project settings
+	 * Get the api key specified in the mod.io project settings
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static MODIO_API FModioApiKey GetProjectApiKey();
@@ -52,10 +63,18 @@ public:
 
 	/**
 	 * Get the options needed to initialize the mod.io SDK specified in the project settings
+	 * @deprecated Use GetProjectInitializeOptionsForSessionId() instead
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities", meta = (DeprecatedFunction, DeprecationMessage = "Use GetProjectInitializeOptionsForSessionId() instead"))
+	static MODIO_API FModioInitializeOptions GetProjectInitializeOptions();
+
+	/**
+	 * Get the options needed to initialize the mod.io SDK specified in the project settings
+	 * @param The LocalSessionIdentifier option to initialize project with
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
-	static MODIO_API FModioInitializeOptions GetProjectInitializeOptions();
-	
+	static MODIO_API FModioInitializeOptions GetProjectInitializeOptionsForSessionId(const FString SessionId);
+
 #if WITH_DEV_AUTOMATION_TESTS
 	/// @brief Gets the automation test options. not exposed to BP to prevent accidental use by developers in BP
 	static MODIO_API FModioInitializeOptions GetAutomationTestOptions();
@@ -86,7 +105,8 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|String",
 			  meta = (DisplayName = "ToString (Filesize)", CompactNodeTitle = "Filesize"))
-	static MODIO_API FText Filesize_ToString(int64 FileSize, int32 MaxDecimals = 2, EFileSizeUnit Unit = EFileSizeUnit::Largest);
+	static MODIO_API FText Filesize_ToString(int64 FileSize, int32 MaxDecimals = 2,
+											 EFileSizeUnit Unit = EFileSizeUnit::Largest);
 
 	/** Converts an integer64 value to a string */
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToString (integer64)", CompactNodeTitle = "->", BlueprintAutocast),
@@ -105,7 +125,7 @@ public:
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToText (integer64)", AdvancedDisplay = "1", BlueprintAutocast),
 			  Category = "mod.io|Utilities|Text")
 	static MODIO_API FText Conv_Int64ToText(int64 Value, bool bAlwaysSign = false, bool bUseGrouping = true,
-								  int32 MinimumIntegralDigits = 1, int32 MaximumIntegralDigits = 324);
+											int32 MinimumIntegralDigits = 1, int32 MaximumIntegralDigits = 324);
 
 	/** @brief Dividend/Divisor and return the floating point result with no checks **/
 	UFUNCTION(BlueprintPure,

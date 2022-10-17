@@ -14,6 +14,9 @@
 
 #include "ModioTerms.generated.h"
 
+/**
+* Strong type struct to store links and metadata associated with a mod
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioLink
 {
@@ -31,9 +34,9 @@ struct MODIO_API FModioLink
 };
 
 /**
- * @brief This struct contains strings that should be displayed to a user
- * when displaying the terms of use and offering to create a mod.io account
- **/
+* Struct with the strings to display to a user when showing the terms of use
+* and the reference URLs to mod.io user account page
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioTerms
 {
@@ -46,7 +49,6 @@ struct MODIO_API FModioTerms
 	/** @brief Text to display on the negative/cancel button */
 	UPROPERTY(BlueprintReadOnly,Category="Terms|Buttons")
 	FString DisagreeButtonText;
-
 	
 	/** @brief Link to the mod.io website */
 	UPROPERTY(BlueprintReadOnly,Category="Terms|Links")
@@ -64,15 +66,20 @@ struct MODIO_API FModioTerms
 	UPROPERTY(BlueprintReadOnly,Category="Terms|Links")
 	FModioLink ManageLink;
 
-	
 	/** @brief The plaintext version of the mod.io terms of use */
 	FString TermsText;
 };
 
+/**
+* Struct to store an optional value for the terms of service
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalTerms
 {
 	GENERATED_BODY()
 
+	/**
+	* The Modio terms as an optional value
+	**/
 	TOptional<FModioTerms> Internal;
 };

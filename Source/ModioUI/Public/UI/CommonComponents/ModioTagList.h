@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -23,26 +31,26 @@ protected:
 	void UpdateTagWidgets();
 	FString GetTagGroupNameForTagValue(FString TagValue);
 
-	#if WITH_EDITORONLY_DATA
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	int32 NumberOfPreviewTags = 1;
 #endif
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	int32 NumberOfTagsToShow = 1;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TArray<FModioModTag> Tags;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText ExcessTagCountText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioTagWidgetBase> TagWidgetClass;
-	
+
 	TOptional<FModioModTagOptions> TagOptions;
 
 public:
-	UFUNCTION(BlueprintCallable, Category="Widgets")
+	UFUNCTION(BlueprintCallable, Category = "Widgets")
 	void SetTags(TArray<FModioModTag> NewTags);
 };

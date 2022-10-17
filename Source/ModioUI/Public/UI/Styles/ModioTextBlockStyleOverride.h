@@ -1,4 +1,15 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
+
 #include "Containers/Map.h"
 #include "Core/ModioNewPropertyHelpers.h"
 #include "Styling/SlateTypes.h"
@@ -14,22 +25,41 @@ USTRUCT(BlueprintType)
 struct MODIOUI_API FModioTextBlockStyleOverride : public FSlateWidgetStyle
 {
 	GENERATED_BODY()
+	/**
+	* Static stored property of the type name
+	**/
 	static const FName TypeName;
+	
+	/**
+	* Function to retrieve the type name stored property
+	* @return FName with the type
+	**/
 	virtual const FName GetTypeName() const override
 	{
 		return TypeName;
 	};
 
+	/**
+	* Retrieve the base text block style
+	* @return The default text bloc style
+	**/
 	static const FModioTextBlockStyleOverride& GetDefault()
 	{
 		static FModioTextBlockStyleOverride Default;
 		return Default;
 	}
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties), Category="Widgets")
+	/**
+	* Stored property to the text block style 
+	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (ShowOnlyInnerProperties), Category = "Widgets")
 	FTextBlockStyle StyleProperties;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (EditCondition = "true!=false", EditConditionHides), Category="Widgets")
+	/**
+	* Stored property that maps between property names and their overridden status
+	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (EditCondition = "true!=false", EditConditionHides),
+			  Category = "Widgets")
 	TMap<FName, bool> OverriddenProperties;
 
 	/// @brief Applies the overrides to the specified input style
@@ -48,8 +78,8 @@ struct MODIOUI_API FModioTextBlockStyleOverride : public FSlateWidgetStyle
 				FCachedPropertyPath PropertyPath = FCachedPropertyPath(Property.Key.ToString());
 				FString PropertyValue;
 				// Cheap trick to copy the property value from one struct to the other
-				if (PropertyPathHelpers::GetPropertyValueAsString((void*)&StyleProperties, FTextBlockStyle::StaticStruct(),
-																  PropertyPath, PropertyValue))
+				if (PropertyPathHelpers::GetPropertyValueAsString(
+						(void*) &StyleProperties, FTextBlockStyle::StaticStruct(), PropertyPath, PropertyValue))
 				{
 					PropertyPathHelpers::SetPropertyValueFromString(&ComputedStyle, FTextBlockStyle::StaticStruct(),
 																	PropertyPath, PropertyValue);

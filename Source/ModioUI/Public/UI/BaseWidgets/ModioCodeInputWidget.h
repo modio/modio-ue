@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -24,17 +32,17 @@ protected:
 	virtual FEventReply NativeValidateCodeInputCharacter(FString Character);
 	virtual FString NativeGatherInput() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioCodeInputWidget")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioCodeInputWidget")
 	FEventReply ValidateCodeInputCharacter(const FString& Character);
 	FEventReply ValidateCodeInputCharacter_Implementation(const FString& Character);
 
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	int32 NumberOfCharacters = 5;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCodeInputStyle"), Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCodeInputStyle"), Category = "Widgets")
 	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultCodeInputStyle"};
 
 	virtual void NativeGetTextValidationRules(TArray<FModioTextValidationRule>& Rules)
@@ -43,7 +51,7 @@ protected:
 	}
 
 	virtual void NativeSetValidationError(FText ErrorText) override;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Data Validation")
 	bool bValidateInput = false;
 
@@ -54,13 +62,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Data Validation",
 			  meta = (EditCondition = "bValidateInput", EditConditionHides))
 	bool bDisplayValidationErrors = false;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category="Widgets")
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category = "Widgets")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
 
 	TSharedPtr<SVerticalBox> MyVerticalBox;
 	TSharedPtr<SModioRichTextBlock> MyErrorTextBlock;
-	
 
 	// parameters for how many characters are needed
 	// implement UIStringInput interface

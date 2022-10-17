@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -33,14 +41,14 @@ public:
 
 	virtual void SetBrushFromMaterial(UMaterialInterface* Material) override;
 
-	UFUNCTION(BlueprintCallable, Category="ModioImage")
+	UFUNCTION(BlueprintCallable, Category = "ModioImage")
 	virtual void DisplayImageWithMaterial(UTexture2DDynamic* Texture, UMaterialInterface* Material,
 										  FName ImageParameterName);
 
-	UFUNCTION(BlueprintCallable, Category="ModioImage")
+	UFUNCTION(BlueprintCallable, Category = "ModioImage")
 	virtual void LoadImageFromFileAsync(FModioImageWrapper ImageLoader);
 
-	UFUNCTION(BlueprintCallable, Category="ModioImage")
+	UFUNCTION(BlueprintCallable, Category = "ModioImage")
 	void LoadImageFromFileWithMaterialAsync(FModioImageWrapper ImageLoader, UMaterialInterface* Material,
 											FName ImageParameterName);
 };

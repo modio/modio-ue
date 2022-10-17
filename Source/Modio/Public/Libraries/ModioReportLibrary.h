@@ -1,25 +1,22 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
-
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Misc/Optional.h"
-#include "Types/ModioReportParams.h"
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioReportParams.h"
 
 #include "ModioReportLibrary.generated.h"
-
 
 /**
  *
@@ -36,9 +33,8 @@ class MODIO_API UModioReportLibrary : public UBlueprintFunctionLibrary
 	/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
 	/// empty
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "mod.io|Content Reporting")
-	static FModioReportParams MakeReportForGame(FModioGameID Game, EModioReportType Type,
-												FString ReportDescription, FString ReporterName,
-												FString ReporterContact);
+	static FModioReportParams MakeReportForGame(FModioGameID Game, EModioReportType Type, FString ReportDescription,
+												FString ReporterName, FString ReporterContact);
 
 	/// @docpublic
 	/// @brief Creates a content report for a game.
@@ -49,9 +45,8 @@ class MODIO_API UModioReportLibrary : public UBlueprintFunctionLibrary
 	/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
 	/// empty
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "mod.io|Content Reporting")
-	static FModioReportParams MakeReportForUser(FModioUserID User, EModioReportType Type,
-												FString ReportDescription, FString ReporterName,
-												FString ReporterContact);
+	static FModioReportParams MakeReportForUser(FModioUserID User, EModioReportType Type, FString ReportDescription,
+												FString ReporterName, FString ReporterContact);
 
 	/// @docpublic
 	/// @brief Creates a content report for a game.

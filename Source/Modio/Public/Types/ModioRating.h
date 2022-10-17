@@ -12,10 +12,18 @@
 
 #include "ModioRating.generated.h"
 
+/**
+* Enumerator with the rating a mod can receive
+**/
 UENUM(BlueprintType)
 enum class EModioRating : uint8
 {
+	/** A neutral rating **/
 	Neutral,
-	Positive, 
+
+	/** A positive rating **/
+	Positive,
+
+	/** A negative rating **/
 	Negative
 };

@@ -1,10 +1,21 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
+
 #include "Styling/SlateStyle.h"
 #include "UI/BaseWidgets/ModioRichTextBlockDecorator.h"
+#include "UI/Styles/ModioRichTextStyle.h"
 #include "UI/Styles/ModioUIStyleRef.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Text/SRichTextBlock.h"
-#include "UI/Styles/ModioRichTextStyle.h"
 
 DECLARE_DELEGATE_RetVal(const FModioRichTextStyle&, FOnGetRichTextStyle);
 
@@ -98,6 +109,8 @@ public:
 	/** Any decorators that should be used while parsing the text. */
 	SLATE_ARGUMENT(TArray<TSharedRef<class ITextDecorator>>, Decorators)
 
+	SLATE_ARGUMENT(FSlateSound, HoveredSound);
+
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
@@ -111,7 +124,17 @@ public:
 		SRichTextBlock::SetDecoratorStyleSet(NewStyleSet.Get());
 	}
 
+	void PlayHoveredSound(const FGeometry& InGeometry, const FPointerEvent& InEvent)
+	{
+		if (GetVisibility() == EVisibility::Visible) 
+		{
+			FSlateApplication::Get().PlaySound(ItemHoverSound);
+		}
+		
+	}
+
 protected:
 	TSharedPtr<FSlateStyleSet> StyleSetOverride;
 	virtual bool CustomPrepass(float InScale) override;
+	FSlateSound ItemHoverSound;
 };

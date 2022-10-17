@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueOpProgress.h"
 #include "Core/ModioModInfoUI.h"
@@ -83,7 +91,7 @@ void UModioDownloadQueueOpProgress::UpdateProgress(const struct FModioModProgres
 		FFormatNamedArguments Args;
 		Args.Add("Progress", UModioSDKLibrary::Filesize_ToString(ProgressInfo.CurrentlyDownloadedBytes.Underlying, 1));
 		Args.Add("Total", UModioSDKLibrary::Filesize_ToString(ProgressInfo.TotalDownloadSize.Underlying, 1));
-							
+
 		OperationProgressText->SetText(FText::Format(FTextFormat::FromString(TEXT("{Progress} of {Total}")), Args));
 	}
 	else if (ProgressInfo.CurrentlyExtractedBytes < ProgressInfo.TotalExtractedSizeOnDisk)

@@ -1,4 +1,15 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
+
 #include "UObject/Object.h"
 //#include "Widgets/Views/SListPanel.h"
 #include "Blueprint/IUserListEntry.h"
@@ -260,7 +271,7 @@ public:
 				// Only scroll the item into view if it's not already in the visible range
 				const int32 NumItemsPerLine = this->GetNumItemsPerLine();
 				const double ScrollLineOffset = this->GetTargetScrollOffset() / NumItemsPerLine;
-				const int32 LineOfItem = FMath::FloorToInt((float)IndexOfItem / (float)NumItemsPerLine);
+				const int32 LineOfItem = FMath::FloorToInt((float) IndexOfItem / (float) NumItemsPerLine);
 				const int32 NumFullLinesInView =
 					FMath::FloorToInt(ScrollLineOffset + NumLinesInView) - FMath::CeilToInt(ScrollLineOffset);
 
@@ -277,21 +288,21 @@ public:
 				{
 					// Set the line with the item at the beginning of the view area
 					float NewLineOffset = LineOfItem;
-					
-					if (LineOfItem > MaxDisplayedLine) {
-						NewLineOffset =
-							LineOfItem - NumFullLinesInView + 1.f +
-							(this->FixedLineScrollOffset.IsSet() ? 0.f : this->NavigationScrollOffset);
+
+					if (LineOfItem > MaxDisplayedLine)
+					{
+						NewLineOffset = LineOfItem - NumFullLinesInView + 1.f +
+										(this->FixedLineScrollOffset.IsSet() ? 0.f : this->NavigationScrollOffset);
 					}
 					//// Center the line in the view area
-					//NewLineOffset -=
+					// NewLineOffset -=
 					//	FMath::FloorToFloat((bDontShowPartialItems ? NumFullLinesInView : NumLinesInView) * 0.5f);
 
 					// Convert the line offset into an item offset
 					double NewScrollOffset = NewLineOffset * NumItemsPerLine;
 					// And clamp the scroll offset within the allowed limits
-					NewScrollOffset =
-						FMath::Clamp(NewScrollOffset, 0.,
+					NewScrollOffset = FMath::Clamp(
+						NewScrollOffset, 0.,
 						(double) (this->GetNumItemsBeingObserved() - NumItemsPerLine * NumFullLinesInView));
 
 					this->SetScrollOffset(NewScrollOffset);
@@ -341,8 +352,7 @@ public:
 				this->WidgetFromItem(
 						TListTypeTraits<ItemType>::NullableItemTypeConvertToItemType(this->ItemToNotifyWhenInView))
 					.IsValid();
-			return (bHasWidgetForItem &&
-					FMath::IsNearlyEqual(this->CurrentScrollOffset, this->GetTargetScrollOffset()))
+			return (bHasWidgetForItem && FMath::IsNearlyEqual(this->CurrentScrollOffset, this->GetTargetScrollOffset()))
 					   ? SListView<ItemType>::EScrollIntoViewResult::Success
 					   : SListView<ItemType>::EScrollIntoViewResult::Deferred;
 		}

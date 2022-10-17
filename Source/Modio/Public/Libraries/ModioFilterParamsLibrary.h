@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "Containers/Array.h"
+#include "Containers/UnrealString.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioFilterParams.h"
 
@@ -68,7 +70,8 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	 * @return *this
 	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
-	static FModioFilterParams& NameContainsStrings(UPARAM(ref) FModioFilterParams& Filter, const FString& SearchString);
+	static FModioFilterParams& NameContainsStrings(UPARAM(ref) FModioFilterParams& Filter,
+												   const TArray<FString>& SearchStrings);
 
 	/**
 	 * @brief Only include mods that were marked live (i.e released) after the specified date

@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -10,8 +18,8 @@
 #include "ModioModInfoUI.generated.h"
 
 /**
- * Wrapper around a FModioModInfo because UMG widgets expect list items to be UObject-based
- */
+* Wrapper around a FModioModInfo because UMG widgets expect list items to be UObject-based
+**/
 UCLASS(BlueprintType)
 class MODIOUI_API UModioModInfoUI : public UObject, public IModioModInfoUIDetails
 {
@@ -27,6 +35,9 @@ public:
 		return Underlying.ModId;
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="ModioModInfoUI")
+	/**
+	* Stored property to the ModInfo in this class
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioModInfoUI")
 	FModioModInfo Underlying;
 };

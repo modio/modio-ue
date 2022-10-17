@@ -18,7 +18,9 @@
 
 DECLARE_DELEGATE_OneParam(FOnLoadImageDelegateFast, class UTexture2DDynamic*);
 
-/** @brief wrapper for images that's returned by the api */
+/** 
+* Strong type struct to wrap image data returned by the mod.io API
+*/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioImageWrapper
 {
@@ -49,10 +51,16 @@ private:
 	static TOptional<FTextureCreationData> LoadTextureDataFromDisk(const FString& ImagePath);
 };
 
+/**
+* Strong type struct to wrap Image data as an optional value
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalImage
 {
 	GENERATED_BODY()
 
+	/**
+	* Optional value of a Modio image wrapper
+	**/
 	TOptional<FModioImageWrapper> Internal;
 };

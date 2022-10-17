@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -10,8 +18,10 @@
 #include "FxWidget.generated.h"
 
 /**
- *
- */
+* Modio UI element that extends the functionality of UWidget with
+* further pointers to a content widget and properties to scale the 
+* rendered elements
+**/
 UCLASS()
 class MODIOUI_API UFxWidget : public UWidget
 {
@@ -68,6 +78,10 @@ protected:
 	}
 
 public:
+	/**
+	* Default UFxWidget constructor 
+	* @param Initializer The FObjectInitializer to use as base configuration
+	**/
 	UFxWidget(const FObjectInitializer& Initializer)
 		: Super(Initializer),
 		  RenderScale(1),
@@ -75,29 +89,54 @@ public:
 		  LayoutScale(1),
 		  VisualOffset(FVector2D::ZeroVector) {};
 
+	/**
+	* Retrieve the Widget for this instance
+	* @return The Widget shared pointer of this instance
+	**/
 	TSharedPtr<SWidget> GetContentWidget()
 	{
 		return MyContentWidget;
 	};
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	/**
+	* Stored property of the proportion scale to render the widget
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	float RenderScale;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	/**
+	* Stored property of the 2D point where the widget origin is located
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	FVector2D RenderScaleOrigin;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	/**
+	* Stored property to the scale of the widget layout
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	float LayoutScale;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	/**
+	* Stored property of the 2D point that represents the offset of the contents to display
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	FVector2D VisualOffset;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	/**
+	* Stored property boolean when it is true, the widget ignores clipping, otherwise false
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	bool bIgnoreClipping;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widget")
+	/**
+	* Stored property of the user widget subclass that stores the content to display
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	TSubclassOf<UUserWidget> ContentClass;
 
+	/**
+	* Stored property of the content to display when an action occurs in the widget
+	**/
 	UPROPERTY(EditAnywhere, Category = "Events")
 	FGetWidget OnGetContent;
 };

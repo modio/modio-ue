@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/CommonComponents/ModioTagList.h"
 #include "Blueprint/UserWidget.h"
@@ -92,7 +100,7 @@ FString UModioTagList::GetTagGroupNameForTagValue(FString TagValue)
 {
 	if (TagOptions.IsSet())
 	{
-		for(auto TagOption : TagOptions.GetValue().InternalList)
+		for (auto TagOption : TagOptions.GetValue().InternalList)
 		{
 			if (TagOption.TagGroupValues.Contains(TagValue))
 			{
@@ -102,7 +110,6 @@ FString UModioTagList::GetTagGroupNameForTagValue(FString TagValue)
 	}
 
 	return FString();
-	
 }
 
 void UModioTagList::SetTags(TArray<FModioModTag> NewTags)
@@ -111,7 +118,7 @@ void UModioTagList::SetTags(TArray<FModioModTag> NewTags)
 	{
 		TagOptions = Subsystem->GetTagOptionsList();
 	}
-	
+
 	Tags = MoveTemp(NewTags);
 	UpdateTagWidgets();
 }

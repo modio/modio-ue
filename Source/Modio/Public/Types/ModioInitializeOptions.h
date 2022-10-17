@@ -14,6 +14,9 @@
 
 #include "ModioInitializeOptions.generated.h"
 
+/**
+* Struct type to store the initialization options used by the mod.io SDK
+**/
 USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeInitializeOptions"))
 struct MODIO_API FModioInitializeOptions
 {

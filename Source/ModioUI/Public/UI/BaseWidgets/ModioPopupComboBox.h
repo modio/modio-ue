@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -12,24 +20,30 @@
 
 #include "ModioPopupComboBox.generated.h"
 
+/***
+* Enumerator with possible placement of a popup element
+**/
 UENUM(BlueprintType)
 enum class EModioPopupPlacement : uint8
 {
+	/** Place popup at the bottom left **/
 	AlignBottomLeft,
+
+	/** Place popup at the top left **/
 	AlignTopLeft
 };
+
 /**
- * 
- */
+* Modio UI element that provides a popup widget with an embeded combox box
+**/
 UCLASS()
 class MODIOUI_API UModioPopupComboBox : public UWidget
 {
 	GENERATED_BODY()
 protected:
-
 	UPROPERTY()
 	FModioUIMenuCommandList CurrentEntries;
-	
+
 	using FOnSelectionChanged = typename TSlateDelegates<FText>::FOnSelectionChanged;
 	using FOnSelectionChangedWithDelegate = typename TSlateDelegates<FModioUIAction>::FOnSelectionChanged;
 
@@ -40,7 +54,7 @@ protected:
 													   const TSharedRef<STableViewBase>& OwnerTable);
 
 	FSlateColor GetButtonTextColor() const;
-	
+
 	const FModioUIStyleRef* GetTextStyle() const;
 
 	void OnSelectionChangedHandler(TSharedPtr<FText> NewSelection, ESelectInfo::Type SelectionType);
@@ -50,36 +64,37 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	TSharedPtr<SModioCustomComboBox<TSharedPtr<FText>>> MyComboBox;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText Description;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText LabelFormatText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText ValueFormatText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool bUseRoundedCorners = true;
 
-	//Possibly this can just reference ComboBoxStyle
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	// Possibly this can just reference ComboBoxStyle
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FModioUIStyleRef RoundedCornerStyle = FModioUIStyleRef {"DefaultComboBoxBorderStyle"};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FModioUIStyleRef ComboBoxStyle = FModioUIStyleRef {"DefaultComboBoxStyle"};
 
-	//TODO: @modio-ue4 move into the ComboBoxStyle
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	// TODO: @modio-ue4 move into the ComboBoxStyle
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
+
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
 	FMargin ContentPadding = FMargin(20.0f, 8);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool bPreviewOpen = false;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TArray<FText> OptionValues;
 
 	TArray<TSharedPtr<FText>> BoundValues;
@@ -89,9 +104,8 @@ protected:
 	FOnSelectionChanged OnSelectionChanged;
 	FOnSelectionChangedWithDelegate OnSelectionChangedWithDelegate;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	EModioPopupPlacement PopupPlacement = EModioPopupPlacement::AlignTopLeft;
-
 
 public:
 	void SetOptionValues(const TArray<FText>& Values);

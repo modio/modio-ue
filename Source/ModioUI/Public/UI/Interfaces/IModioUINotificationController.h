@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Engine/Engine.h"
@@ -5,7 +15,6 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioUser.h"
 #include "UObject/Interface.h"
-#include "ModioUISubsystem.h"
 
 #include "IModioUINotificationController.generated.h"
 
@@ -53,7 +62,7 @@ protected:
 				Cast<ImplementingType>(this), &IModioUINotificationController::HandleDisplayNotificationWidget);
 		}
 	}
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUINotificationController")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUINotificationController")
 	void RegisterUserWidget(const TScriptInterface<IModioUINotificationController>& ControllerWidget);
 	void RegisterUserWidget_Implementation(const TScriptInterface<IModioUINotificationController>& ControllerWidget)
 	{
@@ -61,16 +70,17 @@ protected:
 		{
 			Subsystem->OnDisplayErrorNotification.AddUFunction(ControllerWidget.GetObject(),
 															   FName("HandleDisplayErrorNotification"));
-			Subsystem->OnDisplayNotificationWidget.AddUFunction(ControllerWidget.GetObject(), FName("HandleDisplayNotificationWidget"));
+			Subsystem->OnDisplayNotificationWidget.AddUFunction(ControllerWidget.GetObject(),
+																FName("HandleDisplayNotificationWidget"));
 		}
 	}
 
 public:
 	/// @brief Function to display an arbitrary notification widget that the caller has already configured
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUINotificationController")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUINotificationController")
 	void DisplayNotification(const TScriptInterface<IModioUINotification>& Notification);
 
 	/// @brief Function to display an error code notification widget
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="ModioUINotificationController")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUINotificationController")
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
 };

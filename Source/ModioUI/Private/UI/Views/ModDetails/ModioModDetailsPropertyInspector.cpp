@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/Views/ModDetails/ModioModDetailsPropertyInspector.h"
 #include "Blueprint/WidgetTree.h"
@@ -27,9 +35,9 @@ FText UModioModDetailsPropertyInspector::GetPropertyText(EModioModInfoPropertyTy
 			case EModioModInfoPropertyType::Size:
 				if (ModInfo->Underlying.FileInfo.Filesize < GB)
 				{
-					return UModioSDKLibrary::Filesize_ToString(ModInfo->Underlying.FileInfo.Filesize, 0);	
+					return UModioSDKLibrary::Filesize_ToString(ModInfo->Underlying.FileInfo.Filesize, 0);
 				}
-			
+
 				return UModioSDKLibrary::Filesize_ToString(ModInfo->Underlying.FileInfo.Filesize, 1);
 			case EModioModInfoPropertyType::Subscribers:
 				return FText::AsNumber(ModInfo->Underlying.Stats.SubscribersTotal);
@@ -94,14 +102,14 @@ void UModioModDetailsPropertyInspector::NativeOnUpdatePropertyDisplay()
 			UModioRichTextBlock* PropertyLabelBlock = WidgetTree->ConstructWidget<UModioRichTextBlock>();
 			PropertyLabelBlock->SetDefaultStyleName(DefaultPropertyNameStyleName);
 			PropertyLabelBlock->GetStyleDelegate().BindUObject(this, &UModioModDetailsPropertyInspector::GetTextStyle,
-																 PropertyNameTextStyle);
+															   PropertyNameTextStyle);
 			PropertyLabelBlock->SetText(PropDesc.Label);
 			PropertyGrid->AddChildToGrid(PropertyLabelBlock, CurrentRowIndex, 0);
 
 			UModioRichTextBlock* PropertyValueBlock = WidgetTree->ConstructWidget<UModioRichTextBlock>();
 			PropertyValueBlock->SetDefaultStyleName(DefaultPropertyValueStyleName);
 			PropertyValueBlock->GetStyleDelegate().BindUObject(this, &UModioModDetailsPropertyInspector::GetTextStyle,
-																 PropertyValueTextStyle);
+															   PropertyValueTextStyle);
 			PropertyValueBlock->SetText(GetPropertyText(PropDesc.Property));
 			PropertyGrid->AddChildToGrid(PropertyValueBlock, CurrentRowIndex, 1);
 			CurrentRowIndex++;

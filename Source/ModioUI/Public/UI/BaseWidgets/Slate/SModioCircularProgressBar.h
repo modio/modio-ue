@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Templates/SharedPointer.h"
@@ -50,7 +60,7 @@ public:
 	void SetBackgroundThickness(float NewBackgroundThickness);
 	void SetForegroundThickness(float NewForegroundThickness);
 	void SetRadius(float NewRadius);
-	
+
 	void SetProgress(TAttribute<float> NewProgress);
 	void SetBackgroundColor(FLinearColor NewBackgroundColor);
 	void SetForegroundColor(FLinearColor NewForegroundColor);

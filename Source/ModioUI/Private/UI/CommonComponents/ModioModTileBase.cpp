@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/CommonComponents/ModioModTileBase.h"
 #include "Core/ModioModInfoUI.h"
@@ -65,6 +73,14 @@ void UModioModTileBase::NativeOnInitialized()
 	{
 		TileBorder->RenderOnPhase = false;
 	}
+
+	const FModioModTileStyle* ModTileStyle = Style.FindStyle<FModioModTileStyle>();
+	if (ModTileStyle) 
+	{
+		HoveredSound = ModTileStyle->HoveredSound;
+		PressedSound = ModTileStyle->PressedSound;
+	}
+
 }
 
 void UModioModTileBase::NativeOnSetDataSource()
@@ -223,6 +239,8 @@ void UModioModTileBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FP
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
 	}
+
+	FSlateApplication::Get().PlaySound(HoveredSound);
 }
 
 FReply UModioModTileBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -236,6 +254,7 @@ FReply UModioModTileBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, c
 			if (ModInfo)
 			{
 				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+				FSlateApplication::Get().PlaySound(PressedSound);
 				return FReply::Handled();
 			}
 		}
@@ -372,6 +391,7 @@ void UModioModTileBase::NativeTileClicked()
 		if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
 		{
 			Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+			FSlateApplication::Get().PlaySound(PressedSound);
 		}
 	}
 }

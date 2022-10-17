@@ -71,12 +71,20 @@ UCLASS(MinimalAPI)
 class UModioSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
+
+	#if WITH_EDITOR
+	/// @brief Internal method used for emitting a warning during PIE if the Plugin was initialized during that PIE session
+	void CheckShutdownBeforePIEClose(UWorld*);
+	bool bInitializedDuringPIE = false;
+	#endif	
 public:
 	/** Begin USubsystem interface */
 	virtual void Initialize(FSubsystemCollectionBase& Collection);
 	virtual void Deinitialize();
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const;
 	/** End USubsystem interface */
+
+
 
 	/**
 	 * @brief Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the

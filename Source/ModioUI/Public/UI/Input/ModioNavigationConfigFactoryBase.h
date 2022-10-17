@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Containers/Map.h"
@@ -11,6 +21,9 @@
 
 #include "ModioNavigationConfigFactoryBase.generated.h"
 
+/**
+* UI class that transforms key/analog events to navigation action elements
+**/
 class MODIOUI_API FModioUINavigationConfig : public FNavigationConfig, public IModioInputMappingAccessor
 {
 protected:
@@ -101,6 +114,9 @@ protected:
 	{}
 
 public:
+	/**
+	* Default constructor for this class that maps the virtual navigation input keys
+	**/
 	FModioUINavigationConfig() : FNavigationConfig()
 	{
 		// TODO: @modio-ue4-ui Do we want to map to conceptual next/previous as well?
@@ -114,6 +130,9 @@ public:
 	}
 };
 
+/**
+* Base class that mantains a reference to a navigation configuration
+**/
 UCLASS(abstract)
 class MODIOUI_API UModioNavigationConfigFactoryBase : public UDataAsset
 {
@@ -126,6 +145,9 @@ public:
 	}
 };
 
+/**
+* Factory class that stores navigation configuration as key or analog events
+**/
 UCLASS(Blueprintable, BlueprintType, EditInlineNew)
 class MODIOUI_API UModioNavigationConfigFactory : public UModioNavigationConfigFactoryBase
 {
@@ -133,7 +155,7 @@ class MODIOUI_API UModioNavigationConfigFactory : public UModioNavigationConfigF
 
 protected:
 	/** Should the Tab key perform next and previous style navigation. */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,  Category="ModioNavigationConfigFactory")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioNavigationConfigFactory")
 	bool bTabNavigation;
 
 	/** Should we respect keys for navigation. */

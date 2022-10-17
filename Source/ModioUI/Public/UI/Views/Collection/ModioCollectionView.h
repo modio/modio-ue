@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -18,10 +26,11 @@
 
 #include "ModioCollectionView.generated.h"
 
+// TODO: listen for subscription changes etc
 /**
- *
- */
-/// TODO: listen for subscription changes etc
+* Modio UI element that combines multiple views in a single class,
+* with references to text input, labels or popup elements
+**/
 UCLASS()
 class MODIOUI_API UModioCollectionView : public UModioMenuView,
 										 public IModioUISubscriptionsChangedReceiver,
@@ -29,10 +38,10 @@ class MODIOUI_API UModioCollectionView : public UModioMenuView,
 {
 	GENERATED_BODY()
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* CollectionTitle;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioEditableTextBox* SearchInput;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
@@ -40,27 +49,27 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText ShowSystemCollectionText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* FetchButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioPopupComboBox* ModGroupSelection;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioPopupComboBox* SortBy;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioListView* CollectionList;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* CollectionCount;
 
 	/// @brief Ensures that the underlying data set doesn't get GC'd
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	TArray<UModioModCollectionEntryUI*> CachedCollection;
 
 	/// @brief Ensures that the underlying data set doesn't get GC'd
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	TArray<UModioModCollectionEntryUI*> FilteredCollection;
 
 	FModioUIAction CurrentSortAction;
@@ -75,6 +84,7 @@ protected:
 	virtual void ApplyFiltersToCollection();
 	virtual void NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState) override;
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
+	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 
 	UFUNCTION()
 	void SortAToZ();

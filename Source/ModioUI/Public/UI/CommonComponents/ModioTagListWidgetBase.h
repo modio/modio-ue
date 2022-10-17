@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -9,8 +17,9 @@
 #include "ModioTagListWidgetBase.generated.h"
 
 /**
- *
- */
+* Modio UI element that to wrap a list of viewable mod tags. It can
+* display, clear or select elements within its list
+**/
 UCLASS()
 class MODIOUI_API UModioTagListWidgetBase : public UModioUserWidgetBase
 {
@@ -19,21 +28,36 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 	virtual void NativePreConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioListView* TagSelectorList;
 	int32 CurrentlyDisplayedTagCategoryIndex = 0;
 	int32 TagCategoryCount = 0;
 
+	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+
 public:
-	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
+	/**
+	* Retrieve the list of tags in this list
+	* @return 
+	**/
+	UFUNCTION(BlueprintCallable, Category = "ModioTagWidgetBase")
 	TArray<FString> GetSelectedTags();
 
-	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
+	/**
+	 * Clear the list of tags in this list
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "ModioTagWidgetBase")
 	void ClearSelectedTags();
 
-	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
+	/**
+	 * Retrieve the list of tags in this list
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "ModioTagWidgetBase")
 	void DisplayNextTagCategory();
 
-	UFUNCTION(BlueprintCallable, Category="ModioTagWidgetBase")
+	/**
+	 * Retrieve the list of tags in this list
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "ModioTagWidgetBase")
 	void DisplayPrevTagCategory();
 };

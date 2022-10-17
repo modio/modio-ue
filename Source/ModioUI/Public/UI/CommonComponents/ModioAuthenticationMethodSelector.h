@@ -1,6 +1,17 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Algo/Transform.h"
+#include "Misc/EngineVersionComparison.h"
 #include "ModioUISubsystem.h"
 #include "Settings/ModioUISettings.h"
 #include "UI/BaseWidgets/ModioWidgetBase.h"
@@ -15,6 +26,10 @@
 
 #include "ModioAuthenticationMethodSelector.generated.h"
 
+/**
+* Modio UI element that provides a list of possible authentication methods available
+* on the current session
+**/
 UCLASS()
 class UModioAuthenticationMethodSelector : public UModioWidgetBase, public IModioUIDialogButtonWidget
 {
@@ -28,7 +43,7 @@ protected:
 	TWeakObjectPtr<UModioDialogController> DialogController;
 	TSharedPtr<SHorizontalBox> ButtonBox;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* CancelButton;
 
 	virtual void NativeSetDialogController(class UModioDialogController* Controller) override
@@ -87,8 +102,20 @@ protected:
 	{
 		TSharedPtr<SButton> RowButton;
 		TSharedPtr<SModioRichTextBlock> RowTextBlock;
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+		// UE5 changes the default FTableRowStyle to have a black background, grr
+		static FTableRowStyle StyleOverride = FCoreStyle::Get().GetWidgetStyle<FTableRowStyle>("TableView.Row");
+		StyleOverride.SetEvenRowBackgroundBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
+			.SetOddRowBackgroundBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
+			.SetEvenRowBackgroundHoveredBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
+			.SetOddRowBackgroundHoveredBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)));
+#endif
 		// clang-format off
 		TSharedRef<STableRow<TSharedPtr<FText>>> TableRow = SNew(STableRow<TSharedPtr<FText>>, OwnerTableView)
+#if UE_VERSION_NEWER_THAN(5,0,0) 
+		// Hacky, but Epic don't let you set a style on an STableRow post-construction, extra grr
+		.Style(&StyleOverride)
+#endif 
 		.Content()
 		[
 			SAssignNew(RowButton, SButton)
@@ -121,6 +148,10 @@ protected:
 	TSharedRef<SWidget> RebuildWidget() override;
 
 public:
+	/**
+	* Clear resources in this Widget
+	* @param bReleaseChildren Trigger release as well for super classes
+	**/
 	void ReleaseSlateResources(bool bReleaseChildren) override
 	{
 		Super::ReleaseSlateResources(bReleaseChildren);

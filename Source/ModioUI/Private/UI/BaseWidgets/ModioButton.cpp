@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioButton.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -9,6 +17,8 @@
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Input/SButton.h"
+#include "UI/BaseWidgets/Slate/SModioButtonBase.h"
+#include "Components/ButtonSlot.h"
 
 void UModioButton::ReleaseSlateResources(bool bReleaseChildren)
 {
@@ -24,9 +34,23 @@ void UModioButton::SynchronizeProperties()
 
 TSharedRef<SWidget> UModioButton::RebuildWidget()
 {
-	// OnHovered.Clear();
-	// OnHovered.AddDynamic(this, &UModioButton::SetHovered);
-	Super::RebuildWidget();
+		MyButton = SNew(SModioButtonBase)
+				   .OnClicked(BIND_UOBJECT_DELEGATE(FOnClicked, SlateHandleClicked))
+				   .OnPressed(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandlePressed))
+				   .OnReleased(BIND_UOBJECT_DELEGATE(FSimpleDelegate, SlateHandleReleased))
+				   .OnHovered_UObject(this, &ThisClass::SlateHandleHovered)
+				   .OnUnhovered_UObject(this, &ThisClass::SlateHandleUnhovered)
+				   .ButtonStyle(&WidgetStyle)
+				   .ClickMethod(ClickMethod)
+				   .TouchMethod(TouchMethod)
+				   .PressMethod(PressMethod)
+				   .IsFocusable(IsFocusable);
+
+	if (GetChildrenCount() > 0)
+	{
+		Cast<UButtonSlot>(GetContentSlot())->BuildSlot(MyButton.ToSharedRef());
+	}
+
 	WrappedContent = MyButton;
 	bWrapContent = false;
 	ApplyStyle();

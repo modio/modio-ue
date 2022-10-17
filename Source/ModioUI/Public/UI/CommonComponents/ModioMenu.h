@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -11,32 +19,51 @@
 #include "UI/CommonComponents/ModioDrawer.h"
 #include "UI/CommonComponents/ModioMenuBar.h"
 #include "UI/Dialogs/ModioDialogController.h"
+#include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
 #include "UI/Interfaces/IModioInputMappingAccessor.h"
 #include "UI/Views/CategoryBrowser/ModioFeaturedView.h"
 #include "UI/Views/Collection/ModioCollectionView.h"
 
 #include "ModioMenu.generated.h"
 
+/**
+* Enumerator with possible screen menus to display
+**/
 UENUM(BlueprintType)
 enum class EModioMenuScreen : uint8
 {
+	/** The menu is featured  **/
 	EMMS_Featured = 0,
+
+	/** The menu has multiple elements to display **/
 	EMMS_Collection = 1,
+
+	/** The menu represents search results **/
 	EMMS_SearchResults = 2,
+
+	/** The menu has mod details **/
 	EMMS_ModDetails = 3
 };
 
+/**
+* Enumerator with possible states of a menu drawer
+**/
 UENUM(BlueprintType)
 enum class EModioMenuDrawer : uint8
 {
+	/** Redefine the search in the menu **/
 	EMMD_RefineSearch = 0,
+
+	/** Add an element to the download queue **/
 	EMMD_DownloadQueue = 1
 };
+
 /**
- *
- */
+* Modio UI element that wraps a menu widget, in other words, it stores references to 
+* other visual instances like a controller
+**/
 UCLASS()
-class MODIOUI_API UModioMenu : public UModioUserWidgetBase
+class MODIOUI_API UModioMenu : public UModioUserWidgetBase, public IModioUIUserChangedReceiver
 {
 public:
 	void ShowAuthenticationChoiceDialog();
@@ -102,44 +129,47 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnViewChanged(int64 ViewIndex);
 
-	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UNativeWidgetHost* MenuTitleContent;
 
-	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioWidgetSwitcher* ViewController;
 
-	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioMenuBar* MenuBar;
 
-	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioImage* Background;
 
-	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioDrawerController* DrawerController;
 
-	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioDialogController* DialogController;
 
-	UPROPERTY(BlueprintReadOnly,Category="Widgets", meta = (BindWidget, MustImplement = "ModioUINotificationController"))
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets",
+			  meta = (BindWidget, MustImplement = "ModioUINotificationController"))
 	UWidget* NotificationController;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioMenuView> FeaturedView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioMenuView> CollectionView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioMenuView> SearchResultsView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioMenuView> ModDetailsView;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioDrawer> DownloadProgressDrawer;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioDrawer> RefineSearchDrawer;
+
+	virtual void NativeUserChanged(TOptional<FModioUser> NewUser) override;
 
 public:
 	void ShowDetailsForMod(FModioModID ID);

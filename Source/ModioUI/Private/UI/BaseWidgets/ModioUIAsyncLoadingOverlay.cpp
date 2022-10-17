@@ -1,10 +1,20 @@
-﻿#include "UI/BaseWidgets/ModioUIAsyncLoadingOverlay.h"
+﻿/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
+#include "UI/BaseWidgets/ModioUIAsyncLoadingOverlay.h"
 
 #include "UI/BaseWidgets/ModioUIAsyncLoader.h"
 #include "UI/Styles/ModioDialogStyle.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-#include "Widgets/Layout/SSpacer.h"
 #include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SSpacer.h"
 
 void UModioUIAsyncLoadingOverlay::NativeOnInitialized()
 {
@@ -16,11 +26,10 @@ void UModioUIAsyncLoadingOverlay::NativeOnInitialized()
 	}
 }
 
-
 TSharedRef<SWidget> UModioUIAsyncLoadingOverlay::RebuildWidget()
 {
 	TSharedRef<SWidget> Widget = Super::RebuildWidget();
-	
+
 	return Widget;
 }
 

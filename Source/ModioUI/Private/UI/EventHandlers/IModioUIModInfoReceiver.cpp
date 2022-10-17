@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "UI/EventHandlers/IModioUIModInfoReceiver.h"
 
 void IModioUIModInfoReceiver::ModInfoRequestHandler(FModioModID ModID, FModioErrorCode ec,
@@ -24,11 +34,12 @@ void IModioUIModInfoReceiver::NativeOnModInfoRequestCompleted(FModioModID ModID,
 															  TOptional<FModioModInfo> Info)
 {
 	bRoutedUIModInfoReceiver = true;
-	Execute_OnModInfoRequestCompleted(Cast<UObject>(this), ModID, ec, FModioOptionalModInfo{Info});
+	Execute_OnModInfoRequestCompleted(Cast<UObject>(this), ModID, ec, FModioOptionalModInfo {Info});
 }
 void IModioUIModInfoReceiver::NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,
 																  TOptional<FModioModInfoList> List)
 {
 	bRoutedUIModInfoReceiver = true;
-	Execute_OnListAllModsRequestCompleted(Cast<UObject>(this), RequestIdentifier, ec, FModioOptionalModInfoList(MoveTemp(List)));
+	Execute_OnListAllModsRequestCompleted(Cast<UObject>(this), RequestIdentifier, ec,
+										  FModioOptionalModInfoList(MoveTemp(List)));
 }

@@ -35,7 +35,11 @@ In the directory with your .uproject file: `git submodule add https://github.com
 
 ==== In a non-git project, or without submodules
 
-. Grab the latest release zip from this page, and extract the contents to your project's `Plugins/Modio` directory
+. Grab the latest release zip from the Releases section on this page, and extract the contents to your project's `Plugins/Modio` directory
+
+image:Doc/img/get_latest_release.png[] image:Doc/img/get_latest_release2.png[]
+
+NOTE: The automatically generated zips in on the release page, or the 'Code' dropdown here, will not work! They do not contain our submodule dependencies. 
 
 === Enabling the plugin
 

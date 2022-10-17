@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -6,7 +14,6 @@
 #include "Components/TileView.h"
 #include "CoreMinimal.h"
 #include "UI/BaseWidgets/Slate/SModioTileView.h"
-
 
 #include "ModioTileView.generated.h"
 
@@ -19,13 +26,12 @@ class MODIOUI_API UModioTileView : public UTileView
 	GENERATED_BODY()
 
 protected:
-
 	TSharedPtr<class SModioTileView<UObject*>> MyDerivedTileView;
 
-	UPROPERTY(BlueprintReadOnly,EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool AllowPartialItems = false;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool CenterPanelItems;
 
 	virtual void OnItemHoveredChanged(UObject* Item, bool bNewSelectionState);
@@ -39,10 +45,10 @@ protected:
 	UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass,
 											   const TSharedRef<STableViewBase>& OwnerTable) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool bZoomSelectedEntryWidget = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Widgets")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widgets")
 	ESlateVisibility ScrollbarVisibility;
 
 public:

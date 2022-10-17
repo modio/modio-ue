@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Brushes/SlateColorBrush.h"
@@ -8,11 +18,17 @@
 
 #include "ModioComboBoxStyle.generated.h"
 
+/**
+* Struct derivate of Widget style to store a combo box style
+**/
 USTRUCT(BlueprintType)
 struct MODIOUI_API FModioComboBoxStyle : public FSlateWidgetStyle
 {
 	GENERATED_BODY()
 
+	/**
+	* Default constructor without parameters
+	**/
 	FModioComboBoxStyle() : Super()
 	{
 		// Populate the combo box style from defaults
@@ -23,15 +39,27 @@ struct MODIOUI_API FModioComboBoxStyle : public FSlateWidgetStyle
 			.SetPressed(FSlateColorBrush(FLinearColor(0.5, 0.5, 0.5)));
 	}
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	/**
+	* Stored property that represents the appearance of an ComboBox
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FComboBoxStyle ComboBoxStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	/**
+	* Stored property that represents the menu border style
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FModioWidgetBorderStyle MenuBorderStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	/**
+	* Stored property that represents the button border style
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FModioWidgetBorderStyle ButtonBorderStyle;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Widgets")
+	/**
+	* Stored property that uses a table row style for the dropdown item
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FTableRowStyle DropdownItemStyle;
 };

@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/CommonComponents/ModioModTile.h"
 #include "Components/ListViewBase.h"
@@ -183,6 +191,7 @@ void UModioModTile::SubmitModReport()
 void UModioModTile::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
 	if (MoreOptionsMenu)
 	{
 		FModioUIMenuCommandList MenuEntries;
@@ -220,6 +229,9 @@ FEventReply UModioModTile::OnThumbnailMouseDown(FGeometry MyGeometry, const FPoi
 			if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
 			{
 				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+
+				FSlateApplication::Get().PlaySound(PressedSound);
+
 				return FEventReply(true);
 			}
 		}

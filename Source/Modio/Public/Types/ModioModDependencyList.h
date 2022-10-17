@@ -18,53 +18,71 @@
 #include "ModioModDependencyList.generated.h"
 
 /**
- * @brief Minimal data about a mod which is a dependency of another mod
- * @experimental
- */
+* Basic reference data about a dependency relationship to another mod
+* @experimental
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModDependency
 {
 	GENERATED_BODY();
 	
 	/**
-	 * @brief The ID of the dependency
-	 */
+	* The ID of the mod dependency
+	**/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
 	FModioModID ModID;
 
 	/**
-	 * @brief The name of the dependency
-	 */
+	* The name of the mod dependency
+	**/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
 	FString ModName;
 };
 
 
 /**
- * @brief Paged list of mod dependencies
- * @experimental
- */
+* Strong type struct to wrap multiple ModDependency indexed by a paged result
+* @experimental
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModDependencyList
 {
 	GENERATED_BODY();
 
+	/**
+	* Stored property for a paged result, which provides context on the dependency list
+	**/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependencyList")
 	FModioPagedResult PagedResult;
 
+	/**
+	* Stored property for the dependency list
+	**/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependencyList")
 	TArray<FModioModDependency> InternalList;
 };
 
-
-
+/**
+* Strong type struct to wrap a ModDependencyList data as an optional value
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModDependencyList
 {
 	GENERATED_BODY()
 
+    /**
+    * Default constructor without parameters
+    **/
 	FModioOptionalModDependencyList() = default;
+	
+    /**
+    * Convenience constructor that has a list of mod dependencies
+    * @param ModDependencies An optional value that contains mod dependencies 
+    **/
 	FModioOptionalModDependencyList(TOptional<FModioModDependencyList>&& ModDependencies);
-
+	
+    /**
+    * Stored optional ModioModDependencyList
+    **/
 	TOptional<FModioModDependencyList> Internal;
 };

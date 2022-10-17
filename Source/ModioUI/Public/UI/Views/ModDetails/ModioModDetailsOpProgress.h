@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -10,9 +18,11 @@
 #include "UI/CommonComponents/ModioModManagementWidgetBase.h"
 
 #include "ModioModDetailsOpProgress.generated.h"
+
 /**
- *
- */
+* Base class that stores details of a mod progress operation, keeping
+* references for the progress bar and operation metadata.
+**/
 UCLASS()
 class MODIOUI_API UModioModDetailsOpProgress : public UModioModManagementWidgetBase
 {
@@ -28,22 +38,22 @@ protected:
 	void UpdateTimeRemaining(FModioUnsigned64 ProgressSinceLastUpdate, FModioUnsigned64 AmountRemaining,
 							 double SecondsSinceLastUpdate);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioProgressBar* ProgressBar;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* TimeRemainingText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText TimeRemainingTextFormat;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText SpeedTextFormat;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* OperationSpeedText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* OperationProgressText;
 
 	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;

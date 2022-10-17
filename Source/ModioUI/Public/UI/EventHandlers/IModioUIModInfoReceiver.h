@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Misc/EnumClassFlags.h"
@@ -10,10 +20,16 @@
 
 #include "IModioUIModInfoReceiver.generated.h"
 
+/**
+* Enumerator of the information envents
+**/
 UENUM(meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioUIModInfoEventType : uint8
 {
+	/** Event to list all mods **/
 	ListAllMods,
+
+	/** Event to retrieve the mod information **/
 	GetModInfo
 };
 

@@ -21,38 +21,56 @@ namespace Modio
 	class ModProgressInfo;
 }
 
-/** @brief Class representing the progress of a mod installation or update */
+/** 
+* Strong type struct representing the progress of a mod installation or update 
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModProgressInfo
 {
 	GENERATED_BODY()
 
-	/** @brief Total size of the downloaded file */
+	/** 
+	* Total size of the downloaded file 
+	**/
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo")
 	FModioUnsigned64 TotalDownloadSize;
 
-	/** @brief Current amount downloaded in bytes */
+	/** 
+	* Current amount downloaded in bytes 
+	**/
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo|Current")
 	FModioUnsigned64 CurrentlyDownloadedBytes;
 
-	/** @brief Total size on disk when fully extracted */
+	/** 
+	* Total size on disk when fully extracted 
+	**/
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo")
 	FModioUnsigned64 TotalExtractedSizeOnDisk;
 
-	/** @brief Amount of data currently extracted */
+	/**
+	* Amount of data currently extracted 
+	**/
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo|Current")
 	FModioUnsigned64 CurrentlyExtractedBytes;
 
-	/** @brief The mod ID of the mod being processed */
+	/** 
+	* The mod ID of the mod being processed 
+	**/
 	UPROPERTY(BlueprintReadOnly,Category="ModProgressInfo")
 	FModioModID ID;
 };
 
+/**
+* Struct strong type to wrap an optional value for the ModProgressInfo
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModProgressInfo
 {
 	GENERATED_BODY()
 
+	/**
+	* Stored property for the optional ModProgressInfo
+	**/
 	TOptional<FModioModProgressInfo> Internal;
 };
 

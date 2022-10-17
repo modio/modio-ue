@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -14,20 +22,35 @@
 
 #include "ModioModDetailsImageGallery.generated.h"
 
-// UStruct so that LoadedImage gets a hard reference
+/**
+* Struct so that LoadedImage gets a hard reference
+**/
 USTRUCT()
 struct FModioModDetailsGalleryImageInfo
 {
 	GENERATED_BODY()
+	
+	/**
+	* Stored optional property of the error code
+	**/
 	TOptional<FModioErrorCode> Status;
+	
+	/**
+	* Stored optional property of the downloaded image reference
+	**/
 	TOptional<FModioImageWrapper> DownloadedImageReference;
+
+	/**
+	* Stored property of the loaded dynamic texture image
+	**/
 	UPROPERTY()
 	UTexture2DDynamic* LoadedImage;
 };
 
 /**
- *
- */
+* Base class that stores details of a mod image gallery in an array of 
+* ModioModDetailsGalleryImageInfo.
+**/
 UCLASS()
 class MODIOUI_API UModioModDetailsImageGallery : public UModioUserWidgetBase,
 												 public IModioUIMediaDownloadCompletedReceiver
@@ -64,13 +87,16 @@ protected:
 
 	void ShowImageInternal(int32 RawIndex);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioImageGalleryBase* ImageGallery;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioListViewInteger* NavButtons;
 };
 
+/**
+* Base class that stores details of a mod image gallery navigation button
+**/
 UCLASS()
 class MODIOUI_API UModioModDetailsImageGalleryNavButtonBase : public UModioUserWidgetBase, public IUserObjectListEntry
 {
@@ -80,10 +106,10 @@ protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere,Category="Widgets", meta = (BindWidgetOptional))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioImage* Image;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Appearance")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Appearance")
 	TSoftObjectPtr<UMaterialInterface> SpecifiedMaterial;
 
 	// TODO: @modio-ue4-ui the colors here should possibly be put into some kind of common style

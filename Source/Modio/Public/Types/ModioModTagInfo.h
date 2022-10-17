@@ -15,7 +15,9 @@
 
 #include "ModioModTagInfo.generated.h"
 
-/** @brief Metadata about a group of tags that can be used for filtering mods */
+/** 
+* Metadata about a group of tags that can be used for filtering mods 
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModTagInfo
 {

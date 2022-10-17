@@ -14,7 +14,9 @@
 
 #include "ModioMetadata.generated.h"
 
-
+/**
+* Strong type struct to represent key-value pairs for a mod metadata
+**/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioMetadata
 {

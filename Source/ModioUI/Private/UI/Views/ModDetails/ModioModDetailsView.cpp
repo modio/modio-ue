@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #include "UI/Views/ModDetails/ModioModDetailsView.h"
 #include "Engine/Engine.h"
 #include "Framework/Notifications/NotificationManager.h"
@@ -8,6 +18,7 @@
 #include "UI/EventHandlers/IModioUIAuthenticationChangedReceiver.h"
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "TimerManager.h"
 
 void UModioModDetailsView::NativeConstruct()
 {
@@ -18,6 +29,7 @@ void UModioModDetailsView::NativeConstruct()
 void UModioModDetailsView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
 	if (DetailsLoader)
 	{
 		TScriptInterface<IModioUIAsyncOperationWidget> InterfaceWrapper =
@@ -238,6 +250,16 @@ void UModioModDetailsView::NativeOnSetDataSource()
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 	if (ModInfo)
 	{
+		bCachedSubscriptionState = false;
+		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+		{
+			// Can hit this function directly because the primary subsystem caches the subscriptions, so we dont
+			// have to do it manually in the UI subsystem
+			if (Subsystem->QueryUserSubscriptions().Contains(ModInfo->Underlying.ModId))
+			{
+				bCachedSubscriptionState = true;
+			}
+		}
 		if (ModTitleTextBlock)
 		{
 			ModTitleTextBlock->SetText(FText::FromString(ModInfo->Underlying.ProfileName));
@@ -292,19 +314,16 @@ void UModioModDetailsView::NativeOnSetDataSource()
 
 		if (SubscribeButton)
 		{
-			SubscribeButton->SetLabel(SubscribeLabel);
-
-			if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+			if (bCachedSubscriptionState)
 			{
-				// Can hit this function directly because the primary subsystem caches the subscriptions, so we dont
-				// have to do it manually in the UI subsystem
-				if (Subsystem->QueryUserSubscriptions().Contains(ModInfo->Underlying.ModId))
-				{
-					bCachedSubscriptionState = true;
-					SubscribeButton->SetLabel(UnsubscribeLabel);
-				}
+				SubscribeButton->SetLabel(UnsubscribeLabel);
+			}
+			else
+			{
+				SubscribeButton->SetLabel(SubscribeLabel);
 			}
 		}
+
 		if (ModPropertiesInspector)
 		{
 			ModPropertiesInspector->SetDataSource(DataSource);
@@ -329,6 +348,8 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 			{
 				NewDataSource->Underlying = Info.GetValue();
 				SetDataSource(NewDataSource);
+
+				GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::SetInitialFocus,0.2,false);
 			}
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																	   EModioUIAsyncOperationWidgetState::Success);
@@ -338,6 +359,11 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::Error);
 		}
 	}
+}
+
+void UModioModDetailsView::SetInitialFocus() 
+{
+	FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
 }
 
 void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
@@ -356,8 +382,6 @@ void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
 
 FReply UModioModDetailsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::Navigation);
-
 	return FReply::Handled();
 }
 

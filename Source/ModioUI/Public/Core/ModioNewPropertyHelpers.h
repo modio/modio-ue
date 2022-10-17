@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 // Copyright Epic Games, Inc. All Rights Reserved.
 // This file contains an extended version of IteratePropertyPathRecursive because Epic do not currently support map
 // properties.
@@ -248,7 +258,8 @@ namespace ModioNewPropertyHelpers
 	}
 
 	template<typename StructContainerType, typename T>
-	bool SetPropertyValueForStruct(StructContainerType* InContainer, const FCachedPropertyPath& InPropertyPath, const T& InValue)
+	bool SetPropertyValueForStruct(StructContainerType* InContainer, const FCachedPropertyPath& InPropertyPath,
+								   const T& InValue)
 	{
 		check(InContainer);
 		PropertyPathHelpersInternal::FInternalSetterResolver<T> Resolver(InValue);

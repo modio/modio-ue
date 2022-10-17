@@ -70,6 +70,22 @@ bool UModioSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 	return true;
 }
 
+#if WITH_EDITOR
+void UModioSubsystem::CheckShutdownBeforePIEClose(UWorld*)
+{
+	if (bInitializedDuringPIE)
+	{
+		UE_LOG(LogModio, Warning,
+			   TEXT("mod.io plugin initialized during PIE, but not shut down. Please call "
+					"UModioSubsystem::ShutdownAsync, ensuring you call RunPendingHandlers until it completes (invokes "
+					"your callback) before exiting PIE to ensure cleanup occurs"));
+		bool bShutdownComplete = false;
+		ShutdownAsync(FOnErrorOnlyDelegateFast::CreateLambda([&bShutdownComplete](FModioErrorCode ec){bShutdownComplete = true;}));
+		while (!bShutdownComplete) {RunPendingHandlers();}
+	}
+}
+#endif
+
 void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FOnErrorOnlyDelegateFast OnInitComplete)
 {
 #if WITH_EDITOR
@@ -77,6 +93,15 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 	{
 		UE_LOG(LogModio, Display, TEXT("Setting log level to %d"), (int32) Settings->LogLevel);
 		SetLogLevel(Settings->LogLevel);
+	}
+
+	if (UWorld* CurrentWorld = GEngine->GetCurrentPlayWorld())
+	{
+		if (CurrentWorld->IsPlayInEditor())
+		{
+			bInitializedDuringPIE = true;
+			FWorldDelegates::OnPreWorldFinishDestroy.AddUObject(this, &UModioSubsystem::CheckShutdownBeforePIEClose);
+		}
 	}
 #endif
 
@@ -188,6 +213,10 @@ void UModioSubsystem::DisableModManagement()
 void UModioSubsystem::ShutdownAsync(FOnErrorOnlyDelegateFast OnShutdownComplete)
 {
 	Modio::ShutdownAsync([this, OnShutdownComplete](Modio::ErrorCode ec) {
+#if WITH_EDITOR
+		bInitializedDuringPIE = false;
+#endif
+
 		InvalidateUserSubscriptionCache();
 
 		OnShutdownComplete.ExecuteIfBound(ToUnreal(ec));
@@ -278,12 +307,12 @@ void UModioSubsystem::K2_GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegat
 void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback)
 {
 	Modio::GetModMediaAsync(ToModio(ModId), ToModio(AvatarSize),
-							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::filesystem::path> Path) {
+							[Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
 								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 
 								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								// because we already have a Modio::filesystem::path -> FString overload of ToUnreal
-								// TODO: @modio-ue4 Potentially refactor ToUnreal(Modio::filesystem::path) as a template
+								// because we already have a std::string -> FString overload of ToUnreal
+								// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
 								// function returning type T so we can be explicit about the expected type
 								if (Path)
 								{
@@ -302,12 +331,12 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize Gall
 									   FOnGetMediaDelegateFast Callback)
 {
 	Modio::GetModMediaAsync(ToModio(ModId), ToModio(GallerySize), Index,
-							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::filesystem::path> Path) {
+							[Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
 								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 
 								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								// because we already have a Modio::filesystem::path -> FString overload of ToUnreal
-								// TODO: @modio-ue4 Potentially refactor ToUnreal(Modio::filesystem::path) as a template
+								// because we already have a std::string -> FString overload of ToUnreal
+								// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
 								// function returning type T so we can be explicit about the expected type
 								if (Path)
 								{
@@ -325,12 +354,12 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize Gall
 void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSize, FOnGetMediaDelegateFast Callback)
 {
 	Modio::GetModMediaAsync(ToModio(ModId), ToModio(LogoSize),
-							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::filesystem::path> Path) {
+							[Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
 								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
 
 								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								// because we already have a Modio::filesystem::path -> FString overload of ToUnreal
-								// TODO: @modio-ue4 Potentially refactor ToUnreal(Modio::filesystem::path) as a template
+								// because we already have a std::string -> FString overload of ToUnreal
+								// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
 								// function returning type T so we can be explicit about the expected type
 								if (Path)
 								{
@@ -488,10 +517,10 @@ void UModioSubsystem::K2_ClearUserDataAsync(FOnErrorOnlyDelegate Callback)
 void UModioSubsystem::GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback)
 {
 	Modio::GetUserMediaAsync(ToModio(AvatarSize),
-							 [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::filesystem::path> Media) {
+							 [Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Media) {
 								 // Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								 // because we already have a Modio::filesystem::path -> FString overload of ToUnreal
-								 // TODO: @modio-ue4 Potentially refactor ToUnreal(Modio::filesystem::path) as a
+								 // because we already have a std::string -> FString overload of ToUnreal
+								 // TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a
 								 // template function returning type T so we can be explicit about the expected type
 								 if (Media)
 								 {

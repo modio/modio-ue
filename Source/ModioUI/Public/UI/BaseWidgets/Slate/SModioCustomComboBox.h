@@ -1,7 +1,19 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
-#include "Rendering/DrawElements.h"
 #include "Brushes/SlateColorBrush.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Layout/WidgetPath.h"
+#include "Rendering/DrawElements.h"
 #include "Slate/SRetainerWidget.h"
 #include "Types/SlateEnums.h"
 #include "UI/Styles/ModioUIColorRef.h"
@@ -11,8 +23,6 @@
 #include "Widgets/Input/SButton.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Views/SListView.h"
-#include "Layout/WidgetPath.h"
-#include "Framework/Application/SlateApplication.h"
 
 template<typename DataType>
 class SModioCustomComboBox : public SCompoundWidget
@@ -66,6 +76,8 @@ protected:
 	{
 		bIsHovered = true;
 		SCompoundWidget::OnMouseEnter(MyGeometry, MouseEvent);
+
+		FSlateApplication::Get().PlaySound(HoveredSound);
 	}
 	virtual void OnMouseLeave(const FPointerEvent& MouseEvent) override
 	{
@@ -115,6 +127,8 @@ public:
 	SLATE_EVENT(FOnSelectionChanged, OnSelectionChanged)
 	SLATE_ARGUMENT(TArray<DataType>*, ItemsSource)
 	SLATE_ARGUMENT(EMenuPlacement, MenuPlacement)
+	SLATE_ARGUMENT(FSlateSound, PressedSound)
+	SLATE_ARGUMENT(FSlateSound, HoveredSound)
 	SLATE_END_ARGS()
 
 	int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect,
@@ -153,6 +167,8 @@ public:
 		MenuPlacement = FArgs._MenuPlacement;
 		ContentPadding = FArgs._ContentPadding;
 		MyContent = CreateButtonContentWidget();
+		PressedSound = FArgs._PressedSound;
+		HoveredSound = FArgs._HoveredSound;
 
 		// clang-format off
 		
@@ -331,6 +347,7 @@ protected:
 		if (bIsOpen)
 		{
 			FSlateApplication::Get().SetAllUserFocus(MyContent.ToSharedRef(), EFocusCause::Navigation);
+			FSlateApplication::Get().PlaySound(PressedSound);
 		}
 		return FReply::Handled();
 	}
@@ -422,4 +439,6 @@ protected:
 	TOptional<int32> CurrentSelectionIndex;
 	FMargin ContentPadding;
 	float BorderRadius = 0;
+	FSlateSound PressedSound;
+	FSlateSound HoveredSound;
 };

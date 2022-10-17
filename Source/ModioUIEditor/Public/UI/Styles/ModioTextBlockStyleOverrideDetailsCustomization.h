@@ -1,3 +1,13 @@
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
+
 #pragma once
 
 #include "Algo/Transform.h"
@@ -25,7 +35,8 @@ public:
 		HeaderRow.NameContent()[PropertyHandle->CreatePropertyNameWidget()];
 		HeaderRow.ValueContent()[PropertyHandle->CreatePropertyValueWidget(false)];
 	}
-	FName GetRelativePropertyPath(TSharedPtr<IPropertyHandle> ParentHandle, TSharedPtr<IPropertyHandle> PropertyHandle) const
+	FName GetRelativePropertyPath(TSharedPtr<IPropertyHandle> ParentHandle,
+								  TSharedPtr<IPropertyHandle> PropertyHandle) const
 	{
 		FCachedPropertyPath ParentPath = ParentHandle->GeneratePathToProperty();
 		FCachedPropertyPath ChildPath = PropertyHandle->GeneratePathToProperty();
@@ -35,7 +46,6 @@ public:
 			ChildPath.RemoveFromStart();
 		}
 		return FName(ChildPath.ToString());
-
 	}
 	void OnOverrideToggled(bool NewValue, TSharedPtr<IPropertyHandle> PropertyWithOverrideToggled)
 	{
@@ -94,9 +104,7 @@ public:
 			ChildBuilder);
 
 		StylePropertyHandle = PropertyHandle->GetChildHandle(FName("StyleProperties"));
-		//Perhaps store this and use it to trim the property path before we save it out?
-
-
+		// Perhaps store this and use it to trim the property path before we save it out?
 
 		/*if (StylePropertyHandle)
 		{

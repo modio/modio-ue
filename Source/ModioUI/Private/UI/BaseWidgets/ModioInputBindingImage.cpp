@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioInputBindingImage.h"
 #include "UI/Styles/ModioUIStyleSet.h"
@@ -34,8 +42,7 @@ void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		UMaterialInterface* InputGlyphMaterial =
-			Subsystem->GetInputGlyphMaterialForInputType(KeyToShow, InputDevice);
+		UMaterialInterface* InputGlyphMaterial = Subsystem->GetInputGlyphMaterialForInputType(KeyToShow, InputDevice);
 		if (InputGlyphMaterial)
 		{
 			SetBrushFromMaterial(InputGlyphMaterial);
@@ -45,7 +52,8 @@ void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
 	{
 		SetVisibility(GetVisibilityForMode.Execute(InputDevice));
 		InvalidateLayoutAndVolatility();
-	} else
+	}
+	else
 	{
 		// Disable input images when using Mouse/Keyboard as we do not have appropriate glyphs
 		if (InputDevice == EModioUIInputMode::Keyboard || InputDevice == EModioUIInputMode::Mouse || InputDevice == EModioUIInputMode::Unknown)

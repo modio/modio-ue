@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #include "UI/BaseWidgets/ModioDefaultPopupMenuContent.h"
 #include "Algo/Transform.h"
@@ -8,6 +16,12 @@
 #include "UI/Styles/ModioWidgetBorderStyle.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
+void UModioDefaultPopupMenuContent::NativeConstruct() 
+{
+	Super::NativeConstruct();
+
+	bIsFocusable = true;
+}
 FOptionalSize UModioDefaultPopupMenuContent::GetDesiredItemWidth() const
 {
 	return DesiredSizeFromParentMenu.X;
@@ -78,9 +92,9 @@ void UModioDefaultPopupMenuContent::OnEntrySelected(TSharedPtr<FModioUIMenuEntry
 {
 	NativeGetContentCloseDelegate().ExecuteIfBound();
 
-	for (auto It = CurrentCommandList.MappedActions.CreateIterator(); ++It;)
+	for (auto It = CurrentCommandList.MappedActions.CreateIterator(); It; ++It)
 	{
-		if (It.Key().MenuEntryLabel.EqualTo(SelectedEntry.Get()->MenuEntryLabel))
+		if (It.Key().MenuEntryLabel.EqualToCaseIgnored(SelectedEntry.Get()->MenuEntryLabel))
 		{
 			const FModioUIAction& Action = It.Value();
 			if (Action.CanExecuteAction.IsBound())
@@ -88,11 +102,13 @@ void UModioDefaultPopupMenuContent::OnEntrySelected(TSharedPtr<FModioUIMenuEntry
 				if (Action.CanExecuteAction.Execute())
 				{
 					Action.ExecuteAction.ExecuteIfBound();
+					FSlateApplication::Get().PlaySound(ItemPressedSound); 
 				}
 			}
 			else
 			{
 				Action.ExecuteAction.ExecuteIfBound();
+				FSlateApplication::Get().PlaySound(ItemPressedSound);
 			}
 		}
 	}
@@ -102,7 +118,7 @@ TSharedRef<ITableRow> UModioDefaultPopupMenuContent::GenerateMenuEntryWidget(
 	TSharedPtr<FModioUIMenuEntry> Item, const TSharedRef<STableViewBase>& OwnerTable)
 {
 	// clang-format off
-	return SNew(SModioTableRowBase<TSharedPtr<FModioUIMenuEntry>>, OwnerTable)
+	auto Row = SNew(SModioTableRowBase<TSharedPtr<FModioUIMenuEntry>>, OwnerTable)
 	.Style(FModioUIStyleRef{"DefaultPopupRowStyle"})
 	.Content()
 	[
@@ -115,6 +131,11 @@ TSharedRef<ITableRow> UModioDefaultPopupMenuContent::GenerateMenuEntryWidget(
 		]
 	];
 	// clang-format on
+
+	Row->SetOnMouseEnter(
+		FNoReplyPointerEventHandler::CreateUObject(this, &UModioDefaultPopupMenuContent::PlayHoveredSound));
+
+	return Row;
 }
 
 void UModioDefaultPopupMenuContent::NativeSetMenuEntries(const struct FModioUIMenuCommandList& Entries)
@@ -170,6 +191,7 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 	}
 
 #endif
+
 	// clang-format off
 	MyBox = SNew(SBox)
 		.WidthOverride_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredItemWidth)
@@ -187,6 +209,7 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 								.ItemHeight_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredItemHeight)
 								.OnSelectionChanged_UObject(this, &UModioDefaultPopupMenuContent::OnEntrySelected)
 								.OnGenerateRow_UObject(this, &UModioDefaultPopupMenuContent::GenerateMenuEntryWidget)
+								.IsFocusable(true)
 			]
 		];
 		MyList->SetScrollbarVisibility(EVisibility::Collapsed);
@@ -202,4 +225,11 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 	MyList->RebuildList();
 	MyBorder->RequestRender();
 	return MyBox.ToSharedRef();
+}
+
+FReply UModioDefaultPopupMenuContent::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+	FSlateApplication::Get().SetUserFocus(0, MyList, EFocusCause::SetDirectly);
+
+	return FReply::Handled();
 }
