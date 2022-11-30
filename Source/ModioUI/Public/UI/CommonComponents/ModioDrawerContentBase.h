@@ -14,6 +14,7 @@
 #include "Components/VerticalBoxSlot.h"
 #include "CoreMinimal.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
+#include "Widgets/Images/SImage.h"
 
 #include "ModioDrawerContentBase.generated.h"
 

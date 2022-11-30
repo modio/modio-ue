@@ -14,6 +14,7 @@
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Images/SImage.h"
+#include "Widgets/Text/STextBlock.h"
 
 void UModioLogoWidget::SynchronizeProperties()
 {

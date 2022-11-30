@@ -14,6 +14,7 @@
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/Interfaces/IModioUIPopupMenuContentWidget.h"
 #include "UI/Styles/ModioPopupMenuStyle.h"
+#include "Widgets/Input/SMenuAnchor.h"
 
 void UModioPopupMenu::SynchronizeProperties()
 {
