@@ -31,6 +31,7 @@
 #include "Internal/Convert/ReportParams.h"
 #include "Internal/Convert/Terms.h"
 #include "Internal/Convert/User.h"
+#include "Internal/Convert/UserList.h"
 #include "Internal/ModioConvert.h"
 #include "ModioSettings.h"
 #include "ProfilingDebugging/CpuProfilerTrace.h"
@@ -80,8 +81,12 @@ void UModioSubsystem::CheckShutdownBeforePIEClose(UWorld*)
 					"UModioSubsystem::ShutdownAsync, ensuring you call RunPendingHandlers until it completes (invokes "
 					"your callback) before exiting PIE to ensure cleanup occurs"));
 		bool bShutdownComplete = false;
-		ShutdownAsync(FOnErrorOnlyDelegateFast::CreateLambda([&bShutdownComplete](FModioErrorCode ec){bShutdownComplete = true;}));
-		while (!bShutdownComplete) {RunPendingHandlers();}
+		ShutdownAsync(FOnErrorOnlyDelegateFast::CreateLambda(
+			[&bShutdownComplete](FModioErrorCode ec) { bShutdownComplete = true; }));
+		while (!bShutdownComplete)
+		{
+			RunPendingHandlers();
+		}
 	}
 }
 #endif
@@ -516,23 +521,22 @@ void UModioSubsystem::K2_ClearUserDataAsync(FOnErrorOnlyDelegate Callback)
 
 void UModioSubsystem::GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback)
 {
-	Modio::GetUserMediaAsync(ToModio(AvatarSize),
-							 [Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Media) {
-								 // Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								 // because we already have a std::string -> FString overload of ToUnreal
-								 // TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a
-								 // template function returning type T so we can be explicit about the expected type
-								 if (Media)
-								 {
-									 FModioImageWrapper Out;
-									 Out.ImagePath = ToUnreal(Media.value());
-									 Callback.ExecuteIfBound(ec, Out);
-								 }
-								 else
-								 {
-									 Callback.ExecuteIfBound(ec, {});
-								 }
-							 });
+	Modio::GetUserMediaAsync(ToModio(AvatarSize), [Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Media) {
+		// Manually calling ToUnreal on the path and assigning to the member of FModioImage
+		// because we already have a std::string -> FString overload of ToUnreal
+		// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a
+		// template function returning type T so we can be explicit about the expected type
+		if (Media)
+		{
+			FModioImageWrapper Out;
+			Out.ImagePath = ToUnreal(Media.value());
+			Callback.ExecuteIfBound(ec, Out);
+		}
+		else
+		{
+			Callback.ExecuteIfBound(ec, {});
+		}
+	});
 }
 
 void UModioSubsystem::K2_GetUserMediaAvatarAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegate Callback)
@@ -689,6 +693,15 @@ void UModioSubsystem::K2_SubmitNewModAsync(FModioModCreationHandle Handle, FModi
 		}));
 }
 
+void UModioSubsystem::K2_ListUserCreatedModsAsync(const FModioFilterParams& Filter,
+												  FOnListUserCreatedModsDelegate Callback)
+{
+	ListUserCreatedModsAsync(Filter, FOnListUserCreatedModsDelegateFast::CreateLambda(
+										 [Callback](FModioErrorCode ec, TOptional<FModioModInfoList> ModList) {
+											 Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModInfoList>(ModList));
+										 }));
+}
+
 void UModioSubsystem::ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::ArchiveModAsync(ToModio(Mod), [Callback](Modio::ErrorCode ec) { Callback.ExecuteIfBound(ToUnreal(ec)); });
@@ -703,6 +716,14 @@ void UModioSubsystem::K2_ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegate C
 void UModioSubsystem::VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::VerifyUserAuthenticationAsync([Callback](Modio::ErrorCode ec) { Callback.ExecuteIfBound(ToUnreal(ec)); });
+}
+
+void UModioSubsystem::ListUserCreatedModsAsync(FModioFilterParams Filter, FOnListUserCreatedModsDelegateFast Callback)
+{
+	Modio::ListUserCreatedModsAsync(ToModio(Filter),
+									[Callback](FModioErrorCode ec, Modio::Optional<Modio::ModInfoList> Result) {
+										Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioModInfoList>(Result));
+									});
 }
 
 void UModioSubsystem::K2_VerifyUserAuthenticationAsync(FOnErrorOnlyDelegate Callback)
@@ -723,6 +744,53 @@ void UModioSubsystem::K2_SubmitModChangesAsync(FModioModID Mod, FModioEditModPar
 		Mod, Params,
 		FOnGetModInfoDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioModInfo> MaybeModInfo) {
 			Callback.ExecuteIfBound(ec, FModioOptionalModInfo {MaybeModInfo});
+		}));
+}
+
+void UModioSubsystem::MuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::MuteUserAsync(ToModio(UserID), [Callback](Modio::ErrorCode ec) { Callback.ExecuteIfBound(ToUnreal(ec)); });
+}
+
+void UModioSubsystem::K2_MuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegate Callback)
+{
+	MuteUserAsync(UserID, FOnErrorOnlyDelegateFast::CreateLambda(
+							  [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+}
+
+void UModioSubsystem::UnmuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::UnmuteUserAsync(ToModio(UserID), [Callback](Modio::ErrorCode ec) { Callback.ExecuteIfBound(ToUnreal(ec)); });
+}
+
+void UModioSubsystem::K2_UnmuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegate Callback)
+{
+	UnmuteUserAsync(UserID, FOnErrorOnlyDelegateFast::CreateLambda(
+								[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+}
+
+void UModioSubsystem::GetMutedUsersAsync(FOnMuteUsersDelegateFast Callback)
+{
+	Modio::GetMutedUsersAsync([Callback](Modio::ErrorCode ec, Modio::Optional<Modio::UserList> Dependencies) {
+		if (Dependencies)
+		{
+			FModioUserList Out;
+			Out.InternalList = ToUnreal(Dependencies->GetRawList());
+			Out.PagedResult = FModioPagedResult(Dependencies.value());
+			Callback.ExecuteIfBound(ec, Out);
+		}
+		else
+		{
+			Callback.ExecuteIfBound(ec, {});
+		}
+	});
+}
+
+void UModioSubsystem::K2_GetMutedUsersAsync(FOnMuteUsersDelegate Callback)
+{
+	GetMutedUsersAsync(
+		FOnMuteUsersDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioUserList> Dependencies) {
+			Callback.ExecuteIfBound(ec, FModioOptionalUserList(MoveTempIfPossible(Dependencies)));
 		}));
 }
 

@@ -17,6 +17,7 @@
 #include "UI/Interfaces/IModioUIDialogButtonWidget.h"
 #include "UObject/Object.h"
 #include "Widgets/Layout/SGridPanel.h"
+#include "Widgets/Input/SButton.h"
 
 #include "ModioReportButtonGroupWidget.generated.h"
 

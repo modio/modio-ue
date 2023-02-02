@@ -29,6 +29,7 @@ FORCEINLINE Modio::EditModParams ToModio(const FModioEditModParams& In)
 	Out.MaturityRating = In.MaturityFlags.IsSet() ? static_cast<Modio::MaturityOption>(In.MaturityFlags.GetValue())
 												  : Modio::Optional<Modio::MaturityOption> {};
 	Out.MetadataBlob = ToModioOptional<std::string>(In.MetadataBlob);
+	Out.LogoPath = ToModioOptional<std::string>(In.LogoPath);
 
 	return Out;
 }

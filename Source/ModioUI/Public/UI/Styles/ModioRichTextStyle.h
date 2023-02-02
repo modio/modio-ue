@@ -78,7 +78,7 @@ struct MODIOUI_API FModioRichTextStyle : public FSlateWidgetStyle
 	* Retrieve the set of styles within this widget
 	* @return Shared pointer of  with string style names
 	**/
-	TSharedPtr<class FSlateStyleSet> GetStyleSet() const
+	TSharedPtr<class FSlateStyleSet> CloneStyleSet() const
 	{
 		TSharedPtr<class FSlateStyleSet> StyleInstance = MakeShared<FSlateStyleSet>("ModioRichTextStyleSet");
 

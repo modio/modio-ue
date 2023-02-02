@@ -49,3 +49,8 @@ void UModioEditModLibrary::SetMetadataBlob(FModioEditModParams& In, FString Meta
 {
 	In.MetadataBlob = MetadataBlob;
 }
+
+void UModioEditModLibrary::SetLogoPath(FModioEditModParams& In, FString LogoPath)
+{
+	In.LogoPath = LogoPath;
+}

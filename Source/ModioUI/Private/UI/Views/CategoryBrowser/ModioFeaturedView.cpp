@@ -77,18 +77,18 @@ void UModioFeaturedView::FetchPrimaryCategoryMods()
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	if (Subsystem)
 	{
-		if (UModioUISettings* Settings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
+		if (const UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
 		{
 			if (!Settings->BrowserCategoryConfiguration.IsNull())
 			{
 				if (UModioModBrowserParams* ModBrowserParams = Settings->BrowserCategoryConfiguration.LoadSynchronous())
 				{
 					FModioFilterParams Filter = FModioFilterParams()
-													.WithTags(ModBrowserParams->PrimaryCategoryParams->Tags)
-													.WithoutTags(ModBrowserParams->PrimaryCategoryParams->ExcludedTags)
-													.SortBy(ModBrowserParams->PrimaryCategoryParams->SortField,
-															ModBrowserParams->PrimaryCategoryParams->Direction)
-													.IndexedResults(0, ModBrowserParams->PrimaryCategoryParams->Count);
+					                            .WithTags(ModBrowserParams->PrimaryCategoryParams->Tags)
+					                            .WithoutTags(ModBrowserParams->PrimaryCategoryParams->ExcludedTags)
+					                            .SortBy(ModBrowserParams->PrimaryCategoryParams->SortField,
+					                                    ModBrowserParams->PrimaryCategoryParams->Direction)
+					                            .IndexedResults(0, ModBrowserParams->PrimaryCategoryParams->Count);
 					Subsystem->RequestListAllMods(Filter, GetName().ToString());
 				}
 			}
@@ -102,7 +102,7 @@ void UModioFeaturedView::FetchPrimaryCategoryMods()
 }
 
 FNavigationReply UModioFeaturedView::NativeOnNavigation(const FGeometry& InGeometry,
-														const FNavigationEvent& InNavigationEvent)
+                                                        const FNavigationEvent& InNavigationEvent)
 {
 	return Super::NativeOnNavigation(InGeometry, InNavigationEvent);
 }
@@ -110,8 +110,8 @@ FNavigationReply UModioFeaturedView::NativeOnNavigation(const FGeometry& InGeome
 FReply UModioFeaturedView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	return FReply::Handled()
-		.SetNavigation(PrimaryFeaturedCategory->TakeWidget(), ENavigationGenesis::User)
-		.SetUserFocus(PrimaryFeaturedCategory->TakeWidget(), EFocusCause::SetDirectly);
+	       .SetNavigation(PrimaryFeaturedCategory->TakeWidget(), ENavigationGenesis::User)
+	       .SetUserFocus(PrimaryFeaturedCategory->TakeWidget(), EFocusCause::SetDirectly);
 }
 
 int32 UModioFeaturedView::GetSelectionIndex()
@@ -127,7 +127,7 @@ void UModioFeaturedView::CategorySelectionChanged(int32 Index, UModioFeaturedCat
 }
 
 void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,
-															 TOptional<FModioModInfoList> List)
+                                                             TOptional<FModioModInfoList> List)
 {
 	IModioUIModInfoReceiver::NativeOnListAllModsRequestCompleted(RequestIdentifier, ec, List);
 
@@ -146,7 +146,7 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 			FSlateApplication::Get().SetUserFocus(0, PrimaryFeaturedCategory->TakeWidget(), EFocusCause::SetDirectly);
 
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
-																	   EModioUIAsyncOperationWidgetState::Success);
+			                                                           EModioUIAsyncOperationWidgetState::Success);
 		}
 		else
 		{
@@ -163,7 +163,7 @@ bool UModioFeaturedView::ShouldShowSearchButtonForMenu()
 void UModioFeaturedView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
-	if (UModioUISettings* Settings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
+	if (const UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
 	{
 		if (!Settings->BrowserCategoryConfiguration.IsNull())
 		{

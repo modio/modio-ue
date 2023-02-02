@@ -22,6 +22,7 @@
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/Dialogs/ModioDialogController.h"
 #include "UI/Dialogs/ModioDialogInfo.h"
+#include "UI/Interfaces/IModioAuthenticationContextUIDetails.h"
 #include "UI/Interfaces/IModioUIDataSourceWidget.h"
 #include "UI/Interfaces/IModioUIDialogButtonWidget.h"
 #include "UI/Interfaces/IModioUIStringInputWidget.h"
@@ -294,6 +295,46 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 							}
 						}
 						break;
+					case EModioDialogAsyncCall::BeginAuthentication:
+						// Called on accepting TermsOfUseDialog
+						if (DataSource)
+						{
+							if (DataSource->Implements<UModioAuthenticationContextUIDetails>())
+							{
+								// ProviderInfo is set by user selection on ModioAuthenticationMethodDialog
+								// Selected Destination in editor is ignored
+								FModioUIAuthenticationProviderInfo ProviderInfo =
+									IModioAuthenticationContextUIDetails::Execute_GetProviderInfo(DataSource);
+								if (ProviderInfo.bIsEmailAuthentication)
+								{
+									Controller->ShowEmailAuthenticationDialog();
+								}
+								else if (UModioUISubsystem* Subsystem =
+											 GEngine->GetEngineSubsystem<UModioUISubsystem>())
+								{
+									Subsystem->RequestExternalAuthentication(ProviderInfo.ProviderID);
+								}
+							}
+						}
+						break;
+					case EModioDialogAsyncCall::RetryFetchTerms:
+						// Note that RetryFetchTerms is specific to the Retry button on TermsOfUseFailDialog.  Recheck
+						// functionality if using for a general FetchTerms case in the future.
+						// Consider refactoring this into a specialized set of buttons?
+						if (DataSource)
+						{
+							if (DataSource->Implements<UModioAuthenticationContextUIDetails>())
+							{
+								FModioUIAuthenticationProviderInfo ProviderInfo =
+									IModioAuthenticationContextUIDetails::Execute_GetProviderInfo(DataSource);
+
+								Controller->ShowLoadingDialog();
+								// Selected Destination in editor is ignored
+								Controller->ShowTermsOfUseDialog(
+									MakeShared<FModioUIAuthenticationProviderInfo>(ProviderInfo));
+							}
+						}
+						break;
 					case EModioDialogAsyncCall::UnsubscribeFromMod:
 					{
 						if (DataSource)
@@ -322,15 +363,12 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 						Controller->LogOut();
 						break;
 
-					case EModioDialogAsyncCall::FetchTermsOfService:
-						break;
 					case EModioDialogAsyncCall::SubmitReport:
 						UModioReportInfoUI* ReportInfo = Cast<UModioReportInfoUI>(DataSource);
 						if (ReportInfo)
 						{
 							Controller->ReportContentAsync(ReportInfo->ReportData, Button->Destination);
 						}
-
 						break;
 				}
 				break;
@@ -379,14 +417,14 @@ TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 {
 	TSharedPtr<SButton> RowButton;
 	TSharedPtr<SModioRichTextBlock> RowTextBlock;
-	#if UE_VERSION_NEWER_THAN(5,0,0)
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
 	// UE5 changes the default FTableRowStyle to have a black background, grr
 	static FTableRowStyle StyleOverride = FCoreStyle::Get().GetWidgetStyle<FTableRowStyle>("TableView.Row");
 	StyleOverride.SetEvenRowBackgroundBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
 		.SetOddRowBackgroundBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
 		.SetEvenRowBackgroundHoveredBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)))
 		.SetOddRowBackgroundHoveredBrush(FSlateColorBrush(FSlateColor(FLinearColor::White)));
-	#endif
+#endif
 	// clang-format off
 	TSharedRef<STableRow<TSharedPtr<FText>>> TableRow = SNew(STableRow<TSharedPtr<FText>>, OwnerTableView)
 	#if UE_VERSION_NEWER_THAN(5,0,0) 
@@ -479,7 +517,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 		{
 			ContentPanel->RemoveSlot(InputWidgetSlot->GetWidget());
 		}
-		InputWidgetSlot = ModioUIHelpers::AddSlot(ContentPanel.Get(), 0,3);
+		InputWidgetSlot = ModioUIHelpers::AddSlot(ContentPanel.Get(), 0, 3);
 
 		if (ButtonWidgetSlot)
 		{
@@ -685,5 +723,8 @@ bool UModioDialogBaseInternal::IsInputValid()
 
 void UModioDialogBaseInternal::SetInputWidgetString(FString Input)
 {
-	IModioUIStringInputWidget::Execute_SetInput(InputWidget, Input);
+	if (InputWidget)
+	{
+		IModioUIStringInputWidget::Execute_SetInput(InputWidget, Input);
+	}
 }

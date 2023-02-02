@@ -60,8 +60,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* UnsubscribeButton;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText SpeedFormatText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
+	FText ProgressFormatText = FText::FromString(TEXT("{Progress} of {Total}"));
 
 	void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 

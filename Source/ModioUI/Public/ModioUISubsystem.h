@@ -265,6 +265,10 @@ public:
 	UModioMenu* ShowModBrowserUIForPlayer(TSubclassOf<UModioMenu> MenuClass, APlayerController* Controller,
 										  FOnModBrowserClosed BrowserClosedDelegate);
 
+	/// @brief Closes the Mod.io UI Browser and frees up resources appropriately
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void CloseModBrowserUI();
+
 	/// @brief Sends a command to the browser UI in the form of a virtual keypress
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void SendCommandToBrowserUI(FKey CommandKey, int32 UserIndex = 0);

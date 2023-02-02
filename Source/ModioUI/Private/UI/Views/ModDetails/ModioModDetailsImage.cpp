@@ -10,6 +10,7 @@
 
 #include "UI/Views/ModDetails/ModioModDetailsImage.h"
 #include "Engine/Texture2DDynamic.h"
+#include "Materials/MaterialInterface.h"
 
 void UModioModDetailsImage::NativeDisplayImage(const FSlateBrush& InImage)
 {
@@ -20,6 +21,12 @@ void UModioModDetailsImage::NativeDisplayImage(const FSlateBrush& InImage)
 			if (UMaterialInterface* ResolvedMaterial = FrameMaterial.ResolveReference())
 			{
 				Image->DisplayImageWithMaterial(Texture, ResolvedMaterial, TextureParameterName);
+			}
+		}
+		else
+		{
+			if (UMaterialInterface* Material = Cast<UMaterialInterface>(InImage.GetResourceObject())) {
+				Image->SetBrushFromMaterial(Material);
 			}
 		}
 	}

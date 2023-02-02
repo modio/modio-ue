@@ -100,11 +100,11 @@ struct MODIO_API FModioModInfo
 	 * be labeled as mature.
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "Profile")
-	EModioMaturityFlags ProfileMaturityOption;
+	EModioMaturityFlags ProfileMaturityOption {};
 
 	/** @brief Is the mod marked as visible? */
 	UPROPERTY(BlueprintReadOnly, Category = "Profile")
-	bool bVisible;
+	bool bVisible {};
 
 	/**
 	* Stored property to the metadata string
@@ -126,7 +126,7 @@ struct MODIO_API FModioModInfo
 
 	/** @brief Number of images in the mod's media gallery */
 	UPROPERTY(BlueprintReadOnly, Category = "Media")
-	int32 NumGalleryImages;
+	int32 NumGalleryImages {};
 
 	/** @brief List of youtube links provided by the creator of the mod */
 	UPROPERTY(BlueprintReadOnly, Category = "Media")

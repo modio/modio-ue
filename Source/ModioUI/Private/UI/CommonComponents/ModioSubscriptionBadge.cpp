@@ -115,22 +115,26 @@ void UModioSubscriptionBadge::NativeOnSetDataSource()
 
 void UModioSubscriptionBadge::UpdateProgress(const struct FModioModProgressInfo& ProgressInfo)
 {
-	if (ProgressInfo.CurrentlyDownloadedBytes < ProgressInfo.TotalDownloadSize)
+	switch (ProgressInfo.GetCurrentState())
 	{
-		if (Label)
-		{
-			Label->SetText(DownloadingLabelText);
-			SetPercent(ProgressInfo.CurrentlyDownloadedBytes / (double) ProgressInfo.TotalDownloadSize);
-		}
+		case EModioModProgressState::Downloading:
+			if (Label)
+			{
+				Label->SetText(DownloadingLabelText);
+				SetPercent(ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading)/ (double) ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading));
+			}
+			break;
+		case EModioModProgressState::Extracting:
+			if (Label)
+			{
+				Label->SetText(ExtractingLabelText);
+				SetPercent(ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting) / (double) ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting));
+			}
+			break;
+			default:
+			SetPercent(0);
 	}
-	else if (ProgressInfo.CurrentlyExtractedBytes < ProgressInfo.TotalExtractedSizeOnDisk)
-	{
-		if (Label)
-		{
-			Label->SetText(ExtractingLabelText);
-			SetPercent(ProgressInfo.CurrentlyExtractedBytes / (double) ProgressInfo.TotalExtractedSizeOnDisk);
-		}
-	}
+	
 }
 
 void UModioSubscriptionBadge::SynchronizeProperties()

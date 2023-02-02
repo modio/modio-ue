@@ -20,9 +20,9 @@
 #include "ModioMultiLineEditableTextBox.generated.h"
 
 /**
-* This class facilitates an editable text box with multiline support as well an
-* array of validation rules for that text.
-**/
+ * This class facilitates an editable text box with multiline support as well an
+ * array of validation rules for that text.
+ **/
 UCLASS()
 class MODIOUI_API UModioMultiLineEditableTextBox : public UMultiLineEditableTextBox,
 												   public IModioUIStringInputWidget,
@@ -30,6 +30,8 @@ class MODIOUI_API UModioMultiLineEditableTextBox : public UMultiLineEditableText
 {
 	GENERATED_BODY()
 protected:
+	// Cached style set for input validation
+	TSharedPtr<FSlateStyleSet> ErrorStyleSet;
 	virtual FString NativeGatherInput() override;
 
 	virtual void NativeSetHintText(FText InHintText) override;

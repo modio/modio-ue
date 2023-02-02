@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -22,35 +22,35 @@ struct MODIO_API FModioModStats
 
 	/** @brief Current rank of the mod. */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats|Popularity")
-	int64 PopularityRankPosition;
+	int64 PopularityRankPosition {};
 
 	/** @brief Number of ranking spots the current rank is measured against.  */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats|Popularity")
-	int64 PopularityRankTotalMods;
+	int64 PopularityRankTotalMods {};
 
 	/** @brief Number of total mod downloads.  */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats")
-	int64 DownloadsTotal;
+	int64 DownloadsTotal {};
 
 	/** @brief Number of total users who have subscribed to the mod.  */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats")
-	int64 SubscribersTotal;
+	int64 SubscribersTotal {};
 
 	/** @brief Number of times this mod has been rated. */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats|Rating")
-	int64 RatingTotal;
+	int64 RatingTotal {};
 
 	/** @brief Number of positive ratings. */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats|Rating")
-	int64 RatingPositive;
+	int64 RatingPositive {};
 
 	/** @brief Number of negative ratings. */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats|Rating")
-	int64 RatingNegative;
+	int64 RatingNegative {};
 
 	/** @brief Number of positive ratings, divided by the total ratings to determine it’s percentage score. */
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats|Rating")
-	int64 RatingPercentagePositive;
+	int64 RatingPercentagePositive {};
 
 	/**
 	 * @brief Overall rating of this item calculated using the [Wilson score confidence
@@ -60,7 +60,7 @@ struct MODIO_API FModioModStats
 	 * We actually get a double back from the server, but it's converted to a float for blueprint support
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "ModStats|Rating")
-	float RatingWeightedAggregate;
+	float RatingWeightedAggregate {};
 
 	/**
 	 * @brief Textual representation of the rating in format: Overwhelmingly

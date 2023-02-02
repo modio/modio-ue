@@ -84,14 +84,14 @@ void UModioRichTextBlock::UpdateStyleData()
 	if (OnGetStyle.IsBound())
 	{
 		const FModioRichTextStyle& RichTextStyle = OnGetStyle.Execute();
-		StyleInstance = RichTextStyle.GetStyleSet();
+		StyleInstance = RichTextStyle.CloneStyleSet();
 	}
 	else
 	{
 		const FModioRichTextStyle* RichTextStyle = TextStyle.FindStyle<FModioRichTextStyle>();
 		if (RichTextStyle)
 		{
-			StyleInstance = RichTextStyle->GetStyleSet();
+			StyleInstance = RichTextStyle->CloneStyleSet();
 		}
 	}
 	if (StyleInstance->HasWidgetStyle<FTextBlockStyle>(DefaultStyleName))

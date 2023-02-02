@@ -47,13 +47,14 @@ protected:
 	FModioModProgressInfo PreviewProgressInfo;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, meta = (ClampMin = 0), Category = "Widgets")
-	int64 TotalDownloadSize = 1;
+	int64 PreviewTotal = 1;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, meta = (ClampMin = 0), Category = "Widgets")
-	int64 TotalExtractedSize = 1;
+	int64 PreviewCurrent = 0;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, meta = (ClampMin = 0), Category = "Widgets")
-	int64 CurrentDownloadSize = 0;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, meta = (ClampMin = 0), Category = "Widgets")
-	int64 CurrentExtractedSize = 0;
+	EModioModProgressState PreviewProgressState = EModioModProgressState::Initializing;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category = "Widgets")
 	FModioModID PreviewModID;
 

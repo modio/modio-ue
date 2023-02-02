@@ -18,23 +18,26 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioConvertDataToNativeFormatTest,
-								 "Modio.DataConversion.UnrealToNative.AuthProvider",
-								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
-									 EAutomationTestFlags::ProductFilter)
+                                 "Modio.DataConversion.UnrealToNative.AuthProvider",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+                                 EAutomationTestFlags::ProductFilter)
+
 bool FModioConvertDataToNativeFormatTest::RunTest(const FString& Parameters)
 {
 	TestEqual("AuthProvider ToModio Xbox", ToModio(EModioAuthenticationProvider::XboxLive),
-			  Modio::AuthenticationProvider::XboxLive);
+	          Modio::AuthenticationProvider::XboxLive);
 	TestEqual("AuthProvider ToModio Steam", ToModio(EModioAuthenticationProvider::Steam),
-			  Modio::AuthenticationProvider::Steam);
+	          Modio::AuthenticationProvider::Steam);
 	TestEqual("AuthProvider ToModio GoG", ToModio(EModioAuthenticationProvider::GoG),
-			  Modio::AuthenticationProvider::GoG);
+	          Modio::AuthenticationProvider::GoG);
 	TestEqual("AuthProvider ToModio Itch", ToModio(EModioAuthenticationProvider::Itch),
-			  Modio::AuthenticationProvider::Itch);
+	          Modio::AuthenticationProvider::Itch);
 	TestEqual("AuthProvider ToModio Switch", ToModio(EModioAuthenticationProvider::Switch),
-			  Modio::AuthenticationProvider::Switch);
+	          Modio::AuthenticationProvider::Switch);
 	TestEqual("AuthProvider ToModio Discord", ToModio(EModioAuthenticationProvider::Discord),
-			  Modio::AuthenticationProvider::Discord);
+	          Modio::AuthenticationProvider::Discord);
+	TestEqual("AuthProvider ToModio PSN", ToModio(EModioAuthenticationProvider::PSN),
+	          Modio::AuthenticationProvider::PSN);
 	return true;
 }
 

@@ -37,7 +37,7 @@ FORCEINLINE EModioModManagementEventType ToUnreal(Modio::ModManagementEvent::Eve
 			return EModioModManagementEventType::Uploaded;
 	}
 
-	checkf(false, TEXT("Missed a case in ToModio(EModioEnvironment Environment)"));
+	checkf(false, TEXT("Missed a case in ToUnreal(Modio::ModManagementEvent::EventType Event)"));
 	return EModioModManagementEventType::Installed;
 }
 MODIO_END_CONVERT_SWITCHES

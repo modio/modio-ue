@@ -27,9 +27,9 @@
 #include "ModioAuthenticationMethodSelector.generated.h"
 
 /**
-* Modio UI element that provides a list of possible authentication methods available
-* on the current session
-**/
+ * Modio UI element that provides a list of possible authentication methods available
+ * on the current session
+ **/
 UCLASS()
 class UModioAuthenticationMethodSelector : public UModioWidgetBase, public IModioUIDialogButtonWidget
 {
@@ -83,16 +83,10 @@ protected:
 	{
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
-			if (ButtonInfo->bIsEmailAuthentication)
+			if (DialogController.IsValid())
 			{
-				if (DialogController.IsValid())
-				{
-					DialogController->ShowEmailAuthenticationDialog();
-				}
-			}
-			else
-			{
-				Subsystem->RequestExternalAuthentication(ButtonInfo->ProviderID);
+				DialogController->ShowLoadingDialog();
+				DialogController->ShowTermsOfUseDialog(ButtonInfo);
 			}
 		}
 		return FReply::Handled();
@@ -149,9 +143,9 @@ protected:
 
 public:
 	/**
-	* Clear resources in this Widget
-	* @param bReleaseChildren Trigger release as well for super classes
-	**/
+	 * Clear resources in this Widget
+	 * @param bReleaseChildren Trigger release as well for super classes
+	 **/
 	void ReleaseSlateResources(bool bReleaseChildren) override
 	{
 		Super::ReleaseSlateResources(bReleaseChildren);

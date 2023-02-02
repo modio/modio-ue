@@ -13,7 +13,6 @@
 #include "Components/NamedSlot.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-#include "Widgets/Images/SImage.h"
 #include "Widgets/Layout/SBox.h"
 
 void UModioDrawerContentBase::ReleaseSlateResources(bool bReleaseChildren)

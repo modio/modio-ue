@@ -26,8 +26,8 @@ DECLARE_DYNAMIC_DELEGATE_RetVal_TwoParams(bool, FOnValidateTextPostChange, const
 										  ErrorText);
 
 /**
-* Enumerator with the validation types to perform on input
-**/
+ * Enumerator with the validation types to perform on input
+ **/
 UENUM(BlueprintType)
 enum class EModioInputValidationType : uint8
 {
@@ -42,8 +42,8 @@ enum class EModioInputValidationType : uint8
 };
 
 /**
-* Modio UI element that provides an editable text functionality combining input and text validation
-**/
+ * Modio UI element that provides an editable text functionality combining input and text validation
+ **/
 UCLASS()
 class MODIOUI_API UModioEditableTextBox : public UEditableTextBox,
 										  public IModioUIStringInputWidget,
@@ -52,6 +52,9 @@ class MODIOUI_API UModioEditableTextBox : public UEditableTextBox,
 	GENERATED_BODY()
 
 protected:
+	// Cached style set for error validation
+	TSharedPtr<FSlateStyleSet> ErrorStyleSet;
+
 	UModioEditableTextBox(const FObjectInitializer& Initializer);
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;

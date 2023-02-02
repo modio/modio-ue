@@ -9,6 +9,7 @@
  */
 
 #include "UI/Dialogs/ModioDialogController.h"
+#include "Core/ModioAuthenticationContextUI.h"
 #include "Libraries/ModioErrorConditionLibrary.h"
 #include "ModioUISubsystem.h"
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
@@ -367,5 +368,37 @@ void UModioDialogController::ShowReportEmailDialog(UObject* DialogDataSource)
 	if (!ReportEmailDialog.IsNull())
 	{
 		PushDialog(ReportEmailDialog.LoadSynchronous(), DialogDataSource);
+	}
+}
+
+void UModioDialogController::ShowTermsOfUseDialog(TSharedPtr<FModioUIAuthenticationProviderInfo> ProviderInfo)
+{
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		Subsystem->GetTermsOfUseAsync(ProviderInfo->ProviderID, EModioLanguage::English,
+									  FOnGetTermsOfUseDelegateFast::CreateUObject(
+										  this, &UModioDialogController::HandleTermsOfUseReceived, ProviderInfo));
+	}
+}
+
+void UModioDialogController::HandleTermsOfUseReceived(FModioErrorCode ec, TOptional<FModioTerms> Terms,
+													  TSharedPtr<FModioUIAuthenticationProviderInfo> ProviderInfo)
+{
+	UModioAuthenticationContextUI* AuthContext = NewObject<UModioAuthenticationContextUI>();
+	AuthContext->ProviderInfo = *ProviderInfo;
+	ActualDialog->HideLoadingSpinner();
+	if (Terms && !ec)
+	{
+		AuthContext->Terms = *Terms;
+		if (!TermsOfUseDialog.IsNull())
+		{
+			TermsOfUseDialog.LoadSynchronous();
+			TermsOfUseDialog->DialogText = FText::FromString(AuthContext->Terms.TermsText);
+			PushDialog(TermsOfUseDialog.Get(), AuthContext);
+		}
+	}
+	else if (!TermsOfUseFailDialog.IsNull())
+	{
+		PushDialog(TermsOfUseFailDialog.LoadSynchronous(), AuthContext);
 	}
 }

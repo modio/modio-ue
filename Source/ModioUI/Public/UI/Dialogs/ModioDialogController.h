@@ -20,12 +20,13 @@
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
 #include "UI/BaseWidgets/ModioWidgetBase.h"
 #include "UI/BaseWidgets/ModioWidgetSwitcher.h"
+#include "UI/Interfaces/IModioUIAuthenticationDataProvider.h"
 
 #include "ModioDialogController.generated.h"
 
 /**
-* Enumerator with the possible replies to a dialog box
-**/
+ * Enumerator with the possible replies to a dialog box
+ **/
 UENUM(BlueprintType)
 enum class EModioDialogReply : uint8
 {
@@ -40,9 +41,9 @@ enum class EModioDialogReply : uint8
 };
 
 /**
-* Class definition of a dialog controller, which helps with authentication,
-* subscriptions, and mod report operations
-**/
+ * Class definition of a dialog controller, which helps with authentication,
+ * subscriptions, and mod report operations
+ **/
 UCLASS()
 class MODIOUI_API UModioDialogController : public UModioWidgetBase
 {
@@ -96,6 +97,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> UninstallConfirmationDialog;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	TSoftObjectPtr<UModioDialogInfo> TermsOfUseDialog;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	TSoftObjectPtr<UModioDialogInfo> TermsOfUseFailDialog;
+
 	/// @brief Needs to implement error display interface I guess
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UWidget> ErrorDisplayWidget;
@@ -124,6 +131,11 @@ public:
 	void ShowAuthenticationChoiceDialog();
 	void ShowEmailAuthenticationDialog();
 	void ShowLogoutDialog();
+	// Gets TermsOfUse from the API for the dialog
+	void ShowTermsOfUseDialog(TSharedPtr<FModioUIAuthenticationProviderInfo> ProviderInfo);
+	// Invoked by ShowTermsOfUseDialog(). Sets Terms text field and displays the dialog.
+	void HandleTermsOfUseReceived(FModioErrorCode ec, TOptional<FModioTerms> Terms,
+								  TSharedPtr<FModioUIAuthenticationProviderInfo> ProviderInfo);
 
 	// Does this require a destination parameter?
 	void BeginExternalAuthentication(EModioAuthenticationProvider Provider);

@@ -30,7 +30,7 @@ struct MODIO_API FModioLink
 	FString URL;
 	/** @brief Is displaying this link mandatory? */
 	UPROPERTY(BlueprintReadOnly,Category="Terms|Link")
-	bool bRequired;
+	bool bRequired {};
 };
 
 /**

@@ -79,6 +79,11 @@ void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ec, FModioModID ID)
 {
 	FString Message = ec.GetErrorMessage();
 	int32 value = ec.GetValue();
+	if (ec)
+	{
+		UE_LOG(LogModioUI, Warning, TEXT("Failed to subscribe to mod %s. Received error code %d: %s"), *(ID.ToString()),
+			   ec.GetValue(), *(ec.GetErrorMessage()));
+	}
 	OnSubscriptionRequestCompleted.Broadcast(ec, ID);
 	if (!ec)
 	{
@@ -122,10 +127,10 @@ void UModioUISubsystem::ModManagementEventHandler(FModioModManagementEvent Event
 	{
 		if (ModsDownloadedThisSession.Contains(Event.ID))
 		{
-			ModsDownloadedThisSession.Remove(Event.ID);	
+			ModsDownloadedThisSession.Remove(Event.ID);
 		}
 	}
-	
+
 	ModBrowserInstance->RefreshDownloadQueue();
 }
 
@@ -143,12 +148,13 @@ void UModioUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		FSlateApplication::Get().RegisterInputPreProcessor(Processor.ToSharedRef());
 		// Retrieve the navigation config factory and set it on the application so we can map our virtual inputs to
 		// navigation directions and actions
-		if (UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
+		if (const UModioUISettings* CurrentUISettings = UModioUISettings::StaticClass()->GetDefaultObject<
+			UModioUISettings>())
 		{
 			if (!CurrentUISettings->NavigationConfigOverride.IsNull())
 			{
 				if (UModioNavigationConfigFactoryBase* FactoryInstance =
-						CurrentUISettings->NavigationConfigOverride.LoadSynchronous())
+					CurrentUISettings->NavigationConfigOverride.LoadSynchronous())
 				{
 					FSlateApplication::Get().SetNavigationConfig(FactoryInstance->CreateNavigationConfig());
 				}
@@ -206,11 +212,11 @@ void UModioUISubsystem::RequestRemoveSubscriptionForModID(FModioModID ID, FOnErr
 	{
 		Subsystem->UnsubscribeFromModAsync(
 			ID, FOnErrorOnlyDelegateFast::CreateLambda([HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
-															this, &UModioUISubsystem::UnsubscribeHandler, ID),
-														DedicatedCallback](FModioErrorCode ec) {
-				DedicatedCallback.ExecuteIfBound(ec);
-				HookedHandler.ExecuteIfBound(ec);
-			}));
+						this, &UModioUISubsystem::UnsubscribeHandler, ID),
+					DedicatedCallback](FModioErrorCode ec) {
+					DedicatedCallback.ExecuteIfBound(ec);
+					HookedHandler.ExecuteIfBound(ec);
+				}));
 	}
 }
 
@@ -220,11 +226,11 @@ void UModioUISubsystem::RequestUninstallForModID(FModioModID ID, FOnErrorOnlyDel
 	{
 		Subsystem->ForceUninstallModAsync(
 			ID, FOnErrorOnlyDelegateFast::CreateLambda([HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
-															this, &UModioUISubsystem::UninstallHandler, ID),
-														DedicatedCallback](FModioErrorCode ec) {
-				DedicatedCallback.ExecuteIfBound(ec);
-				HookedHandler.ExecuteIfBound(ec);
-			}));
+						this, &UModioUISubsystem::UninstallHandler, ID),
+					DedicatedCallback](FModioErrorCode ec) {
+					DedicatedCallback.ExecuteIfBound(ec);
+					HookedHandler.ExecuteIfBound(ec);
+				}));
 	}
 }
 
@@ -251,8 +257,8 @@ void UModioUISubsystem::RequestRateUpForModId(FModioModID ModId, FOnErrorOnlyDel
 			ModId, EModioRating::Positive,
 			FOnErrorOnlyDelegateFast::CreateLambda(
 				[HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
-					 this, &UModioUISubsystem::OnRatingSubmissionComplete, EModioRating::Positive),
-				 DedicatedCallback](FModioErrorCode ec) {
+						this, &UModioUISubsystem::OnRatingSubmissionComplete, EModioRating::Positive),
+					DedicatedCallback](FModioErrorCode ec) {
 					DedicatedCallback.ExecuteIfBound(ec);
 					HookedHandler.ExecuteIfBound(ec);
 				}));
@@ -282,8 +288,8 @@ void UModioUISubsystem::RequestRateDownForModId(FModioModID ModId, FOnErrorOnlyD
 			ModId, EModioRating::Negative,
 			FOnErrorOnlyDelegateFast::CreateLambda(
 				[HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
-					 this, &UModioUISubsystem::OnRatingSubmissionComplete, EModioRating::Negative),
-				 DedicatedCallback](FModioErrorCode ec) {
+						this, &UModioUISubsystem::OnRatingSubmissionComplete, EModioRating::Negative),
+					DedicatedCallback](FModioErrorCode ec) {
 					DedicatedCallback.ExecuteIfBound(ec);
 					HookedHandler.ExecuteIfBound(ec);
 				}));
@@ -302,7 +308,7 @@ void UModioUISubsystem::RequestRemoveSubscriptionForModID(FModioModID ID)
 }
 
 void UModioUISubsystem::RequestLogoDownloadForModID(FModioModID ID,
-													EModioLogoSize LogoSize /*= EModioLogoSize::Thumb320*/)
+                                                    EModioLogoSize LogoSize /*= EModioLogoSize::Thumb320*/)
 {
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
@@ -318,7 +324,7 @@ float UModioUISubsystem::GetCurrentDPIScaleValue()
 	GEngine->GameViewport->GetViewportSize(ViewportSize);
 	return GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())
 		->GetDPIScaleBasedOnSize(FIntPoint(FGenericPlatformMath::FloorToInt(ViewportSize.X),
-										   FGenericPlatformMath::FloorToInt(ViewportSize.Y)));
+		                                   FGenericPlatformMath::FloorToInt(ViewportSize.Y)));
 }
 
 void UModioUISubsystem::RequestModInfoForModIDs(TArray<FModioModID> IDs)
@@ -339,7 +345,7 @@ void UModioUISubsystem::RequestListAllMods(FModioFilterParams Params, FString Re
 	{
 		Subsystem->ListAllModsAsync(
 			Params, FOnListAllModsDelegateFast::CreateUObject(this, &UModioUISubsystem::ListAllModsCompletedHandler,
-															  RequestIdentifier));
+			                                                  RequestIdentifier));
 	}
 }
 
@@ -368,7 +374,7 @@ UModioUIStyleSet* UModioUISubsystem::GetDefaultStyleSet()
 	}
 
 	checkf(LoadedDefaultStyleSet, TEXT("Unable to load default style set for the Modio UI module. Please ensure this "
-									   "is set in your project settings window."));
+		       "is set in your project settings window."));
 
 	return LoadedDefaultStyleSet;
 }
@@ -382,8 +388,8 @@ UMaterialInterface* UModioUISubsystem::GetInputGlyphMaterialForInputType(FKey Vi
 			if (UObject* TmpProvider = NewObject<UObject>(this, GlyphProviderClass))
 			{
 				if (UMaterialInterface* GlyphMaterial =
-						IModioUIInputHintGlyphProvider::Execute_GetInputGlyphMaterialForInputType(
-							TmpProvider, VirtualInput, InputType))
+					IModioUIInputHintGlyphProvider::Execute_GetInputGlyphMaterialForInputType(
+						TmpProvider, VirtualInput, InputType))
 				{
 					return GlyphMaterial;
 				}
@@ -419,8 +425,8 @@ void UModioUISubsystem::SetControllerOverrideType(EModioUIInputMode NewOverride)
 }
 
 UModioMenu* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UModioMenu> MenuClass,
-														 APlayerController* Controller,
-														 FOnModBrowserClosed BrowserClosedDelegate)
+                                                         APlayerController* Controller,
+                                                         FOnModBrowserClosed BrowserClosedDelegate)
 {
 	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
 	{
@@ -430,11 +436,22 @@ UModioMenu* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UModioMenu>
 			ModBrowserInstance->AddToViewport();
 			OnModBrowserClosed = BrowserClosedDelegate;
 			OwningPlayerController = Controller;
+
 			return ModBrowserInstance;
 		}
 	}
 	return nullptr;
 	// UE_LOG warn that the mod browser couldn't be displayed
+}
+
+void UModioUISubsystem::CloseModBrowserUI()
+{
+	if (ModBrowserInstance)
+	{
+		ModBrowserInstance->RemoveFromParent();
+		ModBrowserInstance->ConditionalBeginDestroy();
+		ModBrowserInstance = nullptr;
+	}
 }
 
 void UModioUISubsystem::ExecuteOnModBrowserClosedDelegate()
@@ -448,7 +465,7 @@ void UModioUISubsystem::SendCommandToBrowserUI(FKey CommandKey, int32 UserIndex)
 	if (FModioInputKeys::GetAll().Contains(CommandKey) && ModBrowserInstance)
 	{
 		FSlateApplication::Get().ProcessKeyDownEvent(
-			FKeyEvent(CommandKey, FModifierKeysState {}, UserIndex, false, 0, 0));
+			FKeyEvent(CommandKey, FModifierKeysState{}, UserIndex, false, 0, 0));
 	}
 }
 
@@ -517,11 +534,11 @@ void UModioUISubsystem::RequestEmailAuthentication(FModioEmailAuthCode Code, FOn
 	{
 		Subsystem->AuthenticateUserEmailAsync(
 			Code, FOnErrorOnlyDelegateFast::CreateLambda([HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
-															  this, &UModioUISubsystem::OnAuthenticationComplete),
-														  DedicatedCallback](FModioErrorCode ec) {
-				DedicatedCallback.ExecuteIfBound(ec);
-				HookedHandler.ExecuteIfBound(ec);
-			}));
+						this, &UModioUISubsystem::OnAuthenticationComplete),
+					DedicatedCallback](FModioErrorCode ec) {
+					DedicatedCallback.ExecuteIfBound(ec);
+					HookedHandler.ExecuteIfBound(ec);
+				}));
 	}
 }
 
@@ -546,7 +563,7 @@ void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvid
 }
 
 void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvider Provider,
-													  FOnErrorOnlyDelegateFast DedicatedCallback)
+                                                      FOnErrorOnlyDelegateFast DedicatedCallback)
 {
 	// Query the settings, get the authentication data provider, invoke the provider to fill in the rest of the params
 	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
@@ -561,11 +578,11 @@ void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvid
 				Subsystem->AuthenticateUserExternalAsync(
 					NewParams, Provider,
 					FOnErrorOnlyDelegateFast::CreateLambda([HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
-																this, &UModioUISubsystem::OnAuthenticationComplete),
-															DedicatedCallback](FModioErrorCode ec) {
-						DedicatedCallback.ExecuteIfBound(ec);
-						HookedHandler.ExecuteIfBound(ec);
-					}));
+								this, &UModioUISubsystem::OnAuthenticationComplete),
+							DedicatedCallback](FModioErrorCode ec) {
+							DedicatedCallback.ExecuteIfBound(ec);
+							HookedHandler.ExecuteIfBound(ec);
+						}));
 			}
 		}
 	}
@@ -583,13 +600,13 @@ void UModioUISubsystem::RequestGalleryImageDownloadForModID(
 }
 
 void UModioUISubsystem::GalleryImageDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image,
-													FModioModID ID, int32 Index)
+                                                    FModioModID ID, int32 Index)
 {
 	OnModGalleryImageDownloadCompleted.Broadcast(ID, ec, Index, Image);
 }
 
 void UModioUISubsystem::CreatorAvatarDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image,
-													 FModioModID ID)
+                                                     FModioModID ID)
 {
 	OnModCreatorAvatarDownloadCompleted.Broadcast(ID, ec, Image);
 }
@@ -607,7 +624,7 @@ void UModioUISubsystem::OnAuthenticationComplete(FModioErrorCode ec)
 }
 
 void UModioUISubsystem::ModInfoRequestCompletedHandler(FModioErrorCode ec, TOptional<FModioModInfoList> ModInfos,
-													   TArray<FModioModID> IDs)
+                                                       TArray<FModioModID> IDs)
 {
 	if (ec)
 	{
@@ -627,7 +644,7 @@ void UModioUISubsystem::ModInfoRequestCompletedHandler(FModioErrorCode ec, TOpti
 }
 
 void UModioUISubsystem::ListAllModsCompletedHandler(FModioErrorCode ec, TOptional<FModioModInfoList> ModInfos,
-													FString RequestIdentifier)
+                                                    FString RequestIdentifier)
 {
 	OnListAllModsRequestCompleted.Broadcast(RequestIdentifier, ec, ModInfos);
 }
@@ -682,7 +699,7 @@ void UModioUISubsystem::LogOut(FOnErrorOnlyDelegateFast DedicatedCallback)
 	{
 		Subsystem->ClearUserDataAsync(FOnErrorOnlyDelegateFast::CreateLambda(
 			[HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioUISubsystem::OnLogoutComplete),
-			 DedicatedCallback](FModioErrorCode ec) {
+				DedicatedCallback](FModioErrorCode ec) {
 				DedicatedCallback.ExecuteIfBound(ec);
 				HookedHandler.ExecuteIfBound(ec);
 			}));

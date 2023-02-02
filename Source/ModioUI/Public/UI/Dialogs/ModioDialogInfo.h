@@ -19,8 +19,8 @@
 #include "ModioDialogInfo.generated.h"
 
 /**
-* Enum listing possible buttons in a dialog
-**/
+ * Enum listing possible buttons in a dialog
+ **/
 UENUM()
 enum class EModioDialogButtonCommand : uint8
 {
@@ -44,8 +44,8 @@ enum class EModioDialogButtonCommand : uint8
 };
 
 /**
-* Enum listing possible actions performed in a dialog
-**/
+ * Enum listing possible actions performed in a dialog
+ **/
 UENUM()
 enum class EModioDialogAsyncCall : uint8
 {
@@ -55,11 +55,11 @@ enum class EModioDialogAsyncCall : uint8
 	/** Submit an authentication code **/
 	AuthSubmitCode,
 
-	/** Authenticate using an external source **/
-	AuthSubmitExternal,
+	/** Begin Authentication, either email or external, determined by UModioAuthenticationContextUIDetails **/
+	BeginAuthentication,
 
-	/** Retrieve the Terms of Service **/
-	FetchTermsOfService,
+	/** Retry fetching Terms Of Use **/
+	RetryFetchTerms,
 
 	/** Report a mod **/
 	SubmitReport,
@@ -75,8 +75,8 @@ enum class EModioDialogAsyncCall : uint8
 };
 
 /**
-* Enum listing possible operations performed in a dialog
-**/
+ * Enum listing possible operations performed in a dialog
+ **/
 UENUM()
 enum class EModioDialogOperationCall : uint8
 {
@@ -98,42 +98,42 @@ enum class EModioDialogOperationCall : uint8
 // generic handler will try the action, then show a dialog if there was a problem
 
 /**
-* Struct definition for the information display on a dialog button
-**/
+ * Struct definition for the information display on a dialog button
+ **/
 USTRUCT(BlueprintType)
 struct MODIOUI_API FModioDialogButtonInfo
 {
 	GENERATED_BODY()
-	
+
 	/**
-	* Stored property for the label in the button
-	**/
+	 * Stored property for the label in the button
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FText ButtonLabel;
 
 	/**
-	* Stored property to represent the type of dialog button for this instance
-	**/
+	 * Stored property to represent the type of dialog button for this instance
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
-	EModioDialogButtonCommand ButtonCommand;
+	EModioDialogButtonCommand ButtonCommand {};
 
 	/**
-	* Stored property to represent the type of asynchronous call to perform
-	**/
+	 * Stored property to represent the type of asynchronous call to perform
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonCommand==EModioDialogButtonCommand::AsyncCallThenPushDialog",
 					  EditConditionHides),
 			  Category = "Widgets")
-	EModioDialogAsyncCall AsyncCallType;
+	EModioDialogAsyncCall AsyncCallType {};
 
 	/**
-	* Stored property to represent the type of report operation
-	**/
+	 * Stored property to represent the type of report operation
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonCommand==EModioDialogButtonCommand::PushDialogWithOperation",
 					  EditConditionHides),
 			  Category = "Widgets")
-	EModioDialogOperationCall OperationCallType;
+	EModioDialogOperationCall OperationCallType {};
 
 	// clang-format off
 	/**
@@ -141,115 +141,115 @@ struct MODIOUI_API FModioDialogButtonInfo
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonCommand==EModioDialogButtonCommand::PushDialog||ButtonCommand==EModioDialogButtonCommand::AsyncCallThenPushDialog||ButtonCommand==EModioDialogButtonCommand::PushDialogWithOperation",EditConditionHides), Category="Widgets")
-	UModioDialogInfo* Destination;
+	UModioDialogInfo* Destination {};
 	// clang-format on
 };
 
 /**
-* Modio UI element that defines what the information to display 
-* on a dialog box
-**/
+ * Modio UI element that defines what the information to display
+ * on a dialog box
+ **/
 UCLASS()
 class MODIOUI_API UModioDialogInfo : public UObject
 {
 	GENERATED_BODY()
 public:
 	/**
-	* Stored property of the title text to display
-	**/
+	 * Stored property of the title text to display
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MultiLine = true), Category = "Widgets")
 	FText TitleText;
 
 	/**
-	* Stored property widget reference of the content to display below the header
-	**/
+	 * Stored property widget reference of the content to display below the header
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	TSubclassOf<class UWidget> SubHeaderWidget;
 
 	/**
-	* Stored property of the horizontal alignment to the widget used below the header
-	**/
+	 * Stored property of the horizontal alignment to the widget used below the header
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "SubHeaderWidget!=nullptr", EditConditionHides),
 			  Category = "Widgets")
 	TEnumAsByte<EHorizontalAlignment> SubHeaderWidgetHAlign;
 
 	/**
-	* Stored property of the vertical alignment to the widget used below the header
-	**/
+	 * Stored property of the vertical alignment to the widget used below the header
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "SubHeaderWidget!=nullptr", EditConditionHides),
 			  Category = "Widgets")
 	TEnumAsByte<EVerticalAlignment> SubHeaderWidgetVAlign;
 
 	/**
-	* Stored property of the text to display in the dialog box
-	**/
+	 * Stored property of the text to display in the dialog box
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MultiLine = true), Category = "Widgets")
 	FText DialogText;
 
 	/**
-	* Stored property reference to the widget on the input field
-	**/
+	 * Stored property reference to the widget on the input field
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MustImplement = ModioUIStringInputWidget), Category = "Widgets")
 	TSubclassOf<class UWidget> InputWidget;
 
 	/**
-	* Stored property of the horizontal alignment to the widget used as input
-	**/
+	 * Stored property of the horizontal alignment to the widget used as input
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
 			  Category = "Widgets")
 	TEnumAsByte<EHorizontalAlignment> InputWidgetHAlign;
 
 	/**
-	* Stored property of the vertical alignment to the widget used as input
-	**/
+	 * Stored property of the vertical alignment to the widget used as input
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
 			  Category = "Widgets")
 	TEnumAsByte<EVerticalAlignment> InputWidgetVAlign;
 
 	/**
-	* Stored property of the stretch direction to the widget used as input, with default as Both
-	**/
+	 * Stored property of the stretch direction to the widget used as input, with default as Both
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
 			  Category = "Widgets")
 	TEnumAsByte<EStretchDirection::Type> InputWidgetScalingType = EStretchDirection::Both;
 
 	/**
-	* Stored property that defines the widget height of the input field
-	**/
+	 * Stored property that defines the widget height of the input field
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
 			  Category = "Widgets")
 	float InputWidgetHeightOverride;
 
 	/**
-	* Stored property that defines the text to show as hint on the input field
-	**/
+	 * Stored property that defines the text to show as hint on the input field
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "InputWidget!=nullptr", EditConditionHides),
 			  Category = "Widgets")
 	FText InputWidgetHintText;
 
 	/**
-	* Stored property reference to the area button to use
-	**/
+	 * Stored property reference to the area button to use
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	TSubclassOf<class UWidget> ButtonAreaWidget;
 
 	/**
-	* Stored property of the horizontal alignment to the widget used as area button
-	**/
+	 * Stored property of the horizontal alignment to the widget used as area button
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonAreaWidget!=nullptr", EditConditionHides), Category = "Widgets")
 	TEnumAsByte<EHorizontalAlignment> ButtonAreaWidgetHAlign;
 
 	/**
-	* Stored property of the vertical alignment to the widget used as area button 
-	**/
+	 * Stored property of the vertical alignment to the widget used as area button
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonAreaWidget!=nullptr", EditConditionHides), Category = "Widgets")
 	TEnumAsByte<EVerticalAlignment> ButtonAreaWidgetVAlign;
 
 	/**
-	* Stored property array with references to multiple dialog buttons
-	**/
+	 * Stored property array with references to multiple dialog buttons
+	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonAreaWidget==nullptr", EditConditionHides), Category = "Widgets")
 	TArray<FModioDialogButtonInfo> Buttons;

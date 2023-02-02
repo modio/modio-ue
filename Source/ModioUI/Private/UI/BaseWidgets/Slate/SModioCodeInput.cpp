@@ -17,6 +17,11 @@
 #include "Widgets/Input/SEditableText.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SUniformGridPanel.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/SBoxPanel.h"
+#include "Framework/Application/SlateApplication.h"
 
 TSharedRef<SWidget> SModioCodeInput::CreateCharacterWidget(int32 WidgetIndex)
 {

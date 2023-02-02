@@ -23,34 +23,34 @@
 #include "ModioModDetailsImageGallery.generated.h"
 
 /**
-* Struct so that LoadedImage gets a hard reference
-**/
+ * Struct so that LoadedImage gets a hard reference
+ **/
 USTRUCT()
 struct FModioModDetailsGalleryImageInfo
 {
 	GENERATED_BODY()
-	
+
 	/**
-	* Stored optional property of the error code
-	**/
+	 * Stored optional property of the error code
+	 **/
 	TOptional<FModioErrorCode> Status;
-	
+
 	/**
-	* Stored optional property of the downloaded image reference
-	**/
+	 * Stored optional property of the downloaded image reference
+	 **/
 	TOptional<FModioImageWrapper> DownloadedImageReference;
 
 	/**
-	* Stored property of the loaded dynamic texture image
-	**/
+	 * Stored property of the loaded dynamic texture image
+	 **/
 	UPROPERTY()
-	UTexture2DDynamic* LoadedImage;
+	UTexture2DDynamic* LoadedImage {};
 };
 
 /**
-* Base class that stores details of a mod image gallery in an array of 
-* ModioModDetailsGalleryImageInfo.
-**/
+ * Base class that stores details of a mod image gallery in an array of
+ * ModioModDetailsGalleryImageInfo.
+ **/
 UCLASS()
 class MODIOUI_API UModioModDetailsImageGallery : public UModioUserWidgetBase,
 												 public IModioUIMediaDownloadCompletedReceiver
@@ -95,8 +95,8 @@ protected:
 };
 
 /**
-* Base class that stores details of a mod image gallery navigation button
-**/
+ * Base class that stores details of a mod image gallery navigation button
+ **/
 UCLASS()
 class MODIOUI_API UModioModDetailsImageGalleryNavButtonBase : public UModioUserWidgetBase, public IUserObjectListEntry
 {

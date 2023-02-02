@@ -140,10 +140,10 @@ void UModioEditableTextBox::NativeSetValidationError(FText ErrorText)
 
 	if (ResolvedErrorTextStyle)
 	{
-		TSharedPtr<FSlateStyleSet> StyleSet = ResolvedErrorTextStyle->GetStyleSet();
-		if (StyleSet)
+		ErrorStyleSet = ResolvedErrorTextStyle->CloneStyleSet();
+		if (ErrorStyleSet)
 		{
-			ErrorTextBlockStyle = &StyleSet->GetWidgetStyle<FTextBlockStyle>(FName("Error"));
+			ErrorTextBlockStyle = &ErrorStyleSet->GetWidgetStyle<FTextBlockStyle>(FName("Error"));
 		}
 	}
 

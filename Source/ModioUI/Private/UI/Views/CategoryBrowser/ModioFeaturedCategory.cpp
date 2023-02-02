@@ -98,10 +98,12 @@ void UModioFeaturedCategory::NativeOnInitialized()
 	if (NavLeftButton)
 	{
 		NavLeftButton->OnClicked.AddDynamic(this, &UModioFeaturedCategory::HandleNavLeftClicked);
+		NavLeftButton->IsFocusable = false;
 	}
 	if (NavRightButton)
 	{
 		NavRightButton->OnClicked.AddDynamic(this, &UModioFeaturedCategory::HandleNavRightClicked);
+		NavRightButton->IsFocusable = false;
 	}
 	if (CategoryViewContent)
 	{

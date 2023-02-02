@@ -17,10 +17,10 @@ void UModioEditableText::SynchronizeProperties()
 	Super::SynchronizeProperties();
 	if (const FModioRichTextStyle* ResolvedStyle = TextStyle.FindStyle<FModioRichTextStyle>())
 	{
-		TSharedPtr<FSlateStyleSet> StyleSet = ResolvedStyle->GetStyleSet();
-		if (StyleSet)
+		CachedStyleSet = ResolvedStyle->CloneStyleSet();
+		if (CachedStyleSet)
 		{
-			const FTextBlockStyle& SpecificStyle = StyleSet->GetWidgetStyle<FTextBlockStyle>(DefaultStyleName);
+			const FTextBlockStyle& SpecificStyle = CachedStyleSet->GetWidgetStyle<FTextBlockStyle>(DefaultStyleName);
 			MyEditableText->SetFont(SpecificStyle.Font);
 			MyEditableText->SetColorAndOpacity(SpecificStyle.ColorAndOpacity);
 		}

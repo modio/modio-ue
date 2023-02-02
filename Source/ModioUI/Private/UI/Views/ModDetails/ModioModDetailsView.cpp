@@ -287,7 +287,7 @@ void UModioModDetailsView::NativeOnSetDataSource()
 		if (ImageGallery)
 		{
 			ImageGallery->SetDataSource(DataSource);
-			ImageGallery->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			ImageGallery->SetVisibility(ESlateVisibility::Visible);
 		}
 
 		if (ModFullDescriptionTextBlock)

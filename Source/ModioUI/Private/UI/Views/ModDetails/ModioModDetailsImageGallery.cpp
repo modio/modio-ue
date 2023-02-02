@@ -72,10 +72,7 @@ void UModioModDetailsImageGallery::NativeOnSetDataSource()
 			TArray<TSharedPtr<int64>> ImageIndexes;
 			ImageIndexes.Add(MakeShared<int64>(0));
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-			if (Subsystem)
-			{
-				Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId, EModioLogoSize::Thumb1280);
-			}
+			
 			for (int32 ImageIndex = 0; ImageIndex < ModInfo->Underlying.NumGalleryImages; ImageIndex++)
 			{
 				if (!IsDesignTime())
@@ -98,6 +95,13 @@ void UModioModDetailsImageGallery::NativeOnSetDataSource()
 			if (ImageIndexes.Num())
 			{
 				ImageGallery->ResetGallery();
+			}
+
+			// Ensure this is called last, as it invokes an async callback which, if called earlier, *may* be invoked
+			// before the gallery is reset and cause a crash
+			if (Subsystem)
+			{
+				Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId, EModioLogoSize::Thumb1280);
 			}
 		}
 	}

@@ -80,33 +80,44 @@ void UModioDownloadQueueOpProgress::UpdateProgress(const struct FModioModProgres
 {
 	FTimespan fts = FDateTime::Now() - PreviousUpdateTime;
 	double DeltaTime = fts.GetTotalSeconds();
-
-	if (ProgressInfo.CurrentlyDownloadedBytes < ProgressInfo.TotalDownloadSize)
+	switch (ProgressInfo.GetCurrentState())
 	{
-		SetPercent(ProgressInfo.CurrentlyDownloadedBytes / (double) ProgressInfo.TotalDownloadSize);
-		UpdateSpeed(ProgressInfo.CurrentlyDownloadedBytes - PreviousProgressValue, DeltaTime);
+		case EModioModProgressState::Downloading:
+		{
+			FModioUnsigned64 Current = ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading);
+			FModioUnsigned64 Total = ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading);
 
-		PreviousProgressValue = ProgressInfo.CurrentlyDownloadedBytes;
+			SetPercent(Current / (double) Total);
+			UpdateSpeed(Current - PreviousProgressValue, DeltaTime);
 
-		FFormatNamedArguments Args;
-		Args.Add("Progress", UModioSDKLibrary::Filesize_ToString(ProgressInfo.CurrentlyDownloadedBytes.Underlying, 1));
-		Args.Add("Total", UModioSDKLibrary::Filesize_ToString(ProgressInfo.TotalDownloadSize.Underlying, 1));
+			PreviousProgressValue = Current;
 
-		OperationProgressText->SetText(FText::Format(FTextFormat::FromString(TEXT("{Progress} of {Total}")), Args));
+			FFormatNamedArguments Args;
+			Args.Add("Progress",
+					 UModioSDKLibrary::Filesize_ToString(Current.Underlying, 1));
+			Args.Add("Total", UModioSDKLibrary::Filesize_ToString(Total.Underlying, 1));
+
+			OperationProgressText->SetText(FText::Format(FTextFormat(ProgressFormatText), Args));
+		}
+		break;
+		case EModioModProgressState::Extracting:
+		{
+			FModioUnsigned64 Current = ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading);
+			FModioUnsigned64 Total = ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading);
+
+			SetPercent(Current / (double) Total);
+
+			OperationProgressText->SetVisibility(ESlateVisibility::Collapsed);
+			OperationSpeedText->SetVisibility(ESlateVisibility::Collapsed);
+			PreviousProgressValue = Current;
+		}
+		break;
+		default:
+		{
+			PreviousProgressValue = FModioUnsigned64(0);
+		}
+		break;
 	}
-	else if (ProgressInfo.CurrentlyExtractedBytes < ProgressInfo.TotalExtractedSizeOnDisk)
-	{
-		SetPercent(ProgressInfo.CurrentlyExtractedBytes / (double) ProgressInfo.TotalExtractedSizeOnDisk);
-
-		OperationProgressText->SetVisibility(ESlateVisibility::Collapsed);
-		OperationSpeedText->SetVisibility(ESlateVisibility::Collapsed);
-		PreviousProgressValue = ProgressInfo.CurrentlyExtractedBytes;
-	}
-	else
-	{
-		PreviousProgressValue = FModioUnsigned64(0);
-	}
-
 	PreviousUpdateTime = FDateTime::Now();
 }
 

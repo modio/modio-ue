@@ -13,14 +13,20 @@
 #include "ModioModule.h"
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
-#include "HAL/PlatformFilemanager.h"
 #include "Logging/LogVerbosity.h"
 #include "Modio.h"
 #include "ModioSDK.h"
 #include "ModioSettings.h"
+#include "Misc/EngineVersionComparison.h"
+
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+#include "HAL/PlatformFileManager.h"
+#else
+#include "HAL/PlatformFilemanager.h"
+#endif
 
 #if WITH_EDITOR
-	#include "ISettingsModule.h"
+#include "ISettingsModule.h"
 #endif
 
 #define LOCTEXT_NAMESPACE "FModioModule"
@@ -47,7 +53,7 @@ void FModioModule::StartupModule()
 
 		{
 			TRACE_CPUPROFILER_EVENT_SCOPE(ModioLogToFile);
-			
+
 			if (ModioLog)
 			{
 				{
@@ -89,24 +95,24 @@ void FModioModule::StartupModule()
 
 void FModioModule::UnregisterSettings()
 {
-#if WITH_EDITOR
+	#if WITH_EDITOR
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
 		SettingsModule->UnregisterSettings("Project", "Plugins", "mod.io");
 	}
-#endif // WITH_EDITOR
+	#endif // WITH_EDITOR
 }
 
 void FModioModule::RegisterSettings()
 {
-#if WITH_EDITOR
+	#if WITH_EDITOR
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
 		SettingsModule->RegisterSettings("Project", "Plugins", "mod.io", LOCTEXT("RuntimeSettingsName", "mod.io"),
-										 LOCTEXT("RuntimeSettingsDescription", "Configure the mod.io plugin"),
-										 GetMutableDefault<UModioSettings>());
+		                                 LOCTEXT("RuntimeSettingsDescription", "Configure the mod.io plugin"),
+		                                 GetMutableDefault<UModioSettings>());
 	}
-#endif
+	#endif
 }
 
 void FModioModule::ShutdownModule()

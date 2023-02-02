@@ -25,7 +25,7 @@ void UModioFeaturedMod::NativeOnSetDataSource()
 		if (ModInfo)
 		{
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-			Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId);
+			Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId, EModioLogoSize::Thumb1280);
 			if (ModName)
 			{
 				ModName->SetText(FText::FromString(ModInfo->Underlying.ProfileName));

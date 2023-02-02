@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
@@ -13,7 +13,6 @@
 #include "Types/ModioCommonTypes.h"
 
 #include "ModioFileMetadata.generated.h"
-
 
 /** @brief Current state of the scanned file */
 UENUM(BlueprintType)
@@ -58,15 +57,15 @@ struct MODIO_API FModioFileMetadata
 	 * will change frequently until a scan is complete
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|Virus")
-	EModioVirusScanStatus CurrentVirusScanStatus;
+	EModioVirusScanStatus CurrentVirusScanStatus {};
 
 	/** @brief Was a virus detected? */
 	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|Virus")
-	EModioVirusStatus CurrentVirusStatus;
+	EModioVirusStatus CurrentVirusStatus {};
 
 	/** @brief Size of the file in bytes. */
 	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|File")
-	int64 Filesize;
+	int64 Filesize {};
 
 	/** @brief Filename including extension. */
 	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|File")

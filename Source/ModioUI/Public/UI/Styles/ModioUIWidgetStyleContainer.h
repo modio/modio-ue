@@ -28,27 +28,27 @@
 PRAGMA_DISABLE_OPTIMIZATION
 
 /**
-* Strong type reference to a slate color
-**/
+ * Strong type reference to a slate color
+ **/
 USTRUCT()
 struct FModioSlateColorInspector : public FSlateColor
 {
 	GENERATED_BODY();
 	/**
-	* Default constructor without parameters
-	**/
+	 * Default constructor without parameters
+	 **/
 	FModioSlateColorInspector() : FSlateColor() {};
-	
+
 	/**
-	* Convenience constructor with a slate color parameter
-	* @param InColor The slate color to store for this instance
-	**/
+	 * Convenience constructor with a slate color parameter
+	 * @param InColor The slate color to store for this instance
+	 **/
 	FModioSlateColorInspector(FSlateColor InColor) : FSlateColor(InColor) {};
 
 	/**
-	* Ask the instance if the color is linked to use particular style
-	* @return True if the current color style was set to "UseColor_Specified", otherwise false
-	**/
+	 * Ask the instance if the color is linked to use particular style
+	 * @return True if the current color style was set to "UseColor_Specified", otherwise false
+	 **/
 	bool IsUnlinked()
 	{
 		return ColorUseRule == ESlateColorStylingMode::UseColor_Specified;
@@ -91,8 +91,8 @@ public:
 				FSlateColor* ActualColor = const_cast<FSlateColor*>(reinterpret_cast<const FSlateColor*>(Value));
 				if (!FModioSlateColorInspector(*ActualColor).IsUnlinked())
 				{
-					UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
-						   *GetFName().ToString());
+					// UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
+					//	   *GetFName().ToString());
 					ActualColor->Unlink();
 				}
 			}
@@ -119,8 +119,8 @@ public:
 				FSlateColor* ActualColor = const_cast<FSlateColor*>(reinterpret_cast<const FSlateColor*>(Value));
 				if (!FModioSlateColorInspector(*ActualColor).IsUnlinked())
 				{
-					UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
-						   *GetFName().ToString());
+					// UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
+					//	   *GetFName().ToString());
 					ActualColor->Unlink();
 				}
 			}

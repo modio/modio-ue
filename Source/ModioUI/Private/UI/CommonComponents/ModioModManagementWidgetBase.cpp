@@ -45,9 +45,9 @@ void UModioModManagementWidgetBase::SynchronizeProperties()
 #if WITH_EDITOR
 	if (IsDesignTime())
 	{
-		PreviewProgressInfo = FModioModProgressInfo {
-			FModioUnsigned64(TotalDownloadSize), FModioUnsigned64(CurrentDownloadSize),
-			FModioUnsigned64(TotalExtractedSize), FModioUnsigned64(CurrentExtractedSize), PreviewModID};
+		
+		PreviewProgressInfo = FModioModProgressInfo::ConstructPreviewProgressInfo(PreviewProgressState, PreviewCurrent, PreviewTotal);
+		PreviewProgressInfo.ID = PreviewModID;
 		UpdateProgress(PreviewProgressInfo);
 		return;
 	}

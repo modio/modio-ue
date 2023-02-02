@@ -72,6 +72,8 @@ if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem
 ----
 ====
 
+You can close the Mod Browser by calling `CloseModBrowserUI()` on the ModioUISubsystem.
+
 === Configuration
 
 The mod.io Mod Browser will utilise the configuration that you provided on the mod.io Plugin Settings page referenced above; however, there are a number of additional UI-specific settings you will need to update to match your project's requirements. These are all accessible on the `mod.io UI` settings page in your project settings.
@@ -207,6 +209,12 @@ To create a new widget style, add a new entry to the `Widget Styles` map and sel
 
 To customize a widget style, simply expand its entry in the `Widget Styles` map and make changes as you see fit.
 
+==== Customizing Audio
+
+The plugin ships with two default pieces of audio for rollover/focus, and selection. These are configurable per-control as part of the Style Sheet.
+
+If you want to use the provided audio, then you can use the S_Modio_UI sound class to control the volume of the audio cues.
+
 === Known Issues
 
 The mod.io Mod Browser is currently considered a beta release and therefore is shipping with several known issues.
@@ -215,10 +223,8 @@ The mod.io Mod Browser is currently considered a beta release and therefore is s
 * Gamepad navigation is only partially implemented and not yet officially supported. There is a limited set of controller functionality available.
 * When using a gamepad, some input hint glyphs may not be available.
 * Input hint glyphs are not available when keyboard input is used.
-* Logos and images for mods are displayed at a lower resolution (1280x720 images are not yet supported by the plugin)
 * Offline mode is not supported. If there are connectivity issues to the mod.io API then the UI behavior is currently undefined.
 * The "Search and Filter" tag list may not display a scrollbar with a large list of tags.
-* Audio for UI interaction is currently not supported.
 * When making style set or configuration changes inside of the editor, some options may not be re-loaded correctly, and therefore stale state inside of PIE may be possible.
 * Changing users by logging out and logging back in as a new user may result in some inconsistent UI state related to mod collections. This does not occur after restarting.
 * Transparent PNGs retrieved for mod galleries, logos etc may not display correctly

@@ -17,19 +17,20 @@
 #include "ModioEditableText.generated.h"
 
 /**
-* Modio UI element that provides an editable textbox with custom styles
-**/
+ * Modio UI element that provides an editable textbox with custom styles
+ **/
 UCLASS()
 class MODIOUI_API UModioEditableText : public UEditableText
 {
 	GENERATED_BODY()
 protected:
+	TSharedPtr<FSlateStyleSet> CachedStyleSet;
 	virtual void SynchronizeProperties() override;
 
 	/**
-	* Retrieve the style name for this editable text
-	* @return An array of strings with style names
-	**/
+	 * Retrieve the style name for this editable text
+	 * @return An array of strings with style names
+	 **/
 	UFUNCTION()
 	TArray<FString> GetStyleNames() const;
 

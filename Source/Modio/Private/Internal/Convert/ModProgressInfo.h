@@ -10,16 +10,50 @@
 
 #pragma once
 #include "Internal/ModioConvert.h"
+#include "Modio.h"
 #include "ModioSDK.h"
 #include "Types/ModioModProgressInfo.h"
+
+FORCEINLINE EModioModProgressState ToUnreal(const Modio::ModProgressInfo::EModProgressState In)
+{
+	switch (In)
+	{
+		case Modio::ModProgressInfo::EModProgressState::Compressing:
+			return EModioModProgressState::Compressing;
+		case Modio::ModProgressInfo::EModProgressState::Uploading:
+			return EModioModProgressState::Uploading;
+		case Modio::ModProgressInfo::EModProgressState::Downloading:
+			return EModioModProgressState::Downloading;
+		case Modio::ModProgressInfo::EModProgressState::Extracting:
+			return EModioModProgressState::Extracting;
+		case Modio::ModProgressInfo::EModProgressState::Initializing:
+			return EModioModProgressState::Initializing;
+	}
+	UE_LOG(LogModio, Error, TEXT("Unhandled case in ToUnreal(EModProgressState)"));
+	return EModioModProgressState::Initializing;
+}
 
 FORCEINLINE FModioModProgressInfo ToUnreal(const Modio::ModProgressInfo& In)
 {
 	FModioModProgressInfo Out;
-	Out.TotalDownloadSize = ToUnreal(In.TotalDownloadSize);
-	Out.CurrentlyDownloadedBytes = ToUnreal(In.CurrentlyDownloadedBytes);
-	Out.CurrentlyExtractedBytes = ToUnreal(In.CurrentlyExtractedBytes);
-	Out.TotalExtractedSizeOnDisk = ToUnreal(In.TotalExtractedSizeOnDisk);
+	Out.DownloadTotal = In.GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Downloading);
+	Out.DownloadCurrent = In.GetCurrentProgress(Modio::ModProgressInfo::EModProgressState::Downloading);
+
+	Out.ExtractTotal = In.GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Extracting);
+	Out.ExtractCurrent = In.GetCurrentProgress(Modio::ModProgressInfo::EModProgressState::Extracting);
+	Out.CompressTotal = In.GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Compressing);
+	Out.CompressCurrent = In.GetCurrentProgress(Modio::ModProgressInfo::EModProgressState::Compressing);
+
+	Out.UploadTotal = In.GetTotalProgress(Modio::ModProgressInfo::EModProgressState::Uploading);
+	Out.UploadCurrent = In.GetCurrentProgress(Modio::ModProgressInfo::EModProgressState::Uploading);
+	Out.CurrentState = ToUnreal(In.GetCurrentState());
+
+	//Deprecated members
+	Out.CurrentlyDownloadedBytes_DEPRECATED = FModioUnsigned64(Out.DownloadCurrent);
+	Out.CurrentlyExtractedBytes_DEPRECATED = FModioUnsigned64(Out.ExtractCurrent);
+	Out.TotalDownloadSize_DEPRECATED = FModioUnsigned64(Out.DownloadTotal);
+	Out.TotalExtractedSizeOnDisk_DEPRECATED = FModioUnsigned64(Out.ExtractTotal);
+
 	Out.ID = ToUnreal(In.ID);
 	return Out;
 }

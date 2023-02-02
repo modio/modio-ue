@@ -39,13 +39,14 @@ struct MODIOUI_API FModioInputMapping
 	* Convenience constructor with a default virtual key parameter
 	* @param VirtualKey The key to use when creating an instance
 	**/
-	FModioInputMapping(FKey VirtualKey) : VirtualKey(VirtualKey) {}
+	FModioInputMapping(FKey VirtualKey)
+		: VirtualKey(VirtualKey) {}
 
 	/**
 	* Stored property of a single FKey
 	**/
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (EditCondition = "true==false"),
-			  Category = "ModioInputMapping")
+		Category = "ModioInputMapping")
 	FKey VirtualKey;
 
 	/// @brief Array of FNames corresponding to project input axes or actions that are mapped to this virtual key
@@ -57,7 +58,7 @@ struct MODIOUI_API FModioInputMapping
 * Class definition for UI Modio settings that keeps references to navigation, authentication, 
 * and background image provider
 **/
-UCLASS(Config = Modio, defaultconfig)
+UCLASS(Config = Game, defaultconfig)
 class MODIOUI_API UModioUISettings : public UObject, public IModioInputMappingAccessor
 {
 	GENERATED_BODY()
@@ -92,21 +93,21 @@ public:
 	* Stored property of the data provider for authentication actions
 	**/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioUIAuthenticationDataProvider"),
-			  Category = "ModioUISettings")
+		Category = "ModioUISettings")
 	TSubclassOf<UObject> AuthenticationDataProvider;
 
 	/**
 	* Stored property of the glyph provider for input actions
 	**/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioUIInputHintGlyphProvider"),
-			  Category = "ModioUISettings")
+		Category = "ModioUISettings")
 	TSubclassOf<UObject> InputHintGlyphProvider;
 
 	/**
 	* Stored property of the image provider to place as background
 	**/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioMenuBackgroundProvider"),
-			  Category = "ModioUISettings")
+		Category = "ModioUISettings")
 	TSubclassOf<UObject> BackgroundImageProvider;
 
 	/**
@@ -115,12 +116,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	TSoftObjectPtr<UModioModBrowserParams> BrowserCategoryConfiguration;
 
-#if WITH_EDITOR
+	#if WITH_EDITOR
 	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override
 	{
 		if (PropertyChangedEvent.GetPropertyName() ==
-			GET_MEMBER_NAME_CHECKED(UModioUISettings, NavigationConfigOverride))
-		{}
+		    GET_MEMBER_NAME_CHECKED(UModioUISettings, NavigationConfigOverride)) {}
 	}
-#endif
+	#endif
 };

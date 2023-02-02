@@ -63,4 +63,9 @@ public:
     * Optional metadata blob for this mod
     **/
     TOptional<FString> MetadataBlob;
+
+    /**
+	 * Optional path to a new logo image for this mod
+	 **/
+	TOptional<FString> LogoPath;
 };

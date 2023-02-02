@@ -23,21 +23,22 @@ enum class EModioAuthenticationProvider : uint8
 	GoG,
 	Itch,
 	Switch,
-	Discord
+	Discord,
+	PSN
 };
 
 /** @brief Simple struct to encapsulate data passed to external authentication systems */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioAuthenticationParams
 {
-	GENERATED_BODY();
+	GENERATED_BODY()
 
 	/**
 	* Stored property of the authentication token
 	**/
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	FString AuthToken;
-	
+
 	/**
 	* Stored property of the user email
 	**/

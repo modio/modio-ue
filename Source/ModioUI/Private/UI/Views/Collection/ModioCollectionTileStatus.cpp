@@ -66,16 +66,22 @@ void UModioCollectionTileStatus::SetPercent(float InPercent)
 
 void UModioCollectionTileStatus::UpdateProgress(const struct FModioModProgressInfo& ProgressInfo)
 {
-	if (ProgressInfo.CurrentlyDownloadedBytes < ProgressInfo.TotalDownloadSize)
+	switch (ProgressInfo.GetCurrentState())
 	{
-		StatusText->SetText(DownloadingLabelText);
-		SetPercent((float) ProgressInfo.CurrentlyDownloadedBytes / (float) ProgressInfo.TotalDownloadSize);
+		case EModioModProgressState::Downloading:
+		{
+			StatusText->SetText(DownloadingLabelText);
+			SetPercent((float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading) / (float) ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading));
+		}
+		break;
+		case EModioModProgressState::Extracting:
+		{
+			StatusText->SetText(ExtractingLabelText);
+			SetPercent((float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting)/ (float) ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting));
+		}
+		break;
 	}
-	else if (ProgressInfo.CurrentlyExtractedBytes < ProgressInfo.TotalExtractedSizeOnDisk)
-	{
-		StatusText->SetText(ExtractingLabelText);
-		SetPercent((float) ProgressInfo.CurrentlyExtractedBytes / (float) ProgressInfo.TotalExtractedSizeOnDisk);
-	}
+
 }
 
 void UModioCollectionTileStatus::NativeOnModManagementEvent(FModioModManagementEvent Event)

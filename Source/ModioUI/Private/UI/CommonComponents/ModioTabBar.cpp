@@ -123,7 +123,7 @@ void UModioTabBar::ApplyStyle(const FModioUIStyleRef& Style, TSharedPtr<SModioRi
 			ResolvedButtonStyle->RichTextStyle.FindStyle<FModioRichTextStyle>();
 		if (ResolvedTextStyle)
 		{
-			TSharedPtr<FSlateStyleSet> ResolvedRichTextStyleSet = ResolvedTextStyle->GetStyleSet();
+			TSharedPtr<FSlateStyleSet> ResolvedRichTextStyleSet = ResolvedTextStyle->CloneStyleSet();
 			RichTextBox.Get()->SetDecoratorStyleSet(ResolvedRichTextStyleSet);
 			if (ResolvedRichTextStyleSet->HasWidgetStyle<FTextBlockStyle>(FName("Default")))
 			{

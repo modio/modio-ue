@@ -21,7 +21,7 @@ struct MSDFSUPPORT_API FSVGConversionParams
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SVGConversionParams")
-	int32 SVGPathIndex;
+	int32 SVGPathIndex {};
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPreserveRatio), Category = "SVGConversionParams")
 	FVector2D OutputDimensions = FVector2D(32, 32);
@@ -38,7 +38,7 @@ struct MSDFSUPPORT_API FSVGConversionParams
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (EditCondition = "!bAutoFrame"),
 			  Category = "SVGConversionParams")
-	FVector2D Translation;
+	FVector2D Translation {0, 0};
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SVGConversionParams")
 	int32 FieldRangeInPixels = 8;
@@ -53,7 +53,7 @@ class MSDFSUPPORT_API USVGToSDFFunctionLibrary : public UBlueprintFunctionLibrar
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable, Category="SVGToSDFFunctionLibrary")
+	UFUNCTION(BlueprintCallable, Category = "SVGToSDFFunctionLibrary")
 	static bool ConvertSVGToMSDFData(const FString& FilePath, const FSVGConversionParams& Params,
 									 TArray<uint8>& Output);
 };

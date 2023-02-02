@@ -35,18 +35,23 @@ FORCEINLINE Modio::AuthenticationProvider ToModio(EModioAuthenticationProvider P
 			return Modio::AuthenticationProvider::Switch;
 		case EModioAuthenticationProvider::Discord:
 			return Modio::AuthenticationProvider::Discord;
+		case EModioAuthenticationProvider::PSN:
+			return Modio::AuthenticationProvider::PSN;
 	}
 
 	return Modio::AuthenticationProvider::Steam;
 }
+
 MODIO_END_CONVERT_SWITCHES
 
 
 FORCEINLINE Modio::AuthenticationParams ToModio(const FModioAuthenticationParams& UnrealParams)
 {
-    Modio::AuthenticationParams Params;
+	Modio::AuthenticationParams Params;
 	Params.AuthToken = ToModio(FGenericPlatformHttp::UrlEncode(UnrealParams.AuthToken));
-	Params.UserEmail = UnrealParams.UserEmail.TrimStartAndEnd().IsEmpty() ? Modio::Optional<std::string>(ToModio(UnrealParams.UserEmail)) : Modio::Optional<std::string>();
+	Params.UserEmail = UnrealParams.UserEmail.TrimStartAndEnd().IsEmpty()
+		                   ? Modio::Optional<std::string>(ToModio(UnrealParams.UserEmail))
+		                   : Modio::Optional<std::string>();
 	Params.bUserHasAcceptedTerms = UnrealParams.bUserHasAcceptedTerms;
 
 	return Params;

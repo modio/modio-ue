@@ -17,8 +17,8 @@
 #include "ModioModPropertyInspectorBase.generated.h"
 
 /**
-* Enumerator for the types a ModInfo could have as properties
-**/
+ * Enumerator for the types a ModInfo could have as properties
+ **/
 UENUM(BlueprintType)
 enum class EModioModInfoPropertyType : uint8
 {
@@ -42,30 +42,30 @@ enum class EModioModInfoPropertyType : uint8
 };
 
 /**
-* Strong type struct to store the property metadata of a ModInfo
-**/
+ * Strong type struct to store the property metadata of a ModInfo
+ **/
 USTRUCT(BlueprintType)
 struct MODIOUI_API FModioModInfoPropertyDescriptor
 {
 	GENERATED_BODY()
-	
+
 	/**
-	* Stored property of the label for this descriptor
-	**/
+	 * Stored property of the label for this descriptor
+	 **/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioModInfoPropertyDescriptor")
 	FText Label;
 
 	/**
-	* Stored property of the property type enumerated by EModioModInfoPropertyType
-	**/
+	 * Stored property of the property type enumerated by EModioModInfoPropertyType
+	 **/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioModInfoPropertyDescriptor")
-	EModioModInfoPropertyType Property;
+	EModioModInfoPropertyType Property {};
 };
 
 /**
-* Base class definition that stores a list of property descriptors, then it can be used to
-* update those properties on the widget to display
-**/
+ * Base class definition that stores a list of property descriptors, then it can be used to
+ * update those properties on the widget to display
+ **/
 UCLASS()
 class MODIOUI_API UModioModPropertyInspectorBase : public UModioUserWidgetBase
 {

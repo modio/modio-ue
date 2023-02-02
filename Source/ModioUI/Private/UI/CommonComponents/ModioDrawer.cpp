@@ -18,6 +18,7 @@
 #include "UI/Styles/ModioDrawerWidgetStyle.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SGridPanel.h"
+#include "Widgets/Layout/SBox.h"
 
 const FName UModioDrawer::HeaderName = FName("Header");
 const FName UModioDrawer::ContentName = FName("Content");

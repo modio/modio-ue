@@ -46,7 +46,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 */
-	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModFileForModFromMemory", Category = "mods.io|Mods|Submission")
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModFileForModFromMemory", Category = "mod.io|Mods|Submission")
 	static MODIOEX_API void K2_SubmitNewModFileForModFromMemory(UModioSubsystem *Target, FModioModID Mod, FModioCreateModFileMemoryParams Params);
 
 	/**
@@ -69,7 +69,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 */
-	UFUNCTION(BlueprintCallable, DisplayName = "LoadModFileToMemory", Category = "mods.io|Mods")
+	UFUNCTION(BlueprintCallable, DisplayName = "LoadModFileToMemory", Category = "mod.io|Mods")
 	static MODIOEX_API bool K2_LoadModFileToMemory(UModioSubsystem* Target, FModioModID ModId, TArray<uint8>& ModData);
 
 	

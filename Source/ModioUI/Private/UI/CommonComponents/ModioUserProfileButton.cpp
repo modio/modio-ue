@@ -69,19 +69,20 @@ void UModioUserProfileButton::UpdateProgress(const struct FModioModProgressInfo&
 	UModioModManagementWidgetBase::UpdateProgress(ProgressInfo);
 	if (DownloadProgressIndicator)
 	{
-		if (ProgressInfo.CurrentlyDownloadedBytes < ProgressInfo.TotalDownloadSize)
+		switch (ProgressInfo.GetCurrentState())
 		{
-			DownloadProgressIndicator->SetProgress((float) ProgressInfo.CurrentlyDownloadedBytes /
-												   (float) ProgressInfo.TotalDownloadSize);
-		}
-		else if (ProgressInfo.CurrentlyExtractedBytes < ProgressInfo.TotalExtractedSizeOnDisk)
-		{
-			DownloadProgressIndicator->SetProgress((float) ProgressInfo.CurrentlyExtractedBytes /
-												   (float) ProgressInfo.TotalExtractedSizeOnDisk);
-		}
-		else
-		{
-			DownloadProgressIndicator->SetProgress(0);
+			case EModioModProgressState::Downloading:
+				DownloadProgressIndicator->SetProgress(
+					(float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading) /
+					(float) ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading));
+				break;
+			case EModioModProgressState::Extracting:
+				DownloadProgressIndicator->SetProgress(
+					(float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting) /
+					(float) ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting));
+				break;
+			default:
+				DownloadProgressIndicator->SetProgress(0);
 		}
 	}
 }

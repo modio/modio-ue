@@ -114,6 +114,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioDownloadListWidgetBase* CompletedQueue;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
+	FText DownloadingActionText = FText::FromString("Downloading...");
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
+	FText ExtractingActionText = FText::FromString("Extracting...");
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
+	FText InitializingActionText = FText::FromString("Initializing...");
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
+	FText NoDownloadText = FText::FromString("There is no mod being downloaded");
+
 	/// @brief Shows the newly updated user as the profile badge, name etc
 	/// @param NewUser The new user to display, will be empty if no user is yet logged in
 	virtual void NativeDisplayUserInfo(FModioOptionalUser NewUser) override
@@ -169,29 +179,34 @@ protected:
 				}
 				if (ActivityText)
 				{
-					if (CurrentProgress->CurrentlyDownloadedBytes < CurrentProgress->TotalDownloadSize)
+					switch (CurrentProgress->GetCurrentState())
 					{
-						ActivityText->SetText(FText::FromString("Downloading..."));
-
-						CurrentOpProgress->UpdateProgress(CurrentProgress.GetValue());
+						case EModioModProgressState::Downloading:
+							ActivityText->SetText(DownloadingActionText);
+							break;
+						case EModioModProgressState::Extracting:
+							ActivityText->SetText(ExtractingActionText);
+							break;
+						case EModioModProgressState::Initializing:
+							ActivityText->SetText(InitializingActionText);
+							break;
+						default:
+							ActivityText->SetText(DownloadingActionText);
+							
 					}
-					if (CurrentProgress->CurrentlyExtractedBytes < CurrentProgress->TotalExtractedSizeOnDisk)
-					{
-						ActivityText->SetText(FText::FromString("Installing..."));
-						CurrentOpProgress->UpdateProgress(CurrentProgress.GetValue());
-					}
+					CurrentOpProgress->UpdateProgress(CurrentProgress.GetValue());
 				}
 			}
 			else
 			{
 				if (ActivityText)
 				{
-					ActivityText->SetText(FText::FromString("Downloading"));
+					ActivityText->SetText(DownloadingActionText);
 				}
 				if (StatusText)
 				{
 					StatusText->SetVisibility(ESlateVisibility::Visible);
-					StatusText->SetText(FText::FromString("There is no mod being downloaded"));
+					StatusText->SetText(NoDownloadText);
 				}
 				if (CurrentOpProgress)
 				{

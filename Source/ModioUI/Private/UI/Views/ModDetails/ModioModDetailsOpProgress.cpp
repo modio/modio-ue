@@ -69,34 +69,42 @@ void UModioModDetailsOpProgress::UpdateProgress(const struct FModioModProgressIn
 {
 	FTimespan fts = FDateTime::Now() - PreviousUpdateTime;
 	double DeltaTime = PreviousUpdateTime.GetTicks() ? fts.GetTotalMilliseconds() / 1000 : 0.01;
-	UE_LOG(LogTemp, Display, TEXT("%f %llu %llu %llu %llu"), DeltaTime,
-		   ProgressInfo.CurrentlyDownloadedBytes.Underlying, ProgressInfo.TotalDownloadSize.Underlying,
-		   ProgressInfo.CurrentlyExtractedBytes.Underlying, ProgressInfo.TotalExtractedSizeOnDisk.Underlying);
-	if (ProgressInfo.CurrentlyDownloadedBytes < ProgressInfo.TotalDownloadSize)
+	switch (ProgressInfo.GetCurrentState())
 	{
-		SetPercent(ProgressInfo.CurrentlyDownloadedBytes / (double) ProgressInfo.TotalDownloadSize);
-		UpdateTimeRemaining(ProgressInfo.CurrentlyDownloadedBytes - PreviousProgressValue,
-							ProgressInfo.TotalDownloadSize - ProgressInfo.CurrentlyDownloadedBytes, DeltaTime);
-		UpdateSpeed(ProgressInfo.CurrentlyDownloadedBytes - PreviousProgressValue, DeltaTime);
-		PreviousProgressValue = ProgressInfo.CurrentlyDownloadedBytes;
-	}
-	else if (ProgressInfo.CurrentlyExtractedBytes < ProgressInfo.TotalExtractedSizeOnDisk)
-	{
-		SetPercent(ProgressInfo.CurrentlyExtractedBytes / (double) ProgressInfo.TotalExtractedSizeOnDisk);
-		UpdateTimeRemaining(ProgressInfo.CurrentlyExtractedBytes - PreviousProgressValue,
-							ProgressInfo.TotalExtractedSizeOnDisk - ProgressInfo.CurrentlyExtractedBytes, DeltaTime);
-		UpdateSpeed(ProgressInfo.CurrentlyExtractedBytes - PreviousProgressValue, DeltaTime);
-		PreviousProgressValue = ProgressInfo.CurrentlyExtractedBytes;
-	}
-	else
-	{
-		if (TimeRemainingText)
+		case EModioModProgressState::Downloading:
 		{
-			TimeRemainingText->SetText(FText::GetEmpty());
+			FModioUnsigned64 Current = ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading);
+			FModioUnsigned64 Total= ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading);
+			SetPercent(Current / (double) Total);
+			UpdateTimeRemaining(Current - PreviousProgressValue,
+								Total - Current, DeltaTime);
+			UpdateSpeed(Current - PreviousProgressValue, DeltaTime);
+			PreviousProgressValue = Current;
 		}
-		PreviousProgressValue = FModioUnsigned64(0);
+		break;
+		case EModioModProgressState::Extracting:
+		{
+			FModioUnsigned64 Current = ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting);
+			FModioUnsigned64 Total = ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting);
+			SetPercent(Current / (double) Total);
+			UpdateTimeRemaining(Current - PreviousProgressValue,
+								Total - Current,
+								DeltaTime);
+			UpdateSpeed(Current - PreviousProgressValue, DeltaTime);
+			PreviousProgressValue = Current;
+		}
+		break;
+		default:
+		{
+			if (TimeRemainingText)
+			{
+				TimeRemainingText->SetText(FText::GetEmpty());
+			}
+			PreviousProgressValue = FModioUnsigned64(0);
+		}
+		break;
 	}
-
+	
 	PreviousUpdateTime = FDateTime::Now();
 }
 

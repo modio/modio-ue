@@ -15,12 +15,27 @@
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
 #include "Logging/LogVerbosity.h"
+#include "Misc/EngineVersionComparison.h"
 #include "UI/Commands/ModioCommonUICommands.h"
+#include "UObject/CoreRedirects.h"
 
 #define LOCTEXT_NAMESPACE "FModioUIModule"
 
 void FModioUIModule::StartupModule()
 {
+#if UE_VERSION_NEWER_THAN(5, 0, 0)
+	// Redirect ESlateColorStylingMode::UseColor_Specified_Link to ESlateColorStylingMode::UseColor_Specified
+	FCoreRedirectObjectName ColorStyling;
+	ColorStyling.ObjectName = "ESlateColorStylingMode";
+	FCoreRedirect ColorStylingRedirect(ECoreRedirectFlags::Type_Enum, ColorStyling, ColorStyling);
+	TMap<FString, FString> ColorStylingValueChanges;
+	ColorStylingValueChanges.Add("UseColor_Specified_Link", "UseColor_Specified");
+	ColorStylingRedirect.ValueChanges = ColorStylingValueChanges;
+
+	TArray<FCoreRedirect> RedirectList = {ColorStylingRedirect};
+	FCoreRedirects::AddRedirectList(RedirectList, "FModioUIModule::StartupModule()");
+#endif
+
 	EKeys::AddKey(FKeyDetails(FModioInputKeys::Up, LOCTEXT("ModioInputKey_Up", "Up"),
 							  FKeyDetails::EKeyFlags::NotActionBindableKey, NAME_ModioInputKeys));
 	EKeys::AddKey(FKeyDetails(FModioInputKeys::Down, LOCTEXT("ModioInputKey_Down", "Down"),

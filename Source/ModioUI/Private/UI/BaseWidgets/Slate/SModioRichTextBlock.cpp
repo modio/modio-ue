@@ -22,7 +22,7 @@ void SModioRichTextBlock::Construct(const FArguments& InArgs)
 		const FModioRichTextStyle* ResolvedStyle = Style->FindStyle<FModioRichTextStyle>();
 		if (ResolvedStyle)
 		{
-			StyleSetOverride = ResolvedStyle->GetStyleSet();
+			StyleSetOverride = ResolvedStyle->CloneStyleSet();
 			if (StyleSetOverride)
 			{
 				StyleSet = StyleSetOverride.Get();
@@ -74,7 +74,7 @@ void SModioRichTextBlock::ReapplyStyle()
 		const FModioRichTextStyle* ResolvedStyle = Style->FindStyle<FModioRichTextStyle>();
 		if (ResolvedStyle)
 		{
-			StyleSetOverride = ResolvedStyle->GetStyleSet();
+			StyleSetOverride = ResolvedStyle->CloneStyleSet();
 			if (StyleSetOverride)
 			{
 				SRichTextBlock::SetDecoratorStyleSet(StyleSetOverride.Get());

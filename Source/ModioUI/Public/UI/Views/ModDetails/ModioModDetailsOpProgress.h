@@ -44,10 +44,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* TimeRemainingText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText TimeRemainingTextFormat;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText SpeedTextFormat;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))

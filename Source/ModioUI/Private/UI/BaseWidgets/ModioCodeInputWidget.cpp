@@ -58,7 +58,7 @@ void UModioCodeInputWidget::NativeSetValidationError(FText ErrorText)
 
 	if (ResolvedErrorTextStyle)
 	{
-		TSharedPtr<FSlateStyleSet> StyleSet = ResolvedErrorTextStyle->GetStyleSet();
+		TSharedPtr<FSlateStyleSet> StyleSet = ResolvedErrorTextStyle->CloneStyleSet();
 		if (StyleSet)
 		{
 			ErrorTextBlockStyle = &StyleSet->GetWidgetStyle<FTextBlockStyle>(FName("Error"));
