@@ -25,6 +25,8 @@ using System.Linq;
 
 public class Modio : ModuleRules
 {
+    private const bool TraceLogEnabled = false;
+
     private bool PlatformMatches(UnrealTargetPlatform PlatformToCheck, string PlatformIdentifier)
     {
         UnrealTargetPlatform Platform;
@@ -123,7 +125,10 @@ public class Modio : ModuleRules
             /*if (PlatformName != PlatformString)
             {
                 // Platforms that do not match the PlatformName are skipped
-                // Log.TraceInformation("Platform name " + PlatformName + " does not match String " + PlatformString);
+                // if (TraceLogEnabled)
+                // {
+                //     Log.TraceInformation("Platform name " + PlatformName + " does not match String " + PlatformString);
+                // }
                 continue;
             }*/
 
@@ -140,7 +145,11 @@ public class Modio : ModuleRules
                     {
                         if (PlatformMatches(Target.Platform, Platform.Key))
                         {
-                            Log.TraceInformation("Merging in platform configuration " + Platform.Key);
+                            if (TraceLogEnabled)
+                            {
+                                Log.TraceInformation("Merging in platform configuration " + Platform.Key);
+                            }
+
                             //This is the first matching platform we've found, so create our config
                             if (MergedConfig == null)
                             {
@@ -315,7 +324,11 @@ public class Modio : ModuleRules
         {
             string RootPlatformName = PlatformPath.Replace('/', Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar).First();
             ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedSourcePath, RootPlatformName)));
-            Log.TraceInformation("Adding native platform source directory " + Path.Combine(GeneratedSourcePath, RootPlatformName));
+
+            if (TraceLogEnabled)
+            {
+                Log.TraceInformation("Adding native platform source directory " + Path.Combine(GeneratedSourcePath, RootPlatformName));
+            }
         }
         // Add any platform-specific additional modules as private dependencies
         PrivateDependencyModuleNames.AddRange(Config.ModuleDependencies.ToArray());
@@ -401,7 +414,10 @@ public class Modio : ModuleRules
             throw new BuildException("Could not locate native platform configuration file. If you are using a confidential platform, please ensure you have placed the platform code into the correct directory.");
         }
 
-        DumpNativePlatformConfig(PlatformConfig);
+        if (TraceLogEnabled)
+        {
+            DumpNativePlatformConfig(PlatformConfig);
+        }
 
         // When using the native SDK as a submodule, transform the SDK source into paths and files that UBT understands
         // These are all no-ops in marketplace builds or anywhere with 'baked' source files
