@@ -9,6 +9,7 @@
  */
 
 #include "UI/BaseWidgets/ModioMultiLineEditableTextBox.h"
+#include "Misc/EngineVersionComparison.h"
 #include "UI/Styles/ModioEditableTextBoxStyle.h"
 #include "UI/Styles/ModioMultiLineEditableTextBoxStyle.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
@@ -36,7 +37,11 @@ TSharedRef<SWidget> UModioMultiLineEditableTextBox::RebuildWidget()
 {
 	MyEditableTextBlock = SNew(SMultiLineEditableTextBox)
 							  .Style(&WidgetStyle)
+#if !UE_VERSION_OLDER_THAN(5,1,0)
+							  .TextStyle(&WidgetStyle.TextStyle)
+#else
 							  .TextStyle(&TextStyle)
+#endif
 							  .AllowContextMenu(AllowContextMenu)
 							  .IsReadOnly(bIsReadOnly)
 							  .VirtualKeyboardOptions(VirtualKeyboardOptions)
@@ -120,7 +125,7 @@ void UModioMultiLineEditableTextBox::SynchronizeProperties()
 	if (ResolvedStyle)
 	{
 		MyEditableTextBlock->SetStyle(ResolvedStyle);
-		const FTextBlockStyle* ResolvedTextStyle = ResolvedStyle->TextStyle.FindStyle<FTextBlockStyle>();
+		const FTextBlockStyle* ResolvedTextStyle = ResolvedStyle->TextStyleRef.FindStyle<FTextBlockStyle>();
 		if (ResolvedTextStyle)
 		{
 			MyEditableTextBlock->SetTextStyle(ResolvedTextStyle);

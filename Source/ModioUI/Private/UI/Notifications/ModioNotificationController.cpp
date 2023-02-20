@@ -58,7 +58,7 @@ void UModioNotificationControllerBase::NativeDisplayErrorNotification(const FMod
 				ActualClass = GeneratedClass;
 			}
 		}
-		else if (ErrorNotificationClass->Implements<UModioUINotification>())
+		else if (ErrorNotificationClass->ImplementsInterface(UModioUINotification::StaticClass()))
 		{
 			ActualClass = ErrorNotificationClass.Get();
 		}

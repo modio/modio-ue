@@ -1,25 +1,28 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #include "Editor/ModioDialogInfoEditorToolkit.h"
 #include "Framework/Docking/TabManager.h"
+#include "Modules/ModuleManager.h"
 #include "PropertyEditorModule.h"
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
+#include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Images/SImage.h"
+#include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/SOverlay.h"
 
 void FModioDialogEditorToolkit::CreateInternalWidgets()
 {
 	DialogWidget = TStrongObjectPtr<UModioDialogBaseInternal>(NewObject<UModioDialogBaseInternal>());
-	
+	// clang-format off
 	DialogPreview = SNew(SOverlay)
 	+SOverlay::Slot()
 	.HAlign(HAlign_Fill)
@@ -45,7 +48,7 @@ void FModioDialogEditorToolkit::CreateInternalWidgets()
 			]
 		]
 	];
-
+	// clang-format on
 	FPropertyEditorModule& PropertyEditorModule =
 		FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	FDetailsViewArgs DetailsViewArgs;
@@ -55,7 +58,7 @@ void FModioDialogEditorToolkit::CreateInternalWidgets()
 	DialogPropertyEditor = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
 	DialogPropertyEditor->SetObject(ObjectBeingEdited, true);
 	DialogPropertyEditor->OnFinishedChangingProperties().AddRaw(this, &FModioDialogEditorToolkit::UpdatePreview);
-	//Calling after TakeWidget above so we've got the widget rebuilt at this point
+	// Calling after TakeWidget above so we've got the widget rebuilt at this point
 	if (DialogWidget)
 	{
 		UModioDialogInfo* EditObj = Cast<UModioDialogInfo>(ObjectBeingEdited);
@@ -79,6 +82,7 @@ TSharedRef<SDockTab> FModioDialogEditorToolkit::HandleTabSpawnerSpawnPreview(con
 
 TSharedRef<SDockTab> FModioDialogEditorToolkit::HandleTabSpawnerSpawnProperties(const FSpawnTabArgs& Args)
 {
+	// clang-format off
 	return SNew(SDockTab).Label(FText::FromString("Properties"))[
 		SNew(SVerticalBox)
 			+SVerticalBox::Slot()
@@ -99,10 +103,11 @@ TSharedRef<SDockTab> FModioDialogEditorToolkit::HandleTabSpawnerSpawnProperties(
 				]
 			]
 	];
+	// clang-format on
 }
 
-void FModioDialogEditorToolkit::InitAssetEditor(
-	const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, UObject* ObjectToEdit)
+void FModioDialogEditorToolkit::InitAssetEditor(const EToolkitMode::Type Mode,
+												const TSharedPtr<IToolkitHost>& InitToolkitHost, UObject* ObjectToEdit)
 {
 	ObjectBeingEdited = ObjectToEdit;
 	CreateInternalWidgets();
@@ -167,7 +172,6 @@ FString FModioDialogEditorToolkit::GetWorldCentricTabPrefix() const
 {
 	return "Dialog ";
 }
-
 
 FLinearColor FModioDialogEditorToolkit::GetWorldCentricTabColorScale() const
 {

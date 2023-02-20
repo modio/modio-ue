@@ -810,6 +810,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_submitting_a_file_for_a_mod">Submitting a file for a mod</a></li>
 </ul>
 </li>
+<li><a href="#_plugin_quick_start_edit_an_existing_mod">Plugin quick-start: Edit an existing mod</a></li>
 <li><a href="#_plugin_quick_start_user_muteunmute_functions">Plugin quick-start: User mute/unmute functions</a>
 <ul class="sectlevel3">
 <li><a href="#_mute_a_user">Mute a user</a></li>
@@ -2491,7 +2492,7 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="sect4">
 <h5 id="_semantic_queries">Semantic Queries</h5>
 <div class="paragraph">
-<p>In your application, you probably don&#8217;t actually need to handle different network errors in different ways, for example. The semantics of networking errors are largely 'try the function again later'.</p>
+<p>In your application, you probably don&#8217;t need to handle different network errors in different ways, for example. The semantics of networking errors are largely 'try the function again later'.</p>
 </div>
 <div class="paragraph">
 <p>This is where <a href="#ErrorCodeMatches">Error Code Matches</a> comes in.</p>
@@ -2533,29 +2534,25 @@ Error handling in Blueprints is still undergoing improvement. Please let us know
 <div class="sect2">
 <h3 id="_plugin_quick_start_in_game_mod_submission">Plugin quick-start: In-game mod submission</h3>
 <div class="paragraph">
-<p>Submitting a mod from inside your game and making it visible to other players involves two steps:
-* Submission of the mod
-* Submission of the mod&#8217;s data (aka 'the mod file')</p>
+<p>Submitting a mod from inside your game and making it visible to other players involves two steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Submission of the mod</p>
+</li>
+<li>
+<p>Submission of the mod&#8217;s data (aka 'the mod file')</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>These two steps are outlined below.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">CURRENT RELEASE</div>
-</td>
-<td class="content">
-Support for editing the details of an existing mod is currently not available but will be added in a future release.
-</td>
-</tr>
-</table>
+<p>These steps are outlined below. Mods can also be edited after submission, as detailed in <a href="#_plugin_quick_start_edit_an_existing_mod">Plugin quick-start: Edit an existing mod</a></p>
 </div>
 <div class="sect3">
 <h4 id="_submitting_a_new_mod">Submitting a new mod</h4>
 <div class="paragraph">
-<p>In order to submit a mod, you have to first create a mod handle using <a href="#K2_GetModCreationHandle">GetModCreationHandle</a> and use that handle when calling <a href="#K2_SubmitNewModAsync">SubmitNewModAsync</a></p>
+<p>To submit a mod, you must first create a mod handle using <a href="#K2_GetModCreationHandle">GetModCreationHandle</a> and use that handle when calling <a href="#K2_SubmitNewModAsync">SubmitNewModAsync</a>. Note that the newly created mod will remain hidden until a mod file is added in the next step.</p>
 </div>
 <details>
 <summary class="title">Blueprint Example</summary>
@@ -2602,13 +2599,13 @@ Support for editing the details of an existing mod is currently not available bu
 <div class="sect3">
 <h4 id="_submitting_a_file_for_a_mod">Submitting a file for a mod</h4>
 <div class="paragraph">
-<p>Once you have successfully submitted a mod, you can then submit a file for that mod using <a href="#K2_SubmitNewModFileForMod">SubmitNewModFileForMod</a>. When you submit a file, you pass a <a href="#_modiocreatemodfileparams">ModioCreateModFileParams</a> containing the directory of the files that you want to submit. The plugin will then compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you&#8217;ll get notified of the completed upload by the Mod Management callbacks.</p>
+<p>Once you have successfully submitted a mod, you can submit a file for that mod using <a href="#K2_SubmitNewModFileForMod">SubmitNewModFileForMod</a>. When you submit a file, you pass a <a href="#_modiocreatemodfileparams">ModioCreateModFileParams</a> containing the directory of the files that you want to submit. The plugin will compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you&#8217;ll be notified of the completed upload by the Mod Management callbacks.</p>
 </div>
 <details>
 <summary class="title">Blueprint Example</summary>
 <div class="content">
 <div class="paragraph">
-<p>As an example, after the callback for submitting a mod has completed, you can get the Mod Id to use for file submission.</p>
+<p>After the callback for submitting a mod has completed, you can get the Mod Id to use for file submission.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2639,12 +2636,74 @@ Support for editing the details of an existing mod is currently not available bu
 </div>
 </div>
 <div class="sect2">
+<h3 id="_plugin_quick_start_edit_an_existing_mod">Plugin quick-start: Edit an existing mod</h3>
+<div class="paragraph">
+<p>Mod details can be edited in-game using <a href="#K2_SubmitModChangesAsync">SubmitModChangesAsync</a>.  This function allows you to edit multiple parameters with a single call.  It takes an <a href="#FModioModID">[FModioModID]</a> of the mod to edit, an <a href="#FModioEditModParams">[FModioEditModParams]</a> containing one or more parameters to be altered, and a callback that will contain an optional updated <a href="#FModioModInfo">[FModioModInfo]</a> object on success.</p>
+</div>
+<div class="paragraph">
+<p>Note that updating the mod file itself is done via <a href="#K2_SubmitNewModFileForMod">SubmitNewModFileForMod</a>, as detailed in <a href="#_submitting_a_file_for_a_mod">Submitting a file for a mod</a>.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<img src="img/edit_mod.png" alt="edit mod">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>Note that it would be more appropriate to pass an <a href="#FModioEditModParams">[FModioEditModParams]</a> with your desired parameters into <code>UModioManager::EditMod()</code>, however this example shows their creation within the function to illustrate their use.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">EditMod</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">())</span>
+	<span class="p">{</span>
+		<span class="n">FModioEditModParams</span> <span class="n">EditParams</span><span class="p">;</span>
+
+		<span class="c1">// Add one or more parameters to edit</span>
+		<span class="n">EditParams</span><span class="p">.</span><span class="n">Name</span> <span class="o">=</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"My Edited Mod Name"</span><span class="p">);</span>
+		<span class="n">EditParams</span><span class="p">.</span><span class="n">Summary</span> <span class="o">=</span> <span class="n">TEXT</span><span class="p">(</span><span class="s">"My edited summary"</span><span class="p">);</span>
+
+		<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SubmitModChangesAsync</span><span class="p">(</span><span class="n">ModID</span><span class="p">,</span> <span class="n">EditParams</span><span class="p">,</span> <span class="n">FOnGetModInfoDelegateFast</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">UModioManager</span><span class="o">::</span><span class="n">OnSubmitModChangesCallback</span><span class="p">));</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">OnSubmitModChangesCallback</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">FModioOptionalModInfo</span> <span class="n">UpdatedInfo</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">ErrorCode</span> <span class="o">==</span> <span class="nb">false</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">// Mod successfully updated. Can display new details from UpdatedInfo etc.</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+<div class="sect2">
 <h3 id="_plugin_quick_start_user_muteunmute_functions">Plugin quick-start: User mute/unmute functions</h3>
 <div class="paragraph">
-<p>Users have the ability to disable updates from other user&#8217;s mods. This will prevent mod.io from returning mods authored by the muted user. There are three functions to perform these actions:
-* Mute a user
-* Unmute a user
-* List muted users</p>
+<p>Users have the ability to disable updates from other user&#8217;s mods. This will prevent mod.io from returning mods authored by the muted user. There are three functions to perform these actions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mute a user</p>
+</li>
+<li>
+<p>Unmute a user</p>
+</li>
+<li>
+<p>List muted users</p>
+</li>
+</ul>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2653,7 +2712,7 @@ Support for editing the details of an existing mod is currently not available bu
 <div class="title">Note</div>
 </td>
 <td class="content">
-To perform any of these actions, the user must be previously authenticated.
+To perform any of these actions, the muting user must be authenticated.
 </td>
 </tr>
 </table>
@@ -2661,7 +2720,7 @@ To perform any of these actions, the user must be previously authenticated.
 <div class="sect3">
 <h4 id="_mute_a_user">Mute a user</h4>
 <div class="paragraph">
-<p>In order to mute a user, you have to call <a href="#K2_MuteUserAsync">MuteUserAsync</a> with the corresponding UserID and a callback given the asynchronous nature of the function</p>
+<p>To mute a user, call <a href="#K2_MuteUserAsync">MuteUserAsync</a> with the corresponding UserID and a callback, given the asynchronous nature of the function</p>
 </div>
 <details>
 <summary class="title">Blueprint Example</summary>
@@ -2701,7 +2760,7 @@ To perform any of these actions, the user must be previously authenticated.
 <div class="sect3">
 <h4 id="_unmute_a_user">Unmute a user</h4>
 <div class="paragraph">
-<p>To perform the inverse operation, unmute a user, there is a similar function named <a href="#K2_UnmuteUserAsync">UnmuteUserAsync</a> with the corresponding UserID and a callback given the asynchronous nature of the function</p>
+<p>To perform the inverse operation, unmute a user, call <a href="#K2_UnmuteUserAsync">UnmuteUserAsync</a> with the corresponding UserID and a callback, given the asynchronous nature of the function</p>
 </div>
 <details>
 <summary class="title">Blueprint Example</summary>
@@ -2741,7 +2800,7 @@ To perform any of these actions, the user must be previously authenticated.
 <div class="sect3">
 <h4 id="_list_muted_users">List muted users</h4>
 <div class="paragraph">
-<p>This method returns a users list previously muted by an authenticated user. This function name is <a href="#K2_GetMutedUsersAsync">GetMutedUsersAsync</a>&gt;</p>
+<p><a href="#K2_GetMutedUsersAsync">GetMutedUsersAsync</a> returns a list of users previously muted by an authenticated user.</p>
 </div>
 <details>
 <summary class="title">Blueprint Example</summary>
@@ -8672,6 +8731,11 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PortalInUse</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The portal your title is running through</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TMap&lt;FString,FString&gt;">TMap&lt;FString,FString&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedInitializationParameters</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Extended platform-specific initialization parameters. Refer to the platform documentation for valid keys and their values. Unrecognized values will be ignored</p></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -9732,7 +9796,7 @@ This class is part of an experimental feature and is subject to change.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioUIStyleRef">FModioUIStyleRef</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TextStyle</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TextStyleRef</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -13898,7 +13962,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-02-02 15:50:00 +1100
+Last updated 2023-02-20 17:51:57 +1100
 </div>
 </div>
 </body>

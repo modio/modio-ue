@@ -17,6 +17,7 @@
 #include "MaterialEditingLibrary.h"
 #include "MaterialEditorModule.h"
 #include "MaterialEditorUtilities.h"
+#include "Materials/Material.h"
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
@@ -27,6 +28,7 @@
 #include "PropertyEditorModule.h"
 #include "RenderMSDF.h"
 #include "SVGToSDF.h"
+#include "MaterialExpressionHelpers.h"
 #include "ShaderCompiler.h"
 #include "SlateMaterialBrush.h"
 #include "Templates/SharedPointer.h"
@@ -104,23 +106,23 @@ public:
 		ComponentMask->Input.Connect(0, OutputImageSize);
 		PreviewRenderExpression->OutputTextureSize.Connect(0, ComponentMask);
 		// Add all the expressions so far to this material
-		RenderedMaterialInstance->Expressions.Add(PreviewRenderExpression);
-		RenderedMaterialInstance->Expressions.Add(FieldDistance);
-		RenderedMaterialInstance->Expressions.Add(OutputImageSize);
-		RenderedMaterialInstance->Expressions.Add(ComponentMask);
+		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), PreviewRenderExpression);
+		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), FieldDistance);
+		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), OutputImageSize);
+		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), ComponentMask);
 		RenderedMaterialInstance->MaterialDomain = EMaterialDomain::MD_UI;
 		RenderedMaterialInstance->BlendMode = BLEND_Translucent;
 		// Use a flat white color for the rendered preview
 		UMaterialExpressionConstant3Vector* Color =
 			NewObject<UMaterialExpressionConstant3Vector>(RenderedMaterialInstance.Get());
 		Color->Constant = FLinearColor(1, 1, 1, 1);
-		RenderedMaterialInstance->EmissiveColor.Connect(0, Color);
-		RenderedMaterialInstance->Expressions.Add(Color);
+		MaterialExpressionHelpers::ConnectEmissive(RenderedMaterialInstance.Get(), Color);
+		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), Color);
 		// Use the rendered MSDF as the opacity mask for the material
 		UMaterialExpressionConstant* OpacityValue =
 			NewObject<UMaterialExpressionConstant>(RenderedMaterialInstance.Get());
 		OpacityValue->R = 1;
-		RenderedMaterialInstance->Opacity.Connect(0, PreviewRenderExpression);
+		MaterialExpressionHelpers::ConnectOpacity(RenderedMaterialInstance.Get(), PreviewRenderExpression);
 		RenderedMaterialInstance->SetShadingModel(MSM_Unlit);
 		// Notify the material it's been edited
 		RenderedMaterialInstance->PreEditChange(nullptr);

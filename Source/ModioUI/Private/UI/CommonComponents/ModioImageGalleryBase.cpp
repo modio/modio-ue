@@ -13,12 +13,6 @@
 #include "Types/ModioModInfo.h"
 #include "Widgets/Layout/SFxWidget.h"
 
-/*
-void UModioImageGallery::NativeOnInitialized()
-{
-	IModioUIMediaDownloadCompletedReceiver::Register<UModioImageGallery>(
-		EModioUIMediaDownloadEventType::ModGalleryImages);
-}*/
 
 TSharedRef<SWidget> UModioImageGalleryBase::RebuildWidget()
 {
@@ -31,23 +25,15 @@ TSharedRef<SWidget> UModioImageGalleryBase::RebuildWidget()
 		.HAlign(HAlign_Fill)
 		.VAlign(VAlign_Fill)
 		[
-			SAssignNew(BackgroundImageWrapper, SFxWidget)
-			.Content()
-			[
-				BackgroundContent ? BackgroundContent->TakeWidget()
-									: SNullWidget::NullWidget
-			]
+			BackgroundContent ? BackgroundContent->TakeWidget()
+								: SNullWidget::NullWidget
 		] 
 		+SOverlay::Slot()
 		.HAlign(HAlign_Fill)
 		.VAlign(VAlign_Fill)
 		[
-			SAssignNew(ForegroundImageWrapper, SFxWidget)
-			.Content()
-			[
-				ForegroundContent ? ForegroundContent->TakeWidget() 
-									: SNullWidget::NullWidget
-			]
+			ForegroundContent ? ForegroundContent->TakeWidget() 
+								: SNullWidget::NullWidget
 		];
 	// clang-format on
 	return MyGalleryRootWidget.ToSharedRef();
@@ -60,14 +46,6 @@ void UModioImageGalleryBase::ReleaseSlateResources(bool bReleaseChildren)
 	BackgroundImageWrapper.Reset();
 	ForegroundImageWrapper.Reset();
 }
-
-/*
-void UModioImageGallery::NativeOnSetDataSource()
-{
-	Super::NativeOnSetDataSource();
-	ActualModInfo = Cast<UModioModInfoUI>(DataSource);
-}
-*/
 
 void UModioImageGalleryBase::SynchronizeProperties()
 {

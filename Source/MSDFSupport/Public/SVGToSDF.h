@@ -9,10 +9,6 @@
  */
 
 #pragma once
-#include "Containers/Array.h"
-#include "Containers/UnrealString.h"
-#include "Kismet/BlueprintFunctionLibrary.h"
-
 #include "SVGToSDF.generated.h"
 
 USTRUCT(BlueprintType)
@@ -46,14 +42,4 @@ struct MSDFSUPPORT_API FSVGConversionParams
 	// For future use
 	// UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	// bool bIncludeSdfInAlpha = false;
-};
-
-UCLASS()
-class MSDFSUPPORT_API USVGToSDFFunctionLibrary : public UBlueprintFunctionLibrary
-{
-	GENERATED_BODY()
-public:
-	UFUNCTION(BlueprintCallable, Category = "SVGToSDFFunctionLibrary")
-	static bool ConvertSVGToMSDFData(const FString& FilePath, const FSVGConversionParams& Params,
-									 TArray<uint8>& Output);
 };

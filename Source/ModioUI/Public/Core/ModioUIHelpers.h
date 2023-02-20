@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "Layout/Margin.h"
+#include "Misc/Attribute.h"
 #include "Misc/EngineVersionComparison.h"
 #include "Types/SlateEnums.h"
 #include "UObject/SavePackage.h"

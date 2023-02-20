@@ -1,24 +1,24 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 #include "Internal/ModioConvert.h"
 #include "Internal/ModioPrivateDefines.h"
+#include "Modio.h"
 #include "ModioSDK.h"
 #include "Types/ModioInitializeOptions.h"
-#include "Modio.h"
 
 #if PLATFORM_WINDOWS
-// For GetUserSidString
-#include <processthreadsapi.h>
-#include <sddl.h>
+	// For GetUserSidString
+	#include <processthreadsapi.h>
+	#include <sddl.h>
 
 static FORCEINLINE std::string GetUserSidString()
 {
@@ -64,20 +64,27 @@ static FORCEINLINE std::string GetUserSidString()
 
 #endif
 
-FORCEINLINE Modio::InitializeOptions ToModio(const FModioInitializeOptions& In )
+FORCEINLINE Modio::InitializeOptions ToModio(const FModioInitializeOptions& In)
 {
-    Modio::InitializeOptions Options;
-    Options.GameID = ToModio(In.GameId);
-    Options.APIKey = ToModio(In.ApiKey);
-    Options.GameEnvironment = ToModio(In.GameEnvironment);
-	#if PLATFORM_WINDOWS
+	Modio::InitializeOptions Options;
+	Options.GameID = ToModio(In.GameId);
+	Options.APIKey = ToModio(In.ApiKey);
+	Options.GameEnvironment = ToModio(In.GameEnvironment);
+#if PLATFORM_WINDOWS
 
-    Options.User = In.LocalSessionIdentifier.IsSet() ? ToModio(In.LocalSessionIdentifier.GetValue()) : GetUserSidString();
-	
-	#else
-	checkf(In.LocalSessionIdentifier.IsSet(), TEXT("Please set LocalSessionIdentifier on your InitializeOptions before passing them to InitializeAsync"))
-	Options.User = ToModio(In.LocalSessionIdentifier.GetValue());
-	#endif
-    Options.PortalInUse = ToModio(In.PortalInUse);
-    return Options;
+	Options.User =
+		In.LocalSessionIdentifier.IsSet() ? ToModio(In.LocalSessionIdentifier.GetValue()) : GetUserSidString();
+
+#else
+	checkf(In.LocalSessionIdentifier.IsSet(),
+		   TEXT("Please set LocalSessionIdentifier on your InitializeOptions before passing them to InitializeAsync"))
+		Options.User = ToModio(In.LocalSessionIdentifier.GetValue());
+#endif
+	Options.PortalInUse = ToModio(In.PortalInUse);
+
+	for (const TPair<FString, FString>& Element : In.ExtendedInitializationParameters)
+	{
+		Options.ExtendedParameters[ToModio(Element.Key)] = ToModio(Element.Value);
+	}
+	return Options;
 }

@@ -10,6 +10,8 @@
 
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
+//#define ENABLE_TRACE_LOG
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -123,7 +125,9 @@ public class Modio : ModuleRules
             /*if (PlatformName != PlatformString)
             {
                 // Platforms that do not match the PlatformName are skipped
-                // Log.TraceInformation("Platform name " + PlatformName + " does not match String " + PlatformString);
+                // #if ENABLE_TRACE_LOG
+                //     Log.TraceInformation("Platform name " + PlatformName + " does not match String " + PlatformString);
+                // #endif
                 continue;
             }*/
 
@@ -140,7 +144,10 @@ public class Modio : ModuleRules
                     {
                         if (PlatformMatches(Target.Platform, Platform.Key))
                         {
+#if ENABLE_TRACE_LOG
                             Log.TraceInformation("Merging in platform configuration " + Platform.Key);
+#endif
+
                             //This is the first matching platform we've found, so create our config
                             if (MergedConfig == null)
                             {
@@ -278,6 +285,7 @@ public class Modio : ModuleRules
         {
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/json/single_include"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/filesystem/include"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/function2/include"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/fmt/include"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/optional/include"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/asio/asio/include"),
@@ -285,10 +293,7 @@ public class Modio : ModuleRules
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/httpparser/src"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/interface"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/modio"),
-
-                //These files are special vendored dependencies and should be removed when those dependencies are included in the public SDK
-                Path.Combine(ModuleDirectory,  "../ThirdParty/Vendor/function2/include"),
-                
+ 
                 Path.Combine(GeneratedHeaderPath, "Private"),
                 Path.Combine(GeneratedHeaderPath, "Public")
         });
@@ -315,7 +320,10 @@ public class Modio : ModuleRules
         {
             string RootPlatformName = PlatformPath.Replace('/', Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar).First();
             ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedSourcePath, RootPlatformName)));
+
+#if ENABLE_TRACE_LOG
             Log.TraceInformation("Adding native platform source directory " + Path.Combine(GeneratedSourcePath, RootPlatformName));
+#endif
         }
         // Add any platform-specific additional modules as private dependencies
         PrivateDependencyModuleNames.AddRange(Config.ModuleDependencies.ToArray());
@@ -401,7 +409,9 @@ public class Modio : ModuleRules
             throw new BuildException("Could not locate native platform configuration file. If you are using a confidential platform, please ensure you have placed the platform code into the correct directory.");
         }
 
+#if ENABLE_TRACE_LOG
         DumpNativePlatformConfig(PlatformConfig);
+#endif
 
         // When using the native SDK as a submodule, transform the SDK source into paths and files that UBT understands
         // These are all no-ops in marketplace builds or anywhere with 'baked' source files

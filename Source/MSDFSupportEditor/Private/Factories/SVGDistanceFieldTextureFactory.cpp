@@ -21,6 +21,7 @@
 #include "SVGToSDF.h"
 #include "Slate/SImportSVGOptionsWidget.h"
 #include "UObject/SavePackage.h"
+#include "SVGToSDFFunctionLibrary.h"
 
 bool USVGDistanceFieldTextureFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames)
 {

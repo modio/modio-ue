@@ -755,7 +755,7 @@ In many cases, however, you will want to perform some degree of inspection on an
 
 ===== Semantic Queries
 
-In your application, you probably don't actually need to handle different network errors in different ways, for example. The semantics of networking errors are largely 'try the function again later'.
+In your application, you probably don't need to handle different network errors in different ways, for example. The semantics of networking errors are largely 'try the function again later'.
 
 This is where <<ErrorCodeMatches>> comes in. 
 
@@ -780,17 +780,15 @@ image::img/get_last_validation_error.png[]
 === Plugin quick-start: In-game mod submission
 
 Submitting a mod from inside your game and making it visible to other players involves two steps:
+
 * Submission of the mod
 * Submission of the mod's data (aka 'the mod file')
 
-These two steps are outlined below.
-
-[caption=CURRENT RELEASE] 
-NOTE: Support for editing the details of an existing mod is currently not available but will be added in a future release. 
+These steps are outlined below. Mods can also be edited after submission, as detailed in <<Plugin quick-start: Edit an existing mod>>
 
 ==== Submitting a new mod
 
-In order to submit a mod, you have to first create a mod handle using <<K2_GetModCreationHandle>> and use that handle when calling <<K2_SubmitNewModAsync>>
+To submit a mod, you must first create a mod handle using <<K2_GetModCreationHandle>> and use that handle when calling <<K2_SubmitNewModAsync>>. Note that the newly created mod will remain hidden until a mod file is added in the next step.
 
 .Blueprint Example
 [%collapsible]
@@ -837,13 +835,13 @@ void UModioManager::OnSubmitNewModCallback(FModioErrorCode ErrorCode, TOptional<
 
 ==== Submitting a file for a mod
 
-Once you have successfully submitted a mod, you can then submit a file for that mod using <<K2_SubmitNewModFileForMod>>. When you submit a file, you pass a <<ModioCreateModFileParams>> containing the directory of the files that you want to submit. The plugin will then compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you'll get notified of the completed upload by the Mod Management callbacks.
+Once you have successfully submitted a mod, you can submit a file for that mod using <<K2_SubmitNewModFileForMod>>. When you submit a file, you pass a <<ModioCreateModFileParams>> containing the directory of the files that you want to submit. The plugin will compress this folder into a zip file and upload it as the active version of the mod. Note that there is no callback for this method; you'll be notified of the completed upload by the Mod Management callbacks.
 
 .Blueprint Example
 [%collapsible]
 ====
 
-As an example, after the callback for submitting a mod has completed, you can get the Mod Id to use for file submission.
+After the callback for submitting a mod has completed, you can get the Mod Id to use for file submission.
 
 image::img/submit_new_mod_file.png[]
 
@@ -871,18 +869,68 @@ void UModioManager::SubmitNewModFile(FModioModID ModId)
 
 ====
 
+=== Plugin quick-start: Edit an existing mod
+
+Mod details can be edited in-game using <<K2_SubmitModChangesAsync>>.  This function allows you to edit multiple parameters with a single call.  It takes an <<FModioModID>> of the mod to edit, an <<FModioEditModParams>> containing one or more parameters to be altered, and a callback that will contain an optional updated <<FModioModInfo>> object on success.
+
+Note that updating the mod file itself is done via <<K2_SubmitNewModFileForMod>>, as detailed in <<Submitting a file for a mod>>.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/edit_mod.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+Note that it would be more appropriate to pass an <<FModioEditModParams>> with your desired parameters into `UModioManager::EditMod()`, however this example shows their creation within the function to illustrate their use.
+
+[source,c++]
+----
+
+void UModioManager::EditMod(FModioModID ModID)
+{
+	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		FModioEditModParams EditParams;
+
+		// Add one or more parameters to edit
+		EditParams.Name = TEXT("My Edited Mod Name");
+		EditParams.Summary = TEXT("My edited summary");
+		
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->SubmitModChangesAsync(ModID, EditParams, FOnGetModInfoDelegateFast::CreateUObject(this, &UModioManager::OnSubmitModChangesCallback));
+	}
+}
+
+void UModioManager::OnSubmitModChangesCallback(FModioErrorCode ErrorCode, FModioOptionalModInfo UpdatedInfo)
+{
+	if (ErrorCode == false)
+	{
+		// Mod successfully updated. Can display new details from UpdatedInfo etc.
+	}
+}
+
+----
+
+====
+
 === Plugin quick-start: User mute/unmute functions
 
 Users have the ability to disable updates from other user's mods. This will prevent mod.io from returning mods authored by the muted user. There are three functions to perform these actions:
+
 * Mute a user
 * Unmute a user
 * List muted users
 
-NOTE: To perform any of these actions, the user must be previously authenticated.
+NOTE: To perform any of these actions, the muting user must be authenticated.
 
 ==== Mute a user
 
-In order to mute a user, you have to call <<K2_MuteUserAsync>> with the corresponding UserID and a callback given the asynchronous nature of the function
+To mute a user, call <<K2_MuteUserAsync>> with the corresponding UserID and a callback, given the asynchronous nature of the function
 
 .Blueprint Example
 [%collapsible]
@@ -922,7 +970,7 @@ void UModioManager::OnMuteUserCallback(FModioErrorCode ErrorCode)
 
 ==== Unmute a user
 
-To perform the inverse operation, unmute a user, there is a similar function named <<K2_UnmuteUserAsync>> with the corresponding UserID and a callback given the asynchronous nature of the function
+To perform the inverse operation, unmute a user, call <<K2_UnmuteUserAsync>> with the corresponding UserID and a callback, given the asynchronous nature of the function
 
 .Blueprint Example
 [%collapsible]
@@ -960,7 +1008,7 @@ void UModioManager::OnUnmuteUserCallback(FModioErrorCode ErrorCode)
 
 ==== List muted users
 
-This method returns a users list previously muted by an authenticated user. This function name is <<K2_GetMutedUsersAsync>>>
+<<K2_GetMutedUsersAsync>> returns a list of users previously muted by an authenticated user. 
 
 .Blueprint Example
 [%collapsible]

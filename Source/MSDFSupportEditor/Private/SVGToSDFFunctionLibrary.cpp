@@ -8,11 +8,14 @@
  *
  */
 
+
+#include "SVGToSDFFunctionLibrary.h"
 #include "SVGToSDF.h"
 #include "MSDFGenWrapper.h"
 
+
 bool USVGToSDFFunctionLibrary::ConvertSVGToMSDFData(const FString& FilePath, const FSVGConversionParams& Params,
-													TArray<uint8>& Output)
+                                                    TArray<uint8>& Output)
 {
 	msdfgen::Shape SVGShape;
 	msdfgen::Vector2 OutputDimensions = msdfgen::Vector2(Params.OutputDimensions.X, Params.OutputDimensions.Y);

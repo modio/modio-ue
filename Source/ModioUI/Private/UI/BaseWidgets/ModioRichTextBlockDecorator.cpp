@@ -21,6 +21,7 @@
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Images/SImage.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/SNullWidget.h"
 
@@ -248,8 +249,7 @@ void FModioRichTextDecorator::CreateDecoratorText(const FTextRunInfo& RunInfo, F
 				const FTextBlockStyle& MatchingStyle = StyleSet->GetWidgetStyle<FTextBlockStyle>(RunName);
 				InOutTextStyle = MatchingStyle;
 			}
-			else
-			{}
+			else {}
 		}
 		if (const FString* FontSizeString = RunInfo.MetaData.Find("fontsize"))
 		{
