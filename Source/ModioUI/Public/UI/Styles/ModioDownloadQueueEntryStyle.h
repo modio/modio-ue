@@ -67,6 +67,20 @@ struct MODIOUI_API FModioDownloadQueueEntryStyle : public FSlateWidgetStyle
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"), Category = "Widget")
 	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
+
+
+	/**
+	 * Stored UI property to represent the on hovered sound
+	 **/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Appearance)
+	FSlateSound HoveredSound;
+
+
+	/**
+	 * Stored UI property to represent the on pressed sound
+	 **/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Appearance)
+	FSlateSound PressedSound;
 };
 
 /**

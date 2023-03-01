@@ -208,13 +208,14 @@ public:
 		const FVector2D ScaleOrigin = RenderScaleOrigin.Get() * AllottedGeometry.GetLocalSize();
 		const FVector2D Offset = VisualOffset.Get() * AllottedGeometry.GetLocalSize();
 		// create the render transform as a scale around ScaleOrigin and offset it by Offset.
-		// NOTE: On MacOS, not casting to a FVector2D causes compiler errors, however this potentially results in the Carousel widgets not rendering correctly
-		// This is a temporary compiler fix
-#if PLATFORM_MAC || PLATFORM_PS5
-		const auto SlateRenderTransform = Concatenate(Inverse(ScaleOrigin), FVector2D(RenderScale.Get()), ScaleOrigin, Offset);
-#else
-		const auto SlateRenderTransform = Concatenate(Inverse(ScaleOrigin), RenderScale.Get(), ScaleOrigin, Offset);
-#endif
+
+		// NOTE: MacOS requires explicit concatenate definitions because the compiler can't figure them out
+		// automatically so, it needs some help to break those functions and understand that it needs a
+		// "FSlateLayoutTransform" at the end
+		const auto ConcatInv = Concatenate(Inverse(ScaleOrigin), RenderScale.Get());
+		const auto ConcatScale = Concatenate(ConcatInv, ScaleOrigin);
+		const FSlateLayoutTransform SlateRenderTransform = Concatenate(ConcatScale, Offset);
+
 		// This will append the render transform to the layout transform, and we only use it for rendering.
 		FGeometry ModifiedGeometry = AllottedGeometry.MakeChild(AllottedGeometry.GetLocalSize(), SlateRenderTransform);
 

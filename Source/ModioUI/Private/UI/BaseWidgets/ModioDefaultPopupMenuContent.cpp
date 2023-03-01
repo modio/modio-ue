@@ -209,6 +209,7 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 								.ItemHeight_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredItemHeight)
 								.OnSelectionChanged_UObject(this, &UModioDefaultPopupMenuContent::OnEntrySelected)
 								.OnGenerateRow_UObject(this, &UModioDefaultPopupMenuContent::GenerateMenuEntryWidget)
+								.AllowOverscroll(EAllowOverscroll::No)
 								.IsFocusable(true)
 			]
 		];

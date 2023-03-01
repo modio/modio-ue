@@ -13,6 +13,7 @@
 #include "Engine/Engine.h"
 #include "ModioSubsystem.h"
 #include "ModioUISubsystem.h"
+#include "Fonts/FontMeasure.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/Interfaces/IModioUINotification.h"
 
@@ -34,11 +35,6 @@ void UModioModTile::NativeOnSetDataSource()
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																	   EModioUIAsyncOperationWidgetState::InProgress);
 			Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId);
-		}
-
-		if (ModName)
-		{
-			ModName->SetText(FText::FromString(ModInfo->Underlying.ProfileName));
 		}
 
 		if (SubscriptionIndicator)
@@ -70,6 +66,7 @@ void UModioModTile::NativeOnItemSelectionChanged(bool bIsSelected)
 
 void UModioModTile::NativeOnEntryReleased()
 {
+	Super::NativeOnEntryReleased();
 	// PlayAnimationReverse(FocusTransition);
 }
 
@@ -291,6 +288,43 @@ void UModioModTile::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		}
 	}
 	Invalidate(EInvalidateWidgetReason::LayoutAndVolatility);
+
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
+
+	if (ModName && IsValid(ModInfo))
+	{
+		FString modName = ModInfo->Underlying.ProfileName;
+		modName = TruncateLongModName(modName);
+		ModName->SetText(FText::FromString(modName));
+	}
+}
+
+FString UModioModTile::TruncateLongModName(FString inputStr)
+{
+	TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
+
+	bool bChopped = false;
+
+	if (IsValid(Subsystem) && IsValid(DefaultStyleSet))
+	{
+		float textSize = FontMeasure->Measure(FText::FromString(inputStr), DefaultStyleSet->GetFontStyle(ModName->GetDefaultStyleName()), 0.33).X;
+		float xVector = this->GetCachedGeometry().GetLocalSize().X;
+
+		if (xVector != 0.0f)
+		{
+			while (textSize > xVector)
+			{
+				inputStr = inputStr.LeftChop(5);
+				textSize = FontMeasure ->Measure(FText::FromString(inputStr), DefaultStyleSet->GetFontStyle(ModName->GetDefaultStyleName()), 0.33).X;
+				bChopped = true;
+			}
+			bChopped ? inputStr = inputStr.Append("...") : inputStr;
+		}
+	}
+
+	return inputStr;
 }
 
 void UModioModTile::SetSizeOverride(FVector2D NewSize)

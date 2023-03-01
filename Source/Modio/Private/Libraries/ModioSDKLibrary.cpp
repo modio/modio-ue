@@ -176,3 +176,40 @@ float UModioSDKLibrary::Pct_Int64Int64(int64 Part, int64 Whole)
 {
 	return Part / static_cast<double>(Whole);
 }
+
+FText UModioSDKLibrary::RoundNumberString(FText inputText)
+{
+	FString BytesPerSecondFromFText = inputText.ToString();
+
+	TArray<FString> Parsed;
+	const TCHAR* Delims[] = {TEXT("."), TEXT(","), TEXT(" ")};
+	BytesPerSecondFromFText.ParseIntoArray(Parsed, Delims, 3);
+
+	FText FinalText;
+	bool bNeedsDecimals = true;
+	FString decimals = "0";
+	FString num = "0";
+	FString units = "";
+
+	for (int i = Parsed.Num(); i >= 0; i--)
+	{
+		// Units:
+		if (i == Parsed.Num() - 1 && (Parsed[i].Contains("K") || Parsed[i].Contains("M")))
+		{
+			bNeedsDecimals = false;
+			units = " " + Parsed[i];
+		}
+
+		// Decimals:
+		if (i == (Parsed.Num() - 2) && i != 0) decimals = Parsed[i].Mid(0, 1);
+
+		// Numbers:
+		if (i == 0) num = Parsed[i];
+	}
+
+	FString FinalString = "";
+	bNeedsDecimals ? FinalString.Append(num).Append(",").Append(decimals).Append(units) : FinalString.Append(num).Append(units);
+	FinalText = FText::FromString(FinalString);
+
+	return FinalText;
+}

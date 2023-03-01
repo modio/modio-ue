@@ -95,6 +95,7 @@ void UModioUIAsyncLoader::SynchronizeProperties()
 
 void UModioUIAsyncLoader::OnRetryRequested()
 {
+	
 	if (UWidget* ContentWidget = GetContentForSlot("Widget"))
 	{
 		IModioUIAsyncOperationWidget::Execute_RequestOperationRetry(ContentWidget);

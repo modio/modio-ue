@@ -43,6 +43,11 @@ protected:
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
 												  TOptional<FModioImageWrapper> Image) override;
+	virtual void NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+
+	UFUNCTION()
+	FEventReply OnEntryPressed(FGeometry MyGeometry, const FPointerEvent& MouseEvent);
 
 	const FModioRichTextStyle& GetRichTextStyle();
 
@@ -67,4 +72,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioDownloadQueueEntryStyle"),
 			  Category = "Widgets")
 	FModioUIStyleRef EntryStyle;
+
+	FSlateSound PressedSound;
+
+	FSlateSound HoveredSound;
 };

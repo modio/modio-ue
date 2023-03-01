@@ -12,6 +12,13 @@
 #include "Algo/Accumulate.h"
 #include "Core/Input/ModioInputKeys.h"
 #include "Core/ModioFilterParamsUI.h"
+#include "UI/CommonComponents/ModioErrorRetryWidget.h"
+#include "UI/BaseWidgets/ModioButton.h"
+#include "UI/BaseWidgets/ModioGridPanel.h"
+#include "UI/BaseWidgets/ModioPopupComboBox.h"
+#include "UI/BaseWidgets/ModioRichTextBlock.h"
+#include "UI/BaseWidgets/ModioTileView.h"
+#include "UI/BaseWidgets/ModioUIAsyncLoader.h"
 #include "Loc/BeginModioLocNamespace.h"
 #include "Widgets/Layout/SGridPanel.h"
 
@@ -26,6 +33,10 @@ void UModioSearchResultsView::NativeOnInitialized()
 	{
 		RefineSearchButton->OnClicked.AddDynamic(this, &UModioSearchResultsView::OnRefineSearchButtonClicked);
 	}
+
+	RetryDelegate.Clear();
+	RetryDelegate.BindDynamic(this, &UModioSearchResultsView::OnRetryPressed);
+	ModioErrorWithRetryWidget->Execute_SetRetryRequestedDelegate(this, RetryDelegate);
 
 	if (ResultLoader)
 	{
@@ -270,8 +281,18 @@ void UModioSearchResultsView::NativeOnSetDataSource()
 	}
 }
 
+void UModioSearchResultsView::OnRetryPressed() 
+{
+	NativeOnSetDataSource();
+}
+
 void UModioSearchResultsView::NativeRequestOperationRetry()
 {
+	if (!DataSource) 
+	{
+		return;
+	}
+
 	if (UModioFilterParamsUI* Params = Cast<UModioFilterParamsUI>(DataSource))
 	{
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())

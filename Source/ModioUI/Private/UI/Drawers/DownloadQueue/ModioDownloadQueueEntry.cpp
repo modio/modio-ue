@@ -89,8 +89,14 @@ void UModioDownloadQueueEntry::NativeOnInitialized()
 	{
 		UnsubscribeButton->OnClicked.AddDynamic(this, &UModioDownloadQueueEntry::OnUnsubClicked);
 	}
+
 	IModioUIMediaDownloadCompletedReceiver::Register<UModioDownloadQueueEntry>(EModioUIMediaDownloadEventType::ModLogo);
 	bIsFocusable = true;
+
+	if (EntryBorder)
+	{
+		EntryBorder->OnMouseButtonDownEvent.BindDynamic(this, &UModioDownloadQueueEntry::OnEntryPressed);
+	}
 }
 
 void UModioDownloadQueueEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
@@ -101,21 +107,23 @@ void UModioDownloadQueueEntry::NativeOnListItemObjectSet(UObject* ListItemObject
 
 void UModioDownloadQueueEntry::NativeOnItemSelectionChanged(bool bIsSelected)
 {
-	if (EntryBorder)
-	{
-		if (bIsSelected)
-		{
-			if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
-					EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
-			{
-				EntryBorder->SetBrush(ResolvedStyle->HighlightedBorderBrush);
-			}
-		}
-		else
-		{
-			EntryBorder->SetBrush(FSlateNoResource());
-		}
-	}
+	// This function is never called. Saved for now in case this is needed in the future
+
+	//if (EntryBorder)
+	//{
+	//	if (bIsSelected)
+	//	{
+	//		if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
+	//				EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
+	//		{
+	//			EntryBorder->SetBrush(ResolvedStyle->HighlightedBorderBrush);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		EntryBorder->SetBrush(FSlateNoResource());
+	//	}
+	//}
 }
 
 FReply UModioDownloadQueueEntry::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
@@ -147,6 +155,50 @@ void UModioDownloadQueueEntry::NativeOnModLogoDownloadCompleted(FModioModID ModI
 			}
 		}
 	}
+}
+
+void UModioDownloadQueueEntry::NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+	if (EntryBorder)
+	{
+		if (const FModioDownloadQueueEntryStyle* ResolvedStyle = EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
+		{
+			EntryBorder->SetBrush(ResolvedStyle->HighlightedBorderBrush);
+			HoveredSound = ResolvedStyle->HoveredSound;
+			FSlateApplication::Get().PlaySound(HoveredSound);
+		}
+	}
+}
+
+void UModioDownloadQueueEntry::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) {
+	if (EntryBorder)
+	{
+		EntryBorder->SetBrush(FSlateNoResource());
+	}
+}
+
+FEventReply UModioDownloadQueueEntry::OnEntryPressed(FGeometry MyGeometry, const FPointerEvent& MouseEvent)
+{
+	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
+	{
+		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		{
+			if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
+			{
+				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+
+				if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
+						EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
+				{
+					PressedSound = ResolvedStyle->PressedSound;
+					FSlateApplication::Get().PlaySound(PressedSound);
+				}
+
+				return FEventReply(true);
+			}
+		}
+	}
+	return FEventReply(false);
 }
 
 const FModioRichTextStyle& UModioDownloadQueueEntry::GetRichTextStyle()

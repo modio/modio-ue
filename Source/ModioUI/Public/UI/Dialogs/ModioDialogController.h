@@ -105,7 +105,7 @@ protected:
 
 	/// @brief Needs to implement error display interface I guess
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
-	TSubclassOf<UWidget> ErrorDisplayWidget;
+	TSoftObjectPtr<UModioDialogInfo> ErrorDisplayDialog;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSoftObjectPtr<UModioDialogInfo> LogoutConfirmationDialog;
@@ -142,6 +142,8 @@ public:
 
 	void ShowReportContentDialog();
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
+
+	UFUNCTION(BlueprintCallable, Category = "Widgets")
 	void ShowErrorDialog(FModioErrorCode ec, bool bCloseDialogsOnOK = false);
 
 	void ShowLoadingDialog();

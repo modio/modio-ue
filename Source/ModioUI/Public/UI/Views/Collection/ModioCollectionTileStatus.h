@@ -15,6 +15,7 @@
 #include "Types/ModioModManagementEvent.h"
 #include "UI/BaseWidgets/ModioProgressBar.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
+#include "UI/BaseWidgets/ModioSizeBox.h"
 #include "UI/CommonComponents/ModioModManagementWidgetBase.h"
 
 #include "ModioCollectionTileStatus.generated.h"
@@ -32,12 +33,19 @@ protected:
 	FDateTime PreviousUpdateTime;
 
 	void NativeOnSetDataSource() override;
-
 	void SetPercent(float InPercent);
+	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
+	void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 
 	// These could possibly be moved into the global style
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText PendingLabelText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText UpdatePendingLabelText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText UninstallPendingLabelText;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText DownloadingLabelText;
@@ -48,13 +56,18 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText SubscribedLabelText;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText InstalledLabelText;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* StatusText;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioRichTextBlock* StatusPercent;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioProgressBar* ProgressBar;
 
-	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
-
-	void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioSizeBox* ProgressBarSizeBox;
 };

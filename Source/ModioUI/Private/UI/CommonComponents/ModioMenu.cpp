@@ -216,6 +216,21 @@ void UModioMenu::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 void UModioMenu::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+	
+}
+
+void UModioMenu::NativeConstruct()
+{
+	Super::NativeConstruct();
+	if (DrawerController)
+	{
+		int32 NumDrawers = DrawerController->GetChildrenCount();
+		for (int32 ChildIndex = 0; ChildIndex < NumDrawers; ChildIndex++)
+		{
+			DrawerController->SetDrawerExpanded(ChildIndex, false);
+		}
+	}
+
 	if (MenuBar)
 	{
 		if (ViewController && WidgetTree)
@@ -254,47 +269,34 @@ void UModioMenu::NativePreConstruct()
 			ViewController->SetActiveWidgetIndex((int32) EModioMenuScreen::EMMS_Featured);
 		}
 	}
-	if (DrawerController)
-	{
-		if (WidgetTree)
-		{
-			/*
-						if (DownloadProgressDrawer)
-						{
-							UModioDrawer* DownloadProgress = WidgetTree->ConstructWidget<UModioDrawer>(this,
-			   DownloadProgressDrawer); UModioDrawerControllerSlot* DLSlot =
-			   Cast<UModioDrawerControllerSlot>(DrawerController->AddChildToOverlay(DownloadProgress)); if (DLSlot)
-							{
-								DLSlot->SetSlotRightEdge(VAlign_Fill);
-							}
-						}
-						if (RefineSearchDrawer)
-						{
-							UModioDrawer* RefineSearch =
-								WidgetTree->ConstructWidget<UModioDrawer>(this, RefineSearchDrawer);
-							UModioDrawerControllerSlot* RefineSlot =
-								Cast<UModioDrawerControllerSlot>(DrawerController->AddChildToOverlay(RefineSearch));
-							if (RefineSlot)
-							{
-								RefineSlot->SetSlotRightEdge(VAlign_Fill);
-							}
-						}
-			*/
-		}
-	}
-}
-
-void UModioMenu::NativeConstruct()
-{
-	Super::NativeConstruct();
-	if (DrawerController)
-	{
-		int32 NumDrawers = DrawerController->GetChildrenCount();
-		for (int32 ChildIndex = 0; ChildIndex < NumDrawers; ChildIndex++)
-		{
-			DrawerController->SetDrawerExpanded(ChildIndex, false);
-		}
-	}
+	//if (DrawerController)
+	//{
+	//	if (WidgetTree)
+	//	{
+	//		/*
+	//					if (DownloadProgressDrawer)
+	//					{
+	//						UModioDrawer* DownloadProgress = WidgetTree->ConstructWidget<UModioDrawer>(this,
+	//		   DownloadProgressDrawer); UModioDrawerControllerSlot* DLSlot =
+	//		   Cast<UModioDrawerControllerSlot>(DrawerController->AddChildToOverlay(DownloadProgress)); if (DLSlot)
+	//						{
+	//							DLSlot->SetSlotRightEdge(VAlign_Fill);
+	//						}
+	//					}
+	//					if (RefineSearchDrawer)
+	//					{
+	//						UModioDrawer* RefineSearch =
+	//							WidgetTree->ConstructWidget<UModioDrawer>(this, RefineSearchDrawer);
+	//						UModioDrawerControllerSlot* RefineSlot =
+	//							Cast<UModioDrawerControllerSlot>(DrawerController->AddChildToOverlay(RefineSearch));
+	//						if (RefineSlot)
+	//						{
+	//							RefineSlot->SetSlotRightEdge(VAlign_Fill);
+	//						}
+	//					}
+	//		*/
+	//	}
+	//}
 }
 
 void UModioMenu::NativeOnInitialized()
@@ -347,12 +349,13 @@ void UModioMenu::NativeOnInitialized()
 				}
 			}
 		}
+		if (bHasSetBackground == false)
+		{
+			Background->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 
-	if (bHasSetBackground == false)
-	{
-		Background->SetVisibility(ESlateVisibility::Collapsed);
-	}
+	
 }
 
 void UModioMenu::UpdateRefineSearchDrawerSettings(FModioFilterParams Settings)

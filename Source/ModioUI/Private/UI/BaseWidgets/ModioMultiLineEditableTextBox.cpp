@@ -9,7 +9,6 @@
  */
 
 #include "UI/BaseWidgets/ModioMultiLineEditableTextBox.h"
-#include "Misc/EngineVersionComparison.h"
 #include "UI/Styles/ModioEditableTextBoxStyle.h"
 #include "UI/Styles/ModioMultiLineEditableTextBoxStyle.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
@@ -38,7 +37,7 @@ TSharedRef<SWidget> UModioMultiLineEditableTextBox::RebuildWidget()
 	MyEditableTextBlock = SNew(SMultiLineEditableTextBox)
 							  .Style(&WidgetStyle)
 #if !UE_VERSION_OLDER_THAN(5,1,0)
-							  .TextStyle(&WidgetStyle.TextStyle)
+		.TextStyle(&WidgetStyle.TextStyle
 #else
 							  .TextStyle(&TextStyle)
 #endif

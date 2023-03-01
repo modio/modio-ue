@@ -90,4 +90,7 @@ public:
 								  UObject* DialogDataSource = nullptr);
 	TOptional<FString> GetInputWidgetString();
 	void SetInputWidgetString(FString Input);
+
+	void SetHeaderText(FText text);
+	void SetContentText(FText text);
 };

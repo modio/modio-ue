@@ -116,6 +116,7 @@ void UModioModDetailsImageGallery::NativeOnModLogoDownloadCompleted(FModioModID 
 		UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 		if (ModInfo && ModInfo->Underlying.ModId == ModID)
 		{
+
 			ImageInfo[0].Status = ec;
 			ImageInfo[0].DownloadedImageReference = Image;
 			if (!ec && Image)

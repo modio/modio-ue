@@ -265,7 +265,10 @@ public:
 	UModioMenu* ShowModBrowserUIForPlayer(TSubclassOf<UModioMenu> MenuClass, APlayerController* Controller,
 										  FOnModBrowserClosed BrowserClosedDelegate);
 
-	/// @brief Closes the Mod.io UI Browser and frees up resources appropriately
+	/// Sets the browser visibility to collapsed, does not free resources and is generally more stable
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void HideModBrowserUI();
+
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void CloseModBrowserUI();
 

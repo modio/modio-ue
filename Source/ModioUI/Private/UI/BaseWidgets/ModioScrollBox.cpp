@@ -103,7 +103,6 @@ TSharedRef<SWidget> UModioScrollBox::RebuildWidget()
 				MyGridForCustomScrollbar->AddSlot(0, 0).AttachWidget(MyScrollBox.ToSharedRef());
 				break;
 		}
-
 		return MyGridForCustomScrollbar.ToSharedRef();
 	}
 	else
@@ -121,6 +120,8 @@ void UModioScrollBox::ReleaseSlateResources(bool bReleaseChildren)
 
 void UModioScrollBox::SynchronizeProperties()
 {
+	bAllowRightClickDragScrolling = false;
+	SetAllowOverscroll(false);
 	Super::SynchronizeProperties();
 	if (ScrollbarSlot != nullptr)
 	{

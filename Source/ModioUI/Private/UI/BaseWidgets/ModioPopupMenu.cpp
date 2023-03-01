@@ -74,7 +74,8 @@ TSharedRef<SWidget> UModioPopupMenu::RebuildWidget()
 	MenuButton->SetLabel(ButtonLabel);
 	MenuButton->OnClicked.AddDynamic(this, &UModioPopupMenu::HandleButtonClicked);
 	// Refactor and expose on the popup menu?
-	MenuButton->DisplayHintForInputHandler(FModioInputKeys::MoreOptions);
+	// Temporary fix since this function seems to have not been implemented correctly or is missing features
+	// MenuButton->DisplayHintForInputHandler(FModioInputKeys::MoreOptions);
 	TSharedRef<SWidget> Widget = SAssignNew(MyMenuAnchor, SMenuAnchor)
 									 .Placement(Placement)
 									 .FitInWindow(bFitInWindow)

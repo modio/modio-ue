@@ -103,6 +103,7 @@ public:
 	{
 		bCenterPanelItems = bNewCenterBasedOnPanelItems;
 	}
+	
 	virtual void SetConsumeMouseWheel(EConsumeMouseWheel NewValue)
 	{
 		this->ConsumeMouseWheel = NewValue;

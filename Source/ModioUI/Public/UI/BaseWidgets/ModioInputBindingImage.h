@@ -37,7 +37,6 @@ protected:
 	virtual void OnWidgetRebuilt() override;
 	virtual void SynchronizeProperties() override;
 	virtual void NativeOnInputDeviceChanged(EModioUIInputMode InputDevice) override;
-
 	void UpdateBrushImage(EModioUIInputMode InputDevice);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")

@@ -69,4 +69,5 @@ public:
 	* @param DefaultName The new style name to use
 	**/
 	void SetDefaultStyleName(FName DefaultName = "default");
+	FName GetDefaultStyleName();
 };

@@ -428,27 +428,40 @@ UModioMenu* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UModioMenu>
                                                          APlayerController* Controller,
                                                          FOnModBrowserClosed BrowserClosedDelegate)
 {
-	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
+	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
+	if (!IsValid(Settings) || !MenuClass)
 	{
-		if (MenuClass)
-		{
-			ModBrowserInstance = CreateWidget<UModioMenu>(Controller, MenuClass);
-			ModBrowserInstance->AddToViewport();
-			OnModBrowserClosed = BrowserClosedDelegate;
-			OwningPlayerController = Controller;
-
-			return ModBrowserInstance;
-		}
+		return nullptr;
 	}
-	return nullptr;
+
+	if (IsValid(ModBrowserInstance)) 
+	{
+		ModBrowserInstance->SetVisibility(ESlateVisibility::Visible);
+		return ModBrowserInstance;
+	}
+
+	ModBrowserInstance = CreateWidget<UModioMenu>(Controller, MenuClass);
+	ModBrowserInstance->AddToViewport();
+	OnModBrowserClosed = BrowserClosedDelegate;
+	OwningPlayerController = Controller;
+
+	return ModBrowserInstance;
 	// UE_LOG warn that the mod browser couldn't be displayed
+}
+
+void UModioUISubsystem::HideModBrowserUI() 
+{
+	if (IsValid(ModBrowserInstance))
+	{
+		ModBrowserInstance->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UModioUISubsystem::CloseModBrowserUI()
 {
 	if (ModBrowserInstance)
 	{
-		ModBrowserInstance->RemoveFromParent();
+		ModBrowserInstance->RemoveFromViewport();
 		ModBrowserInstance->ConditionalBeginDestroy();
 		ModBrowserInstance = nullptr;
 	}

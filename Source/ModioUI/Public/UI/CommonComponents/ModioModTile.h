@@ -50,16 +50,22 @@ protected:
 	virtual void NativeOnSetExpandedState(bool bExpandedState) override;
 	virtual FNavigationReply NativeOnNavigation(const FGeometry& InGeometry,
 												const FNavigationEvent& InNavigationEvent) override;
+	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	void OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating);
+
 	UFUNCTION()
 	void SubmitNegativeRating();
+
 	UFUNCTION()
 	void SubmitPositiveRating();
+
 	UFUNCTION()
 	void SubmitModReport();
 
 	UFUNCTION()
 	void NativeMoreOptionsClicked();
+
 	UFUNCTION()
 	void NativeReportClicked();
 
@@ -72,12 +78,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText MoreOptionsLabel;
 
-	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileActiveFrame;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	FString TruncateLongModName(FString inputStr);
 
 public:
 	UPROPERTY(BlueprintAssignable)

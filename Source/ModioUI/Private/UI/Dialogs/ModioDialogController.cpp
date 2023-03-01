@@ -259,6 +259,15 @@ void UModioDialogController::ShowUninstallConfirmationDialog(UObject* DialogData
 
 void UModioDialogController::ShowErrorDialog(FModioErrorCode ec, bool bCloseDialogsOnOK /*= false*/)
 {
+	if (ErrorDisplayDialog.IsNull())
+	{
+		return;	
+	}
+
+	PushDialog(ErrorDisplayDialog.LoadSynchronous());
+	
+	ActualDialog->SetHeaderText(FText::FromString("Error " + FString::FromInt(ec.GetValue())));
+	ActualDialog->SetContentText(FText::FromString(ec.GetErrorMessage()));
 	// create a copy of the error widget
 	// call the interface methods to set the error code
 	// call the interface methods to set the close handler to either swap back or close all the dialogs altogether

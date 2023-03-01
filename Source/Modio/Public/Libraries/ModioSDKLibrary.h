@@ -133,4 +133,13 @@ public:
 					  Keywords = "/ % percent pct"),
 			  Category = "mod.io|Math|integer64")
 	static MODIO_API float Pct_Int64Int64(int64 Dividend, int64 Divisor);
+
+
+		/**
+	 * @brief Sets the correct decimals depending on the file size or speed
+	 *
+	 * @param Input value of bytes per second as FText
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
+	static MODIO_API FText RoundNumberString(FText inputText);
 };

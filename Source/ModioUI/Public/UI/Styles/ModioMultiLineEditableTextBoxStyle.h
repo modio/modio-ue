@@ -13,7 +13,6 @@
 #include "Styling/SlateTypes.h"
 #include "UI/Styles/ModioUIStyleRef.h"
 #include "UI/Styles/ModioUIWidgetStyleContainer.h"
-#include "Misc/EngineVersionComparison.h"
 
 #include "ModioMultiLineEditableTextBoxStyle.generated.h"
 
@@ -39,11 +38,13 @@ struct MODIOUI_API FModioMultiLineEditableTextBoxStyle : public FEditableTextBox
 	{
 		return TypeName;
 	};
+
 	/**
 	* Stored property of the text style
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioTextWidgetStyle"), Category = "Widget")
 	FModioUIStyleRef TextStyleRef;
+	
 	/**
 	* Retrieve a default instance of the multiline editable text box
 	**/

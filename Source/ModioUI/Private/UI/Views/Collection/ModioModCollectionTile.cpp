@@ -23,97 +23,111 @@ void UModioModCollectionTile::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
 	UModioModCollectionEntryUI* CollectionEntry = Cast<UModioModCollectionEntryUI>(DataSource);
-	if (CollectionEntry)
+	if (!CollectionEntry)
 	{
-		// If the user is not subscribed (i.e. CollectionEntry is a system mod) and the mod state is not installed, hide
-		// it.
-		EModioModState ModState = CollectionEntry->Underlying.GetModState();
-		if (ModState != EModioModState::Installed && CollectionEntry->bCachedSubscriptionStatus == false)
-		{
-			SetVisibility(ESlateVisibility::Collapsed);
-			return;
-		}
+		return;
+	}
+	// If the user is not subscribed (i.e. CollectionEntry is a system mod) and the mod state is not installed, hide
+    // it.
+    EModioModState ModState = CollectionEntry->Underlying.GetModState();
+    if (ModState != EModioModState::Installed && CollectionEntry->bCachedSubscriptionStatus == false)
+    {
+        SetVisibility(ESlateVisibility::Collapsed);
+        return;
+    }
 
-		SetVisibility(ESlateVisibility::Visible);
+    SetVisibility(ESlateVisibility::Visible);
 
-		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-		{
-			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
-																	   EModioUIAsyncOperationWidgetState::InProgress);
-			Subsystem->RequestLogoDownloadForModID(CollectionEntry->Underlying.GetModProfile().ModId);
-		}
-		if (ModName)
-		{
-			ModName->SetText(FText::FromString(CollectionEntry->Underlying.GetModProfile().ProfileName));
-		}
-		if (SizeOnDiskLabel)
-		{
-			const uint64 NumBytes = CollectionEntry->Underlying.GetSizeOnDisk().Underlying;
-			if (NumBytes < GB)
+    if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+    {
+        IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
+                                                                   EModioUIAsyncOperationWidgetState::InProgress);
+        Subsystem->RequestLogoDownloadForModID(CollectionEntry->Underlying.GetModProfile().ModId);
+    }
+    if (ModName)
+    {
+        ModName->SetText(FText::FromString(CollectionEntry->Underlying.GetModProfile().ProfileName));
+    }
+    if (SizeOnDiskLabel)
+    {
+		/* GetSizeOnDisk() always returns 0 in the beginning of download, so FOR NOW setting the visibility to collapsed
+		* until there's a correct number.
+		* TODO: get the correct size in the beginning of the download
+		*/
+
+		SizeOnDiskLabel->SetVisibility(ESlateVisibility::Collapsed);
+        const uint64 NumBytes = CollectionEntry->Underlying.GetSizeOnDisk().Underlying;
+        if (NumBytes < GB)
+        {
+			if (NumBytes > 0)
 			{
+				SizeOnDiskLabel->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
 				SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 0));
 			}
-			else
-			{
-				SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 1));
-			}
-		}
-		// Perform the initial hide of the remove mod button if we are not subscribed (because we want users to use
-		// 'More Options' to do a force uninstall, in that case)
-		if (SubscribeButton)
-		{
-			if (CollectionEntry->bCachedSubscriptionStatus == false)
-			{
-				SubscribeButton->SetVisibility(ESlateVisibility::Hidden);
-			}
-			else
-			{
-				SubscribeButton->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-		if (SubscriptionIndicator)
-		{
-			SubscriptionIndicator->SetVisibility(CollectionEntry->bCachedSubscriptionStatus
-													 ? ESlateVisibility::HitTestInvisible
-													 : ESlateVisibility::Collapsed);
-		}
-		if (StatusWidget)
-		{
-			StatusWidget->SetDataSource(DataSource);
-		}
-		if (StatusLine)
-		{
-			StatusLine->SetText(CollectionEntry->bCachedSubscriptionStatus ? SubscribedStatusText
-																		   : InstalledStatusText);
-		}
-		if (MoreOptionsMenu)
-		{
-			FModioUIMenuCommandList MenuEntries;
-			FModioUIExecuteAction PositiveRatingDelegate;
-			PositiveRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitPositiveRating);
-			FModioUIExecuteAction NegativeRatingDelegate;
-			NegativeRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitNegativeRating);
-			FModioUIExecuteAction ReportDelegate;
-			ReportDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitModReport);
+        }
+        else
+        {
+			SizeOnDiskLabel->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
-			MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateUp", "Rate Up")},
-										  FModioUIAction {PositiveRatingDelegate});
-			MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateDown", "Rate Down")},
-										  FModioUIAction {NegativeRatingDelegate});
-			MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("Report", "Report")},
-										  FModioUIAction {ReportDelegate});
+            SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 1));
+        }
+    }
+    // Perform the initial hide of the remove mod button if we are not subscribed (because we want users to use
+    // 'More Options' to do a force uninstall, in that case)
+    if (SubscribeButton)
+    {
+        if (CollectionEntry->bCachedSubscriptionStatus == false)
+        {
+            SubscribeButton->SetVisibility(ESlateVisibility::Hidden);
+        }
+        else
+        {
+            SubscribeButton->SetVisibility(ESlateVisibility::Visible);
+        }
+    }
+    if (SubscriptionIndicator)
+    {
+        SubscriptionIndicator->SetVisibility(CollectionEntry->bCachedSubscriptionStatus
+                                                 ? ESlateVisibility::HitTestInvisible
+                                                 : ESlateVisibility::Collapsed);
+    }
+    if (StatusWidget)
+    {
+        StatusWidget->SetDataSource(DataSource);
+    }
+    if (StatusLine)
+    {
+        StatusLine->SetText(CollectionEntry->bCachedSubscriptionStatus ? SubscribedStatusText
+                                                                       : InstalledStatusText);
+    }
+    if (MoreOptionsMenu)
+    {
+        FModioUIMenuCommandList MenuEntries;
+        FModioUIExecuteAction PositiveRatingDelegate;
+        PositiveRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitPositiveRating);
+        FModioUIExecuteAction NegativeRatingDelegate;
+        NegativeRatingDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitNegativeRating);
+        FModioUIExecuteAction ReportDelegate;
+        ReportDelegate.BindDynamic(this, &UModioModCollectionTile::SubmitModReport);
 
-			// Force Uninstall should only be available if current user isn't subscribed
-			if (CollectionEntry->bCachedSubscriptionStatus == false)
-			{
-				FModioUIExecuteAction ForceUninstallDelegate;
-				ForceUninstallDelegate.BindDynamic(this, &UModioModCollectionTile::ForceUninstall);
-				MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("ForceUninstall", "Force Uninstall")},
-											  FModioUIAction {ForceUninstallDelegate});
-			}
-			MoreOptionsMenu->SetMenuEntries(MenuEntries);
-		}
-	}
+        MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateUp", "Rate Up")},
+                                      FModioUIAction {PositiveRatingDelegate});
+        MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("RateDown", "Rate Down")},
+                                      FModioUIAction {NegativeRatingDelegate});
+        MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("Report", "Report")},
+                                      FModioUIAction {ReportDelegate});
+
+        // Force Uninstall should only be available if current user isn't subscribed
+        if (CollectionEntry->bCachedSubscriptionStatus == false)
+        {
+            FModioUIExecuteAction ForceUninstallDelegate;
+            ForceUninstallDelegate.BindDynamic(this, &UModioModCollectionTile::ForceUninstall);
+            MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("ForceUninstall", "Force Uninstall")},
+                                          FModioUIAction {ForceUninstallDelegate});
+        }
+        MoreOptionsMenu->SetMenuEntries(MenuEntries);
+    }
 }
 FReply UModioModCollectionTile::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {

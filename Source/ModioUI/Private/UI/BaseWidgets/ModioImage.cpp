@@ -36,7 +36,7 @@ void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture)
 }
 void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture, UMaterialInterface* Material, FName ImageParameterName)
 {
-	if (Texture)
+	if (Texture && IsValid(Material))
 	{
 		SetBrushFromMaterial(Material);
 		CachedMaterial = GetDynamicMaterial();
@@ -62,7 +62,8 @@ void UModioImage::DisplayImageWithMaterial(UTexture2DDynamic* Texture, UMaterial
 void UModioImage::SetBrushFromMaterial(UMaterialInterface* Material)
 {
 	Super::SetBrushFromMaterial(Material);
-	if (UMaterialInstanceDynamic* Instance = Cast<UMaterialInstanceDynamic>(Material))
+	UMaterialInstanceDynamic* Instance = Cast<UMaterialInstanceDynamic>(Material);
+	if (IsValid(Instance))
 	{
 		CachedMaterial = Instance;
 	}

@@ -11,7 +11,6 @@
 #pragma once
 
 #include "Components/Widget.h"
-
 #include "ModioWidgetBase.generated.h"
 
 /**

@@ -40,12 +40,14 @@ public class Modio : ModuleRules
             public List<string> IncludeDirectories = new List<string>();
             public List<string> PlatformSpecificDefines = new List<string>();
             public List<string> ModuleDependencies = new List<string>();
+            public List<string> SystemLibraryDependencies = new List<string>();
             public List<string> PlatformSourceFolderNames = new List<string>();
         }
         public Dictionary<string, PlatformConfig> Platforms;
         public List<string> IncludeDirectories;
         public List<string> PlatformSpecificDefines;
         public List<string> ModuleDependencies = new List<string>();
+        public List<string> SystemLibraryDependencies = new List<string>();
     };
 #if UE_5_0_OR_LATER
     private ModioPlatformConfigFile.PlatformConfig ParseInnerPlatformConfig(JsonObject InnerPlatformObject)
@@ -71,6 +73,11 @@ public class Modio : ModuleRules
         {
             ParsedInnerPlatform.PlatformSourceFolderNames = new List<string>(ParsedPlatformSourceFolderNames);
         }
+        string[] ParsedPlatformSystemLibraryDependencies;
+        if (InnerPlatformObject.TryGetStringArrayField("SystemLibraryDependencies", out ParsedPlatformSystemLibraryDependencies))
+        {
+            ParsedInnerPlatform.SystemLibraryDependencies = new List<string>(ParsedPlatformSystemLibraryDependencies);
+        }
         return ParsedInnerPlatform;
     }
 #endif
@@ -88,7 +95,12 @@ public class Modio : ModuleRules
         }
         ParsedConfig.IncludeDirectories = new List<string>(PlatformConfigObject.GetStringArrayField("IncludeDirectories"));
         ParsedConfig.PlatformSpecificDefines = new List<string>(PlatformConfigObject.GetStringArrayField("PlatformSpecificDefines"));
-        
+        string[] ParsedPlatformSystemLibraryDependencies;
+        if (PlatformConfigObject.TryGetStringArrayField("SystemLibraryDependencies", out ParsedPlatformSystemLibraryDependencies))
+        {
+            ParsedConfig.SystemLibraryDependencies = new List<string>(ParsedPlatformSystemLibraryDependencies);
+        }
+
         JsonObject PlatformsInnerObject = PlatformConfigObject.GetObjectField("Platforms");
         ParsedConfig.Platforms = PlatformsInnerObject.KeyNames.ToDictionary(x => x, x =>
         ParseInnerPlatformConfig(PlatformsInnerObject.GetObjectField(x)), System.StringComparer.OrdinalIgnoreCase);
@@ -110,6 +122,14 @@ public class Modio : ModuleRules
         foreach (string SourceFolder in Config.PlatformSourceFolderNames)
         {
             Log.TraceInformation("Source Directory: " + SourceFolder);
+        }
+        foreach (string ModuleName in Config.ModuleDependencies)
+        {
+            Log.TraceInformation("Platform Module: " + ModuleName);
+        }
+        foreach (string SystemLibrary in Config.SystemLibraryDependencies)
+        {
+            Log.TraceInformation("System Library: " + SystemLibrary);
         }
     }
 
@@ -157,7 +177,7 @@ public class Modio : ModuleRules
                             MergedConfig.IncludeDirectories.AddRange(Platform.Value.IncludeDirectories);
                             MergedConfig.PlatformSpecificDefines.AddRange(Platform.Value.PlatformSpecificDefines);
                             MergedConfig.ModuleDependencies.AddRange(Platform.Value.ModuleDependencies);
-
+                            MergedConfig.SystemLibraryDependencies.AddRange(Platform.Value.SystemLibraryDependencies);
                             bFoundPlatformConfig = true;
                         }
                     }
@@ -167,6 +187,7 @@ public class Modio : ModuleRules
                         MergedConfig.IncludeDirectories.AddRange(CurrentConfig.IncludeDirectories);
                         MergedConfig.PlatformSpecificDefines.AddRange(CurrentConfig.PlatformSpecificDefines);
                         MergedConfig.ModuleDependencies.AddRange(CurrentConfig.ModuleDependencies);
+                        MergedConfig.SystemLibraryDependencies.AddRange(CurrentConfig.SystemLibraryDependencies);
                     }
                 }
             }
@@ -335,6 +356,7 @@ public class Modio : ModuleRules
         }
         // Add platform-specific include directories
         PrivateIncludePaths.AddRange(Config.IncludeDirectories);
+        PublicSystemLibraries.AddRange(Config.SystemLibraryDependencies);
     }
     private void AddCommonDefinitions()
     {
@@ -356,6 +378,8 @@ public class Modio : ModuleRules
         PrivateDefinitions.Add("MODIO_SEPARATE_COMPILATION=1");
         // Disable unnecessary inlining as a result of header-only mode not being used
         PrivateDefinitions.Add("MODIO_IMPL=");
+        // Disable internal warnings caused by deprecated functionality we don't consume
+        PrivateDefinitions.Add("MODIO_DISABLE_ALL_DEPRECATIONS");
 
         // Pass-through of SDK version identifier with Unreal prefix
         string VersionFilePath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.modio");

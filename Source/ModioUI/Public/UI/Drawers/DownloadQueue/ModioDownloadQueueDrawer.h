@@ -52,9 +52,11 @@ protected:
 
 		if (CurrentOpProgress)
 		{
+			CurrentOpProgress->SetVisibility(ESlateVisibility::Collapsed);
 			CurrentOpProgress->OperationCompletedDelegate().BindDynamic(
 				this, &UModioDownloadQueueDrawer::HandleOperationCompleted);
 		}
+
 		UModioUserWidgetBase::NativeOnInitialized();
 		bIsFocusable = true;
 	}

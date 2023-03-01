@@ -18,6 +18,90 @@
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 
+void UModioSubscriptionBadge::NativeOnSetDataSource()
+{
+	Super::NativeOnSetDataSource();
+	if (!DataSource)
+	{
+		return;
+	}
+
+	UModioModInfoUI* Data = Cast<UModioModInfoUI>(DataSource);
+	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+	if (!Data || !Subsystem)
+	{
+		return;
+	}
+
+	TMap<FModioModID, FModioModCollectionEntry> UserMods = Subsystem->QueryUserSubscriptions();
+	if (!UserMods.Contains(Data->Underlying.ModId))
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+
+	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	switch (UserMods[Data->Underlying.ModId].GetModState())
+	{
+		case EModioModState::InstallationPending:
+			Label->SetText(PendingLabelText);
+		case EModioModState::UninstallPending:
+		case EModioModState::UpdatePending:
+			Label->SetText(PendingLabelText);
+			SetPercent(0.f);
+			break;
+		case EModioModState::Downloading:
+			Label->SetText(DownloadingLabelText);
+		case EModioModState::Extracting:
+			Label->SetText(ExtractingLabelText);
+			BeginTickIfNeeded(true);
+			break;
+		case EModioModState::Installed:
+			Label->SetText(SubscribedLabelText);
+			SetPercent(100.f);
+			break;
+	}
+	SetVisibility(UserMods.Contains(Data->Underlying.ModId) ? ESlateVisibility::HitTestInvisible
+															: ESlateVisibility::Collapsed);
+}
+
+void UModioSubscriptionBadge::SetPercent(float InPercent)
+{
+	if (ProgressBar)
+	{
+		ProgressBar->SetPercent(InPercent);
+	}
+}
+
+
+void UModioSubscriptionBadge::UpdateProgress(const struct FModioModProgressInfo& ProgressInfo)
+{
+	switch (ProgressInfo.GetCurrentState())
+	{
+		case EModioModProgressState::Downloading:
+			Label->SetText(DownloadingLabelText);
+			SetPercent(ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading) /
+					   (double) ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading));
+			break;
+		case EModioModProgressState::Extracting:
+			Label->SetText(ExtractingLabelText);
+			SetPercent(ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting) /
+					   (double) ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting));
+			break;
+		case EModioModProgressState::Initializing:
+
+			break;
+		case EModioModProgressState::Compressing:
+			break;
+	}
+}
+
+void UModioSubscriptionBadge::ReleaseSlateResources(bool bReleaseChildren)
+{
+	Super::ReleaseSlateResources(bReleaseChildren);
+	WrappedContent.Reset();
+}
+
 void UModioSubscriptionBadge::NativeOnModManagementEvent(FModioModManagementEvent Event)
 {
 	IModioUIModManagementEventReceiver::NativeOnModManagementEvent(Event);
@@ -52,89 +136,6 @@ void UModioSubscriptionBadge::NativeOnModManagementEvent(FModioModManagementEven
 			}
 		}
 	}
-}
-
-void UModioSubscriptionBadge::ReleaseSlateResources(bool bReleaseChildren)
-{
-	Super::ReleaseSlateResources(bReleaseChildren);
-	WrappedContent.Reset();
-}
-
-void UModioSubscriptionBadge::SetPercent(float InPercent)
-{
-	if (ProgressBar)
-	{
-		ProgressBar->SetPercent(InPercent);
-	}
-}
-
-void UModioSubscriptionBadge::NativeOnSetDataSource()
-{
-	Super::NativeOnSetDataSource();
-	if (DataSource)
-	{
-		UModioModInfoUI* Data = Cast<UModioModInfoUI>(DataSource);
-		if (Data)
-		{
-			UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
-			if (Subsystem)
-			{
-				TMap<FModioModID, FModioModCollectionEntry> UserMods = Subsystem->QueryUserSubscriptions();
-				if (UserMods.Contains(Data->Underlying.ModId))
-				{
-					switch (UserMods[Data->Underlying.ModId].GetModState())
-					{
-						case EModioModState::InstallationPending:
-						case EModioModState::UninstallPending:
-						case EModioModState::UpdatePending:
-							if (Label)
-							{
-								Label->SetText(PendingLabelText);
-								SetPercent(0.f);
-							}
-							break;
-						case EModioModState::Downloading:
-						case EModioModState::Extracting:
-							BeginTickIfNeeded(true);
-							break;
-						case EModioModState::Installed:
-							if (Label)
-							{
-								Label->SetText(SubscribedLabelText);
-								SetPercent(100.f);
-							}
-							break;
-					}
-				}
-				SetVisibility(UserMods.Contains(Data->Underlying.ModId) ? ESlateVisibility::HitTestInvisible
-																		: ESlateVisibility::Collapsed);
-			}
-		}
-	}
-}
-
-void UModioSubscriptionBadge::UpdateProgress(const struct FModioModProgressInfo& ProgressInfo)
-{
-	switch (ProgressInfo.GetCurrentState())
-	{
-		case EModioModProgressState::Downloading:
-			if (Label)
-			{
-				Label->SetText(DownloadingLabelText);
-				SetPercent(ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading)/ (double) ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading));
-			}
-			break;
-		case EModioModProgressState::Extracting:
-			if (Label)
-			{
-				Label->SetText(ExtractingLabelText);
-				SetPercent(ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting) / (double) ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting));
-			}
-			break;
-			default:
-			SetPercent(0);
-	}
-	
 }
 
 void UModioSubscriptionBadge::SynchronizeProperties()

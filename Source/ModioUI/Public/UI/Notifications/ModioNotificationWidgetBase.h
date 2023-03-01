@@ -95,10 +95,9 @@ class MODIOUI_API UModioNotificationErrorWidgetBase : public UModioNotificationW
 	GENERATED_BODY()
 protected:
 	virtual void NativeConfigure(const FModioNotificationParams& Params);
-	FDateTime StartTime;
-	bool bDisplayStarted = false;
 	virtual void NativeOnDisplay();
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioImage* NotificationBackground;
 
@@ -110,6 +109,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* NotificationMessage;
+
+	FDateTime StartTime;
+	bool bDisplayStarted = false;
 
 public:
 };

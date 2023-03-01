@@ -10,49 +10,58 @@
 
 #include "UI/Views/Collection/ModioCollectionTileStatus.h"
 #include "Core/ModioModCollectionEntryUI.h"
+#include "Core/ModioModInfoUI.h"
 
 void UModioCollectionTileStatus::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
-	if (UModioModCollectionEntryUI* Data = Cast<UModioModCollectionEntryUI>(DataSource))
+	if (!DataSource) 
 	{
-		UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
-		if (Subsystem)
-		{
-			TMap<FModioModID, FModioModCollectionEntry> UserMods = Subsystem->QueryUserSubscriptions();
-			if (UserMods.Contains(Data->Underlying.GetID()))
-			{
-				SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-				switch (UserMods[Data->Underlying.GetID()].GetModState())
-				{
-					case EModioModState::InstallationPending:
-					case EModioModState::UninstallPending:
-					case EModioModState::UpdatePending:
+		return;
+	}
 
-						if (StatusText)
-						{
-							StatusText->SetText(PendingLabelText);
-							SetPercent(0.f);
-						}
-						break;
+	UModioModCollectionEntryUI* CollectionEntry = Cast<UModioModCollectionEntryUI>(DataSource);
+	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+	
+	if (!IsValid(CollectionEntry) || !Subsystem)
+	{
+		return;
+	}
 
-					case EModioModState::Downloading:
-					case EModioModState::Extracting:
-						BeginTickIfNeeded(true);
-						break;
-					case EModioModState::Installed:
-						if (StatusText)
-						{
-							SetVisibility(ESlateVisibility::Hidden);
-						}
-						break;
-				}
-			}
-			else
-			{
-				SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
+	TMap<FModioModID, FModioModCollectionEntry> UserMods = Subsystem->QueryUserSubscriptions();
+	if (!UserMods.Contains(CollectionEntry->Underlying.GetID()))
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+		return;
+	}
+
+	ProgressBarSizeBox->SetVisibility(ESlateVisibility::Collapsed);
+	StatusPercent->SetVisibility(ESlateVisibility::Collapsed);
+
+	switch (UserMods[CollectionEntry->Underlying.GetID()].GetModState())
+	{
+		case EModioModState::InstallationPending:
+			StatusText->SetText(PendingLabelText);
+			break;
+		case EModioModState::UninstallPending:
+			StatusText->SetText(UninstallPendingLabelText);
+			break;
+		case EModioModState::UpdatePending:
+			StatusText->SetText(UpdatePendingLabelText);
+			break;
+		case EModioModState::Downloading:
+			StatusText->SetText(DownloadingLabelText);
+			break;
+		case EModioModState::Extracting:
+			StatusText->SetText(ExtractingLabelText);
+			BeginTickIfNeeded(true);
+			break;
+		case EModioModState::Installed:
+			StatusText->SetText(InstalledLabelText);
+			break;
+		default:
+			SetPercent(0.0f);
+			break;
 	}
 }
 
@@ -71,13 +80,31 @@ void UModioCollectionTileStatus::UpdateProgress(const struct FModioModProgressIn
 		case EModioModProgressState::Downloading:
 		{
 			StatusText->SetText(DownloadingLabelText);
-			SetPercent((float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading) / (float) ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading));
+			if (ProgressBarSizeBox && ProgressBarSizeBox->GetVisibility() != ESlateVisibility::SelfHitTestInvisible)
+			{
+				ProgressBarSizeBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			}
+
+			if (StatusPercent && StatusPercent->GetVisibility() != ESlateVisibility::SelfHitTestInvisible)
+			{
+				StatusPercent->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			}
+
+			float Current = (float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading);
+			float Total = (float) ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading);
+			int percent = Current / Total * 100;
+			StatusPercent->SetText(FText::FromString(FString::FromInt(percent).Append(" %")));
+			SetPercent(Current / Total);
 		}
 		break;
 		case EModioModProgressState::Extracting:
 		{
 			StatusText->SetText(ExtractingLabelText);
-			SetPercent((float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting)/ (float) ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting));
+			float Current = (float) ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting);
+			float Total = (float) ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting);
+			int percent = Current / Total * 100;
+			StatusPercent->SetText(FText::FromString(FString::FromInt(percent).Append(" %")));
+			SetPercent(Current / Total);
 		}
 		break;
 	}

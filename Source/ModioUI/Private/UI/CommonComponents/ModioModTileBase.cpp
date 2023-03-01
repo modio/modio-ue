@@ -165,15 +165,6 @@ void UModioModTileBase::SynchronizeProperties()
 	Super::SynchronizeProperties();
 }
 
-void UModioModTileBase::ReleaseSlateResources(bool bReleaseChildren)
-{
-	Super::ReleaseSlateResources(bReleaseChildren);
-	if (SubscriptionIndicator)
-	{
-		SubscriptionIndicator->ReleaseSlateResources(true);
-	}
-}
-
 void UModioModTileBase::NativeOnSetExpandedState(bool bExpanded)
 {
 	bRoutedOnSetExpandedState = true;
@@ -201,7 +192,6 @@ void UModioModTileBase::HandleModLogoOperationStateChanged(EModioUIAsyncOperatio
 				break;
 			case EModioUIAsyncOperationWidgetState::Success:
 				// No need to do anything, the normal callback for the image fetch will handle
-				UE_LOG(LogTemp, Display, TEXT("NOOP"));
 				break;
 		}
 	}

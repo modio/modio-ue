@@ -128,7 +128,8 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 					.ListItemsSource(&ButtonParams)
 					.ItemHeight(0)
 					.ItemWidth(0)
-					.IsFocusable(true)
+					.IsFocusable(false)						// There should be no reason to be able to focus on a slot element
+					.SelectionMode(ESelectionMode::None)
 					.Visibility_UObject(this, &UModioDialogBaseInternal::GetButtonListVisibility)
 					.OnGenerateTile_UObject(this, &UModioDialogBaseInternal::OnGenerateButton)
 				]
@@ -727,4 +728,24 @@ void UModioDialogBaseInternal::SetInputWidgetString(FString Input)
 	{
 		IModioUIStringInputWidget::Execute_SetInput(InputWidget, Input);
 	}
+}
+
+void UModioDialogBaseInternal::SetHeaderText(FText text) 
+{
+	if (!HeadingTextBlock) 
+	{
+		return;	
+	}
+
+	HeadingTextBlock->SetText(text);
+}
+
+void UModioDialogBaseInternal::SetContentText(FText text)
+{
+	if (!DialogTextBlock)
+	{
+		return;
+	}
+
+	DialogTextBlock->SetText(text);
 }

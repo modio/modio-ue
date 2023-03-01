@@ -56,14 +56,8 @@ void UModioModManagementWidgetBase::SynchronizeProperties()
 
 void UModioModManagementWidgetBase::BeginTickIfNeeded(bool bShouldStartTicking)
 {
-	bool bWasTicking = bShouldTick;
-	bShouldTick = bShouldStartTicking;
-	// Currently not used because UUserWidgets always tick
-	/*if (bShouldTick && !bWasTicking)
-	{
-		RegisterActiveTimer(0.0f,
-							FWidgetActiveTimerDelegate::CreateUObject(this, &UModioSubscriptionBadge::RegisteredTick));
-	}*/
+	/*bool bWasTicking = bShouldTick;
+	bShouldTick = bShouldStartTicking;*/
 }
 
 void UModioModManagementWidgetBase::UpdateProgress(const FModioModProgressInfo& ProgressInfo) {}
@@ -71,11 +65,7 @@ void UModioModManagementWidgetBase::UpdateProgress(const FModioModProgressInfo& 
 void UModioModManagementWidgetBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::Tick(MyGeometry, InDeltaTime);
-
-	if (bShouldTick)
-	{
-		UpdateProgressIfNeeded();
-	}
+	UpdateProgressIfNeeded();
 }
 
 bool UModioModManagementWidgetBase::UpdateProgressIfNeeded(bool bForceUpdate)

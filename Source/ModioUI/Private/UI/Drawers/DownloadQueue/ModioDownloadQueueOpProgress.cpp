@@ -17,11 +17,20 @@ void UModioDownloadQueueOpProgress::UpdateSpeed(FModioUnsigned64 DeltaBytes, dou
 {
 	if (DeltaBytes)
 	{
-		int64 BytesPerSecond = DeltaBytes / DeltaTime;
-		// UE_LOG(LogTemp, Display, TEXT("%lld bytes"), BytesPerSecond);
-		FText BytesPerSecondString = FText::AsMemory(BytesPerSecond, EMemoryUnitStandard::IEC);
+		//int64 BytesPerSecond = DeltaBytes / DeltaTime;
+		//UE_LOG(LogTemp, Warning, TEXT("%lld bytes"), BytesPerSecond);
+		//FText BytesPerSecondString = FText::AsMemory(BytesPerSecond, EMemoryUnitStandard::SI);
+
+		int64 BytesPerSecond = DeltaBytes / DeltaTime / 8;
+		FText BytesPerSecondString = FText::AsMemory(BytesPerSecond, EMemoryUnitStandard::SI);
+
+
+		FText RoundedBytesPerSecondString = UModioSDKLibrary::RoundNumberString(BytesPerSecondString);
 		OperationSpeedText->SetText(FText::Format(
-			SpeedFormatText, FFormatNamedArguments {{FString("Bytes"), FFormatArgumentValue(BytesPerSecondString)}}));
+			SpeedFormatText,
+			FFormatNamedArguments {{FString("Bytes"), FFormatArgumentValue(RoundedBytesPerSecondString)}}));
+		OperationSpeedText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
 	}
 }
 
@@ -34,6 +43,7 @@ void UModioDownloadQueueOpProgress::NativeOnInitialized()
 		UnsubscribeButton->OnClicked.AddDynamic(this, &UModioDownloadQueueOpProgress::OnUnsubscribeClicked);
 	}
 }
+
 void UModioDownloadQueueOpProgress::OnUnsubscribeClicked()
 {
 	UModioModInfoUI* ActualData = Cast<UModioModInfoUI>(DataSource);
@@ -91,13 +101,19 @@ void UModioDownloadQueueOpProgress::UpdateProgress(const struct FModioModProgres
 			UpdateSpeed(Current - PreviousProgressValue, DeltaTime);
 
 			PreviousProgressValue = Current;
+			int decimals = 0;
+			Current.Underlying < 1024 * 1024 * 1024 ? decimals = 0 : decimals = 1;
 
 			FFormatNamedArguments Args;
 			Args.Add("Progress",
-					 UModioSDKLibrary::Filesize_ToString(Current.Underlying, 1));
+					 UModioSDKLibrary::Filesize_ToString(Current.Underlying, decimals));
 			Args.Add("Total", UModioSDKLibrary::Filesize_ToString(Total.Underlying, 1));
 
+			FText currenttext = UModioSDKLibrary::Filesize_ToString(Current.Underlying, 1);
+			FText totaltext = UModioSDKLibrary::Filesize_ToString(Total.Underlying, 1);
+
 			OperationProgressText->SetText(FText::Format(FTextFormat(ProgressFormatText), Args));
+			OperationProgressText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		}
 		break;
 		case EModioModProgressState::Extracting:

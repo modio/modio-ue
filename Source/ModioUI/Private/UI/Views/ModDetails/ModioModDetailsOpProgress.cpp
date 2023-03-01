@@ -9,6 +9,7 @@
  */
 
 #include "UI/Views/ModDetails/ModioModDetailsOpProgress.h"
+#include "Libraries/ModioSDKLibrary.h"
 #include "Core/ModioModInfoUI.h"
 #include "Types/ModioModProgressInfo.h"
 
@@ -42,13 +43,18 @@ void UModioModDetailsOpProgress::UpdateSpeed(FModioUnsigned64 DeltaBytes, double
 {
 	if (DeltaBytes)
 	{
-		double BytesPerSecond = DeltaBytes / DeltaTime;
+		/*double BytesPerSecond = DeltaBytes / DeltaTime;
+		FText BytesPerSecondString = FText::AsMemory(BytesPerSecond, EMemoryUnitStandard::SI);*/
+
+		int64 BytesPerSecond = DeltaBytes / DeltaTime / 8;
 		FText BytesPerSecondString = FText::AsMemory(BytesPerSecond, EMemoryUnitStandard::SI);
+		FText RoundedBytesPerSecondString = UModioSDKLibrary::RoundNumberString(BytesPerSecondString);
+
 		if (OperationSpeedText)
 		{
 			OperationSpeedText->SetText(
 				FText::Format(SpeedTextFormat,
-							  FFormatNamedArguments {{FString("Bytes"), FFormatArgumentValue(BytesPerSecondString)}}));
+							  FFormatNamedArguments {{FString("Bytes"), FFormatArgumentValue(RoundedBytesPerSecondString)}}));
 		}
 	}
 }
@@ -76,6 +82,7 @@ void UModioModDetailsOpProgress::UpdateProgress(const struct FModioModProgressIn
 			FModioUnsigned64 Current = ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading);
 			FModioUnsigned64 Total= ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading);
 			SetPercent(Current / (double) Total);
+
 			UpdateTimeRemaining(Current - PreviousProgressValue,
 								Total - Current, DeltaTime);
 			UpdateSpeed(Current - PreviousProgressValue, DeltaTime);
@@ -115,7 +122,7 @@ void UModioModDetailsOpProgress::UpdateTimeRemaining(FModioUnsigned64 ProgressSi
 	{
 		if (!FMath::IsNearlyZero(SecondsSinceLastUpdate))
 		{
-			double ProgressPerSecond = ProgressSinceLastUpdate / SecondsSinceLastUpdate;
+			double ProgressPerSecond = ProgressSinceLastUpdate / SecondsSinceLastUpdate / 8;
 			if (ProgressPerSecond)
 			{
 				float TotalSecondsRemaining = AmountRemaining / ProgressPerSecond;

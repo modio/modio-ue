@@ -46,7 +46,6 @@ class MODIOUI_API UModioModTileBase : public UModioUserWidgetBase,
 
 protected:
 	virtual void NativeOnInitialized() override;
-
 	TWeakObjectPtr<UWidget> WeakExpandedWidget;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category = "Widgets")
@@ -61,7 +60,6 @@ protected:
 												  TOptional<FModioImageWrapper> Image) override;
 
 	virtual void SynchronizeProperties() override;
-	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 	virtual void NativeOnSetExpandedState(bool bExpanded);
 	UFUNCTION()
 	virtual void HandleModLogoOperationStateChanged(EModioUIAsyncOperationWidgetState NewState);

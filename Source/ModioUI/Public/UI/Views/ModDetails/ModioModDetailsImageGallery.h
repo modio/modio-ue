@@ -18,7 +18,9 @@
 #include "UI/CommonComponents/ModioImageGalleryBase.h"
 #include "UI/CommonComponents/ModioListViewInteger.h"
 #include "UI/Interfaces/IModioInputMappingAccessor.h"
+#include "UI/Styles/ModioDynamicImageStyle.h"
 #include "UI/Styles/ModioUIColorRef.h"
+#include "UI/Styles/ModioUIStyleRef.h"
 
 #include "ModioModDetailsImageGallery.generated.h"
 
@@ -92,6 +94,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioListViewInteger* NavButtons;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioDynamicImageStyle"), Category = "Widgets")
+	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultDynamicImageStyle"};
 };
 
 /**

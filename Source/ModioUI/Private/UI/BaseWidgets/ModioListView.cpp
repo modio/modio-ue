@@ -13,6 +13,7 @@
 void UModioListView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
+
 #if WITH_EDITORONLY_DATA
 	if (IsDesignTime() && bSimulateSelection)
 	{

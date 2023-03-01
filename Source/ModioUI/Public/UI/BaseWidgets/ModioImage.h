@@ -30,10 +30,14 @@ class MODIOUI_API UModioImage : public UImage
 protected:
 	virtual void SynchronizeProperties();
 
+
 	virtual void ImageLoadHandler(UTexture2DDynamic* Texture);
-	virtual void ImageLoadHandler(UTexture2DDynamic* Texture, class UMaterialInterface* Material,
-								  FName ImageParameterName);
-	UPROPERTY(Transient)
+
+	UFUNCTION()
+	virtual void ImageLoadHandler(UTexture2DDynamic* Texture, class UMaterialInterface* Material = nullptr,
+								  FName ImageParameterName = "");
+	
+	UPROPERTY()
 	class UMaterialInstanceDynamic* CachedMaterial;
 
 public:

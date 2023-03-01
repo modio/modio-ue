@@ -249,7 +249,8 @@ void FModioRichTextDecorator::CreateDecoratorText(const FTextRunInfo& RunInfo, F
 				const FTextBlockStyle& MatchingStyle = StyleSet->GetWidgetStyle<FTextBlockStyle>(RunName);
 				InOutTextStyle = MatchingStyle;
 			}
-			else {}
+			else
+			{}
 		}
 		if (const FString* FontSizeString = RunInfo.MetaData.Find("fontsize"))
 		{

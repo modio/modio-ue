@@ -15,7 +15,6 @@
 #include "Containers/Array.h"
 #include "CoreMinimal.h"
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
-
 #include "ModioUIAsyncLoader.generated.h"
 
 /**

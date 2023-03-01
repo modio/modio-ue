@@ -76,6 +76,9 @@ To begin using the Plugin, either from Blueprint or from C++, please read our li
 * link:Doc/getting-started.adoc#plugin-quick-start-browsing-available-mods[Mod Browsing]
 * link:Doc/getting-started.adoc#plugin-quick-start-mod-subscriptions-and-management[Mod Subscription Management]
 
+== Example Projects
+
+We provide an example Blueprint implementation of the plugin in a simple demonstration project. You can find the example project https://github.com/modio/modio-ue4-sample[here].
 
 == Large studios and Publishers
 A private white label option is available to license, if you want a fully featured mod-platform that you can control and host in-house. mailto:developers@mod.io[Contact us,Whitelabel Inquiry] to discuss.

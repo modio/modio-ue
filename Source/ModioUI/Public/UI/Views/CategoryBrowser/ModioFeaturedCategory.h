@@ -91,6 +91,11 @@ protected:
 	UFUNCTION()
 	void HandleNavLeftClicked()
 	{
+		if (ItemList->GetNumItems() <= 0) 
+		{
+			return;
+		}
+
 		if (ItemList)
 		{
 			int32 ItemIndex = FMath::Max(ItemList->GetScrollOffset() - ItemList->GetDisplayedEntryWidgets().Num(), 0.f);
@@ -104,6 +109,11 @@ protected:
 	UFUNCTION()
 	void HandleNavRightClicked()
 	{
+		if (ItemList->GetNumItems() <= 0)
+		{
+			return;
+		}
+
 		if (ItemList)
 		{
 			int32 ItemIndex = FMath::Min(ItemList->GetScrollOffset() + ItemList->GetDisplayedEntryWidgets().Num(),

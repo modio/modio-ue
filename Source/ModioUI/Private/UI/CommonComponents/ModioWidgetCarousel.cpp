@@ -113,8 +113,8 @@ void UModioWidgetCarousel::SynchronizeProperties()
 
 void UModioWidgetCarousel::ReleaseSlateResources(bool bReleaseChildren)
 {
-	MyCarousel.Reset();
 	Super::ReleaseSlateResources(bReleaseChildren);
+	MyCarousel.Reset();
 }
 
 void UModioWidgetCarousel::SetItems(TArray<UObject*> Items)

@@ -177,3 +177,8 @@ void UModioRichTextBlock::SetDefaultStyleName(FName DefaultName /*= "default"*/)
 {
 	DefaultStyleName = DefaultName;
 }
+
+FName UModioRichTextBlock::GetDefaultStyleName()
+{
+	return DefaultStyleName;
+}

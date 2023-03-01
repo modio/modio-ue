@@ -281,6 +281,7 @@ void UModioModDetailsView::NativeOnSetDataSource()
 
 		if (ProgressWidget)
 		{
+			// this doesn't work, needs to be made into a task
 			ProgressWidget->SetDataSource(DataSource);
 		}
 
