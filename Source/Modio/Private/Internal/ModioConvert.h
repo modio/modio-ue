@@ -39,6 +39,7 @@ struct FModioUnsigned64 ToUnreal(const Modio::FileSize& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
+std::map<std::string, std::string> ToModio(const TMap<FString, FString>& StringMap);
 std::chrono::system_clock::time_point ToModioDateTime(FDateTime Time);
 Modio::ApiKey ToModio(const FModioApiKey& In);
 Modio::EmailAddress ToModio(const FModioEmailAddress& In);

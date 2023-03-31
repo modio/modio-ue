@@ -27,6 +27,16 @@ std::vector<std::string> ToModio(const TArray<FString>& StringArray)
 	return Result;
 }
 
+std::map<std::string, std::string> ToModio(const TMap<FString, FString>& StringMap)
+{
+	std::map<std::string, std::string> Result;
+	for (const TPair<FString, FString>& It : StringMap)
+	{
+		Result.emplace(std::make_pair(ToModio(It.Key), ToModio(It.Value)));
+	}
+	return Result;
+}
+
 std::chrono::system_clock::time_point ToModioDateTime(FDateTime Time)
 {
 	return std::chrono::system_clock::time_point(std::chrono::system_clock::duration(Time.ToUnixTimestamp()));

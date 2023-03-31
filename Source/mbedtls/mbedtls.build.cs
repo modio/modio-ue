@@ -1,6 +1,13 @@
 using UnrealBuildTool;
+using System;
 using System.IO;
 using System.Collections.Generic;
+
+#if UE_5_0_OR_LATER
+using EpicGames.Core;
+#else
+using Tools.DotNETCommon;
+#endif
 
 public class mbedtls : ModuleRules
 {
@@ -107,10 +114,32 @@ public class mbedtls : ModuleRules
                     "ssl_tls13_client.c",
                     "ssl_tls13_generic.c"
                     };
-            if (!Directory.Exists(Path.Combine(ModuleDirectory, "Private/GeneratedSource")))
+
+            string GeneratedSourcePath = Path.Combine(ModuleDirectory, "Private/GeneratedSource");
+            if (!Directory.Exists(GeneratedSourcePath))
             {
-                Directory.CreateDirectory(Path.Combine(ModuleDirectory, "Private/GeneratedSource"));
+                Directory.CreateDirectory(GeneratedSourcePath);
             }
+
+
+            if (Target.bBuildEditor == true)
+            {
+                DirectoryReference[] Directories = GetAllModuleDirectories();
+#if !UE_5_0_OR_LATER
+                DirectoryReference DirRef = new Tools.DotNETCommon.DirectoryReference(GeneratedSourcePath);
+#else
+                DirectoryReference DirRef = new EpicGames.Core.DirectoryReference(GeneratedSourcePath);
+#endif //!UE_5_0_OR_LATER
+                int Position = Array.IndexOf(Directories, DirRef);
+                if (Position < 0)
+                {
+                    // This line makes sure that the UAT UE4Editor build does not skip the files inside and that native
+                    // Linux compilation works, to avoid any "liker errors". UE4Game does not complain about linking.
+                    ConditionalAddModuleDirectory(DirRef);
+                }
+            }
+
+
             foreach (string CFile in CFiles)
             {
                 //Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over

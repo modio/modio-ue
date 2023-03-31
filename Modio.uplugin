@@ -98,6 +98,11 @@
 			"WhitelistPlatforms": [
 				"Linux"
 			]
+		},
+		{
+			"Name": "ModioEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
 		}
 	],
 	"LocalizationTargets": [

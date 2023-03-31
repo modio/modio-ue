@@ -140,7 +140,8 @@ public class MSDFSupportEditor : ModuleRules
                 foreach (string HeaderFile in HeaderFiles)
                 {
                     //Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
-                    ExternalDependencies.Add(HeaderFile);
+                    //Causes spurious rebuilds for some reason, disabling the dependency for now
+                    //ExternalDependencies.Add(HeaderFile);
                     //Preserve subdirectory structure (msdfgen includes headers via relative paths in a few places, grumble grumble)
                     string RelativeDestinationPath = HeaderFile.Replace(Path.Combine(ModuleDirectory, "../ThirdParty/msdfgen/"), "");
                     string DestinationPath = Path.Combine(GeneratedHeaderPath, RelativeDestinationPath);

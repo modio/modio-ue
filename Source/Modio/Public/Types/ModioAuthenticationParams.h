@@ -24,7 +24,9 @@ enum class EModioAuthenticationProvider : uint8
 	Itch,
 	Switch,
 	Discord,
-	PSN
+	PSN, 
+	Epic,
+	Oculus
 };
 
 /** @brief Simple struct to encapsulate data passed to external authentication systems */
@@ -51,4 +53,10 @@ struct MODIO_API FModioAuthenticationParams
 	**/
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	bool bUserHasAcceptedTerms = false;
+
+	/**
+	 * Stored property of extended parameters required by some providers.
+	 **/
+	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
+	TMap<FString, FString> ExtendedParameters;
 };

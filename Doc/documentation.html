@@ -871,6 +871,11 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#ValidateCodeInputCharacter">Validate Code Input Character</a></li>
 </ul>
 </li>
+<li><a href="#_modiodialogcontroller">ModioDialogController</a>
+<ul class="sectlevel3">
+<li><a href="#ShowErrorDialog">Show Error Dialog</a></li>
+</ul>
+</li>
 <li><a href="#_modiodownloadqueueopprogress">ModioDownloadQueueOpProgress</a>
 <ul class="sectlevel3">
 <li><a href="#OperationCompletedDelegate">Operation Completed Delegate</a></li>
@@ -1160,6 +1165,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#RequestGalleryImageDownloadForModID">Request Gallery Image Download for Mod ID</a></li>
 <li><a href="#RequestExternalAuthentication">Request External Authentication</a></li>
 <li><a href="#RequestEmailAuthentication">Request Email Authentication</a></li>
+<li><a href="#HideModBrowserUI">Hide Mod Browser UI</a></li>
 <li><a href="#GetInputGlyphMaterialForInputType">Get Input Glyph Material for Input Type</a></li>
 <li><a href="#GetDefaultStyleSet">Get Default Style Set</a></li>
 <li><a href="#GetCurrentDPIScaleValue">Get Current DPIScale Value</a></li>
@@ -1302,6 +1308,16 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#MakeApiKey">Make Api Key</a></li>
 <li><a href="#GetRawValueFromModID">Get Raw Value from Mod ID</a></li>
 <li><a href="#EqualTo">ModioModID == ModioModID</a></li>
+<li><a href="#SetVersionString">Set Version String</a></li>
+<li><a href="#SetTags">Set Tags</a></li>
+<li><a href="#SetModfilePlatforms">Set Modfile Platforms</a></li>
+<li><a href="#SetModFileMetadataBlob">Set Mod File Metadata Blob</a></li>
+<li><a href="#SetMetadataBlob">Set Metadata Blob</a></li>
+<li><a href="#SetMarkAsActiveRelease">Set Mark as Active Release</a></li>
+<li><a href="#SetInitialVisibility">Set Initial Visibility</a></li>
+<li><a href="#SetHomepageURL">Set Homepage URL</a></li>
+<li><a href="#SetDescription">Set Description</a></li>
+<li><a href="#SetChangelogString">Set Changelog String</a></li>
 <li><a href="#GetValue">Get Value</a></li>
 <li><a href="#GetMessage">Get Message</a></li>
 <li><a href="#ErrorCodeMatches">Error Code Matches</a></li>
@@ -1322,6 +1338,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#GetTotalProgress">Get Total Progress</a></li>
 <li><a href="#GetCurrentState">Get Current State</a></li>
 <li><a href="#GetCurrentProgress">Get Current Progress</a></li>
+<li><a href="#RoundNumberString">Round Number String</a></li>
 <li><a href="#Pct_Int64Int64">Get Percent (integer64/integer64)</a></li>
 <li><a href="#IsValidSecurityCodeFormat">Is Valid Security Code Format</a></li>
 <li><a href="#IsValidEmailAddressFormat">Is Valid Email Address Format</a></li>
@@ -3407,6 +3424,24 @@ The parameters for a named material are exposed in the <code>Named Brush Materia
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FEventReply</span> <span class="n">ValidateCodeInputCharacter</span><span class="p">(</span><span class="n">FString</span> <span class="n">Character</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modiodialogcontroller">ModioDialogController</h3>
+<hr>
+<div class="sect3">
+<h4 id="ShowErrorDialog">Show Error Dialog</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowErrorDialog.png" alt="nd img ShowErrorDialog">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowErrorDialog</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ec</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bCloseDialogsOnOK</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -7699,6 +7734,20 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="HideModBrowserUI">Hide Mod Browser UI</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_HideModBrowserUI.png" alt="nd img HideModBrowserUI">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">HideModBrowserUI</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="GetInputGlyphMaterialForInputType">Get Input Glyph Material for Input Type</h4>
 <div class="imageblock">
 <div class="content">
@@ -7822,22 +7871,6 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">CloseModBrowserUI</span><span class="p">()</span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Closes the Mod.io UI Browser and frees up resources appropriately</p>
-</div>
-<h5 id="_parameters_61" class="discrete">Parameters</h5>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modio UISubsystem Object Reference</p></td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 </div>
@@ -7859,7 +7892,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>performs validation on the text passed in, storing the validation message of the first rule that failed /// validation in ValidationMessageText if validation failed //</p>
 </div>
-<h5 id="_parameters_62" class="discrete">Parameters</h5>
+<h5 id="_parameters_61" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7898,7 +7931,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetValidationError</span><span class="p">(</span><span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_63" class="discrete">Parameters</h5>
+<h5 id="_parameters_62" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7929,7 +7962,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetTextValidationRules</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioTextValidationRule</span><span class="o">&gt;</span> <span class="n">Rules</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_64" class="discrete">Parameters</h5>
+<h5 id="_parameters_63" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7999,7 +8032,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Requests the widget make any network or asynchronous calls required to load external data to display</p>
 </div>
-<h5 id="_parameters_65" class="discrete">Parameters</h5>
+<h5 id="_parameters_64" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8030,7 +8063,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetItems</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">UObject</span><span class="o">*&gt;</span> <span class="n">Items</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_66" class="discrete">Parameters</h5>
+<h5 id="_parameters_65" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8601,6 +8634,11 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#bool">bool</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bUserHasAcceptedTerms</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TMap&lt;FString,FString&gt;">TMap&lt;FString,FString&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedParameters</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
@@ -9537,6 +9575,16 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TextStyle</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FSlateSound">FSlateSound</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">HoveredSound</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FSlateSound">FSlateSound</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PressedSound</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -10355,7 +10403,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the session identifier for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_67" class="discrete">Parameters</h4>
+<h4 id="_parameters_66" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10397,7 +10445,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the portal for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_68" class="discrete">Parameters</h4>
+<h4 id="_parameters_67" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10439,7 +10487,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if not equal</p>
 </div>
-<h4 id="_parameters_69" class="discrete">Parameters</h4>
+<h4 id="_parameters_68" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10477,7 +10525,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Make initialization options, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_70" class="discrete">Parameters</h4>
+<h4 id="_parameters_69" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10523,7 +10571,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a game id from a integer, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_71" class="discrete">Parameters</h4>
+<h4 id="_parameters_70" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10557,7 +10605,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Creates an AuthenticationParams object</p>
 </div>
-<h4 id="_parameters_72" class="discrete">Parameters</h4>
+<h4 id="_parameters_71" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10603,7 +10651,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a ApiKey id from a string, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_73" class="discrete">Parameters</h4>
+<h4 id="_parameters_72" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10637,7 +10685,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use with care.</p>
 </div>
-<h4 id="_parameters_74" class="discrete">Parameters</h4>
+<h4 id="_parameters_73" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10675,7 +10723,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if equal</p>
 </div>
-<h4 id="_parameters_75" class="discrete">Parameters</h4>
+<h4 id="_parameters_74" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10699,6 +10747,146 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="SetVersionString">Set Version String</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetVersionString.png" alt="nd img SetVersionString">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetVersionString</span><span class="p">(</span><span class="n">FModioCreateModFileParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Version</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetTags">Set Tags</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetTags.png" alt="nd img SetTags">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetTags</span><span class="p">(</span><span class="n">FModioCreateModParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">TArray</span><span class="o">&lt;</span><span class="n">FString</span><span class="o">&gt;</span> <span class="n">Tags</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetModfilePlatforms">Set Modfile Platforms</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetModfilePlatforms.png" alt="nd img SetModfilePlatforms">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetModfilePlatforms</span><span class="p">(</span><span class="n">FModioCreateModFileParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">TArray</span><span class="o">&lt;</span><span class="n">EModioModfilePlatform</span><span class="o">&gt;</span> <span class="n">Platforms</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetModFileMetadataBlob">Set Mod File Metadata Blob</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetModFileMetadataBlob.png" alt="nd img SetModFileMetadataBlob">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetModFileMetadataBlob</span><span class="p">(</span><span class="n">FModioCreateModFileParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">FString</span> <span class="n">MetadataBlob</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetMetadataBlob">Set Metadata Blob</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetMetadataBlob.png" alt="nd img SetMetadataBlob">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetMetadataBlob</span><span class="p">(</span><span class="n">FModioCreateModParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">FString</span> <span class="n">MetadataBlob</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetMarkAsActiveRelease">Set Mark as Active Release</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetMarkAsActiveRelease.png" alt="nd img SetMarkAsActiveRelease">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetMarkAsActiveRelease</span><span class="p">(</span><span class="n">FModioCreateModFileParams</span> <span class="n">In</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bMarkAsActiveRelease</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetInitialVisibility">Set Initial Visibility</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetInitialVisibility.png" alt="nd img SetInitialVisibility">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetInitialVisibility</span><span class="p">(</span><span class="n">FModioCreateModParams</span> <span class="n">In</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">InitialVisibility</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetHomepageURL">Set Homepage URL</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetHomepageURL.png" alt="nd img SetHomepageURL">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetHomepageURL</span><span class="p">(</span><span class="n">FModioCreateModParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">FString</span> <span class="n">HomepageURL</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetDescription">Set Description</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetDescription.png" alt="nd img SetDescription">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetDescription</span><span class="p">(</span><span class="n">FModioCreateModParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Description</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetChangelogString">Set Changelog String</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetChangelogString.png" alt="nd img SetChangelogString">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetChangelogString</span><span class="p">(</span><span class="n">FModioCreateModFileParams</span> <span class="n">In</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Changelog</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="GetValue">Get Value</h3>
 <div class="imageblock">
 <div class="content">
@@ -10710,7 +10898,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetValue</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_76" class="discrete">Parameters</h4>
+<h4 id="_parameters_75" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10745,7 +10933,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetMessage</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_77" class="discrete">Parameters</h4>
+<h4 id="_parameters_76" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10780,7 +10968,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the passed-in ErrorCode matches the specified error condition</p>
 </div>
-<h4 id="_parameters_78" class="discrete">Parameters</h4>
+<h4 id="_parameters_77" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10797,13 +10985,13 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true if the code matches the condition // NOTE: The definition of EModioErrorCondition is duplicated here because of an issue // reported here: // <a href="https://forums.unrealengine.com/t/ustruct-type-must-be-a-uclass-ustruct-or-uenum/358937" class="bare">https://forums.unrealengine.com/t/ustruct-type-must-be-a-uclass-ustruct-or-uenum/358937</a> // Because of that, the line below was commented.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true if the code matches the condition</p></td>
 </tr>
 </tbody>
 </table>
 <h4 id="_returns_20" class="discrete">Returns</h4>
 <div class="paragraph">
-<p>true if the code matches the condition /// NOTE: The definition of EModioErrorCondition is duplicated here because of an issue // reported here: // <a href="https://forums.unrealengine.com/t/ustruct-type-must-be-a-uclass-ustruct-or-uenum/358937" class="bare">https://forums.unrealengine.com/t/ustruct-type-must-be-a-uclass-ustruct-or-uenum/358937</a> // Because of that, the line below was commented.</p>
+<p>true if the code matches the condition</p>
 </div>
 <hr>
 </div>
@@ -10822,7 +11010,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Runs a filter over the user&#8217;s subscription list</p>
 </div>
-<h4 id="_parameters_79" class="discrete">Parameters</h4>
+<h4 id="_parameters_78" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10937,7 +11125,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetLogoSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Logo</span><span class="p">,</span> <span class="n">EModioLogoSize</span> <span class="n">LogoSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_80" class="discrete">Parameters</h4>
+<h4 id="_parameters_79" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10976,7 +11164,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetGallerySize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">GalleryImage</span><span class="p">,</span> <span class="n">EModioGallerySize</span> <span class="n">GallerySize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_81" class="discrete">Parameters</h4>
+<h4 id="_parameters_80" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11015,7 +11203,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetAvatarSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Avatar</span><span class="p">,</span> <span class="n">EModioAvatarSize</span> <span class="n">AvatarSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_82" class="discrete">Parameters</h4>
+<h4 id="_parameters_81" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11054,7 +11242,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetPath</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_83" class="discrete">Parameters</h4>
+<h4 id="_parameters_82" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11089,7 +11277,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioModState</span> <span class="n">GetModState</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_84" class="discrete">Parameters</h4>
+<h4 id="_parameters_83" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11124,7 +11312,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModInfo</span> <span class="n">GetModProfile</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_85" class="discrete">Parameters</h4>
+<h4 id="_parameters_84" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11159,7 +11347,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModID</span> <span class="n">GetID</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_86" class="discrete">Parameters</h4>
+<h4 id="_parameters_85" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11197,7 +11385,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the total amount of progress required for the specified state.</p>
 </div>
-<h4 id="_parameters_87" class="discrete">Parameters</h4>
+<h4 id="_parameters_86" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11239,7 +11427,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Returns a EModioModProgressState indicating which state the mod operation is in</p>
 </div>
-<h4 id="_parameters_88" class="discrete">Parameters</h4>
+<h4 id="_parameters_87" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11273,7 +11461,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the progress value for the specified state. <code>CurrentProgress == TotalProgress</code> for states which have completed, for example if a mod is currently Extracting, then passing in Downloading would give you a value equal to the total download size because the download has completed</p>
 </div>
-<h4 id="_parameters_89" class="discrete">Parameters</h4>
+<h4 id="_parameters_88" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11298,6 +11486,40 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>FModioUnsigned64 containing current progress in bytes</p>
 </div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="RoundNumberString">Round Number String</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_RoundNumberString.png" alt="nd img RoundNumberString">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">RoundNumberString</span><span class="p">(</span><span class="n">FText</span> <span class="n">inputText</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sets the correct decimals depending on the file size or speed</p>
+</div>
+<h4 id="_parameters_89" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Input Text</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 <div class="sect2">
@@ -12753,6 +12975,14 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PSN</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Epic</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Oculus</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -13125,6 +13355,14 @@ This class is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SystemError</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that a low-level system error occurred outside of mod.io SDK control.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">OperationCanceled</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that the asynchronous operation was cancelled before it completed.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModManagementDisabled</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">When this condition is true, the error code indicates that Mod Management has not been enabled.</p></td>
 </tr>
 </tbody>
 </table>
@@ -13962,7 +14200,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-03-01 16:38:20 +1100
+Last updated 2023-03-31 11:12:41 +1100
 </div>
 </div>
 </body>

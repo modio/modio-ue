@@ -25,7 +25,7 @@ UCLASS()
 class MODIO_API UModioCreateModLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-
+public:
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Mod Params")
 	static void SetInitialVisibility(UPARAM(ref) FModioCreateModParams& In, bool InitialVisibility);
 
@@ -55,5 +55,5 @@ class MODIO_API UModioCreateModLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Mod File Params")
 	static void SetModfilePlatforms(UPARAM(ref) FModioCreateModFileParams& In,
-							 UPARAM(ref) TArray<EModioModfilePlatform>& Platforms);
+									UPARAM(ref) TArray<EModioModfilePlatform>& Platforms);
 };

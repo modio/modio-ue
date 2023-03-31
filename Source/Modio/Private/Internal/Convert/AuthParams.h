@@ -37,6 +37,10 @@ FORCEINLINE Modio::AuthenticationProvider ToModio(EModioAuthenticationProvider P
 			return Modio::AuthenticationProvider::Discord;
 		case EModioAuthenticationProvider::PSN:
 			return Modio::AuthenticationProvider::PSN;
+		case EModioAuthenticationProvider::Epic:
+			return Modio::AuthenticationProvider::Epic;
+		case EModioAuthenticationProvider::Oculus:
+			return Modio::AuthenticationProvider::Oculus;
 	}
 
 	return Modio::AuthenticationProvider::Steam;
@@ -53,6 +57,7 @@ FORCEINLINE Modio::AuthenticationParams ToModio(const FModioAuthenticationParams
 		                   ? Modio::Optional<std::string>(ToModio(UnrealParams.UserEmail))
 		                   : Modio::Optional<std::string>();
 	Params.bUserHasAcceptedTerms = UnrealParams.bUserHasAcceptedTerms;
+	Params.ExtendedParameters = ToModio(UnrealParams.ExtendedParameters);
 
 	return Params;
 }
