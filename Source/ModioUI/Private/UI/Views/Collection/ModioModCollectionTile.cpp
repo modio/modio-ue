@@ -46,7 +46,7 @@ void UModioModCollectionTile::NativeOnSetDataSource()
     }
     if (ModName)
     {
-        ModName->SetText(FText::FromString(CollectionEntry->Underlying.GetModProfile().ProfileName));
+		ModName->SetText(FText::FromString(TruncateLongModName(CollectionEntry->Underlying.GetModProfile().ProfileName, ModName)));
     }
     if (SizeOnDiskLabel)
     {
@@ -101,6 +101,10 @@ void UModioModCollectionTile::NativeOnSetDataSource()
         StatusLine->SetText(CollectionEntry->bCachedSubscriptionStatus ? SubscribedStatusText
                                                                        : InstalledStatusText);
     }
+	if (TileButton)
+	{
+		TileButton->OnClicked.AddUniqueDynamic(this, &UModioModCollectionTile::ShowModDetails);
+	}
     if (MoreOptionsMenu)
     {
         FModioUIMenuCommandList MenuEntries;
@@ -129,23 +133,7 @@ void UModioModCollectionTile::NativeOnSetDataSource()
         MoreOptionsMenu->SetMenuEntries(MenuEntries);
     }
 }
-FReply UModioModCollectionTile::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-	// TODO: @modio-ue4 should match our key mappings stuff
-	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
-	{
-		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-		{
-			if (UModioModCollectionEntryUI* ModInfo = Cast<UModioModCollectionEntryUI>(DataSource))
-			{
-				Subsystem->ShowDetailsForMod(ModInfo->Underlying.GetID());
-				FSlateApplication::Get().PlaySound(PressedSound);
-				return FReply::Handled();
-			}
-		}
-	}
-	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-}
+
 void UModioModCollectionTile::NativeOnSetExpandedState(bool bExpanded)
 {
 	Super::NativeOnSetExpandedState(bExpanded);
@@ -162,6 +150,41 @@ void UModioModCollectionTile::NativeConstruct()
 	}
 }
 
+void UModioModCollectionTile::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	if (MoreOptionsMenu->GetIsMenuOpen())
+	{
+		MoreOptionsMenu->Close();
+	}
+	Super::NativeOnMouseLeave(InMouseEvent);
+}
+
+FReply UModioModCollectionTile::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+	bHasFocus = true;
+	return FReply::Handled();
+}
+
+void UModioModCollectionTile::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
+{
+	bHasFocus = false;
+}
+
+void UModioModCollectionTile::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) 
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	if (ModName)
+	{
+		UModioModCollectionEntryUI* CollectionEntry = Cast<UModioModCollectionEntryUI>(DataSource);
+		if (!CollectionEntry)
+		{
+			return;
+		}
+		ModName->SetText(
+			FText::FromString(TruncateLongModName(CollectionEntry->Underlying.GetModProfile().ProfileName, ModName)));
+	}
+}
+
 void UModioModCollectionTile::OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating)
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
@@ -171,6 +194,15 @@ void UModioModCollectionTile::OnRatingSubmissionComplete(FModioErrorCode ec, EMo
 }
 void UModioModCollectionTile::SubmitNegativeRating()
 {
+	if (!bIsUserAuthenticated)
+	{
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (Subsystem)
+		{
+			Subsystem->ShowUserAuthenticationDialog();
+		}
+	}
+
 	UModioModCollectionEntryUI* ModInfo = Cast<UModioModCollectionEntryUI>(DataSource);
 	if (ModInfo)
 	{
@@ -188,6 +220,15 @@ void UModioModCollectionTile::SubmitNegativeRating()
 
 void UModioModCollectionTile::SubmitPositiveRating()
 {
+	if (!bIsUserAuthenticated)
+	{
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (Subsystem)
+		{
+			Subsystem->ShowUserAuthenticationDialog();
+		}
+	}
+
 	UModioModCollectionEntryUI* ModInfo = Cast<UModioModCollectionEntryUI>(DataSource);
 	if (ModInfo)
 	{
@@ -306,20 +347,20 @@ void UModioModCollectionTile::NativeOnItemSelectionChanged(bool bIsSelected)
 	Super::NativeOnItemSelectionChanged(bIsSelected);
 	if (bIsSelected)
 	{
-		// if (!bCurrentExpandedState)
-		//{
-		//	PlayAnimationForward(FocusTransition);
-		//}
+		if (!bCurrentExpandedState)
+		{
+			PlayAnimationForward(FocusTransition);
+		}
 	}
 	else
 	{
-		// PlayAnimationReverse(FocusTransition);
+		PlayAnimationReverse(FocusTransition);
 	}
 }
 
 void UModioModCollectionTile::NativeOnEntryReleased()
 {
-	// PlayAnimationReverse(FocusTransition);
+	//PlayAnimationReverse(FocusTransition);
 	Super::NativeOnEntryReleased();
 }
 
@@ -348,14 +389,73 @@ void UModioModCollectionTile::BuildCommandList(TSharedRef<FUICommandList> Comman
 	CommandList->MapAction(
 		FModioCommonUICommands::Get().MoreOptions,
 		FUIAction(FExecuteAction::CreateUObject(this, &UModioModCollectionTile::NativeMoreOptionsClicked)));
+	CommandList->MapAction(
+		FModioCommonUICommands::Get().Confirm,
+		FUIAction(FExecuteAction::CreateUObject(this, &UModioModCollectionTile::NativeCollectionTileClicked)));
 }
 
 void UModioModCollectionTile::NativeMoreOptionsClicked()
 {
+	if (MoreOptionsMenu->GetIsMenuOpen())
+	{
+		SetFocus();
+		return;
+	}
 	if (MoreOptionsMenu)
 	{
 		MoreOptionsMenu->ToggleOpen(true);
 	}
 }
+
+FReply UModioModCollectionTile::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry,
+															  const FPointerEvent& InMouseEvent)
+{
+	if (MoreOptionsMenu->GetIsMenuOpen() && !IsHovered())
+	{
+		MoreOptionsMenu->Close();
+	}
+	return Super::NativeOnPreviewMouseButtonDown(InGeometry, InMouseEvent);
+}
+
+void UModioModCollectionTile::NativeCollectionTileClicked()
+{
+	if(MoreOptionsMenu->GetIsMenuOpen())
+	{
+		MoreOptionsMenu->SelectCurrentMenuItem();
+		return;
+	}
+
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		UModioModCollectionEntryUI* ModInfo = Cast<UModioModCollectionEntryUI>(DataSource);
+		if (IsValid(ModInfo))
+		{
+			Subsystem->ShowDetailsForMod(ModInfo->Underlying.GetID());
+			FSlateApplication::Get().PlaySound(PressedSound);
+		}
+	}
+}
+
+void UModioModCollectionTile::ShowModDetails() 
+{
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		if (MoreOptionsMenu->GetIsMenuOpen())
+		{
+			Subsystem->SetCurrentFocusTarget(nullptr);
+			MoreOptionsMenu->Close();
+			return;
+		}
+
+		if (UModioModInfoUI* ModInfo = GetAsModInfoUIObject())
+		{
+			Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+
+			FSlateApplication::Get().PlaySound(PressedSound);
+			return;
+		}
+	}
+}
+
 
 #include "Loc/EndModioLocNamespace.h"

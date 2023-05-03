@@ -73,7 +73,9 @@ void UModioDownloadQueueOpProgress::NativeOnSetDataSource()
 				}
 			}
 		}
-		ModNameLabel->SetText(FText::FromString(Data->Underlying.ProfileName));
+
+		FString TruncatedName = TruncateLongModName(Data->Underlying.ProfileName, ModNameLabel, truncateDivider);
+		ModNameLabel->SetText(FText::FromString(TruncatedName));
 	}
 	BeginTickIfNeeded(true);
 }
@@ -118,8 +120,8 @@ void UModioDownloadQueueOpProgress::UpdateProgress(const struct FModioModProgres
 		break;
 		case EModioModProgressState::Extracting:
 		{
-			FModioUnsigned64 Current = ProgressInfo.GetCurrentProgress(EModioModProgressState::Downloading);
-			FModioUnsigned64 Total = ProgressInfo.GetTotalProgress(EModioModProgressState::Downloading);
+			FModioUnsigned64 Current = ProgressInfo.GetCurrentProgress(EModioModProgressState::Extracting);
+			FModioUnsigned64 Total = ProgressInfo.GetTotalProgress(EModioModProgressState::Extracting);
 
 			SetPercent(Current / (double) Total);
 
@@ -139,6 +141,7 @@ void UModioDownloadQueueOpProgress::UpdateProgress(const struct FModioModProgres
 
 void UModioDownloadQueueOpProgress::NativeOnModManagementEvent(FModioModManagementEvent Event)
 {
+	CurrentStatus = Event.Event;
 	IModioUIModManagementEventReceiver::NativeOnModManagementEvent(Event);
 	if (DataSource)
 	{

@@ -142,6 +142,8 @@ struct MODIOUI_API FModioDialogButtonInfo
 	UPROPERTY(BlueprintReadWrite, EditAnywhere,
 			  meta = (EditCondition = "ButtonCommand==EModioDialogButtonCommand::PushDialog||ButtonCommand==EModioDialogButtonCommand::AsyncCallThenPushDialog||ButtonCommand==EModioDialogButtonCommand::PushDialogWithOperation",EditConditionHides), Category="Widgets")
 	UModioDialogInfo* Destination {};
+
+	TSharedPtr<SWidget, ESPMode::NotThreadSafe> WidgetReference;
 	// clang-format on
 };
 

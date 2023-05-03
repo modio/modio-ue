@@ -15,6 +15,9 @@
 
 #include "ModioDrawerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDrawerClosed);
+
+
 struct EVisibility;
 /**
  *
@@ -33,6 +36,8 @@ protected:
 	virtual void UpdateVisibility();
 
 public:
+	FOnDrawerClosed OnDrawerClosed;
+
 	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	bool ToggleDrawerExpanded(int32 SlotIndex, bool bCloseOtherDrawers = true);
 	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
@@ -43,4 +48,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	void CollapseAllDrawers();
+
+	bool SetFocusToActiveDrawer();
 };

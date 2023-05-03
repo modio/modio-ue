@@ -81,35 +81,14 @@ void UModioNotificationErrorWidgetBase::NativeConfigure(const FModioNotification
 			}
 			if (GlyphMaterial)
 			{
-				if (UMaterialInstanceDynamic* AsDynamicMaterial = Cast<UMaterialInstanceDynamic>(GlyphMaterial))
-				{
-					UMaterialInstanceDynamic* NewInstance =
-						UMaterialInstanceDynamic::Create(AsDynamicMaterial->Parent, this);
-					NewInstance->CopyInterpParameters(AsDynamicMaterial);
-					StatusIndicator->SetBrushFromMaterial(NewInstance);
-				}
-				else
-				{
-					UMaterialInstanceDynamic* NewMaterialInstance =
-						UMaterialInstanceDynamic::Create(GlyphMaterial, this);
-					StatusIndicator->SetBrushFromMaterial(NewMaterialInstance);
-				}
+				StatusIndicator->SetBrushFromMaterial(GlyphMaterial);
 			}
 		}
-		if (NotificationBackground)
+		if (StatusColorBackground)
 		{
 			if (UMaterialInterface* BackgroundMaterial = ResolvedStyle->BackgroundMaterial.ResolveReference())
 			{
-				UMaterialInstanceDynamic* NewMaterialInstance = nullptr;
-				if (UMaterialInstanceDynamic* AsDynamicMaterial = Cast<UMaterialInstanceDynamic>(BackgroundMaterial))
-				{
-					NewMaterialInstance = UMaterialInstanceDynamic::Create(AsDynamicMaterial->Parent, this);
-					NewMaterialInstance->K2_CopyMaterialInstanceParameters(AsDynamicMaterial);
-				}
-				else
-				{
-					NewMaterialInstance = UMaterialInstanceDynamic::Create(BackgroundMaterial, this);
-				}
+				UMaterialInstanceDynamic* NewMaterialInstance =	UMaterialInstanceDynamic::Create(BackgroundMaterial, this);
 
 				if (NewMaterialInstance)
 				{
@@ -123,7 +102,7 @@ void UModioNotificationErrorWidgetBase::NativeConfigure(const FModioNotification
 						NewMaterialInstance->SetVectorParameterValue(
 							FName("Color"), ResolvedStyle->SuccessColor.ResolveReference().GetSpecifiedColor());
 					}
-					NotificationBackground->SetBrushFromMaterial(NewMaterialInstance);
+					StatusColorBackground->SetBrushFromMaterial(NewMaterialInstance);
 				}
 			}
 		}

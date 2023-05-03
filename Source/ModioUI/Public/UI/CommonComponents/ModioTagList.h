@@ -53,4 +53,6 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "Widgets")
 	void SetTags(TArray<FModioModTag> NewTags);
+
+	TSubclassOf<UModioTagWidgetBase> GetTagWidgetClass();
 };

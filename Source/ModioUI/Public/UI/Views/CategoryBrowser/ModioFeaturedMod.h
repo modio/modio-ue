@@ -25,12 +25,14 @@ class MODIOUI_API UModioFeaturedMod : public UModioModTileBase
 {
 	GENERATED_BODY()
 protected:
+	float truncateDivider = 1.0f;
 	bool bCurrentSelectionState = false;
 
 	virtual void NativeOnSetDataSource() override;
 
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
@@ -42,6 +44,11 @@ protected:
 	{
 		if (bCurrentSelectionState)
 		{
+			if (MoreOptionsMenu->GetIsMenuOpen())
+			{
+				MoreOptionsMenu->SelectCurrentMenuItem();
+				return;
+			}
 			Super::NativeTileClicked();
 		}
 	}

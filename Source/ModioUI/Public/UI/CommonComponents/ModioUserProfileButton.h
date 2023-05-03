@@ -57,10 +57,10 @@ protected:
 	UMaterialInterface* GCMaterial;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
-	TSoftObjectPtr<UMaterialInterface> UserBrushMaterial;
+	UMaterialInterface* UserBrushMaterial;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
-	TSoftObjectPtr<UMaterialInterface> NoUserBrushMaterial;
+	UMaterialInterface* NoUserBrushMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "Widgets")
 	FName ProfileTextureParameterName = "WidgetTexture";

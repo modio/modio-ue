@@ -9,6 +9,9 @@
  */
 
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
+#include "ModioUISubsystem.h"
+#include "Fonts/FontMeasure.h"
+#include "UI/Styles/ModioUIStyleSet.h"
 #if WITH_EDITOR
 	#include "Blueprint/WidgetTree.h"
 	#include "Editor/WidgetCompilerLog.h"
@@ -138,4 +141,38 @@ FReply UModioUserWidgetBase::NativeOnKeyDown(const FGeometry& InGeometry, const 
 		return FReply::Handled();
 	}
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+}
+
+FString UModioUserWidgetBase::TruncateLongModName(FString inputStr, UModioRichTextBlock* ModName, float divider)
+{
+	TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
+	float DPIScale = Subsystem->GetCurrentDPIScaleValue();
+	FString originalInputStr = inputStr;
+
+	if (IsValid(Subsystem) && IsValid(DefaultStyleSet))
+	{
+		float textSize = FontMeasure->Measure(inputStr, ModName->GetDefaultTextStyle().Font).X * DPIScale;
+		float xVector = ModName->GetCachedGeometry().GetAbsoluteSize().X /divider;
+
+		if (xVector != 0.0f)
+		{
+			while (textSize > xVector)
+			{
+				inputStr = inputStr.LeftChop(1);
+				textSize = FontMeasure->Measure(inputStr, ModName->GetDefaultTextStyle().Font).X * DPIScale;
+			}
+
+			if ((inputStr != originalInputStr))
+			{
+				inputStr = inputStr.LeftChop(3);
+				if (inputStr.EndsWith(" "))
+					inputStr = inputStr.LeftChop(1);
+				inputStr = inputStr.Append("...");
+			}
+		}
+	}
+
+	return inputStr;
 }

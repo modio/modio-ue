@@ -31,6 +31,7 @@ class MODIOUI_API UModioRefineSearchDrawer : public UModioUserWidgetBase,
 {
 	GENERATED_BODY()
 protected:
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioEditableTextBox* SearchInput;
 
@@ -49,19 +50,32 @@ protected:
 	UPROPERTY(Transient)
 	UModioTagOptionsUI* TagOptions;
 
+	UPROPERTY()
+	TArray<UWidget*> NavigationPath;
+
+	UPROPERTY()
+	UModioUISubsystem* UISubsystem;
+
+	int CurrentNavIndex = 0;
+
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
-	virtual FReply NativeOnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void BuildCommandList(TSharedRef<FUICommandList> InCommandList) override;
 
+	void ConstructNavigationPath();
+	void ValidateAndSetFocus();
 	UFUNCTION()
 	void OnClearClicked();
 	UFUNCTION()
 	void OnApplyClicked();
 
+
 	void NextTagCategory();
 	void PrevTagCategory();
+
+	void CategoryNav(bool bMoveForward);
 
 	FString NativeGetSearchString() override;
 	TArray<FString> NativeGetSelectedTagValues() override;

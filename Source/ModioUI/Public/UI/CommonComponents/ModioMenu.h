@@ -26,6 +26,7 @@
 
 #include "ModioMenu.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDownloadQueueClosed);
 /**
 * Enumerator with possible screen menus to display
 **/
@@ -76,9 +77,13 @@ public:
 	int32 GetPageIndex();
 	void RefreshDownloadQueue();
 
+	FDownloadQueueClosed OnDownloadQueueClosed;
+
 private:
 	GENERATED_BODY()
 	bool bRoutedOnViewChanged = false;
+
+	bool bMenuFocused = false;
 
 protected:
 	// Action Delegates
@@ -120,14 +125,21 @@ protected:
 	void HandleViewChanged(int32 ViewIndex);
 
 	virtual void NativeOnViewChanged(int64 ViewIndex);
+	virtual void NativeTick(const FGeometry& InGeometry, float DeltaTime) override;
 
-	// This will either live here or on the menubar depending on how we want focus to work
+	// Using switched from NativeOnKeyDown to NativeOnPreviewKeyDown to capture input event when the menu is hidden 
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnViewChanged(int64 ViewIndex);
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Widgets", meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* ViewChangedAnim;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Widgets", meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* DialogAnim;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UNativeWidgetHost* MenuTitleContent;
@@ -182,4 +194,7 @@ public:
 	{
 		DrawerController->SetDrawerExpanded((int32) EModioMenuDrawer::EMMD_RefineSearch, false, false);
 	}
+
+	UModioDialogController* GetDialogController();
+	UModioDrawerController* GetDrawerController();
 };

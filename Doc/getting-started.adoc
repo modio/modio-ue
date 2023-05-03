@@ -24,12 +24,24 @@ The settings have the following parameters:
 |===
 |[.paramname]#Game Id#|Your mod.io-provided Game Id for the target environment (Live, or Test)
 |[.paramname]#API Key#|Your mod.io-provided Game Id for the target environment (Live, or Test)
-|[.paramname]#Environment#|Are you targeting the production/live environment or the private/test environment?
+|[.paramname]#Environment#|Your current environment, Live or Test (check difference below)
 |[.paramname]#Log Level#|The default logging level to use. Messages with a lower log level will be silently discarded.
 
 |===
 
 You can find your Game ID and API Key by going to the applicable mod.io environment, going to your Profile and selecting "API Access" from the navigation bar.
+
+==== Endpoint Environment
+
+The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.
+
+Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game's modding capabilities.
+
+In summary, here are the three steps:
+
+* Test Environment: Used for integration between your game and mod.io
+* Live Environment, Hidden: Used for quality assurance and pre-release mods
+* Live Environment, Public: It is open for everyone to see.
 
 '''
 

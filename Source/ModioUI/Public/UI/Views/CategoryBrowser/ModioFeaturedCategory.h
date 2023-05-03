@@ -50,6 +50,12 @@ protected:
 
 	FOnGetSelectionIndex SelectionIndexDelegate;
 
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Widgets", meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* NavLeftHoverAnim;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Widgets", meta = (BindWidgetAnimOptional))
+	UWidgetAnimation* NavRightHoverAnim;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* Title;
 
@@ -81,12 +87,22 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 
 	virtual void NativeOnInitialized() override;
-	virtual void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) override;
+
+	virtual FReply NativeOnFocusReceived(const FGeometry& MyGeometry,const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 
 	void OnItemListEntryGenerated(UUserWidget& GeneratedWidget);
 	void OnItemListEntryReleased(UUserWidget& GeneratedWidget);
 	void OnCategoryFinishedScrolling(UObject* CategoryItem, UUserWidget& CategoryItemWidget);
+
+	UFUNCTION()
+	void PlayNavRightHoverAnim();
+	UFUNCTION()
+	void PlayNavRightUnhoverAnim();
+	UFUNCTION()
+	void PlayNavLeftHoverAnim();
+	UFUNCTION()
+	void PlayNavLeftUnhoverAnim();
 
 	UFUNCTION()
 	void HandleNavLeftClicked()
@@ -148,7 +164,6 @@ protected:
 
 	virtual bool NativeSupportsKeyboardFocus() const override;
 
-	FReply NativeOnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent) override;
 	FNavigationReply NativeOnNavigation(const FGeometry& InGeometry,
 										const FNavigationEvent& InNavigationEvent) override;
 	virtual void NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,

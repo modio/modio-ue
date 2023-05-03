@@ -14,11 +14,13 @@
 #include "Logging/LogMacros.h"
 #include "ModioUISubsystem.h"
 #include "Rendering/DrawElements.h"
+#include "Fonts/FontMeasure.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 
 void UModioModTileBase::NativeConstruct()
 {
 	Super::NativeConstruct();
+	UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	bIsFocusable = true;
 	IModioUIMediaDownloadCompletedReceiver::Register<UModioModTileBase>(EModioUIMediaDownloadEventType::ModLogo);
 	IModioUIAuthenticationChangedReceiver::Register<UModioModTileBase>();
@@ -217,7 +219,7 @@ void UModioModTileBase::SetExpandedState(bool bExpanded)
 }
 
 void UModioModTileBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
+{	
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 	if (TileBorder)
 	{
@@ -229,7 +231,7 @@ void UModioModTileBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FP
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
 	}
-
+	PlayAnimation(FocusTransition);
 	FSlateApplication::Get().PlaySound(HoveredSound);
 }
 
@@ -265,11 +267,17 @@ void UModioModTileBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 0);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 0);
 	}
+
+	PlayAnimationReverse(FocusTransition);
 }
 
 void UModioModTileBase::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent)
 {
 	Super::NativeOnAddedToFocusPath(InFocusEvent);
+	if (UISubsystem) 
+	{
+		UISubsystem->SetCurrentFocusTarget(this);
+	}
 	if (TileBorder)
 	{
 		TileBorder->SetHoveredState();
@@ -280,6 +288,7 @@ void UModioModTileBase::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
 	}
+	PlayAnimation(FocusTransition);
 }
 
 void UModioModTileBase::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
@@ -295,12 +304,40 @@ void UModioModTileBase::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusE
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 0);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 0);
 	}
+	PlayAnimationReverse(FocusTransition);
 }
 
 FReply UModioModTileBase::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	// return FReply::Handled();
+	if (TileBorder)
+	{
+		TileBorder->SetHoveredState();
+		TileBorder->EnableBorder();
+	}
+	if (TileFrame)
+	{
+		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
+		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
+	}
+
+	FSlateApplication::Get().PlaySound(HoveredSound);
+	PlayAnimation(FocusTransition);
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
+}
+
+void UModioModTileBase::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
+{
+	if (TileBorder)
+	{
+		TileBorder->ClearHoveredState();
+		TileBorder->DisableBorder();
+	}
+	if (TileFrame)
+	{
+		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 0);
+		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 0);
+	}
 }
 
 void UModioModTileBase::OnModSubscriptionStatusChanged(FModioModID ID, bool Subscribed)
@@ -320,7 +357,7 @@ void UModioModTileBase::OnModSubscriptionStatusChanged(FModioModID ID, bool Subs
 				if (SubscriptionIndicator)
 				{
 					SubscriptionIndicator->SetVisibility(Subscribed ? ESlateVisibility::HitTestInvisible
-																	: ESlateVisibility::Collapsed);
+																	: ESlateVisibility::Hidden);
 				}
 			}
 		}
@@ -359,7 +396,7 @@ void UModioModTileBase::NativeSubscribeClicked()
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 			if (Subsystem)
 			{
-				Subsystem->ShowModUnsubscribeDialog(Data);
+				Subsystem->RequestRemoveSubscriptionForModID(Data->Underlying.ModId);				
 			}
 		}
 	}

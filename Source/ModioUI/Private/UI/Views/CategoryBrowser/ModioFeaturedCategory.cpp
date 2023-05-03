@@ -98,11 +98,15 @@ void UModioFeaturedCategory::NativeOnInitialized()
 	if (NavLeftButton)
 	{
 		NavLeftButton->OnClicked.AddDynamic(this, &UModioFeaturedCategory::HandleNavLeftClicked);
+		NavLeftButton->OnHovered.AddDynamic(this, &UModioFeaturedCategory::PlayNavLeftHoverAnim);
+		NavLeftButton->OnUnhovered.AddDynamic(this, &UModioFeaturedCategory::PlayNavLeftUnhoverAnim);
 		NavLeftButton->IsFocusable = false;
 	}
 	if (NavRightButton)
 	{
 		NavRightButton->OnClicked.AddDynamic(this, &UModioFeaturedCategory::HandleNavRightClicked);
+		NavRightButton->OnHovered.AddDynamic(this, &UModioFeaturedCategory::PlayNavRightHoverAnim);
+		NavRightButton->OnUnhovered.AddDynamic(this, &UModioFeaturedCategory::PlayNavRightUnhoverAnim);
 		NavRightButton->IsFocusable = false;
 	}
 	if (CategoryViewContent)
@@ -110,6 +114,51 @@ void UModioFeaturedCategory::NativeOnInitialized()
 		CategoryViewContent->SetActualAsyncOperationWidget(TScriptInterface<IModioUIAsyncOperationWidget>(this));
 	}
 }
+
+void UModioFeaturedCategory::PlayNavRightHoverAnim()
+{
+	// Only play animations in earlier than 5.1
+	#if UE_VERSION_OLDER_THAN(5,1,0)
+	if (IsValid(NavRightHoverAnim))
+	{
+		PlayAnimation(NavRightHoverAnim);
+	}
+	#endif
+}
+
+void UModioFeaturedCategory::PlayNavRightUnhoverAnim()
+{
+	// Only play animations in earlier than 5.1
+	#if UE_VERSION_OLDER_THAN(5, 1, 0)
+	if (IsValid(NavRightHoverAnim))
+	{
+		PlayAnimationReverse(NavRightHoverAnim);
+	}
+	#endif
+}
+
+void UModioFeaturedCategory::PlayNavLeftHoverAnim()
+{
+	// Only play animations in earlier than 5.1
+	#if UE_VERSION_OLDER_THAN(5, 1, 0)
+	if (IsValid(NavRightHoverAnim))
+	{
+		PlayAnimation(NavLeftHoverAnim);
+	}
+	#endif
+}
+
+void UModioFeaturedCategory::PlayNavLeftUnhoverAnim()
+{
+	// Only play animations in earlier than 5.1
+	#if UE_VERSION_OLDER_THAN(5, 1, 0)
+	if (IsValid(NavRightHoverAnim))
+	{
+		PlayAnimationReverse(NavLeftHoverAnim);
+	}
+	#endif
+}
+
 
 void UModioFeaturedCategory::OnItemListEntryGenerated(UUserWidget& GeneratedWidget)
 {
@@ -154,8 +203,6 @@ void UModioFeaturedCategory::OnCategoryFinishedScrolling(UObject* CategoryItem, 
 	{
 		if (Widget == &CategoryItemWidget)
 		{
-			UE_LOG(LogTemp, Display, TEXT("NumEntryWidgets %d, Scrolling VisibleItemIndex %d"),
-				   ItemList->GetDisplayedEntryWidgets().Num(), VisibleItemIndex);
 			SelectionChangedDelegate.Broadcast(VisibleItemIndex, this);
 			return;
 		}
@@ -206,7 +253,7 @@ void UModioFeaturedCategory::NativeOnRemovedFromFocusPath(const FFocusEvent& InF
 	bEmitSelectionEvents = bPreviousEmitSelectionEvents;
 }
 
-void UModioFeaturedCategory::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent)
+FReply UModioFeaturedCategory::NativeOnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent)
 {
 	if (SelectionIndexDelegate.IsBound() && ItemList)
 	{
@@ -215,30 +262,15 @@ void UModioFeaturedCategory::NativeOnAddedToFocusPath(const FFocusEvent& InFocus
 				? ItemList->GetIndexForItem(*ItemList->ItemFromEntryWidget(*(ItemList->GetDisplayedEntryWidgets()[0])))
 				: 0;
 
-		int32 PendingSelectionIndex = INDEX_NONE;
-		PendingSelectionIndex = SelectionIndexDelegate.Execute();
-
-		if (PendingSelectionIndex != INDEX_NONE)
-		{
-			ItemList->NavigateToIndex(StartDisplayedIndex + PendingSelectionIndex);
-			ItemList->SetSelectedIndex(StartDisplayedIndex + PendingSelectionIndex);
-		}
-		else
-		{
-			ItemList->NavigateToIndex(StartDisplayedIndex);
-			ItemList->SetSelectedIndex(StartDisplayedIndex);
-		}
+		ItemList->NavigateToIndex(StartDisplayedIndex);
+		ItemList->SetSelectedIndex(StartDisplayedIndex);
 	}
+	return FReply::Unhandled();
 }
 
 bool UModioFeaturedCategory::NativeSupportsKeyboardFocus() const
 {
 	return false;
-}
-
-FReply UModioFeaturedCategory::NativeOnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent)
-{
-	return FReply::Unhandled();
 }
 
 void UModioFeaturedCategory::NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,
@@ -299,8 +331,6 @@ void UModioFeaturedCategory::OnCategorySelectionChangedInternal(UModioTileView::
 		{
 			if (Widget == ItemList->GetEntryWidgetFromItem(Item))
 			{
-				UE_LOG(LogTemp, Display, TEXT("NumEntryWidgets %d, Selection VisibleItemIndex %d"),
-					   ItemList->GetDisplayedEntryWidgets().Num(), VisibleItemIndex);
 				SelectionChangedDelegate.Broadcast(VisibleItemIndex, this);
 				return;
 			}

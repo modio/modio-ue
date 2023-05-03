@@ -59,19 +59,19 @@ struct MODIOUI_API FModioInputMappingGlyph
 		switch (InputMode)
 		{
 			case EModioUIInputMode::Mouse:
-				return MouseGlyph.IsNull() ? nullptr : MouseGlyph.LoadSynchronous();
+				return MouseGlyph.IsNull() ? nullptr : MouseGlyph.Get();
 				break;
 			case EModioUIInputMode::Keyboard:
-				return KeyboardGlyph.IsNull() ? nullptr : KeyboardGlyph.LoadSynchronous();
+				return KeyboardGlyph.IsNull() ? nullptr : KeyboardGlyph.Get();
 				break;
 			case EModioUIInputMode::XBox:
-				return XBoxControllerGlyph.IsNull() ? nullptr : XBoxControllerGlyph.LoadSynchronous();
+				return XBoxControllerGlyph.IsNull() ? nullptr : XBoxControllerGlyph.Get();
 				break;
 			case EModioUIInputMode::Playstation:
-				return PSControllerGlyph.IsNull() ? nullptr : PSControllerGlyph.LoadSynchronous();
+				return PSControllerGlyph.IsNull() ? nullptr : PSControllerGlyph.Get();
 				break;
 			case EModioUIInputMode::Controller:
-				return FallbackControllerGlyph.IsNull() ? nullptr : FallbackControllerGlyph.LoadSynchronous();
+				return FallbackControllerGlyph.IsNull() ? nullptr : FallbackControllerGlyph.Get();
 				break;
 			default:
 				break;

@@ -15,21 +15,20 @@
 #include "Styling/SlateTypes.h"
 #include "Styling/SlateWidgetStyle.h"
 #include "UI/Styles/ModioWidgetBorderStyle.h"
-
 #include "ModioComboBoxStyle.generated.h"
 
 /**
 * Struct derivate of Widget style to store a combo box style
 **/
 USTRUCT(BlueprintType)
-struct MODIOUI_API FModioComboBoxStyle : public FSlateWidgetStyle
+struct FModioComboBoxStyle : public FSlateWidgetStyle
 {
 	GENERATED_BODY()
-
+public:
 	/**
 	* Default constructor without parameters
 	**/
-	FModioComboBoxStyle() : Super()
+	FModioComboBoxStyle()
 	{
 		// Populate the combo box style from defaults
 		ComboBoxStyle = FCoreStyle::Get().GetWidgetStyle<FComboBoxStyle>("ComboBox");

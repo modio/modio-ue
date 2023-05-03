@@ -65,7 +65,6 @@ protected:
 	virtual void HandleModLogoOperationStateChanged(EModioUIAsyncOperationWidgetState NewState);
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-
 	virtual void NativeTileClicked();
 
 	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry,
@@ -78,7 +77,8 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FModioUIMaterialRef ErrorMaterial = FModioUIMaterialRef {"ImageError"};
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget)) UModioImage* Thumbnail;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget)) 
+	UModioImage* Thumbnail;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioUserWidgetBase* SubscriptionIndicator;
@@ -101,6 +101,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioModTileStyle"), Category = "Widgets")
 	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultModTileStyle"};
 
+	UPROPERTY()
+	class UModioUISubsystem* UISubsystem;
+
 	FSlateSound HoveredSound;
 	FSlateSound PressedSound;
 
@@ -111,6 +114,7 @@ protected:
 	virtual void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent);
 	virtual void NativeOnAuthenticationChanged(TOptional<FModioUser> User);
 
 	bool bIsUserAuthenticated;

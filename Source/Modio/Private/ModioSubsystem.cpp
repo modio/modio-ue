@@ -16,6 +16,7 @@
 #include "Internal/Convert/EditModParams.h"
 #include "Internal/Convert/ErrorCode.h"
 #include "Internal/Convert/FilterParams.h"
+#include "Internal/Convert/GameInfo.h"
 #include "Internal/Convert/InitializeOptions.h"
 #include "Internal/Convert/List.h"
 #include "Internal/Convert/ModCollectionEntry.h"
@@ -307,6 +308,23 @@ void UModioSubsystem::K2_GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegat
 							   [Callback](FModioErrorCode ec, TOptional<FModioModInfo> ModInfo) {
 								   Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModInfo>(ModInfo));
 							   }));
+}
+
+void UModioSubsystem::GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegateFast Callback)
+{
+	Modio::GetGameInfoAsync(ToModio(GameID),
+							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::GameInfo> GameInfo) {
+								TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+								Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioGameInfo>(GameInfo));
+							});
+}
+
+void UModioSubsystem::K2_GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegate Callback)
+{
+	GetGameInfoAsync(GameID, FOnGetGameInfoDelegateFast::CreateLambda(
+								 [Callback](FModioErrorCode ec, TOptional<FModioGameInfo> GameInfo) {
+									 Callback.ExecuteIfBound(ec, ToBP<FModioOptionalGameInfo>(GameInfo));
+								 }));
 }
 
 void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback)

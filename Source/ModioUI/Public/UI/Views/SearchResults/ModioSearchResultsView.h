@@ -13,8 +13,8 @@
 #include "Algo/Transform.h"
 #include "Core/ModioModInfoUI.h"
 #include "CoreMinimal.h"
-#include "UI/Commands/ModioUIAction.h"
 #include "UI/CommonComponents/ModioTagList.h"
+#include "UI/Commands/ModioUIAction.h"
 #include "UI/EventHandlers/IModioUIModInfoReceiver.h"
 #include "UI/Interfaces/IModioUIAsyncOperationWidget.h"
 #include "UI/Interfaces/IModioUIAsyncRetryWidget.h"
@@ -62,6 +62,13 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 
 	virtual void NativeRequestOperationRetry() override;
+
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent);
+
+	virtual FReply NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+
+	FReply TryNavigateGrid();
+
 	UFUNCTION()
 	void OnRefineSearchButtonClicked();
 
@@ -74,6 +81,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	class UModioTileView* ResultsTileView;
 
+	// This is initialized on blueprints, since it was a lot simpler there
+	UPROPERTY(BlueprintReadWrite, Category = "Widgets")
+	class UUserWidget* FirstTile;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets",
 			  meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
 	class UWidget* ResultLoader;
@@ -82,13 +93,13 @@ protected:
 	class UModioGridPanel* NoResultsDialog;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	class UModioRichTextBlock* SearchQuery;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	class UModioTagList* SearchTags;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	class UModioButton* RefineSearchButton;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	class UModioButton* NoResultsRefineSearchButton;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	class UModioPopupComboBox* SortBy;
@@ -96,8 +107,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	class UModioErrorRetryWidget* ModioErrorWithRetryWidget;
 
-	// Override GetMenuTitleContent to return the correct widget with the number of results populated
-	virtual TSharedRef<SWidget> GetMenuTitleContent() override;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioRichTextBlock* SearchResultsCount;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioRichTextStyle"),
 			  Category = "ModioSearchResultsView")
@@ -107,17 +118,29 @@ protected:
 	FText PageTitle;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioSearchResultsView")
-	FText ModCountFormatText;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioSearchResultsView")
 	FText ModQueryFormatText;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FString DefaultTagText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ModioSearchResultsView")
+	FText SearchInputTagFormatText;
+
 	FText GetPageTitle() const;
-	FText GetModCountText() const;
 
 	bool HasSortActionApplied;
 	FModioUIAction CurrentSortAction;
 	FOnRetryRequested RetryDelegate;
+	int CurrentListIndex = 0;
+	int CurrentRow = 0;
+
+	TArray<FModioModTag> DefaultTags;
+	TArray<FString> TagNames;
+	FString SearchInputString;
+
+	UFUNCTION()
+	void OnDrawerClosed();
 
 public:
+	void SetSearchInputString(FString input);
 };

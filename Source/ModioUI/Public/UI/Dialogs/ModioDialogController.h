@@ -20,9 +20,13 @@
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
 #include "UI/BaseWidgets/ModioWidgetBase.h"
 #include "UI/BaseWidgets/ModioWidgetSwitcher.h"
+#include "UI/Styles/ModioUIStyleRef.h"
+#include "UI/Dialogs/ModioDialogInfo.h"
 #include "UI/Interfaces/IModioUIAuthenticationDataProvider.h"
 
 #include "ModioDialogController.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDialogClosed);
 
 /**
  * Enumerator with the possible replies to a dialog box
@@ -51,20 +55,25 @@ class MODIOUI_API UModioDialogController : public UModioWidgetBase
 protected:
 	virtual void SynchronizeProperties() override;
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
+	FReply OnBackgroundButtonClicked();
+
 	UPROPERTY()
 	class UModioDialogBaseInternal* ActualDialog;
 
 	TSharedPtr<class SBackgroundBlur> MyBackgroundBlur;
+	TSharedPtr<class SModioButtonBase> MyBackgroundButton;
+	TSharedPtr<class SBox> MyBackgroundBox;
+	TSharedPtr<class SModioButtonBase> ClickDisableButton;
 
 	/// @brief Controls the animation direction. If negative, we are transitioning from visible ->collapsed; 0, we are
 	/// not transitioning at all; positive, we are transitioning from collapsed ->visible
 	int32 AnimationDirection;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild), Category = "Appearance")
+	FModioUIStyleRef InvisibleButtonStyleRef = FModioUIStyleRef {"InvisibleButtonStyle"};
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Transient, Category = "Widgets")
 	bool bCurrentlyDisplayingDialog = false;
-
-	UPROPERTY(Transient)
-	TArray<class UModioDialogInfo*> DialogStack;
 
 	UPROPERTY(Transient)
 	TArray<FString> DialogInputValues;
@@ -118,12 +127,20 @@ protected:
 	void OnFetchExternalCompleted(FModioErrorCode ModioErrorCode) {}
 
 	void HandleEmailRequestSent(FModioErrorCode ec, UModioDialogInfo* DestinationOnSuccess);
+	void HandleAuthCodeRequestSent(FModioErrorCode ec);
 	void SendEmailCodeRequest(FString EmailAddress, UModioDialogInfo* DestinationOnSuccess);
 	void HandleUnsubscribe(FModioModID ec, bool IsSubscribe);
 	void HandleExternalAuthenticationComplete(FModioErrorCode ec);
-	void SubmitEmailAuthCode(FString Code, UModioDialogInfo* DestinationOnSuccess);
+	void SubmitEmailAuthCode(FString Code);
 
 public:
+	FOnDialogClosed OnDialogClosed;
+
+	UPROPERTY(Transient)
+	TArray<class UModioDialogInfo*> DialogStack;
+
+	UModioDialogBaseInternal* GetActualDialog();
+	bool TrySetFocusToActiveDialog();
 	void PopDialog();
 	void FinalizeDialog(EModioDialogReply Reply = EModioDialogReply::Neutral);
 	void PushDialog(UModioDialogInfo* InitialDialog, UObject* DialogDataSource = nullptr);
@@ -147,7 +164,6 @@ public:
 	void ShowErrorDialog(FModioErrorCode ec, bool bCloseDialogsOnOK = false);
 
 	void ShowLoadingDialog();
-
 	void ShowModUnsubscribeDialog(UObject* DialogDataSource);
 	void HandleUnsubscribeError(FModioErrorCode ModioErrorCode);
 	void RequestUnsubscribe(const FModioModID& ModId, UModioDialogInfo* DestinationOnSuccess);

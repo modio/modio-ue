@@ -32,10 +32,17 @@ class MODIOUI_API UModioDownloadQueueOpProgress : public UModioModManagementWidg
 public:
 	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioRichTextButton* UnsubscribeButton;
+
+	EModioModManagementEventType CurrentStatus = EModioModManagementEventType::Installed;
+
 protected:
+	float truncateDivider = 0.34f;
+
 	FModioUnsigned64 PreviousProgressValue = FModioUnsigned64(0);
 	FDateTime PreviousUpdateTime;
-
+	
 	void UpdateSpeed(FModioUnsigned64 DeltaBytes, double DeltaTime);
 	void NativeOnSetDataSource() override;
 	void NativeOnInitialized() override;
@@ -56,9 +63,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* OperationProgressText;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	UModioRichTextButton* UnsubscribeButton;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText SpeedFormatText;

@@ -9,12 +9,25 @@
  */
 
 #include "UI/BaseWidgets/ModioTileView.h"
+#include "UI/CommonComponents/ModioModTile.h"
+#include "UI/CommonComponents/ModioModTileBase.h"
 #include "UI/BaseWidgets/Slate/SModioObjectTableRow.h"
 
 void UModioTileView::OnItemHoveredChanged(UObject* Item, bool bNewSelectionState)
 {
+	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(subsystem) && subsystem->GetCurrentFocusTarget()) 
+	{
+		UModioModTile* modTile = Cast<UModioModTile>(subsystem->GetCurrentFocusTarget());
+		if (IsValid(modTile) && !modTile->AllowMouseHoverFocus())
+		{
+			return;
+		}
+	}
+	MyDerivedTileView->SetScrollToTarget(false);
+	FSlateApplication::Get().SetUserFocus(0, MyDerivedTileView->WidgetFromItem(Item)->AsWidget());
 	UTileView::SetItemSelection(Item, bNewSelectionState);
-	UTileView::RequestNavigateToItem(Item);
+	//UTileView::RequestNavigateToItem(Item);
 }
 
 void UModioTileView::SynchronizeProperties()

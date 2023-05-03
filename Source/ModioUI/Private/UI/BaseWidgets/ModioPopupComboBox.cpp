@@ -80,11 +80,10 @@ TSharedRef<ITableRow> UModioPopupComboBox::GenerateOptionWidget(TSharedPtr<FText
 			SNew(SBox) 
 			.HAlign(HAlign_Right)
 			.VAlign(VAlign_Center)
-			.HeightOverride(32)
 			[
 				SNew(SModioRichTextBlock)
 				.Text(FText::Format(ValueFormatText, Args))
-				.StyleReference_UObject(this, &UModioPopupComboBox::GetTextStyle)
+				.StyleReference(&TextStyle)
 				.HoveredSound(ComboStyle->HoveredSound)
 			]
 		];
@@ -105,11 +104,6 @@ FSlateColor UModioPopupComboBox::GetButtonTextColor() const
 	return FSlateColor(FLinearColor::White);
 }
 
-const FModioUIStyleRef* UModioPopupComboBox::GetTextStyle() const
-{
-	return &TextStyle;
-}
-
 // TODO: use Rich Text and set the style from the ComboBoxStyle
 TSharedRef<SWidget> UModioPopupComboBox::GenerateButtonContent(TSharedPtr<FText> Item)
 {
@@ -120,12 +114,11 @@ TSharedRef<SWidget> UModioPopupComboBox::GenerateButtonContent(TSharedPtr<FText>
 	// clang-format off
 	return SNew(SBox) 
 		.HAlign(HAlign_Right)
-		.VAlign(VAlign_Center)
-		.HeightOverride(32)
+		.VAlign(VAlign_Fill)
 		[
 			SNew(SModioRichTextBlock)
 			.Text(FText::Format(LabelFormatText, Args))
-			.StyleReference_UObject(this, &UModioPopupComboBox::GetTextStyle)
+			.StyleReference(&TextStyle)
 			.HoveredSound(ComboStyle->HoveredSound)
 		];
 	//TODO: @modio-ue4 bind the font delegate here too so we can actually change the size of the text etc
@@ -179,8 +172,33 @@ void UModioPopupComboBox::SetOptionValues(const TArray<FText>& Values)
 	}
 }
 
+bool UModioPopupComboBox::IsComboBoxOpen()
+{
+	return MyComboBox->bIsOpen;
+}
+
+void UModioPopupComboBox::SetComboBoxOpen(bool bOpen) 
+{
+	if (bOpen)
+	{
+		MyComboBox->Open();
+		return;
+	}
+	MyComboBox->Close();
+}
+
+void UModioPopupComboBox::SetFocusToButton() 
+{
+	FSlateApplication::Get().SetAllUserFocus(MyComboBox->GetContent());
+}
+
 void UModioPopupComboBox::OnSelectionChangedHandler(TSharedPtr<FText> NewSelection, ESelectInfo::Type SelectionType)
 {
+	if (SelectionType == ESelectInfo::OnNavigation)
+	{
+		return;
+	}
+
 	if (OnSelectionChanged.IsBound())
 	{
 		OnSelectionChanged.Execute(NewSelection ? *NewSelection : FText::GetEmpty(), SelectionType);

@@ -38,6 +38,8 @@ protected:
 
 class MODIOUI_API IModioInputMappingAccessor
 {
+public:
+
 protected:
 	TArray<FString> GetModioInputMappingNames();
 	TArray<FString> GetAllProjectInputNames();

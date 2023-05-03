@@ -21,10 +21,9 @@
 void UModioCheckBox::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
-	const FModioCheckBoxStyle* ResolvedStyle = CheckBoxStyle.FindStyle<FModioCheckBoxStyle>();
 
-	MyCheckbox->SetStyle(ResolvedStyle ? &ResolvedStyle->CheckBoxStyle : &WidgetStyle);
 	MyCheckbox->SetContent(GetContentWidget());
+	MyCheckbox->SetStyle(GetCheckboxStyle());
 	if (MyDefaultLabel.IsValid())
 	{
 		MyDefaultLabel->SetText(
@@ -81,8 +80,10 @@ TSharedRef<SWidget> UModioCheckBox::GetContentWidget()
 }
 FMargin UModioCheckBox::GetCheckboxContentPadding() const
 {
+
 	if (const FModioCheckBoxStyle* ResolvedStyle = CheckBoxStyle.FindStyle<FModioCheckBoxStyle>())
 	{
+	
 		return ResolvedStyle->ContentPadding;
 	}
 	else
@@ -93,15 +94,14 @@ FMargin UModioCheckBox::GetCheckboxContentPadding() const
 
 TSharedRef<SWidget> UModioCheckBox::RebuildWidget()
 {
-	// resolve style
-	const FModioCheckBoxStyle* ResolvedStyle = CheckBoxStyle.FindStyle<FModioCheckBoxStyle>();
-
+	const FCheckBoxStyle* style = GetCheckboxStyle();
+	FMargin margin = GetCheckboxContentPadding();
 	return SAssignNew(MyCheckbox, SCheckBox)
 		.OnCheckStateChanged(BIND_UOBJECT_DELEGATE(FOnCheckStateChanged, SlateOnCheckStateChangedCallback))
-		.Style(ResolvedStyle ? &ResolvedStyle->CheckBoxStyle : &WidgetStyle)
+		.Style(style)
 		.HAlign(HorizontalAlignment)
 		.IsFocusable(IsFocusable)
-		.Padding_UObject(this, &UModioCheckBox::GetCheckboxContentPadding)[GetContentWidget()];
+		.Padding(margin)[GetContentWidget()];
 }
 
 void UModioCheckBox::ReleaseSlateResources(bool bReleaseChildren)
@@ -118,4 +118,10 @@ void UModioCheckBox::SetLabelText(FText InText)
 	{
 		MyCheckbox->Invalidate(EInvalidateWidgetReason::Layout);
 	}
+}
+
+void UModioCheckBox::SetStyle(const FModioCheckBoxStyle* InStyle) 
+{
+	MyCheckbox->SetStyle(&InStyle->CheckBoxStyle);
+	MyDefaultLabel->SetTextStyle(InStyle->TextStyle);
 }

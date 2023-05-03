@@ -61,8 +61,8 @@ void UModioSubscriptionBadge::NativeOnSetDataSource()
 			SetPercent(100.f);
 			break;
 	}
-	SetVisibility(UserMods.Contains(Data->Underlying.ModId) ? ESlateVisibility::HitTestInvisible
-															: ESlateVisibility::Collapsed);
+
+	SetVisibility(UserMods.Contains(Data->Underlying.ModId) ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 }
 
 void UModioSubscriptionBadge::SetPercent(float InPercent)

@@ -23,12 +23,12 @@ TSharedRef<STableViewBase> UModioListViewString::RebuildListWidget()
 {
 	FListViewConstructArgs Args;
 	Args.bAllowFocus = false;
-	Args.SelectionMode = ESelectionMode::Single;
+	Args.SelectionMode = ESelectionMode::None;
 	Args.bClearSelectionOnClick = false;
 	Args.ConsumeMouseWheel = EConsumeMouseWheel::Never;
 	Args.bReturnFocusToSelection = false;
 	Args.Orientation = Orientation;
-	MyListView = StaticCastSharedRef<SListView<TSharedPtr<FString>>>(
+	MyListView = StaticCastSharedRef<SModioListView<TSharedPtr<FString>>>(
 		ITypedUMGListView<TSharedPtr<FString>>::ConstructListView<SModioListView>(this, ListItems, Args));
 	if (bOverrideItemSize)
 	{

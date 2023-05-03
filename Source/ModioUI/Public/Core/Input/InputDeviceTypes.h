@@ -36,7 +36,9 @@ enum class EModioUIInputMode : uint8
 	Playstation = 1 << 4,
 
 	/** Any controller input type **/
-	Controller = XBox | Playstation
+	Controller = XBox | Playstation,
+
+	NintendoSwitch = 1 << 6
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnInputDeviceChanged, EModioUIInputMode);

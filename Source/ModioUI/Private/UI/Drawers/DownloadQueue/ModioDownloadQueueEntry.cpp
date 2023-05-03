@@ -11,6 +11,8 @@
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueEntry.h"
 #include "Core/ModioModInfoUI.h"
 #include "Libraries/ModioSDKLibrary.h"
+#include "GameFramework/InputSettings.h"
+#include "Settings/ModioUISettings.h"
 #include "UI/Styles/ModioButtonStyle.h"
 #include "UI/Styles/ModioDownloadQueueEntryStyle.h"
 
@@ -20,10 +22,6 @@ void UModioDownloadQueueEntry::NativeOnSetDataSource()
 	UModioModInfoUI* ActualData = Cast<UModioModInfoUI>(DataSource);
 	if (ActualData)
 	{
-		if (ModNameLabel)
-		{
-			ModNameLabel->SetText(FText::FromString(ActualData->Underlying.ProfileName));
-		}
 		if (ModSizeLabel)
 		{
 			ModSizeLabel->SetText(UModioSDKLibrary::Filesize_ToString(ActualData->Underlying.FileInfo.Filesize));
@@ -107,34 +105,47 @@ void UModioDownloadQueueEntry::NativeOnListItemObjectSet(UObject* ListItemObject
 
 void UModioDownloadQueueEntry::NativeOnItemSelectionChanged(bool bIsSelected)
 {
-	// This function is never called. Saved for now in case this is needed in the future
-
-	//if (EntryBorder)
-	//{
-	//	if (bIsSelected)
-	//	{
-	//		if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
-	//				EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
-	//		{
-	//			EntryBorder->SetBrush(ResolvedStyle->HighlightedBorderBrush);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		EntryBorder->SetBrush(FSlateNoResource());
-	//	}
-	//}
+	if (EntryBorder)
+	{
+		if (bIsSelected)
+		{
+			if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
+					EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
+			{
+				EntryBorder->SetBrush(ResolvedStyle->HighlightedBorderBrush);
+				HoveredSound = ResolvedStyle->HoveredSound;
+				FSlateApplication::Get().PlaySound(HoveredSound);
+			}
+		}
+		else
+		{
+			EntryBorder->SetBrush(FSlateNoResource());
+		}
+	}
 }
 
 FReply UModioDownloadQueueEntry::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	FReply OriginalReply = Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
-	if (UnsubscribeButton)
+
+	if (EntryBorder)
 	{
-		UnsubscribeButton->SetFocus();
-		OriginalReply.SetUserFocus(UnsubscribeButton->TakeWidget(), EFocusCause::Navigation);
+		if (const FModioDownloadQueueEntryStyle* ResolvedStyle = EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
+		{
+			EntryBorder->SetBrush(ResolvedStyle->HighlightedBorderBrush);
+			HoveredSound = ResolvedStyle->HoveredSound;
+			FSlateApplication::Get().PlaySound(HoveredSound);
+		}
 	}
 	return OriginalReply;
+}
+
+void UModioDownloadQueueEntry::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
+{
+	if (EntryBorder)
+	{
+		EntryBorder->SetBrush(FSlateNoResource());
+	}
 }
 
 void UModioDownloadQueueEntry::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
@@ -157,7 +168,7 @@ void UModioDownloadQueueEntry::NativeOnModLogoDownloadCompleted(FModioModID ModI
 	}
 }
 
-void UModioDownloadQueueEntry::NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+void UModioDownloadQueueEntry::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	if (EntryBorder)
 	{
@@ -170,10 +181,74 @@ void UModioDownloadQueueEntry::NativeOnMouseEnter(const FGeometry& MyGeometry, c
 	}
 }
 
-void UModioDownloadQueueEntry::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) {
+void UModioDownloadQueueEntry::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
 	if (EntryBorder)
 	{
 		EntryBorder->SetBrush(FSlateNoResource());
+	}
+}
+
+FReply UModioDownloadQueueEntry::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
+	{
+		if (UInputSettings* CurrentInputSettings = UInputSettings::GetInputSettings())
+		{
+			FModioInputMapping MappedKey;
+
+			for (int i = 0; i < CurrentUISettings->ModioToProjectInputMappings.Num(); i++)
+			{
+				if (CurrentUISettings->ModioToProjectInputMappings[i].VirtualKey == FModioInputNames::Confirm)
+				{
+					MappedKey = CurrentUISettings->ModioToProjectInputMappings[i];
+					break;
+				}
+			}
+
+			if (MappedKey.MappedProjectInputs.IsValidIndex(0))
+			{
+				TArray<FInputActionKeyMapping> ActionMappings;
+				CurrentInputSettings->GetActionMappingByName(MappedKey.MappedProjectInputs[0], ActionMappings);
+
+				for (auto& ActionMapping : ActionMappings)
+				{
+					if (ActionMapping.Key == InKeyEvent.GetKey()) {
+
+						if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+						{
+							if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
+							{
+								Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+								GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseDownloadDrawer();
+
+								if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
+										EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
+								{
+									PressedSound = ResolvedStyle->PressedSound;
+									FSlateApplication::Get().PlaySound(PressedSound);
+								}
+
+								
+								return FReply::Handled();
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return FReply::Unhandled();
+}
+
+void UModioDownloadQueueEntry::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
+
+	if (ModNameLabel && IsValid(ModInfo))
+	{
+		FString modName = TruncateLongModName(ModInfo->Underlying.ProfileName, ModNameLabel, truncateDivider);
+		ModNameLabel->SetText(FText::FromString(modName));
 	}
 }
 
@@ -186,12 +261,14 @@ FEventReply UModioDownloadQueueEntry::OnEntryPressed(FGeometry MyGeometry, const
 			if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
 			{
 				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+				GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseDownloadDrawer();
 
 				if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
 						EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
 				{
 					PressedSound = ResolvedStyle->PressedSound;
 					FSlateApplication::Get().PlaySound(PressedSound);
+					
 				}
 
 				return FEventReply(true);

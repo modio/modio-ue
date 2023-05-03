@@ -13,7 +13,6 @@
 #include "Engine/Engine.h"
 #include "ModioSubsystem.h"
 #include "ModioUISubsystem.h"
-#include "Fonts/FontMeasure.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/Interfaces/IModioUINotification.h"
 
@@ -70,49 +69,44 @@ void UModioModTile::NativeOnEntryReleased()
 	// PlayAnimationReverse(FocusTransition);
 }
 
-/*
 
 void UModioModTile::NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-	if (!bCurrentExpandedState)
+	if (!AllowMouseHoverFocus())
 	{
-		if (DetailsView && !DetailsView->IsOpen())
-		{
-			DetailsView->Close();
-			DetailsView->Open(true);
-		}
+		return;
 	}
+
 	Super::NativeOnMouseEnter(MyGeometry, MouseEvent);
 }
 
 void UModioModTile::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
-	/ *if (!bCurrentExpandedState)
+	if (!AllowMouseHoverFocus())
 	{
-		if (DetailsView)
-		{
-			DetailsView->Close();
-		}
-	}* /
+		return;
+	}
+
 	Super::NativeOnMouseLeave(InMouseEvent);
 }
 
-*/
+bool UModioModTile::AllowMouseHoverFocus() 
+{
+	UModioModTile* target = Cast<UModioModTile>(UISubsystem->GetCurrentFocusTarget());
+	if (!IsValid(target)) 
+	{
+		return true;
+	}
+	return !target->MoreOptionsMenu->GetIsMenuOpen();
+}
 
 void UModioModTile::NativeOnSetExpandedState(bool bExpandedState)
 {
 	bool bOldExpandedState = bCurrentExpandedState;
 
 	Super::NativeOnSetExpandedState(bExpandedState);
-	/*if (SubscribeButton)
-	{
-		SubscribeButton->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
-	}
-
-	if (MoreOptionsMenu)
-	{
-		MoreOptionsMenu->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
-	}*/
+	SubscribeButton->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	MoreOptionsMenu->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 
 	/*if (SizeOverride)
 	{
@@ -124,10 +118,16 @@ void UModioModTile::NativeOnSetExpandedState(bool bExpandedState)
 	}*/
 }
 
-FNavigationReply UModioModTile::NativeOnNavigation(const FGeometry& InGeometry,
-												   const FNavigationEvent& InNavigationEvent)
+FReply UModioModTile::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	return Super::NativeOnNavigation(InGeometry, InNavigationEvent);
+	if (!AllowMouseHoverFocus())
+	{
+		UISubsystem->SetCurrentFocusTarget(nullptr);
+		return FReply::Handled();
+	}
+
+	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	return OnThumbnailMouseDown(InGeometry, InMouseEvent).NativeReply;
 }
 
 void UModioModTile::OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating)
@@ -140,6 +140,15 @@ void UModioModTile::OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating 
 
 void UModioModTile::SubmitNegativeRating()
 {
+	if (!bIsUserAuthenticated)
+	{
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (Subsystem)
+		{
+			Subsystem->ShowUserAuthenticationDialog();
+		}
+	}
+
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 	if (ModInfo)
 	{
@@ -157,6 +166,15 @@ void UModioModTile::SubmitNegativeRating()
 
 void UModioModTile::SubmitPositiveRating()
 {
+	if (!bIsUserAuthenticated)
+	{
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (Subsystem)
+		{
+			Subsystem->ShowUserAuthenticationDialog();
+		}
+	}
+
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 	if (ModInfo)
 	{
@@ -213,16 +231,27 @@ void UModioModTile::NativeOnInitialized()
 
 	if (SubscriptionIndicator)
 	{
-		SubscriptionIndicator->SetVisibility(ESlateVisibility::Collapsed);
+		SubscriptionIndicator->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
 FEventReply UModioModTile::OnThumbnailMouseDown(FGeometry MyGeometry, const FPointerEvent& MouseEvent)
 {
+	if (MouseEvent.IsTouchEvent())
+	{
+	//	return;
+	}
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
+			if (!AllowMouseHoverFocus() || MoreOptionsMenu->GetIsMenuOpen()) 
+			{
+				Subsystem->SetCurrentFocusTarget(nullptr);
+				MoreOptionsMenu->Close();
+				return FEventReply(true);
+			}
+
 			if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
 			{
 				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
@@ -240,6 +269,7 @@ void UModioModTile::NativeMoreOptionsClicked()
 {
 	if (MoreOptionsMenu)
 	{
+		UISubsystem->SetCurrentFocusTarget(this);
 		MoreOptionsMenu->ToggleOpen(true);
 	}
 }
@@ -253,6 +283,17 @@ void UModioModTile::NativeReportClicked()
 	}
 }
 
+FReply UModioModTile::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	if (MoreOptionsMenu->GetIsMenuOpen() && !IsHovered()) 
+	{
+		MoreOptionsMenu->Close();
+		return FReply::Handled();
+	}
+
+	return FReply::Unhandled();
+}
+
 void UModioModTile::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 {
 	Super::BuildCommandList(CommandList);
@@ -261,70 +302,48 @@ void UModioModTile::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 						   FUIAction(FExecuteAction::CreateUObject(this, &UModioModTile::NativeMoreOptionsClicked)));
 }
 
+void UModioModTile::NativeTileClicked() 
+{
+	if (MoreOptionsMenu->GetIsMenuOpen()) 
+	{
+		MoreOptionsMenu->SelectCurrentMenuItem();
+		return;
+	}
+
+	Super::NativeTileClicked();
+}
+
 void UModioModTile::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 	bool bIsSelected = IUserObjectListEntry::IsListItemSelected();
 	bool bFocusOrFocusedDescendents = (HasAnyUserFocus() || HasFocusedDescendants());
 	bool bDisplayButtons = bIsSelected && bFocusOrFocusedDescendents;
-	ESlateVisibility DesiredVisibility = bDisplayButtons ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
-	if (SubscribeButton && SubscribeButton->GetVisibility() != DesiredVisibility)
-	{
-		SubscribeButton->SetVisibility(DesiredVisibility);
-	}
-
-	if (MoreOptionsMenu && MoreOptionsMenu->GetVisibility() != DesiredVisibility)
-	{
-		MoreOptionsMenu->SetVisibility(DesiredVisibility);
-	}
 
 	if (TileActiveFrame)
 	{
-		ESlateVisibility FrameVisibility =
-			bFocusOrFocusedDescendents ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
-		if (TileActiveFrame->GetVisibility() != FrameVisibility)
-		{
-			TileActiveFrame->SetVisibility(FrameVisibility);
-		}
+		ESlateVisibility FrameVisibility = bFocusOrFocusedDescendents && TileActiveFrame->GetRenderOpacity() >= 0.1f
+											   ? ESlateVisibility::Visible
+											   : ESlateVisibility::Hidden;
+		SubscribeButton->SetVisibility(FrameVisibility);
+		MoreOptionsMenu->SetVisibility(FrameVisibility);
 	}
 	Invalidate(EInvalidateWidgetReason::LayoutAndVolatility);
 
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
-
 	if (ModName && IsValid(ModInfo))
 	{
 		FString modName = ModInfo->Underlying.ProfileName;
-		modName = TruncateLongModName(modName);
+		modName = TruncateLongModName(modName, ModName, truncateDivider);
 		ModName->SetText(FText::FromString(modName));
 	}
 }
 
-FString UModioModTile::TruncateLongModName(FString inputStr)
+void UModioModTile::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
 {
-	TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-	UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
-
-	bool bChopped = false;
-
-	if (IsValid(Subsystem) && IsValid(DefaultStyleSet))
-	{
-		float textSize = FontMeasure->Measure(FText::FromString(inputStr), DefaultStyleSet->GetFontStyle(ModName->GetDefaultStyleName()), 0.33).X;
-		float xVector = this->GetCachedGeometry().GetLocalSize().X;
-
-		if (xVector != 0.0f)
-		{
-			while (textSize > xVector)
-			{
-				inputStr = inputStr.LeftChop(5);
-				textSize = FontMeasure ->Measure(FText::FromString(inputStr), DefaultStyleSet->GetFontStyle(ModName->GetDefaultStyleName()), 0.33).X;
-				bChopped = true;
-			}
-			bChopped ? inputStr = inputStr.Append("...") : inputStr;
-		}
-	}
-
-	return inputStr;
+	MoreOptionsMenu->Close();
+	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
+	
 }
 
 void UModioModTile::SetSizeOverride(FVector2D NewSize)

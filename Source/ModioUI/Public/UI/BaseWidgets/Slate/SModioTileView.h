@@ -103,7 +103,11 @@ public:
 	{
 		bCenterPanelItems = bNewCenterBasedOnPanelItems;
 	}
-	
+	void SetScrollToTarget(bool bScrollToTarget)
+	{
+		this->bNavigateOnScrollIntoView = false;
+	}
+
 	virtual void SetConsumeMouseWheel(EConsumeMouseWheel NewValue)
 	{
 		this->ConsumeMouseWheel = NewValue;
@@ -228,7 +232,6 @@ public:
 
 			// We have completed the generation pass. The WidgetGenerator will clean up unused Widgets.
 			this->WidgetGenerator.OnEndGenerationPass();
-			UE_LOG(LogTemp, Display, TEXT("Generated %g widgets"), NumLinesShownOnScreen);
 			const float TotalGeneratedLineAxisSize =
 				FMath::FloorToFloat(NumLinesShownOnScreen) * TileDimensions.ScrollAxis;
 			return STableViewBase::FReGenerateResults(
@@ -313,11 +316,6 @@ public:
 					// Make sure the line containing the existing entry for this item is fully in view
 					if (LineOfItem == MinDisplayedLine)
 					{
-						// This line is clipped at the top/left, so set it as the new offset
-						UE_LOG(LogTemp, Display, TEXT("left Set scroll offset %g"),
-							   LineOfItem * NumItemsPerLine - (this->FixedLineScrollOffset.IsSet() /*&& LineOfItem > 0*/
-																   ? 0.f
-																   : this->NavigationScrollOffset));
 						this->SetScrollOffset(LineOfItem * NumItemsPerLine -
 											  (this->FixedLineScrollOffset.IsSet() /*&& LineOfItem > 0*/
 												   ? 0.f
@@ -330,9 +328,6 @@ public:
 						const float NewLineOffset =
 							LineOfItem - NumLinesInView + 1.f +
 							(this->FixedLineScrollOffset.IsSet() ? 0.f : this->NavigationScrollOffset);
-
-						UE_LOG(LogTemp, Display, TEXT("right Set scroll offset %g"),
-							   FMath::CeilToFloat(FMath::CeilToFloat(NewLineOffset) * NumItemsPerLine));
 						this->SetScrollOffset(FMath::CeilToFloat(FMath::CeilToFloat(NewLineOffset) * NumItemsPerLine));
 					}
 				}
@@ -353,6 +348,11 @@ public:
 				this->WidgetFromItem(
 						TListTypeTraits<ItemType>::NullableItemTypeConvertToItemType(this->ItemToNotifyWhenInView))
 					.IsValid();
+			if (bHasWidgetForItem)
+			{
+				this->NavigateToWidget(0, this->WidgetFromItem(TListTypeTraits<ItemType>::NullableItemTypeConvertToItemType(
+															 this->ItemToNotifyWhenInView))->AsWidget());
+			}
 			return (bHasWidgetForItem && FMath::IsNearlyEqual(this->CurrentScrollOffset, this->GetTargetScrollOffset()))
 					   ? SListView<ItemType>::EScrollIntoViewResult::Success
 					   : SListView<ItemType>::EScrollIntoViewResult::Deferred;

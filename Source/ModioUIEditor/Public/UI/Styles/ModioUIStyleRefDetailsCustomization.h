@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Engine/Engine.h"
+#include "UI/Styles/ModioWidgetStyleData.h"
 #include "ModioUISubsystem.h"
 
 class FModioUIStyleRefDetailsCustomization : public IPropertyTypeCustomization
@@ -64,19 +65,27 @@ public:
 					}
 					if (FoundObject)
 					{
-						for (const TPair<FName, USlateWidgetStyleContainerBase*> StyleEntry :
-							 DefaultStyle->WidgetStyles)
+						for (auto& asset : DefaultStyle->WidgetStyleAssets)
 						{
-							if (StyleEntry.Value->GetClass()->IsChildOf(FoundObject))
+							for (auto& style : asset->WidgetStyles)
 							{
-								RawStyleNames.Add(StyleEntry.Key);
+								if (style.Value->GetClass()->IsChildOf(FoundObject))
+								{
+									RawStyleNames.Add(style.Key);
+								}
 							}
 						}
 					}
 				}
 				else
 				{
-					DefaultStyle->WidgetStyles.GetKeys(RawStyleNames);
+					for (auto& asset : DefaultStyle->WidgetStyleAssets)
+					{
+						for (auto& style : asset->WidgetStyles)
+						{
+							RawStyleNames.Add(style.Key);
+						}
+					}
 				}
 
 				FStructProperty* UnderlyingStruct =
@@ -91,7 +100,11 @@ public:
 					UModioUIWidgetStyleContainer* OuterContainer = Cast<UModioUIWidgetStyleContainer>(Outer);
 					if (OuterContainer)
 					{
-						const FName* FoundName = DefaultStyle->WidgetStyles.FindKey(OuterContainer);
+						const FName* FoundName = nullptr;
+						for (auto& asset : DefaultStyle->WidgetStyleAssets)
+						{
+							FoundName = asset->WidgetStyles.FindKey(OuterContainer);
+						}
 						if (FoundName)
 						{
 							RawStyleNames.Remove(*FoundName);

@@ -15,6 +15,7 @@
 #include "ModioUISubsystem.h"
 #include "Settings/ModioUISettings.h"
 #include "UI/BaseWidgets/ModioWidgetBase.h"
+#include "UI/BaseWidgets/Slate/SModioButtonBase.h"
 #include "UI/BaseWidgets/Slate/SModioRichTextBlock.h"
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/Dialogs/ModioDialogController.h"
@@ -23,6 +24,7 @@
 #include "UObject/WeakObjectPtrTemplates.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Views/STileView.h"
+#include "Framework/Application/SlateApplication.h"
 
 #include "ModioAuthenticationMethodSelector.generated.h"
 
@@ -37,7 +39,6 @@ class UModioAuthenticationMethodSelector : public UModioWidgetBase, public IModi
 
 protected:
 	TSharedPtr<STileView<TSharedPtr<FModioUIAuthenticationProviderInfo>>> MyButtonList;
-	TArray<TSharedPtr<SButton>> Buttons;
 	TArray<TSharedPtr<FModioUIAuthenticationProviderInfo>> AuthMethods;
 	FModioUIStyleRef ButtonStyle {"DefaultDialogButtonStyle"};
 	TWeakObjectPtr<UModioDialogController> DialogController;
@@ -112,10 +113,11 @@ protected:
 #endif 
 		.Content()
 		[
-			SAssignNew(RowButton, SButton)
+			SAssignNew(RowButton, SModioButtonBase)
 			.OnClicked_Static(&UModioAuthenticationMethodSelector::OnButtonClicked, ButtonInfo, DialogController)
 			.HAlign(HAlign_Center)
 			.VAlign(VAlign_Center)
+			.IsFocusable(true)
 			.ContentPadding(FMargin(16, 4,16, 2))
 			[
 				SAssignNew(RowTextBlock, SModioRichTextBlock).Text(ButtonInfo->ProviderUILabel).StyleReference_UObject(this, &UModioAuthenticationMethodSelector::GetButtonTextStyle)
@@ -146,6 +148,7 @@ public:
 	 * Clear resources in this Widget
 	 * @param bReleaseChildren Trigger release as well for super classes
 	 **/
+
 	void ReleaseSlateResources(bool bReleaseChildren) override
 	{
 		Super::ReleaseSlateResources(bReleaseChildren);

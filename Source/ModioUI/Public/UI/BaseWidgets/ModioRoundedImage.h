@@ -32,6 +32,10 @@ protected:
 	UPROPERTY(Transient)
 	UMaterialInterface* CachedReferencedMaterial;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
+	UMaterialInstanceDynamic* ImageMaterial;
+
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FName TextureParameterName = "WidgetTexture";
 

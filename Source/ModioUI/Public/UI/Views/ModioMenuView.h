@@ -34,6 +34,7 @@ protected:
 	TSubclassOf<UUserWidget> TitleContentClass;
 
 public:
+
 	const FText& GetName();
 	// function here to get the index inside our view switcher?
 

@@ -27,6 +27,21 @@ struct MODIOUI_API FModioDynamicImageStyle : public FSlateWidgetStyle
 {
 	GENERATED_BODY()
 
+	static const FName TypeName;
+
+	virtual const FName GetTypeName() const override
+	{
+		return TypeName;
+	};
+
+	static const FModioDynamicImageStyle& GetDefault()
+	{
+		static FModioDynamicImageStyle Default;
+		return Default;
+	}
+
+	FModioDynamicImageStyle() : Super() {}
+
 	/**
 	* Stored property to represent the image loading brush
 	**/
@@ -38,6 +53,9 @@ struct MODIOUI_API FModioDynamicImageStyle : public FSlateWidgetStyle
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	FSlateBrush ImageUnavailableBrush;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Appearance)
+	FSlateSound HoveredSound;
 };
 
 /**
@@ -53,6 +71,11 @@ public:
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category = "Widget")
 	FModioDynamicImageStyle Style;
+
+	virtual void PostLoad() override
+	{
+		Super::PostLoad();
+	}
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override
 	{

@@ -11,10 +11,12 @@
 #include "UI/Views/CategoryBrowser/ModioFeaturedView.h"
 #include "Algo/Transform.h"
 #include "Core/ModioModInfoUI.h"
+#include "GameFramework/InputSettings.h"
 #include "Engine/Engine.h"
 #include "ModioUISubsystem.h"
 #include "Settings/ModioUISettings.h"
 #include "UI/BaseWidgets/Slate/SModioTileView.h"
+#include "UI/BaseWidgets/ModioGridPanel.h"
 #include "UI/CommonComponents/ModioTabBar.h"
 #include "UI/Views/ModDetails/ModioAsyncOpWrapperWidget.h"
 
@@ -44,6 +46,15 @@ void UModioFeaturedView::NativeConstruct()
 {
 	Super::NativeConstruct();
 	AdditionalCategories->OnEntryWidgetGenerated().AddUObject(this, &UModioFeaturedView::OnAdditionalCategoryCreated);
+	FCustomWidgetNavigationDelegate additionaNavDelegate;
+	additionaNavDelegate.BindUFunction(this, "SetFocusToPrimaryCategory");
+	AdditionalCategories->SetNavigationRuleCustom(EUINavigation::Up, additionaNavDelegate);
+	if (PrimaryCategoryGridPanel)
+	{
+		FCustomWidgetNavigationDelegate primaryNavDelegate;
+		primaryNavDelegate.BindUFunction(this, "SetFocusToAdditionalCategory");
+		PrimaryCategoryGridPanel->SetNavigationRuleCustom(EUINavigation::Down, primaryNavDelegate);
+	}
 }
 
 void UModioFeaturedView::NativeOnInitialized()
@@ -109,20 +120,46 @@ FNavigationReply UModioFeaturedView::NativeOnNavigation(const FGeometry& InGeome
 
 FReply UModioFeaturedView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	return FReply::Handled()
-	       .SetNavigation(PrimaryFeaturedCategory->TakeWidget(), ENavigationGenesis::User)
-	       .SetUserFocus(PrimaryFeaturedCategory->TakeWidget(), EFocusCause::SetDirectly);
+	UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (UISubsystem && UISubsystem->GetCurrentFocusTarget())
+	{
+		UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
+	}
+	else
+	{
+		PrimaryFeaturedCategory->SetFocusToCurrentElement();
+	}
+	return FReply::Handled();
+}
+
+FReply UModioFeaturedView::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	
+	return FReply::Unhandled();
+}
+
+void UModioFeaturedView::SetFocusToPrimaryCategory() 
+{
+	if (PrimaryFeaturedCategory)
+	{
+		PrimaryFeaturedCategory->SetFocusToCurrentElement();
+	}
+
+}
+
+void UModioFeaturedView::SetFocusToAdditionalCategory() 
+{
+	AdditionalCategories->NavigateToIndex(0);
+	AdditionalCategories->SetSelectedIndex(0);
 }
 
 int32 UModioFeaturedView::GetSelectionIndex()
 {
-	UE_LOG(LogTemp, Display, TEXT("Delegate called, returning %d"), CurrentlySelectedCategoryColumn);
 	return CurrentlySelectedCategoryColumn;
 }
 
 void UModioFeaturedView::CategorySelectionChanged(int32 Index, UModioFeaturedCategory* RealCategory)
 {
-	UE_LOG(LogTemp, Display, TEXT("Changed Index to %d"), Index);
 	CurrentlySelectedCategoryColumn = Index;
 }
 
@@ -142,9 +179,7 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 				return WrappedMod;
 			});
 			PrimaryFeaturedCategory->SetItems(CachedFeaturedItems);
-
-			FSlateApplication::Get().SetUserFocus(0, PrimaryFeaturedCategory->TakeWidget(), EFocusCause::SetDirectly);
-
+			PrimaryFeaturedCategory->SetFocusToCurrentElement();
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 			                                                           EModioUIAsyncOperationWidgetState::Success);
 		}
@@ -181,6 +216,7 @@ void UModioFeaturedView::NativeUserChanged(TOptional<FModioUser> NewUser)
 {
 	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
 	FetchPrimaryCategoryMods();
-	AdditionalCategories->RegenerateAllEntries();
 	SynchronizeProperties();
+	PrimaryFeaturedCategory->SetFocusToCurrentElement();
+	AdditionalCategories->RegenerateAllEntries();
 }

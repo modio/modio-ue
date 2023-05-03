@@ -14,6 +14,7 @@
 #include "Core/ModioModInfoUI.h"
 #include "CoreMinimal.h"
 #include "Types/ModioRating.h"
+#include "UI/BaseWidgets/ModioScrollBox.h"
 #include "UI/BaseWidgets/ModioButton.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/CommonComponents/ModioModManagementWidgetBase.h"
@@ -48,6 +49,8 @@ protected:
 	virtual void NativeDisplayModDetails(const TScriptInterface<class IModioModInfoUIDetails>& Details) override;
 	virtual void NativeDisplayModDetailsForId(const FModioModID& ModID) override;
 	virtual void NativeRequestOperationRetry() override;
+	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+
 	UFUNCTION()
 	void RateUpClicked();
 	UFUNCTION()
@@ -120,6 +123,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioSubscriptionBadge* SubscriptionBadge;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioScrollBox* ScrollBox;
+
 #if WITH_EDITORONLY_DATA
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Editor Preview Data")
@@ -142,9 +148,19 @@ protected:
 	
 	FTimerHandle SetFocusTimerHandle;
 
+	UPROPERTY()
+	TArray<UWidget*> ScrollableWidgets;
+
+	void FillScrollableWidgetsArray();
+
+	int CurrentIndex = 0;
+
 	UFUNCTION()
 	void SetInitialFocus();
-
+	UFUNCTION()
+	void OnDialogClosed();
+	UFUNCTION()
+	void OnDownloadQueueClosed();
 
 public:
 	/**

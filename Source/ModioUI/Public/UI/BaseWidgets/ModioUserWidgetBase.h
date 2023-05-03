@@ -14,6 +14,7 @@
 #include "CoreMinimal.h"
 #include "Misc/EngineVersionComparison.h"
 #include "Types/ModioErrorCode.h"
+#include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/Interfaces/IModioInputMappingAccessor.h"
 
 #if UE_VERSION_NEWER_THAN(5, 0, 0)
@@ -81,6 +82,8 @@ protected:
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 public:
+	FString TruncateLongModName(FString inputStr, UModioRichTextBlock* ModName, float divider = 1.0f);
+
 	UFUNCTION(BlueprintCallable, Category = "Data Binding")
 	void SetDataSource(UObject* NewDataSource);
 

@@ -43,7 +43,7 @@ struct MODIOUI_API FModioMultiLineEditableTextBoxStyle : public FEditableTextBox
 	* Stored property of the text style
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioTextWidgetStyle"), Category = "Widget")
-	FModioUIStyleRef TextStyleRef;
+	FModioUIStyleRef ModioTextStyle;
 	
 	/**
 	* Retrieve a default instance of the multiline editable text box

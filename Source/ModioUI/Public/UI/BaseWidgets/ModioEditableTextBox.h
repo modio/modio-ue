@@ -17,6 +17,7 @@
 #include "UI/Interfaces/IModioUIErrorDisplayWidget.h"
 #include "UI/Interfaces/IModioUIStringInputWidget.h"
 #include "UI/Interfaces/IModioUITextValidator.h"
+#include "UI/Interfaces/IModioInputMappingAccessor.h"
 #include "UI/Styles/ModioUIStyleRef.h"
 #include "Widgets/Layout/SGridPanel.h"
 
@@ -24,6 +25,9 @@
 
 DECLARE_DYNAMIC_DELEGATE_RetVal_TwoParams(bool, FOnValidateTextPostChange, const FText&, ChangedText, FText&,
 										  ErrorText);
+DECLARE_MULTICAST_DELEGATE(FOnSubmit);
+DECLARE_MULTICAST_DELEGATE(FOnNavigateDown);
+
 
 /**
  * Enumerator with the validation types to perform on input
@@ -47,14 +51,19 @@ enum class EModioInputValidationType : uint8
 UCLASS()
 class MODIOUI_API UModioEditableTextBox : public UEditableTextBox,
 										  public IModioUIStringInputWidget,
-										  public IModioUITextValidator
+										  public IModioUITextValidator,
+										  public IModioInputMappingAccessor
 {
 	GENERATED_BODY()
+public:
+	void StartInput();
+	TSharedPtr<SEditableTextBox> GetMyEditableTextBlock();
+	FOnSubmit OnSubmit;
+	FOnNavigateDown OnNavigateDown;
 
 protected:
 	// Cached style set for error validation
 	TSharedPtr<FSlateStyleSet> ErrorStyleSet;
-
 	UModioEditableTextBox(const FObjectInitializer& Initializer);
 	virtual void SynchronizeProperties() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
@@ -66,7 +75,6 @@ protected:
 	const FSlateBrush* GetBorderImage() const;
 	EVisibility GetHintGlyphVisibility() const;
 	virtual void HandleOnTextChanged(const FText& InText) override;
-
 	virtual void NativeGetTextValidationRules(TArray<FModioTextValidationRule>& Rules)
 	{
 		Rules = ValidationRules;
@@ -93,4 +101,6 @@ protected:
 
 	TSharedPtr<SVerticalBox> MyVerticalBox;
 	TSharedPtr<SModioRichTextBlock> MyErrorTextBlock;
+
+	FReply OnKeyDownHandler(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent);
 };

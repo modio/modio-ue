@@ -9,6 +9,7 @@
  */
 
 #include "UI/BaseWidgets/ModioRoundedImage.h"
+#include "UI/Styles/ModioUIStyleSet.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 
@@ -26,14 +27,14 @@ void UModioRoundedImage::SynchronizeProperties()
 
 		if (UMaterialInstanceDynamic* AsDynamicMaterial = Cast<UMaterialInstanceDynamic>(Material))
 		{
-			UMaterialInstanceDynamic* NewInstance = UMaterialInstanceDynamic::Create(AsDynamicMaterial->Parent, this);
-			NewInstance->CopyInterpParameters(AsDynamicMaterial);
-			SetBrushFromMaterial(NewInstance);
+			ImageMaterial = UMaterialInstanceDynamic::Create(AsDynamicMaterial->Parent, this);
+			ImageMaterial->CopyInterpParameters(AsDynamicMaterial);
+			SetBrushFromMaterial(ImageMaterial);
 		}
 		else
 		{
-			UMaterialInstanceDynamic* NewMaterialInstance = UMaterialInstanceDynamic::Create(Material, this);
-			SetBrushFromMaterial(NewMaterialInstance);
+			ImageMaterial = UMaterialInstanceDynamic::Create(Material, this);
+			SetBrushFromMaterial(ImageMaterial);
 		}
 	}
 }

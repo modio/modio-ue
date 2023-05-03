@@ -12,8 +12,10 @@
 
 #include "Core/ModioNewPropertyHelpers.h"
 #include "Materials/MaterialInterface.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/EngineVersionComparison.h"
 #include "ModioUI.h"
+#include "AssetRegistry/IAssetRegistry.h"
 #include "PropertyPathHelpers.h"
 #include "Styling/SlateWidgetStyleContainerBase.h"
 #include "UI/Styles/ModioUIBrushRef.h"
@@ -80,23 +82,40 @@ public:
 	virtual void PreSave(const class ITargetPlatform* TargetPlatform) override
 #endif
 	{
-		for (FPropertyValueIterator It = FPropertyValueIterator(FStructProperty::StaticClass(), GetClass(), this); It;
-			 ++It)
-		{
-			const FStructProperty* Prop = CastField<FStructProperty>(It->Key);
+		/* Causes colors to randomly lose value in packaged builds*/
+		//for (FPropertyValueIterator It = FPropertyValueIterator(FStructProperty::StaticClass(), GetClass(), this); It;
+		//	 ++It)
+		//{
+		//	const FStructProperty* Prop = CastField<FStructProperty>(It->Key);
 
-			const void* Value = It->Value;
-			if (Prop->Struct == FSlateColor::StaticStruct())
+		//	const void* Value = It->Value;
+		//	if (Prop->Struct == FSlateColor::StaticStruct())
+		//	{
+		//		FSlateColor* ActualColor = const_cast<FSlateColor*>(reinterpret_cast<const FSlateColor*>(Value));
+		//		if (!FModioSlateColorInspector(*ActualColor).IsUnlinked())
+		//		{
+		//			// UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
+		//			//	   *GetFName().ToString());
+		//			ActualColor->Unlink();
+		//		}
+		//	}
+		//}
+
+		for (const TPair<FName, FModioUIMaterialRef>& SerializedBrush : SerializedMaterials)
+		{
+			UMaterialInterface* BrushMaterial = SerializedBrush.Value.ResolveReference();
+
+			if (BrushMaterial)
 			{
-				FSlateColor* ActualColor = const_cast<FSlateColor*>(reinterpret_cast<const FSlateColor*>(Value));
-				if (!FModioSlateColorInspector(*ActualColor).IsUnlinked())
+				if (!ModioNewPropertyHelpers::SetPropertyValue<UObject*>(this, SerializedBrush.Key.ToString(),
+																		 BrushMaterial))
 				{
-					// UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
-					//	   *GetFName().ToString());
-					ActualColor->Unlink();
+					ModioNewPropertyHelpers::SetPropertyValue<UObject*>(
+						this, SerializedBrush.Key.ToString() + ".ResourceObject", BrushMaterial);
 				}
 			}
 		}
+
 #if UE_VERSION_NEWER_THAN(5, 0, 0)
 		Super::PreSave(SaveContext);
 #else
@@ -104,11 +123,11 @@ public:
 #endif
 	};
 
-	virtual void PostLoad() override
-	{
-		Super::PostLoad();
 
-		for (FPropertyValueIterator It = FPropertyValueIterator(FStructProperty::StaticClass(), GetClass(), this); It;
+	void LoadBrushMaterials()
+	{
+		/* Causes colors to randomly lose value in packaged builds*/
+		/*for (FPropertyValueIterator It = FPropertyValueIterator(FStructProperty::StaticClass(), GetClass(), this); It;
 			 ++It)
 		{
 			const FStructProperty* Prop = CastField<FStructProperty>(It->Key);
@@ -119,35 +138,37 @@ public:
 				FSlateColor* ActualColor = const_cast<FSlateColor*>(reinterpret_cast<const FSlateColor*>(Value));
 				if (!FModioSlateColorInspector(*ActualColor).IsUnlinked())
 				{
-					// UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
-					//	   *GetFName().ToString());
+					 UE_LOG(LogModioUI, Display, TEXT("Unlinking color %s in %s"), *Prop->GetAuthoredName(),
+						   *GetFName().ToString());
 					ActualColor->Unlink();
 				}
 			}
-		}
-		SerializedColors.Remove(NAME_None);
+		}*/
+		//SerializedColors.Remove(NAME_None);
 
-		for (const TPair<FName, FModioUIColorRef>& SerializedColor : SerializedColors)
-		{
-			TArray<FString> PropertyPathElems;
-			if (!ModioNewPropertyHelpers::SetPropertyValue(this, SerializedColor.Key.ToString(),
-														   SerializedColor.Value.ResolveReference()))
-			{
-				// UE_LOG(LogModioUI, Warning,
-				//	   TEXT("Unable to restore serialized value for %s in %s"), *SerializedColor.Key.ToString(),
-				//*GetFName().ToString());
-			}
-		}
+		//for (const TPair<FName, FModioUIColorRef>& SerializedColor : SerializedColors)
+		//{
+		//	TArray<FString> PropertyPathElems;
+		//	if (!ModioNewPropertyHelpers::SetPropertyValue(this, SerializedColor.Key.ToString(),
+		//												   SerializedColor.Value.ResolveReference()))
+		//	{
+		//		// UE_LOG(LogModioUI, Warning,
+		//		//	   TEXT("Unable to restore serialized value for %s in %s"), *SerializedColor.Key.ToString(),
+		//		//*GetFName().ToString());
+		//	}
+		//}
+
 		for (const TPair<FName, FModioUIMaterialRef>& SerializedBrush : SerializedMaterials)
 		{
 			UMaterialInterface* BrushMaterial = SerializedBrush.Value.ResolveReference();
+			
 			if (BrushMaterial)
 			{
 				if (!ModioNewPropertyHelpers::SetPropertyValue<UObject*>(this, SerializedBrush.Key.ToString(),
-																		 Cast<UObject>(BrushMaterial)))
+																		 BrushMaterial))
 				{
 					ModioNewPropertyHelpers::SetPropertyValue<UObject*>(
-						this, SerializedBrush.Key.ToString() + ".ResourceObject", Cast<UObject>(BrushMaterial));
+						this, SerializedBrush.Key.ToString() + ".ResourceObject", BrushMaterial);
 				}
 			}
 		}

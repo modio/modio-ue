@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Widgets/Input/SButton.h"
+#include "Framework/Application/SlateApplication.h"
 #include "ModioUI.h"
 
 class MODIOUI_API SModioButtonBase : public SButton
@@ -19,7 +20,11 @@ public:
 	virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent) override 
 	{
 		bIsFocusedByController = true;
-
+#if UE_VERSION_OLDER_THAN(5, 0, 0)
+		FSlateApplication::Get().PlaySound(Style->HoveredSlateSound);
+#else
+		// Implement hovered sounds for UE5
+#endif
 		return FReply::Handled();
 	}
 	

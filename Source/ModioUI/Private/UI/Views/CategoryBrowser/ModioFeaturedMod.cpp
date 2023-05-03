@@ -26,10 +26,7 @@ void UModioFeaturedMod::NativeOnSetDataSource()
 		{
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 			Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId, EModioLogoSize::Thumb1280);
-			if (ModName)
-			{
-				ModName->SetText(FText::FromString(ModInfo->Underlying.ProfileName));
-			}
+
 			// Some of this logic perhaps would be better on the Subscribe button itself, treat that button as a special
 			// case
 			/*if (SubscribeButton)
@@ -58,6 +55,15 @@ void UModioFeaturedMod::NativeOnSetDataSource()
 
 void UModioFeaturedMod::SubmitNegativeRating()
 {
+	if (!bIsUserAuthenticated)
+	{
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (Subsystem)
+		{
+			Subsystem->ShowUserAuthenticationDialog();
+		}
+	}
+
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 	if (ModInfo)
 	{
@@ -75,6 +81,15 @@ void UModioFeaturedMod::SubmitNegativeRating()
 
 void UModioFeaturedMod::SubmitPositiveRating()
 {
+	if (!bIsUserAuthenticated)
+	{
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (Subsystem)
+		{
+			Subsystem->ShowUserAuthenticationDialog();
+		}
+	}
+
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 	if (ModInfo)
 	{
@@ -160,13 +175,18 @@ FReply UModioFeaturedMod::NativeOnFocusReceived(const FGeometry& InGeometry, con
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
-void UModioFeaturedMod::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
+void UModioFeaturedMod::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) 
 {
-	Super::NativeOnFocusLost(InFocusEvent);
+	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
 	if (FocusTransition)
 	{
 		PlayAnimationReverse(FocusTransition);
 	}
+}
+
+void UModioFeaturedMod::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
+{
+	Super::NativeOnFocusLost(InFocusEvent);
 }
 
 void UModioFeaturedMod::NativeOnItemSelectionChanged(bool bIsSelected)
@@ -194,6 +214,15 @@ void UModioFeaturedMod::NativeOnItemSelectionChanged(bool bIsSelected)
 void UModioFeaturedMod::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::Tick(MyGeometry, InDeltaTime);
+
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
+
+	if (ModName && IsValid(ModInfo))
+	{
+		FString modName = ModInfo->Underlying.ProfileName;
+		modName = TruncateLongModName(modName, ModName, truncateDivider);
+		ModName->SetText(FText::FromString(modName));
+	}
 }
 
 void UModioFeaturedMod::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,

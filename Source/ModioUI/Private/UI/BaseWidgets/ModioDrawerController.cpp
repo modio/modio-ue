@@ -123,6 +123,7 @@ void UModioDrawerController::SetDrawerExpanded(int32 SlotIndex, bool bExpandedSt
 	{
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		FSlateApplication::Get().SetUserFocus(0, Subsystem->ModBrowserInstance->TakeWidget(), EFocusCause::SetDirectly);
+		OnDrawerClosed.Broadcast();
 	}
 }
 
@@ -144,4 +145,24 @@ bool UModioDrawerController::IsAnyDrawerExpanded() const
 void UModioDrawerController::CollapseAllDrawers()
 {
 	SetDrawerExpanded(0, false, true);
+}
+
+bool UModioDrawerController::SetFocusToActiveDrawer()
+{
+	for (UPanelSlot* CurrentSlot : Slots)
+	{
+		if (UModioDrawerControllerSlot* TargetSlot = Cast<UModioDrawerControllerSlot>(CurrentSlot))
+		{
+			if (TargetSlot->GetExpandedState() && TargetSlot->Content && TargetSlot->Content->HasFocusedDescendants()) 
+			{
+				return true;
+			}
+			if (TargetSlot->GetExpandedState() && TargetSlot->Content && !TargetSlot->Content->HasFocusedDescendants())
+			{
+				TargetSlot->Content->SetFocus();
+				return true;
+			}
+		}
+	}
+	return false;
 }

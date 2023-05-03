@@ -123,6 +123,7 @@ TSharedRef<SWidget> UModioDrawer::RebuildWidget()
 		[
 			SAssignNew(MyDrawerBox, SBox)
 			.MinDesiredWidth(MinWidth)
+			.MaxDesiredWidth(MinWidth)
 			[
 				SAssignNew(MyGridPanel, SGridPanel)
 				.FillRow(0, HeaderFillOverride)

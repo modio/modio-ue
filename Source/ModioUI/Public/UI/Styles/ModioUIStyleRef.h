@@ -56,9 +56,10 @@ public:
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			ISlateStyle* DefaultStyle = (Subsystem->GetDefaultStyleSet());
+			UModioUIStyleSet* DefaultStyle = Subsystem->GetDefaultStyleSet();
 			if (DefaultStyle && DefaultStyle->HasWidgetStyle<StyleType>(StyleName))
 			{
+				DefaultStyle->RefreshStyleMaterials(StyleName);
 				return &DefaultStyle->GetWidgetStyle<StyleType>(StyleName);
 			}
 		}

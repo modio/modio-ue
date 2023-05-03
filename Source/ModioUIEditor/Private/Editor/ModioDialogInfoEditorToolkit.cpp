@@ -9,15 +9,14 @@
  */
 
 #include "Editor/ModioDialogInfoEditorToolkit.h"
+#include "Widgets/Docking/SDockTab.h"
 #include "Framework/Docking/TabManager.h"
-#include "Modules/ModuleManager.h"
 #include "PropertyEditorModule.h"
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
-#include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Images/SImage.h"
-#include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/SOverlay.h"
+#include "Widgets/Input/SButton.h"
 
 void FModioDialogEditorToolkit::CreateInternalWidgets()
 {

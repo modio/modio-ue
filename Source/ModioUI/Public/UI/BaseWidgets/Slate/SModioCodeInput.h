@@ -11,12 +11,17 @@
 #pragma once
 
 #include "Brushes/SlateNoResource.h"
+#include "CoreMinimal.h"
 #include "Input/Reply.h"
 #include "UI/Styles/ModioCodeInputStyle.h"
+#include "UI/Interfaces/IModioInputMappingAccessor.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/SCompoundWidget.h"
 
-class SModioCodeInput : public SCompoundWidget
+DECLARE_MULTICAST_DELEGATE(FOnNavigating);
+DECLARE_MULTICAST_DELEGATE(FOnSubmit);
+
+class SModioCodeInput : public SCompoundWidget, public IModioInputMappingAccessor
 {
 protected:
 	TArray<TSharedPtr<class STextBlock>> CharacterWidgets;
@@ -46,6 +51,9 @@ public:
 	SLATE_ARGUMENT(const FModioCodeInputStyle*, Style);
 	SLATE_ARGUMENT(int32, NumChildren);
 	SLATE_END_ARGS();
+
+	FOnNavigating OnNavigateDown;
+	FOnSubmit OnSubmit;
 
 	void Construct(const FArguments& InArgs);
 

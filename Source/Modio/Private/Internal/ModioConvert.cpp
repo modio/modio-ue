@@ -68,7 +68,6 @@ FString ToUnreal(const std::string& String)
 	return UTF8_TO_TCHAR(String.c_str());
 }
 
-
 FModioUnsigned64 ToUnreal(const Modio::FileSize& In)
 {
 	return FModioUnsigned64(In);
@@ -305,6 +304,11 @@ Modio::Language ToModio(EModioLanguage Language)
 FModioModID ToUnreal(Modio::ModID Value)
 {
 	return FModioModID(Value);
+}
+
+FModioGameID ToUnreal(Modio::GameID Value)
+{
+	return FModioGameID(Value);
 }
 
 FModioFileMetadataID ToUnreal(Modio::FileMetadataID Value)

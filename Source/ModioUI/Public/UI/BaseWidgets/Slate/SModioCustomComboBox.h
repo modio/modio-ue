@@ -42,12 +42,12 @@ protected:
 			if (OnGetButtonContent.IsBound())
 			{
 				if (CurrentSelectionIndex)
-				{
+				{ 
 					return SNew(SButton)
 						.HAlign(HAlign_Fill)
-						.VAlign(VAlign_Center)
+						.VAlign(VAlign_Fill)
 						.ButtonStyle(&InvisibleButtonStyle)
-						.OnClicked(this, &SModioCustomComboBox::OnButtonClicked)
+						.OnPressed(this, &SModioCustomComboBox::OnButtonPressed)
 						.ContentPadding(ContentPadding)
 						.Content()[OnGetButtonContent.Execute((*UnderlyingData)[CurrentSelectionIndex.GetValue()])];
 				}
@@ -55,9 +55,9 @@ protected:
 				{
 					return SNew(SButton)
 						.HAlign(HAlign_Fill)
-						.VAlign(VAlign_Center)
+						.VAlign(VAlign_Fill)
 						.ButtonStyle(&InvisibleButtonStyle)
-						.OnClicked(this, &SModioCustomComboBox::OnButtonClicked)
+						.OnPressed(this, &SModioCustomComboBox::OnButtonPressed)
 						.ContentPadding(ContentPadding)
 						.Content()[OnGetButtonContent.Execute((*UnderlyingData)[0])];
 				}
@@ -66,12 +66,26 @@ protected:
 		// Perhaps return the button with empty content here instead?
 		return SNew(SButton)
 			.HAlign(HAlign_Fill)
-			.VAlign(VAlign_Center)
+			.VAlign(VAlign_Fill)
 			.ButtonStyle(&InvisibleButtonStyle)
-			.OnClicked(this, &SModioCustomComboBox::OnButtonClicked)
+			.OnPressed(this, &SModioCustomComboBox::OnButtonPressed)
 			.ContentPadding(ContentPadding)
 			.Content()[SNew(STextBlock).Text(FText::FromString("No data!"))];
 	}
+
+	TSharedPtr<SListView<DataType>> CreateListViewWidget()
+	{
+
+		return SNew(SListView<DataType>)
+			.SelectionMode(ESelectionMode::Single)
+			.OnGenerateRow(OnGenerateOptionWidget)
+			.ListItemsSource(UnderlyingData)
+			.HandleDirectionalNavigation(true)
+			.HandleGamepadEvents(true)
+			.OnSelectionChanged(this, &SModioCustomComboBox::OnSelectionChanged)
+			.Visibility(this, &SModioCustomComboBox::GetMenuVisibility);
+	}
+
 	virtual void OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override
 	{
 		bIsHovered = true;
@@ -98,6 +112,12 @@ protected:
 			{
 				Close();
 			}
+			bIsHovered = false;
+		}
+		else
+		{
+			bIsHovered = true;
+			FSlateApplication::Get().PlaySound(HoveredSound);
 		}
 
 		SCompoundWidget::OnFocusChanging(PreviousFocusPath, NewWidgetPath, InFocusEvent);
@@ -115,7 +135,6 @@ public:
 	using FOnGenerateWidget = typename TSlateDelegates<DataType>::FOnGenerateWidget;
 	using FOnGenerateRow = typename SListView<DataType>::FOnGenerateRow;
 	using FOnSelectionChanged = typename SListView<DataType>::FOnSelectionChanged;
-
 	SLATE_BEGIN_ARGS(SModioCustomComboBox) : _ContentPadding(FMargin()) {}
 	// OnGenerateWidget
 	SLATE_ARGUMENT(FMargin, ContentPadding)
@@ -131,6 +150,7 @@ public:
 	SLATE_ARGUMENT(FSlateSound, HoveredSound)
 	SLATE_END_ARGS()
 
+	bool bIsOpen = false;
 	int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect,
 				  FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle,
 				  bool bParentEnabled) const override
@@ -144,7 +164,7 @@ public:
 			}
 			MyOptionalRetainerWidget->GetEffectMaterial()->SetScalarParameterValue("Hovered", bIsHovered ? 1 : 0);
 		}
-		if (bIsOpen)
+		if (bIsOpen && MyListView)
 		{
 			FVector2D RealSize =
 				FVector2D(AllottedGeometry.GetLocalSize().X,
@@ -167,6 +187,7 @@ public:
 		MenuPlacement = FArgs._MenuPlacement;
 		ContentPadding = FArgs._ContentPadding;
 		MyContent = CreateButtonContentWidget();
+		MyListView = CreateListViewWidget();
 		PressedSound = FArgs._PressedSound;
 		HoveredSound = FArgs._HoveredSound;
 
@@ -183,32 +204,32 @@ public:
 				.Image(this, &SModioCustomComboBox::GetBackgroundBrush)
 			]
 			+ SOverlay::Slot()
-			.VAlign(VAlign_Fill)
+			.VAlign(VAlign_Center)
 			.HAlign(HAlign_Fill)
 			[
 				SNew(SVerticalBox)
 				+ SVerticalBox::Slot()
 				.Expose(ButtonSlot)
-				.VAlign(VAlign_Top)
+				.VAlign(VAlign_Fill)
 				.HAlign(HAlign_Fill)
-				.AutoHeight()
 				[
 					MyContent.ToSharedRef()
 				]
 				+ SVerticalBox::Slot()
-				.VAlign(VAlign_Top)
+				.VAlign(VAlign_Fill)
 				.HAlign(HAlign_Fill)
+				.Expose(ListSlot)
 				.AutoHeight()
 				[
-					SAssignNew(MyListView, SListView<DataType>)
-					.SelectionMode(ESelectionMode::Single)
-					.OnGenerateRow(OnGenerateOptionWidget)
-					.ListItemsSource(UnderlyingData)
-					.OnSelectionChanged(this, &SModioCustomComboBox::OnSelectionChanged)
-					.Visibility(this, &SModioCustomComboBox::GetMenuVisibility)
+					MyListView.ToSharedRef()
 				]
 			];
 
+		if (MyListView)
+		{
+			MyListView->SetScrollbarVisibility(EVisibility::Collapsed);
+		}
+		
 		if (FArgs._bUseRoundedCorners && FArgs._MenuBorderStyle.IsSet()
 			&& !FArgs._MenuBorderStyle->MaskMaterial.IsNull())
 		{
@@ -241,27 +262,69 @@ public:
 	void Open()
 	{
 		bIsOpen = true;
-		FSlateApplication::Get().SetAllUserFocus(MyContent.ToSharedRef(), EFocusCause::Navigation);
+		MyContent = CreateButtonContentWidget();
+		MyListView = CreateListViewWidget();
+		if (ButtonSlot)
+		{
+			ButtonSlot->AttachWidget(MyContent.ToSharedRef());
+		}
+		if (ListSlot)
+		{
+			ListSlot->AttachWidget(MyListView.ToSharedRef());
+			if (MyListView)
+			{
+				MyListView->SetScrollbarVisibility(EVisibility::Collapsed);
+			}
+		}
 	}
 	void Toggle()
 	{
 		bIsOpen = !bIsOpen;
 		MyContent = CreateButtonContentWidget();
+		MyListView = CreateListViewWidget();
 		if (ButtonSlot)
 		{
 			ButtonSlot->AttachWidget(MyContent.ToSharedRef());
 		}
+		if (ListSlot)
+		{
+			if (bIsOpen)
+			{
+				ListSlot->AttachWidget(MyListView.ToSharedRef());
+				if (MyListView)
+				{
+					MyListView->SetScrollbarVisibility(EVisibility::Collapsed);
+				}
+			}
+			else
+			{
+				ListSlot->DetachWidget();
+				FSlateApplication::Get().SetKeyboardFocus(MyContent);
+			}
+		}
+		
 	}
 	void Close()
 	{
 		bIsOpen = false;
 		MyContent = CreateButtonContentWidget();
+		MyListView = CreateListViewWidget();
 		if (ButtonSlot)
 		{
 			ButtonSlot->AttachWidget(MyContent.ToSharedRef());
 		}
+		if (ListSlot)
+		{
+			ListSlot->DetachWidget();
+		}
 		FSlateApplication::Get().SetKeyboardFocus(MyContent);
 	}
+
+	TSharedPtr<SWidget> GetContent()
+	{
+		return MyContent;
+	}
+
 	void SetBorderStyle(TOptional<FModioWidgetBorderStyle> NewStyle)
 	{
 		if (NewStyle.IsSet() && NewStyle->MaskMaterial.IsValid())
@@ -284,8 +347,13 @@ public:
 	}
 	void SetSelectedItemIndex(int32 Index)
 	{
+		if (!MyListView)
+		{
+			return;
+		}
 		if (Index >= 0 && Index < UnderlyingData->Num())
 		{
+			
 			MyListView->SetSelection((*UnderlyingData)[Index]);
 		}
 		else
@@ -300,7 +368,10 @@ public:
 		{
 			ButtonSlot->AttachWidget(MyContent.ToSharedRef());
 		}
-		MyListView->RebuildList();
+		if (MyListView)
+		{
+			MyListView->RebuildList();
+		}
 	}
 
 protected:
@@ -314,7 +385,7 @@ protected:
 	virtual FVector2D ComputeDesiredSize(float InLayoutScaleMultiplier) const override
 	{
 		FVector2D ComputedDesiredSize = SCompoundWidget::ComputeDesiredSize(InLayoutScaleMultiplier);
-		if (bIsOpen)
+		if (bIsOpen && MyListView)
 		{
 			ComputedDesiredSize = ComputedDesiredSize - FVector2D(0, MyListView->GetDesiredSize().Y);
 		}
@@ -322,7 +393,7 @@ protected:
 	}
 	virtual FSlateLayoutTransform ComputeLocalTransform() const
 	{
-		if (bIsOpen)
+		if (bIsOpen && MyListView)
 		{
 			switch (MenuPlacement)
 			{
@@ -335,21 +406,20 @@ protected:
 	}
 	virtual FNavigationReply OnNavigation(const FGeometry& MyGeometry, const FNavigationEvent& InNavigationEvent)
 	{
-		if (bIsOpen)
+		if (!bIsOpen)
 		{
-			return FNavigationReply::Stop();
+			return FNavigationReply::Escape();
 		}
 		return SCompoundWidget::OnNavigation(MyGeometry, InNavigationEvent);
 	}
-	virtual FReply OnButtonClicked()
+	virtual void OnButtonPressed()
 	{
 		Toggle();
-		if (bIsOpen)
+		if (bIsOpen && MyListView)
 		{
-			FSlateApplication::Get().SetAllUserFocus(MyContent.ToSharedRef(), EFocusCause::Navigation);
+			FSlateApplication::Get().SetAllUserFocus(MyListView.ToSharedRef(), EFocusCause::Navigation);
 			FSlateApplication::Get().PlaySound(PressedSound);
 		}
-		return FReply::Handled();
 	}
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 	{
@@ -357,7 +427,7 @@ protected:
 			FSlateApplication::Get().GetNavigationActionFromKey(InKeyEvent) == EUINavigationAction::Accept)
 		{
 			TArray<DataType> SelectedItems;
-			if (MyListView->GetSelectedItems(SelectedItems))
+			if (MyListView && MyListView->GetSelectedItems(SelectedItems))
 			{
 				DataType Item = SelectedItems[0];
 				if (UnderlyingData && Item != nullptr)
@@ -367,6 +437,11 @@ protected:
 					{
 						// check here if the user selected a different item before assigning and emitting an event
 						CurrentSelectionIndex = SelectedItemIndex;
+						if (OnSelectionChangedDelegate.IsBound())
+						{
+							FSlateApplication::Get().PlaySound(PressedSound);
+							OnSelectionChangedDelegate.Execute(Item, ESelectInfo::Direct);
+						}
 						if (bIsOpen)
 						{
 							Close();
@@ -382,6 +457,11 @@ protected:
 	virtual void OnSelectionChanged(DataType Item, ESelectInfo::Type SelectionType)
 	{
 		// Ensure that the proposed selection is different
+		if (SelectionType == ESelectInfo::OnNavigation)
+		{
+			FSlateApplication::Get().PlaySound(HoveredSound);
+		}
+
 		if (SelectionType != ESelectInfo::OnNavigation)
 		{
 			if (UnderlyingData && Item != nullptr)
@@ -405,8 +485,6 @@ protected:
 				Close();
 			}
 		}
-		/*
-		 */
 	}
 	virtual const FSlateBrush* GetBackgroundBrush() const
 	{
@@ -424,7 +502,7 @@ protected:
 
 		return bIsOpen ? EVisibility::Visible : EVisibility::Collapsed;
 	}
-	bool bIsOpen = false;
+
 	bool bIsHovered = false;
 	FOnGenerateWidget OnGetButtonContent;
 	FOnGenerateRow OnGenerateOptionWidget;
@@ -433,6 +511,7 @@ protected:
 	TSharedPtr<SWidget> MyContent;
 	TSharedPtr<SImage> MyBackground;
 	SVerticalBox::FSlot* ButtonSlot;
+	SVerticalBox::FSlot* ListSlot;
 	TSharedPtr<SRetainerWidget> MyOptionalRetainerWidget;
 	TArray<DataType>* UnderlyingData;
 	FModioUIColorRef BackgroundColor;

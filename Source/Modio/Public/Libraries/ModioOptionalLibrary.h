@@ -1,26 +1,26 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Types/ModioGameInfo.h"
+#include "Types/ModioImageWrapper.h"
+#include "Types/ModioModDependencyList.h"
 #include "Types/ModioModInfo.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModProgressInfo.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioTerms.h"
-#include "Types/ModioImageWrapper.h"
-#include "Types/ModioModDependencyList.h"
 
 #include "ModioOptionalLibrary.generated.h"
-
 
 UCLASS()
 class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
@@ -44,7 +44,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @param ModInfoList - if this returned false, then this will be defaulted
 	 * @return true if the optional has a value set
 	 */
-	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalModInfoList)")
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalModInfoList)")
 	static bool GetValue_ModioOptionalModInfoList(const struct FModioOptionalModInfoList& OptionalModInfoList,
 												  struct FModioModInfoList& ModInfoList);
 
@@ -67,9 +68,29 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalModInfo)")
 	static bool GetValue_ModioOptionalModInfo(const struct FModioOptionalModInfo& OptionalModInfo,
-												  struct FModioModInfo& ModInfo);
+											  struct FModioModInfo& ModInfo);
 
-	
+	/**
+	 * Check if the game info has a valid value
+	 *
+	 * @param OptionalGameInfo - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioOptionalGameInfo)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalGameInfo(const struct FModioOptionalGameInfo& OptionalGameInfo);
+
+	/**
+	 * Get the mod info from the optional if it's set
+	 *
+	 * @param OptionalGameInfo -
+	 * @param GameInfo - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalGameInfo)")
+	static bool GetValue_ModioOptionalGameInfo(const struct FModioOptionalGameInfo& OptionalGameInfo,
+											   struct FModioGameInfo& GameInfo);
+
 	/**
 	 * Check if the user optional has a valid value
 	 *
@@ -107,7 +128,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @param ModTagOptions - if this returned false, then this will be defaulted
 	 * @return true if the optional has a value set
 	 */
-	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalModTagOptions)")
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalModTagOptions)")
 	static bool GetValue_ModioOptionalModTagOptions(const struct FModioOptionalModTagOptions& OptionalModTagOptions,
 													struct FModioModTagOptions& ModTagOptions);
 
@@ -128,7 +150,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @param ModProgressInfo - if this returned false, then this will be defaulted
 	 * @return true if the optional has a value set
 	 */
-	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalModProgressInfo)")
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalModProgressInfo)")
 	static bool GetValue_ModioOptionalModProgressInfo(
 		const struct FModioOptionalModProgressInfo& OptionalModProgressInfo,
 		struct FModioModProgressInfo& ModProgressInfo);
@@ -151,9 +174,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @return true if the optional has a value set
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalImage)")
-	static bool GetValue_ModioOptionalImage(
-		const struct FModioOptionalImage& OptionalImage,
-		struct FModioImageWrapper& Image);
+	static bool GetValue_ModioOptionalImage(const struct FModioOptionalImage& OptionalImage,
+											struct FModioImageWrapper& Image);
 
 	/**
 	 * Check if the terms has a valid value
@@ -173,9 +195,7 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @return true if the optional has a value set
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalTerms)")
-	static bool GetValue_ModioOptionalTerms(
-		const struct FModioOptionalTerms& OptionalTerms,
-		struct FModioTerms& Terms);
+	static bool GetValue_ModioOptionalTerms(const struct FModioOptionalTerms& OptionalTerms, struct FModioTerms& Terms);
 
 	/**
 	 * Check if the optional mod dependency list has a valid value
@@ -200,7 +220,6 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalModDependencyList(
 		const struct FModioOptionalModDependencyList& OptionalDependencyList,
 		struct FModioModDependencyList& DependencyList);
-
 
 	/**
 	 * Check if the ModioModID has a valid value

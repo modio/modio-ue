@@ -37,9 +37,6 @@ protected:
 	FText TagTextFormat;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
-	FString TagCategory;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FString TagValue;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
@@ -69,7 +66,6 @@ public:
 	UFUNCTION()
 	void SetTagValue(FString Category, FString NewValue)
 	{
-		TagCategory = Category;
 		TagValue = NewValue;
 	}
 };

@@ -9,6 +9,10 @@
  */
 
 #include "UI/Drawers/RefineSearch/ModioRefineSearchDrawer.h"
+#include "UI/CommonComponents/ModioTagSelectorWidgetBase.h"
+#include "UI/CommonComponents/ModioSelectableTag.h"
+#include "UI/BaseWidgets/ModioGridPanel.h"
+#include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
 #include "Types/ModioFilterParams.h"
 
 void UModioRefineSearchDrawer::NativeOnInitialized()
@@ -22,24 +26,70 @@ void UModioRefineSearchDrawer::NativeOnInitialized()
 	{
 		ClearButton->OnClicked.AddDynamic(this, &UModioRefineSearchDrawer::OnClearClicked);
 	}
-	bIsFocusable = true;
+
+	UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 }
 
 FReply UModioRefineSearchDrawer::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	if (TagSelector)
-	{
-		TagSelector->InvalidateLayoutAndVolatility();
-	}
-	if (ApplyButton)
-	{
-		FSlateApplication::Get().SetUserFocus(0, ApplyButton->TakeWidget(), EFocusCause::Navigation);
+	ConstructNavigationPath();
+	ValidateAndSetFocus();
+	return FReply::Handled();
+}
 
-		return FReply::Handled();
-	}
-	else
+void UModioRefineSearchDrawer::ConstructNavigationPath() 
+{
+	NavigationPath.Empty();
+	NavigationPath.Add(SearchInput);
+	
+	for (auto& item : TagSelector->TagSelectorList->GetDisplayedEntryWidgets()) 
 	{
-		return FReply::Handled();
+		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
+		if (!tagSelector) 
+		{
+			continue;
+		}
+
+		for (auto& widget : tagSelector->CategoryTagList->GetDisplayedEntryWidgets())
+		{
+			UModioSelectableTag* tag = Cast<UModioSelectableTag>(widget);
+			if (!tag) 
+			{
+				continue;
+			}
+			NavigationPath.Add(tag->TagSelectedCheckbox);
+		}
+	}
+
+	NavigationPath.Add(ApplyButton);
+	NavigationPath.Add(ClearButton);
+}
+
+void UModioRefineSearchDrawer::ValidateAndSetFocus() 
+{
+	if (NavigationPath.IsValidIndex(CurrentNavIndex))
+	{
+		if (!NavigationPath[CurrentNavIndex]->TakeWidget()->SupportsKeyboardFocus()) 
+		{
+			SearchInput->StartInput();
+			return;
+		}
+		NavigationPath[CurrentNavIndex]->SetFocus();
+
+		for (auto& item : TagSelector->TagSelectorList->GetDisplayedEntryWidgets())
+		{
+			UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
+			if (!tagSelector)
+			{
+				continue;
+			}
+
+			if (tagSelector->HasFocusedDescendants())
+			{
+				TagSelector->CategoryTextBlock->SetText(tagSelector->TagCategoryLabel->GetText());
+				break;
+			}
+		}
 	}
 }
 
@@ -64,20 +114,68 @@ void UModioRefineSearchDrawer::OnApplyClicked()
 	GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseSearchDrawer();
 }
 
-FReply UModioRefineSearchDrawer::NativeOnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (ProcessCommandForEvent(InKeyEvent))
+	ConstructNavigationPath();
+	
+	if (UModioDrawerControllerSlot* controllerSlot = Cast<UModioDrawerControllerSlot>(Slot)) 
 	{
+		if (!controllerSlot->GetExpandedState())
+		{
+			return FReply::Unhandled();
+		}
+	}
+
+	if (!IsVisible()) 
+	{
+		return FReply::Unhandled();
+	}
+
+	if ((GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Back ||
+		 GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::RefineSearch) &&
+		InKeyEvent.GetKey().IsGamepadKey() && SearchInput->HasFocusedDescendants())
+	{
+		ApplyButton->SetFocus();
+		return FReply::Unhandled();
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+	{
+		if (NavigationPath.IsValidIndex(CurrentNavIndex + 1)) {
+			CurrentNavIndex += 1;
+		}
+		ValidateAndSetFocus();
+		return FReply::Handled();
+	}
+	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up) 
+	{
+		if (NavigationPath.IsValidIndex(CurrentNavIndex - 1))
+		{
+			CurrentNavIndex -= 1;
+		}
+		ValidateAndSetFocus();
+		return FReply::Handled();
+	}
+	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left) 
+	{
+		if (CurrentNavIndex == NavigationPath.Num() - 1) 
+		{
+			CurrentNavIndex -= 1;
+		}
+		ValidateAndSetFocus();
+		return FReply::Handled();
+	}
+	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right) 
+	{
+		if (CurrentNavIndex == NavigationPath.Num() - 2)
+		{
+			CurrentNavIndex += 1;
+		}
+		ValidateAndSetFocus();
 		return FReply::Handled();
 	}
 
-	auto CurrentFocus = FSlateApplication::Get().GetUserFocusedWidget(0);
-	if (CurrentFocus == this->TakeWidget()) 
-	{
-		FSlateApplication::Get().SetUserFocus(0, ApplyButton->TakeWidget(), EFocusCause::Navigation);
-	}
-
-	return Super::NativeOnKeyDown(MyGeometry, InKeyEvent);
+	return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
 }
 
 FReply UModioRefineSearchDrawer::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -86,18 +184,55 @@ FReply UModioRefineSearchDrawer::NativeOnMouseButtonDown(const FGeometry& InGeom
 }
 
 void UModioRefineSearchDrawer::NextTagCategory()
-{
-	if (TagSelector)
-	{
-		TagSelector->DisplayNextTagCategory();
-	}
+{ 
+	CategoryNav(true);
 }
 
 void UModioRefineSearchDrawer::PrevTagCategory()
 {
-	if (TagSelector)
+	CategoryNav(false);
+}
+
+void UModioRefineSearchDrawer::CategoryNav(bool bMoveForward)
+{
+	int currentCategoryIndex = 0;
+	bool bCategoryHasSelection = false;
+	for (auto& item : TagSelector->TagSelectorList->GetDisplayedEntryWidgets())
 	{
-		TagSelector->DisplayPrevTagCategory();
+		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
+		if (!tagSelector)
+		{
+			continue;
+		}
+
+		if (tagSelector->HasFocusedDescendants())
+		{
+			bCategoryHasSelection = true;
+			break;
+		}
+		currentCategoryIndex++;
+	}
+
+	if (!bCategoryHasSelection)
+	{
+		currentCategoryIndex = 0;
+	}
+	currentCategoryIndex += bMoveForward ? 1 : -1;
+	if (TagSelector->TagSelectorList->GetDisplayedEntryWidgets().IsValidIndex(bCategoryHasSelection ? currentCategoryIndex : 0))
+	{
+		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(
+			TagSelector->TagSelectorList->GetDisplayedEntryWidgets()[bCategoryHasSelection ? currentCategoryIndex : 0]);
+		if (tagSelector->CategoryTagList->GetDisplayedEntryWidgets().IsValidIndex(0))
+		{
+			UModioSelectableTag* tag =
+				Cast<UModioSelectableTag>(tagSelector->CategoryTagList->GetDisplayedEntryWidgets()[0]);
+			if (!tag)
+			{
+				return;
+			}
+			NavigationPath.Find(tag->TagSelectedCheckbox, CurrentNavIndex);
+			ValidateAndSetFocus();
+		}
 	}
 }
 
@@ -109,6 +244,13 @@ void UModioRefineSearchDrawer::BuildCommandList(TSharedRef<FUICommandList> InCom
 	InCommandList->MapAction(
 		FModioCommonUICommands::Get().PreviousPage,
 		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::PrevTagCategory)));
+	InCommandList->MapAction(
+		FModioCommonUICommands::Get().Subscribe,
+		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnApplyClicked)));
+	InCommandList->MapAction(
+		FModioCommonUICommands::Get().MoreOptions,
+		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnClearClicked)));
+
 }
 
 FString UModioRefineSearchDrawer::NativeGetSearchString()

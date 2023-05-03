@@ -14,6 +14,7 @@
 #include "ModioModBrowserParams.h"
 #include "UI/Input/ModioNavigationConfigFactoryBase.h"
 #include "UI/ModioMenuDefaultBackgroundProvider.h"
+#include "UI/ModioDefaultInputGlyphProvider.h"
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "UObject/SoftObjectPath.h"
 #include "UObject/SoftObjectPtr.h"
@@ -24,12 +25,25 @@ UModioUISettings::UModioUISettings(const FObjectInitializer& Initializer) : Supe
 	{
 		ModioToProjectInputMappings.Add(FModioInputMapping {InputKey});
 	}
+
+	InputHintGlyphProvider = UModioDefaultInputGlyphProvider::StaticClass();
 	AuthenticationDataProvider = UModioUIDefaultAuthProvider::StaticClass();
-	BackgroundImageProvider = UModioMenuDefaultBackgroundProvider::StaticClass();
-	DefaultStyleSet =
-		TSoftObjectPtr<UModioUIStyleSet>(FSoftObjectPath("/Modio/UI/Styles/ModioUIDefaultStyle.ModioUIDefaultStyle"));
-	NavigationConfigOverride = TSoftObjectPtr<UModioNavigationConfigFactoryBase>(
-		FSoftObjectPath("/Modio/UI/DefaultNavigationConfigFactory.DefaultNavigationConfigFactory"));
-	BrowserCategoryConfiguration = TSoftObjectPtr<UModioModBrowserParams>(
-		FSoftObjectPath("/Modio/UI/Browser/DefaultModBrowserParams.DefaultModBrowserParams"));
+	DefaultStyleSet = Cast<UModioUIStyleSet>(FSoftObjectPath("/Modio/UI/Styles/ModioUIDefaultStyle.ModioUIDefaultStyle").TryLoad());
+	NavigationConfigOverride = TSoftObjectPtr<UModioNavigationConfigFactoryBase>(FSoftObjectPath("/Modio/UI/DefaultNavigationConfigFactory.DefaultNavigationConfigFactory"));
+	BrowserCategoryConfiguration = TSoftObjectPtr<UModioModBrowserParams>(FSoftObjectPath("/Modio/UI/Browser/DefaultModBrowserParams.DefaultModBrowserParams"));
+}
+
+void UModioUISettings::PostInitProperties()
+{
+	// These are not always correctly fetched in the constructor, so this is to make sure they are
+
+	Super::PostInitProperties();
+	if (!InputHintGlyphProvider)
+	{
+		InputHintGlyphProvider = UModioDefaultInputGlyphProvider::StaticClass();
+	}
+	if (!AuthenticationDataProvider)
+	{
+		AuthenticationDataProvider = UModioUIDefaultAuthProvider::StaticClass();
+	}
 }

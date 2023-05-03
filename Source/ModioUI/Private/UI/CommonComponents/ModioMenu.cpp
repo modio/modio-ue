@@ -17,6 +17,8 @@
 #include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/Commands/ModioUIMenuCommandList.h"
+#include "UI/Dialogs/ModioDialogBaseInternal.h"
+#include "UI/Interfaces/IModioUIDialogButtonWidget.h"
 #include "UI/Interfaces/IModioMenuBackgroundProvider.h"
 #include "UI/Interfaces/IModioUIDownloadQueueWidget.h"
 #include "UI/Interfaces/IModioUIRefineSearchWidget.h"
@@ -112,6 +114,10 @@ void UModioMenu::ToggleRefineSearchDrawer()
 				}
 			}
 		}
+		else 
+		{
+			SetFocus();
+		}
 	}
 }
 
@@ -154,6 +160,10 @@ void UModioMenu::ToggleDownloadQueueDrawer()
 						}
 					}
 				}
+				else
+				{
+					OnDownloadQueueClosed.Broadcast();
+				}
 			}
 		}
 		else
@@ -161,6 +171,11 @@ void UModioMenu::ToggleDownloadQueueDrawer()
 			if (DialogController)
 			{
 				DialogController->ShowAuthenticationChoiceDialog();
+			}
+
+			if (DialogAnim)
+			{
+				PlayAnimation(DialogAnim);
 			}
 		}
 	}
@@ -177,6 +192,7 @@ void UModioMenu::GoToPreviousSubmenu()
 		if (DrawerController->IsAnyDrawerExpanded())
 		{
 			DrawerController->CollapseAllDrawers();
+			SetKeyboardFocus();
 			return;
 		}
 	}
@@ -190,6 +206,11 @@ void UModioMenu::GoToPreviousSubmenu()
 				Subsystem->ExecuteOnModBrowserClosedDelegate();
 			}
 		}
+	}
+
+	if (IsValid(DialogController) && DialogController->GetActualDialog())
+	{
+		DialogController->FinalizeDialog();
 	}
 }
 
@@ -305,11 +326,10 @@ void UModioMenu::NativeOnInitialized()
 
 	// Listen for UserChanged events to reset view on log in/out
 	IModioUIUserChangedReceiver::Register<UModioMenu>();
-
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (Subsystem)
 	{
 		Subsystem->EnableModManagement();
-
 		// Cache tags for this game
 		Subsystem->GetTagOptionsList();
 	}
@@ -331,31 +351,10 @@ void UModioMenu::NativeOnInitialized()
 		ViewController->SetClipping(EWidgetClipping::ClipToBoundsAlways);
 	}
 
-	bool bHasSetBackground = false;
-	if (Background)
+	if (Subsystem && Subsystem->GetDefaultStyleSet())
 	{
-		if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
-		{
-			if (UClass* BackgroundImageProviderClass = Settings->BackgroundImageProvider.Get())
-			{
-				if (UObject* TmpBackgroundProvider = NewObject<UObject>(this, BackgroundImageProviderClass))
-				{
-					if (UMaterialInterface* BackgroundMaterial =
-							IModioMenuBackgroundProvider::Execute_GetBackgroundMaterial(TmpBackgroundProvider))
-					{
-						Background->SetBrushFromMaterial(BackgroundMaterial);
-						bHasSetBackground = true;
-					}
-				}
-			}
-		}
-		if (bHasSetBackground == false)
-		{
-			Background->SetVisibility(ESlateVisibility::Collapsed);
-		}
+		Background->SetBrushFromMaterial(Subsystem->GetDefaultStyleSet()->NativeGetBackgroundMaterial());
 	}
-
-	
 }
 
 void UModioMenu::UpdateRefineSearchDrawerSettings(FModioFilterParams Settings)
@@ -388,9 +387,18 @@ void UModioMenu::OnSearchSettingsChanged(FModioFilterParams Settings)
 		{
 			if (UModioSearchResultsView* View = Cast<UModioSearchResultsView>(Child))
 			{
+				for (UWidget* DrawerControllerChild : DrawerController->GetAllChildren())
+				{
+					if (DrawerControllerChild->Implements<UModioUIRefineSearchWidget>())
+					{
+						FString searchString =
+							IModioUIRefineSearchWidget::Execute_GetSearchString(DrawerControllerChild);
+						View->SetSearchInputString(searchString);
+					}
+				}
+
 				UModioFilterParamsUI* Data = NewObject<UModioFilterParamsUI>();
 				Data->Underlying = Settings;
-
 				View->SetDataSource(Data);
 			}
 		}
@@ -418,9 +426,23 @@ bool UModioMenu::RequestShowSearchResults(FModioFilterParams Params)
 	return true;
 }
 
+UModioDialogController* UModioMenu::GetDialogController()
+{
+	return DialogController;
+}
+
+UModioDrawerController* UModioMenu::GetDrawerController()
+{
+	return DrawerController;
+}
+
 void UModioMenu::HandleViewChanged(int32 ViewIndex)
 {
 	bRoutedOnViewChanged = false;
+	if (ViewChangedAnim)
+	{
+		PlayAnimation(ViewChangedAnim);
+	}
 	NativeOnViewChanged(ViewIndex);
 	checkf(bRoutedOnViewChanged, TEXT("Overridden implementations of NativeOnViewChanged should call "
 									  "Super::NativeOnViewChanged to ensure events are routed to blueprint"));
@@ -432,9 +454,17 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 	OnViewChanged(ViewIndex);
 	if (ViewController && MenuTitleContent)
 	{
+		UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (subsystem)
+		{
+			subsystem->SetCurrentFocusTarget(nullptr);
+		}
+
 		UModioScrollBox* OuterScrollBox = Cast<UModioScrollBox>(ViewController->GetActiveWidget());
 		if (OuterScrollBox)
 		{
+			OuterScrollBox->SetAlwaysShowScrollbar(false);
+			OuterScrollBox->SetScrollBarVisibility(ESlateVisibility::Collapsed);
 			if (UModioMenuView* MenuView = Cast<UModioMenuView>(OuterScrollBox->GetChildAt(0)))
 			{
 				MenuTitleContent->SetContent(MenuView->GetMenuTitleContent());
@@ -442,7 +472,7 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 				{
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
 				}
-				FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
+				FSlateApplication::Get().SetUserFocus(0, MenuView->GetMenuTitleContent(), EFocusCause::Navigation);
 			}
 		}
 		UWidget* ActiveWidget = ViewController->GetActiveWidget();
@@ -455,10 +485,33 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 				{
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
 				}
-
-				FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
+				FSlateApplication::Get().SetUserFocus(0, MenuView->GetMenuTitleContent(), EFocusCause::Navigation);
 			}
 		}
+	}
+	bMenuFocused = false;
+}
+
+void UModioMenu::NativeTick(const FGeometry& InGeometry, float DeltaTime) 
+{
+	if (DialogController->TrySetFocusToActiveDialog())
+	{
+		ViewController->SetVisibility(ESlateVisibility::HitTestInvisible);
+		bMenuFocused = false;
+		return;
+	}
+
+	if (DrawerController->SetFocusToActiveDrawer())
+	{
+		bMenuFocused = false;
+		return;
+	}
+
+	ViewController->SetVisibility(ESlateVisibility::Visible);
+	if (!bMenuFocused) 
+	{	
+		bMenuFocused = true;
+		FSlateApplication::Get().SetUserFocus(0, MenuTitleContent->GetContent(), EFocusCause::Navigation);
 	}
 }
 
@@ -468,6 +521,7 @@ FReply UModioMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent&
 	{
 		return FReply::Handled();
 	}
+
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
@@ -490,16 +544,21 @@ FReply UModioMenu::NativeOnFocusReceived(const FGeometry& InGeometry, const FFoc
 			FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
 		}
 	}
+	DialogController->TrySetFocusToActiveDialog();
 
 	return FReply::Handled();
 }
-
 
 void UModioMenu::ShowAuthenticationChoiceDialog()
 {
 	if (DialogController)
 	{
 		DialogController->ShowAuthenticationChoiceDialog();
+	}
+
+	if (DialogAnim)
+	{
+		PlayAnimation(DialogAnim);
 	}
 }
 
@@ -508,6 +567,11 @@ void UModioMenu::ShowLogoutDialog()
 	if (DialogController)
 	{
 		DialogController->ShowLogoutDialog();
+	}
+
+	if (DialogAnim)
+	{
+		PlayAnimation(DialogAnim);
 	}
 }
 
@@ -525,6 +589,10 @@ void UModioMenu::ShowModReportDialog(UObject* DialogDataSource)
 	{
 		DialogController->ShowModReportDialog(DialogDataSource);
 	}
+	if (DialogAnim)
+	{
+		PlayAnimation(DialogAnim);
+	}
 }
 
 void UModioMenu::ShowReportEmailDialog(UObject* DialogDataSource)
@@ -532,6 +600,10 @@ void UModioMenu::ShowReportEmailDialog(UObject* DialogDataSource)
 	if (DialogController)
 	{
 		DialogController->ShowReportEmailDialog(DialogDataSource);
+	}
+	if (DialogAnim)
+	{
+		PlayAnimation(DialogAnim);
 	}
 }
 
@@ -541,12 +613,20 @@ void UModioMenu::ShowUninstallConfirmationDialog(UObject* DialogDataSource)
 	{
 		DialogController->ShowUninstallConfirmationDialog(DialogDataSource);
 	}
+	if (DialogAnim)
+	{
+		PlayAnimation(DialogAnim);
+	}
 }
 
 void UModioMenu::NativeUserChanged(TOptional<FModioUser> NewUser)
 {
 	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
-
+	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (subsystem)
+	{
+		subsystem->SetCurrentFocusTarget(nullptr);
+	}
 	// Reset view to Featured when a user logs out
 	if (GetPageIndex() > 0)
 	{

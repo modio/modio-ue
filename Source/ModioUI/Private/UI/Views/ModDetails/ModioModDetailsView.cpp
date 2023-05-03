@@ -11,9 +11,12 @@
 #include "UI/Views/ModDetails/ModioModDetailsView.h"
 #include "Engine/Engine.h"
 #include "Framework/Notifications/NotificationManager.h"
+#include "GameFramework/InputSettings.h"
 #include "Loc/BeginModioLocNamespace.h"
 #include "ModioSubsystem.h"
 #include "Types/ModioRating.h"
+#include "Settings/ModioUISettings.h"
+#include "UI/CommonComponents/ModioMenu.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/EventHandlers/IModioUIAuthenticationChangedReceiver.h"
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
@@ -70,6 +73,8 @@ void UModioModDetailsView::NativeOnInitialized()
 	if (Subsystem)
 	{
 		Subsystem->OnSubscriptionStatusChanged.AddUObject(this, &UModioModDetailsView::OnModSubscriptionStatusChanged);
+		Subsystem->ModBrowserInstance->OnDownloadQueueClosed.AddDynamic(this, &UModioModDetailsView::OnDownloadQueueClosed);
+		Subsystem->ModBrowserInstance->GetDialogController()->OnDialogClosed.AddDynamic(this, &UModioModDetailsView::OnDialogClosed);
 	}
 }
 
@@ -96,6 +101,7 @@ void UModioModDetailsView::OnModSubscriptionStatusChanged(FModioModID ID, bool S
 			}
 		}
 	}
+	RateUpButton->SetKeyboardFocus();
 }
 
 void UModioModDetailsView::NativeSubscribeClicked()
@@ -120,8 +126,7 @@ void UModioModDetailsView::NativeSubscribeClicked()
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 			if (Subsystem)
 			{
-				Subsystem->ShowModUnsubscribeDialog(Data);
-				;
+				Subsystem->RequestRemoveSubscriptionForModID(Data->Underlying.ModId);				
 			}
 		}
 	}
@@ -171,6 +176,62 @@ void UModioModDetailsView::NativeDisplayModDetailsForId(const FModioModID& ModID
 void UModioModDetailsView::NativeRequestOperationRetry()
 {
 	ShowDetailsForMod(CurrentModID);
+}
+
+FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	FillScrollableWidgetsArray();
+
+	if (ProcessCommandForEvent(InKeyEvent))
+	{
+		return FReply::Handled();
+	}
+
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (ImageGallery->bIsFocused)
+	{
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+		{
+			if (ScrollableWidgets.IsValidIndex(CurrentIndex + 1))
+			{
+				CurrentIndex += 1;
+				ScrollBox->ScrollWidgetIntoView(ScrollableWidgets[CurrentIndex], true,
+												EDescendantScrollDestination::Center);
+			}
+			return FReply::Handled();
+		}
+
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+		{
+			if (ScrollableWidgets.IsValidIndex(CurrentIndex - 1))
+			{
+				CurrentIndex -= 1;
+				ScrollBox->ScrollWidgetIntoView(ScrollableWidgets[CurrentIndex], true,
+												EDescendantScrollDestination::Center);
+			}
+			return FReply::Handled();
+		}
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Next)
+	{
+		ImageGallery->ChangeImage(FModioInputKeys::Next);
+		return FReply::Handled();
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Previous)
+	{
+		ImageGallery->ChangeImage(FModioInputKeys::Previous);
+		return FReply::Handled();
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Subscribe)
+	{
+		NativeSubscribeClicked();
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 }
 
 // These methods potentially need us to know about the user's ratings
@@ -362,7 +423,33 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 	}
 }
 
-void UModioModDetailsView::SetInitialFocus() 
+void UModioModDetailsView::FillScrollableWidgetsArray()
+{
+	// The contents here can be easily adjusted for smoother scrolling - these seemed work fine for now
+	ScrollableWidgets.Empty();
+	ScrollableWidgets.Add(ImageGallery);
+	ScrollableWidgets.Add(ModFullDescriptionTextBlock);
+	ScrollableWidgets.Add(ModChangelog);
+}
+
+void UModioModDetailsView::SetInitialFocus()
+{
+	FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+}
+
+void UModioModDetailsView::OnDialogClosed()
+{
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(Subsystem))
+	{
+		if (Subsystem->GetCurrentFocusTarget() != SubscribeButton)
+		{
+			FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+		}
+	}
+}
+
+void UModioModDetailsView::OnDownloadQueueClosed()
 {
 	FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
 }
@@ -378,6 +465,21 @@ void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
 	if (ImageGallery)
 	{
 		ImageGallery->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+	if (IsValid(Subsystem))
+	{
+		TOptional<FModioModProgressInfo> CurrentProgress = Subsystem->QueryCurrentModUpdate();
+
+		if (CurrentProgress)
+		{
+			(CurrentProgress->ID == CurrentModID)
+				? ProgressWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible)
+				: ProgressWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+			ProgressWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

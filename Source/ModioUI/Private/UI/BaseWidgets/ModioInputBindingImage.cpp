@@ -33,8 +33,11 @@ void UModioInputBindingImage::NativeOnInputDeviceChanged(EModioUIInputMode Input
 	IModioUIInputDeviceChangedReceiver::NativeOnInputDeviceChanged(InputDevice);
 	if (!IsDesignTime())
 	{
-		UpdateBrushImage(InputDevice);
-		LastDeviceType = InputDevice;
+		if (KeyToShow.IsValid() && KeyToShow.GetFName() != NAME_None)
+		{
+			UpdateBrushImage(InputDevice);
+			LastDeviceType = InputDevice;
+		}
 	}
 }
 
@@ -43,9 +46,14 @@ void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		UMaterialInterface* InputGlyphMaterial = Subsystem->GetInputGlyphMaterialForInputType(KeyToShow, InputDevice);
-		if (InputGlyphMaterial)
+		if (IsValid(InputGlyphMaterial))
 		{
 			SetBrushFromMaterial(InputGlyphMaterial);
+			SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		} else
+		{
+			SetVisibility(ESlateVisibility::Collapsed);
+			InvalidateLayoutAndVolatility();
 		}
 	}
 	if (GetVisibilityForMode.IsBound())
@@ -56,7 +64,7 @@ void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
 	else
 	{
 		// Disable input images when using Mouse/Keyboard as we do not have appropriate glyphs
-		if (InputDevice == EModioUIInputMode::Keyboard || InputDevice == EModioUIInputMode::Mouse || InputDevice == EModioUIInputMode::Unknown)
+		if (InputDevice == EModioUIInputMode::Mouse || InputDevice == EModioUIInputMode::Unknown)
 		{
 			SetVisibility(ESlateVisibility::Collapsed);
 			InvalidateLayoutAndVolatility();

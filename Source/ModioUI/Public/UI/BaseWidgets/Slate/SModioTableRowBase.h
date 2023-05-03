@@ -81,10 +81,10 @@ protected:
 	{
 		const FModioTableRowStyle* ResolvedStyle = Style.FindStyle<FModioTableRowStyle>();
 
-		if (!ResolvedStyle)
-		{
-			return FSlateColor(FLinearColor::White);
-		}
+		//if (!ResolvedStyle)
+		//{
+		//	return FSlateColor(FLinearColor::White);
+		//}
 
 		if (STableRow<ItemType>::IsHovered())
 		{

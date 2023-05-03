@@ -36,6 +36,14 @@ struct FModioModTag ToUnreal(const Modio::ModTag& In);
 struct FModioModInfo ToUnreal(const Modio::ModInfo& In);
 struct FModioModDependency ToUnreal(const Modio::ModDependency& In);
 struct FModioUnsigned64 ToUnreal(const Modio::FileSize& In);
+struct FModioOtherUrl ToUnreal(const Modio::OtherUrl& In);
+struct FModioGameInfo ToUnreal(const Modio::GameInfo& In);
+struct FModioGameID ToUnreal(Modio::GameID Value);
+struct FModioTheme ToUnreal(const Modio::Theme& In);
+struct FModioLogo ToUnreal(const Modio::Detail::Logo& In);
+struct FModioHeaderImage ToUnreal(const Modio::HeaderImage& In);
+struct FModioIcon ToUnreal(const Modio::Detail::Icon& In);
+struct FModioGameStats ToUnreal(const Modio::GameStats& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);

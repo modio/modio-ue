@@ -36,14 +36,26 @@ void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture)
 }
 void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture, UMaterialInterface* Material, FName ImageParameterName)
 {
-	if (Texture && IsValid(Material))
-	{
-		SetBrushFromMaterial(Material);
+	if (Texture && !Material)
+    {
 		CachedMaterial = GetDynamicMaterial();
 		CachedMaterial->SetTextureParameterValue(ImageParameterName, Texture);
 		CachedMaterial->SetScalarParameterValue("UseRenderTarget", 1);
+
 		InvalidateLayoutAndVolatility();
 	}
+	else if (Texture && Material)
+    {
+        SetBrushFromMaterial(UMaterialInstanceDynamic::Create(Material->GetMaterial(), this));
+        CachedMaterial = GetDynamicMaterial();
+        if (Cast<UMaterialInstance>(Material))
+        {
+            CachedMaterial->CopyInterpParameters(Cast<UMaterialInstance>(Material));
+        }
+        CachedMaterial->SetTextureParameterValue(ImageParameterName, Texture);
+        CachedMaterial->SetScalarParameterValue("UseRenderTarget", 1);
+        InvalidateLayoutAndVolatility();
+    }
 }
 
 void UModioImage::LoadImageFromFileWithMaterialAsync(FModioImageWrapper ImageLoader, UMaterialInterface* Material,
@@ -62,9 +74,4 @@ void UModioImage::DisplayImageWithMaterial(UTexture2DDynamic* Texture, UMaterial
 void UModioImage::SetBrushFromMaterial(UMaterialInterface* Material)
 {
 	Super::SetBrushFromMaterial(Material);
-	UMaterialInstanceDynamic* Instance = Cast<UMaterialInstanceDynamic>(Material);
-	if (IsValid(Instance))
-	{
-		CachedMaterial = Instance;
-	}
 }

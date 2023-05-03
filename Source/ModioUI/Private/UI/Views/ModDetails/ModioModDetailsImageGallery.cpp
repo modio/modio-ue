@@ -9,6 +9,7 @@
  */
 
 #include "UI/Views/ModDetails/ModioModDetailsImageGallery.h"
+#include "UI/Views/ModDetails/ModioModDetailsImage.h"
 #include "Brushes/SlateImageBrush.h"
 #include "Core/ModioModInfoUI.h"
 #include "Engine/Engine.h"
@@ -66,11 +67,25 @@ void UModioModDetailsImageGallery::NativeOnSetDataSource()
 		UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 		if (ModInfo)
 		{
-			ImageInfo.Empty(ModInfo->Underlying.NumGalleryImages + 1);
-			ImageInfo.SetNumZeroed(ModInfo->Underlying.NumGalleryImages + 1);
+			if (ModInfo->Underlying.NumGalleryImages > 0)
+			{
+				ImageInfo.Empty(ModInfo->Underlying.NumGalleryImages);
+				ImageInfo.SetNumZeroed(ModInfo->Underlying.NumGalleryImages);
+			}
+
+			// if there are no gallery images, ImageInfo will only have one member, modlogo
+			else
+			{
+				ImageInfo.Empty(1);
+				ImageInfo.SetNumZeroed(1);
+			}
 
 			TArray<TSharedPtr<int64>> ImageIndexes;
-			ImageIndexes.Add(MakeShared<int64>(0));
+			if (ModInfo->Underlying.NumGalleryImages == 0)
+			{
+				ImageIndexes.Add(MakeShared<int64>(0));
+			}
+			
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 			
 			for (int32 ImageIndex = 0; ImageIndex < ModInfo->Underlying.NumGalleryImages; ImageIndex++)
@@ -82,8 +97,10 @@ void UModioModDetailsImageGallery::NativeOnSetDataSource()
 						Subsystem->RequestGalleryImageDownloadForModID(ModInfo->Underlying.ModId, ImageIndex);
 					}
 				}
-				ImageIndexes.Add(MakeShared<int64>(ImageIndex + 1));
+				ImageIndexes.Add(MakeShared<int64>(ImageIndex));
+
 			}
+
 			if (NavButtons)
 			{
 				NavButtons->SetListItems(ImageIndexes);
@@ -99,7 +116,8 @@ void UModioModDetailsImageGallery::NativeOnSetDataSource()
 
 			// Ensure this is called last, as it invokes an async callback which, if called earlier, *may* be invoked
 			// before the gallery is reset and cause a crash
-			if (Subsystem)
+			// This will be called only if there are no other gallery images to show
+			if (Subsystem && ModInfo->Underlying.NumGalleryImages == 0)
 			{
 				Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId, EModioLogoSize::Thumb1280);
 			}
@@ -111,12 +129,12 @@ void UModioModDetailsImageGallery::NativeOnModLogoDownloadCompleted(FModioModID 
 																	TOptional<FModioImageWrapper> Image)
 {
 	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image);
-	if (DataSource)
-	{
-		UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
-		if (ModInfo && ModInfo->Underlying.ModId == ModID)
-		{
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 
+	if (DataSource && ModInfo && ModInfo->Underlying.NumGalleryImages == 0)
+	{
+		if (ModInfo->Underlying.ModId == ModID)
+		{
 			ImageInfo[0].Status = ec;
 			ImageInfo[0].DownloadedImageReference = Image;
 			if (!ec && Image)
@@ -136,49 +154,100 @@ void UModioModDetailsImageGallery::NativeOnModGalleryImageDownloadCompleted(FMod
 	if (DataSource)
 	{
 		UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
-		if (ModInfo && ModInfo->Underlying.ModId == ModID)
+
+		 if (ModInfo && ModInfo->Underlying.ModId == ModID)
 		{
-			ImageInfo[ImageIndex + 1].Status = ec;
-			ImageInfo[ImageIndex + 1].DownloadedImageReference = Image;
+			ImageInfo[ImageIndex].Status = ec;
+			ImageInfo[ImageIndex].DownloadedImageReference = Image;
+
 			if (!ec && Image)
 			{
 				Image->LoadAsync(FOnLoadImageDelegateFast::CreateUObject(
-					this, &UModioModDetailsImageGallery::OnGalleryImageLoad, ModID, ImageIndex + 1));
+					this, &UModioModDetailsImageGallery::OnGalleryImageLoad, ModID, ImageIndex));
 			}
 		}
 	}
 }
 
-void UModioModDetailsImageGallery::BuildCommandList(TSharedRef<FUICommandList> CommandList)
+FReply UModioModDetailsImageGallery::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	CommandList->MapAction(FModioCommonUICommands::Get().NextPage,
-						   FUIAction(FExecuteAction::CreateUObject(this, &UModioModDetailsImageGallery::NextImage)));
-	CommandList->MapAction(FModioCommonUICommands::Get().PreviousPage,
-						   FUIAction(FExecuteAction::CreateUObject(this, &UModioModDetailsImageGallery::PrevImage)));
+	bIsFocused = true;
+
+	const FModioDynamicImageStyle* ResolvedStyle = Style.FindStyle<FModioDynamicImageStyle>();
+	if (ResolvedStyle)
+	{
+		FSlateApplication::Get().PlaySound(ResolvedStyle->HoveredSound);
+	}
+
+	ActiveBackground->SetVisibility(ESlateVisibility::Visible);
+	SetKeyboardFocus();
+
+	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
+}
+
+void UModioModDetailsImageGallery::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
+{
+	bIsFocused = false;
+	ActiveBackground->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UModioModDetailsImageGallery::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	bIsFocused = true;
+
+	const FModioDynamicImageStyle* ResolvedStyle = Style.FindStyle<FModioDynamicImageStyle>();
+	if (ResolvedStyle)
+	{
+		FSlateApplication::Get().PlaySound(ResolvedStyle->HoveredSound);
+	}
+
+	ActiveBackground->SetVisibility(ESlateVisibility::Visible);
+	SetKeyboardFocus();
+
+	return Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+}
+
+void UModioModDetailsImageGallery::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	bIsFocused = false;
+	ActiveBackground->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UModioModDetailsImageGallery::PrevImage()
 {
 	ShowImageInternal(CurrentImageIndex - 1);
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
+
 	if (NavButtons)
 	{
-		NavButtons->ClearSelection();
-		NavButtons->SelectSingleItem(CurrentImageIndex);
+		if (IsValid(ModInfo) && ModInfo->Underlying.NumGalleryImages > 1)
+		{
+			NavButtons->ClearSelection();
+			NavButtons->SelectSingleItem(CurrentImageIndex);
+		}
 	}
 }
 
 void UModioModDetailsImageGallery::NextImage()
 {
 	ShowImageInternal(CurrentImageIndex + 1);
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
+
 	if (NavButtons)
 	{
-		NavButtons->ClearSelection();
-		NavButtons->SelectSingleItem(CurrentImageIndex);
+		if (IsValid(ModInfo) && ModInfo->Underlying.NumGalleryImages > 1)
+		{
+			NavButtons->ClearSelection();
+			NavButtons->SelectSingleItem(CurrentImageIndex);
+		}
 	}
 }
 
 void UModioModDetailsImageGallery::ApplyImageToWidget(UWidget* Widget, int32 ImageIndex)
 {
+	if ((ImageIndex + 1) > ImageInfo.Num())
+		return;
+
 	UTexture2DDynamic* TargetImage = ImageInfo[ImageIndex].LoadedImage;
 	{
 		if (TargetImage)
@@ -188,7 +257,23 @@ void UModioModDetailsImageGallery::ApplyImageToWidget(UWidget* Widget, int32 Ima
 		}
 		else
 		{
-			if (ImageInfo[ImageIndex].Status)
+			// when starting, the code runs here before the async operation is ready,
+			// so we want loading brush instead of error, where it would otherwise go
+			if (ImageInfo[ImageIndex].DownloadedImageReference.IsSet() && ImageInfo[ImageIndex].DownloadedImageReference.GetValue().GetState() == EModioImageState::LoadingIntoMemory)
+			{
+				UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+				if (Subsystem)
+				{
+					UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
+					if (DefaultStyleSet)
+					{
+						TSharedPtr<FSlateBrush> LoadingBrush =
+							DefaultStyleSet->GetMaterialBrush(FName("Loading"), {}, FVector2D(256, 256));
+						IModioUIImageDisplay::Execute_DisplayImage(Widget, *LoadingBrush);
+					}
+				}
+			}
+			else if (ImageInfo[ImageIndex].Status)
 			{
 				UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 				if (Subsystem)
@@ -210,7 +295,7 @@ void UModioModDetailsImageGallery::ApplyImageToWidget(UWidget* Widget, int32 Ima
 					UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
 					if (DefaultStyleSet)
 					{
-						TSharedPtr<FSlateBrush> LoadingBrush =
+						TSharedPtr<FSlateBrush> LoadingBrush = 
 							DefaultStyleSet->GetMaterialBrush(FName("Loading"), {}, FVector2D(256, 256));
 						IModioUIImageDisplay::Execute_DisplayImage(Widget, *LoadingBrush);
 					}
@@ -246,11 +331,15 @@ void UModioModDetailsImageGallery::ShowImageInternal(int32 RawIndex)
 {
 	if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
 	{
-		int32 NewIndex = RawIndex % (ModInfo->Underlying.NumGalleryImages + 1);
-		if (RawIndex < 0)
+		int32 NewIndex = 0;
+
+		(ModInfo->Underlying.NumGalleryImages > 0) ? NewIndex = RawIndex % (ModInfo->Underlying.NumGalleryImages) : NewIndex = 0;
+
+		if (RawIndex < 0 && ModInfo->Underlying.NumGalleryImages > 0)
 		{
-			NewIndex = ModInfo->Underlying.NumGalleryImages;
+			NewIndex = ModInfo->Underlying.NumGalleryImages - 1;
 		}
+
 		// int32 NewIndex = FMath::Clamp<int32>(RawIndex, 0, ModInfo->Underlying.NumGalleryImages);
 		if (ImageGallery)
 		{
@@ -259,6 +348,18 @@ void UModioModDetailsImageGallery::ShowImageInternal(int32 RawIndex)
 				NewIndex > CurrentImageIndex ? EModioUIDirection::MoveLeft : EModioUIDirection::MoveRight, NewIndex);
 		}
 		CurrentImageIndex = NewIndex;
+	}
+}
+
+void UModioModDetailsImageGallery::ChangeImage(const FKey& InputKey)
+{
+	if (InputKey == FModioInputKeys::Next)
+	{
+		NextImage();
+	}
+	else if (InputKey == FModioInputKeys::Previous)
+	{
+		PrevImage();
 	}
 }
 

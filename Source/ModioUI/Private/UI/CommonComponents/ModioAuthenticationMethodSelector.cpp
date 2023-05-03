@@ -9,6 +9,7 @@
  */
 
 #include "UI/CommonComponents/ModioAuthenticationMethodSelector.h"
+#include "Framework/Application/SlateApplication.h"
 
 #include "Loc/BeginModioLocNamespace.h"
 
@@ -58,6 +59,12 @@ TSharedRef<SWidget> UModioAuthenticationMethodSelector::RebuildWidget()
 				 .Orientation(Orient_Horizontal)
 				 .ListItemsSource(&AuthMethods)
 				 .ItemHeight(0)
+				 .IsFocusable(false)						// There should be no reason to be able to focus on a slot element
+				 .SelectionMode(ESelectionMode::None)
+				 .WrapHorizontalNavigation(false)
+				 .HandleGamepadEvents(false)
+				 .HandleDirectionalNavigation(false)
+				 .AllowOverscroll(EAllowOverscroll::No)
 				 .ItemWidth(0)
 				 .OnGenerateTile_UObject(this, &UModioAuthenticationMethodSelector::OnGenerateButton)
 	]

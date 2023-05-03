@@ -28,14 +28,16 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 	virtual void NativePreConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	UModioListView* TagSelectorList;
+
 	int32 CurrentlyDisplayedTagCategoryIndex = 0;
 	int32 TagCategoryCount = 0;
 
-	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
-
 public:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioListView* TagSelectorList;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
+	UModioRichTextBlock* CategoryTextBlock;
 	/**
 	* Retrieve the list of tags in this list
 	* @return 
@@ -48,16 +50,4 @@ public:
 	 **/
 	UFUNCTION(BlueprintCallable, Category = "ModioTagWidgetBase")
 	void ClearSelectedTags();
-
-	/**
-	 * Retrieve the list of tags in this list
-	 **/
-	UFUNCTION(BlueprintCallable, Category = "ModioTagWidgetBase")
-	void DisplayNextTagCategory();
-
-	/**
-	 * Retrieve the list of tags in this list
-	 **/
-	UFUNCTION(BlueprintCallable, Category = "ModioTagWidgetBase")
-	void DisplayPrevTagCategory();
 };

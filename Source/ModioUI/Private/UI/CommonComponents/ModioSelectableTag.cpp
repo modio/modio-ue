@@ -13,6 +13,16 @@
 #include "Components/ListViewBase.h"
 #include "UI/CommonComponents/ModioListViewString.h"
 
+bool UModioSelectableTag::IsCheckboxChecked()
+{
+	return TagSelectedCheckbox->IsChecked();
+}
+
+FString UModioSelectableTag::GetTagString()
+{
+	return TagSelectedCheckbox->GetLabelText().ToString();
+}
+
 void UModioSelectableTag::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -37,4 +47,23 @@ void UModioSelectableTag::OnCheckboxStateChanged(bool bIsChecked)
 											   ESelectInfo::OnMouseClick);
 		}
 	}
+}
+
+void UModioSelectableTag::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) 
+{
+	if (const FModioCheckBoxStyle* ResolvedStyle = FocusedStyle.FindStyle<FModioCheckBoxStyle>())
+	{
+		TagSelectedCheckbox->SetStyle(ResolvedStyle);
+		FSlateApplication::Get().PlaySound(ResolvedStyle->HoveredSlateSound);
+	}
+	Super::NativeOnAddedToFocusPath(InFocusEvent);
+}
+
+void UModioSelectableTag::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) 
+{
+	if (const FModioCheckBoxStyle* ResolvedStyle = NormalStyle.FindStyle<FModioCheckBoxStyle>())
+	{
+		TagSelectedCheckbox->SetStyle(ResolvedStyle);
+	}
+	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
 }

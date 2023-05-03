@@ -33,7 +33,7 @@ public:
 	/**
 	* Constructor without parameters that starts as a white color
 	**/
-	FModioUIColor() : FModioUIColor(FLinearColor::White) {};
+	FModioUIColor() : FModioUIColor(FLinearColor::White){};
 
 	/**
 	* Default constructor that copies parameters from another ModioUIColor
@@ -127,6 +127,10 @@ public:
 		}
 
 		return true;
+	}
+
+	FLinearColor* GetInternalColor() {
+		return InternalColor.Get();
 	}
 };
 

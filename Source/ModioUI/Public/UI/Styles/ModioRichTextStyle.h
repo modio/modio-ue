@@ -84,27 +84,12 @@ struct MODIOUI_API FModioRichTextStyle : public FSlateWidgetStyle
 
 		for (const auto& Style : Styles)
 		{
-			if (!StyleInstance->HasWidgetStyle<FTextBlockStyle>(Style.Key))
-			{
-				StyleInstance->Set(Style.Key, Style.Value);
-			}
-			else
-			{
-				const_cast<FTextBlockStyle&>(StyleInstance->GetWidgetStyle<FTextBlockStyle>(Style.Key)) = Style.Value;
-			}
+			StyleInstance->Set(Style.Key, Style.Value);
 		}
 
 		for (const auto& StyleOverride : InlineStyleOverrides)
 		{
-			if (!StyleInstance->HasWidgetStyle<FModioTextBlockStyleOverride>(StyleOverride.Key))
-			{
-				StyleInstance->Set(StyleOverride.Key, StyleOverride.Value);
-			}
-			else
-			{
-				const_cast<FModioTextBlockStyleOverride&>(StyleInstance->GetWidgetStyle<FModioTextBlockStyleOverride>(
-					StyleOverride.Key)) = StyleOverride.Value;
-			}
+			StyleInstance->Set(StyleOverride.Key, StyleOverride.Value);
 		}
 		// This also needs to have the FModioTextBlockStyleOverrides added
 		return StyleInstance;

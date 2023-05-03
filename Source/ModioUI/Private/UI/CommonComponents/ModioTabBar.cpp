@@ -31,6 +31,7 @@ TSharedRef<SWidget> UModioTabBar::RebuildWidget()
 		.ItemWidth(ItemSize.X)
 		.ScrollbarVisibility(EVisibility::Collapsed)
 		.Orientation(EOrientation::Orient_Horizontal)
+		.IsFocusable(false)
 		.OnGenerateTile_UObject(this, &UModioTabBar::OnGenerateTabButton);
 }
 
@@ -64,6 +65,7 @@ TSharedRef<ITableRow> UModioTabBar::OnGenerateTabButton(TSharedPtr<FText> TabNam
 			.OnClicked_UObject(this, &UModioTabBar::OnTabClicked, TabName)
 			.HAlign(HAlign_Fill)
 			.VAlign(VAlign_Center)
+			.IsFocusable(false)
 			[
 				SAssignNew(RowTextBlock, SModioRichTextBlock).Text(*TabName.Get())
 			]

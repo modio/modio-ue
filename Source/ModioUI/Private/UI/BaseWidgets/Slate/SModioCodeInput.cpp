@@ -9,8 +9,10 @@
  */
 
 #include "UI/BaseWidgets/Slate/SModioCodeInput.h"
+#include "UI/Interfaces/IModioInputMappingAccessor.h"
 #include "Brushes/SlateNoResource.h"
 #include "Core/ModioUIHelpers.h"
+#include "Core/Input/ModioInputKeys.h"
 #include "Materials/MaterialInterface.h"
 #include "Misc/EngineVersionComparison.h"
 #include "Widgets/Images/SImage.h"
@@ -36,12 +38,18 @@ TSharedRef<SWidget> SModioCodeInput::CreateCharacterWidget(int32 WidgetIndex)
 }
 FReply SModioCodeInput::OnKeyDownHandler(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (InKeyEvent.GetKey() == EKeys::Left || InKeyEvent.GetKey() == EKeys::Right || InKeyEvent.GetKey() == EKeys::Tab)
+	if (InKeyEvent.GetKey() == FModioInputKeys::Down)
 	{
-		return FReply::Handled();
+		OnNavigateDown.Broadcast();
 	}
+	if (InKeyEvent.GetKey() == EKeys::Enter)
+	{
+		OnSubmit.Broadcast();
+	}
+
 	return FReply::Unhandled();
 }
+
 void SModioCodeInput::Construct(const FArguments& InArgs)
 {
 	bCanSupportFocus = true;
@@ -78,6 +86,7 @@ void SModioCodeInput::Construct(const FArguments& InArgs)
 	{
 		MyCharacterGrid->SetSlotPadding(Style->CharacterSpacing);
 	}
+
 	RebuildChildren(InArgs._NumChildren);
 }
 void SModioCodeInput::OnInputTextChanged(const FText& NewText)
@@ -106,6 +115,11 @@ FText SModioCodeInput::GetCharacterAtIndex(int32 Index) const
 
 const FSlateBrush* SModioCodeInput::GetCharacterBorder() const
 {
+	if (!Style)
+	{
+		return &CachedCharacterBrush;
+	}
+
 	CachedCharacterBrush = Style->CharacterBrush;
 	CachedCharacterBrush.Margin = FMargin(0, 0, 0, 3);
 	if (FSlateApplication::Get().HasFocusedDescendants(AsShared()))
@@ -129,11 +143,14 @@ EVisibility SModioCodeInput::GetCaretVisibility(uint32 Index) const
 
 void SModioCodeInput::RebuildChildren(uint32 NumChildren)
 {
-	FakeCaretBrush.SetResourceObject(Style->FakeCaretMaterial.ResolveReference());
-	FakeCaretBrush.TintColor = FModioUIColorRef(FName("Accent")).ResolveReference();
-	FakeCaretBrush.SetImageSize(FVector2D(45, 45));
-	FakeCaretBrush.DrawAs = ESlateBrushDrawType::Image;
-	FakeCaretBrush.ImageType = ESlateBrushImageType::FullColor;
+	if (!FakeCaretBrush.GetResourceObject())
+	{
+		FakeCaretBrush.SetResourceObject(Style->FakeCaretMaterial.ResolveReference());
+		FakeCaretBrush.TintColor = FModioUIColorRef(FName("Accent")).ResolveReference();
+		FakeCaretBrush.SetImageSize(FVector2D(45, 45));
+		FakeCaretBrush.DrawAs = ESlateBrushDrawType::Image;
+		FakeCaretBrush.ImageType = ESlateBrushImageType::FullColor;
+	}
 
 	CharacterWidgets.Empty();
 	MyCharacterGrid->ClearChildren();
@@ -180,13 +197,12 @@ void SModioCodeInput::SetStyle(const FModioCodeInputStyle* NewStyle)
 	if (MyCharacterGrid && Style)
 	{
 		MyCharacterGrid->SetSlotPadding(Style->CharacterSpacing);
-	}
-
-	for (const TSharedPtr<STextBlock>& Child : CharacterWidgets)
-	{
-		if (Child)
+		for (const TSharedPtr<STextBlock>& Child : CharacterWidgets)
 		{
-			Child->SetTextStyle(Style);
+			if (Child)
+			{
+				Child->SetTextStyle(Style);
+			}
 		}
 	}
 	Invalidate(EInvalidateWidgetReason::Layout | EInvalidateWidgetReason::Paint);

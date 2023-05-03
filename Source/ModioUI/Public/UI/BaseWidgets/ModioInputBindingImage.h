@@ -42,8 +42,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FKey KeyToShow;
 
-	EModioUIInputMode LastDeviceType = EModioUIInputMode::Unknown;
-
 	FGetVisibilityForInputModeDelegate GetVisibilityForMode;
 
 public:
@@ -62,6 +60,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioInputBindingImage")
 	void SetKeyToShow(FKey NewKey);
 
+	EModioUIInputMode LastDeviceType = EModioUIInputMode::Unknown;
 	/**
 	* Retrieve the delegate to the input mode
 	* @return The delegate used as input mode

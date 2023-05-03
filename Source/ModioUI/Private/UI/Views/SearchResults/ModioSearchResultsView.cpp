@@ -19,6 +19,9 @@
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/BaseWidgets/ModioTileView.h"
 #include "UI/BaseWidgets/ModioUIAsyncLoader.h"
+#include "UI/CommonComponents/ModioMenu.h"
+#include "UI/CommonComponents/ModioModTile.h"
+#include "Types/ModioModTag.h"
 #include "Loc/BeginModioLocNamespace.h"
 #include "Widgets/Layout/SGridPanel.h"
 
@@ -32,6 +35,11 @@ void UModioSearchResultsView::NativeOnInitialized()
 	if (RefineSearchButton)
 	{
 		RefineSearchButton->OnClicked.AddDynamic(this, &UModioSearchResultsView::OnRefineSearchButtonClicked);
+	}
+
+	if (NoResultsRefineSearchButton)
+	{
+		NoResultsRefineSearchButton->OnClicked.AddDynamic(this, &UModioSearchResultsView::OnRefineSearchButtonClicked);
 	}
 
 	RetryDelegate.Clear();
@@ -84,12 +92,15 @@ void UModioSearchResultsView::NativeOnInitialized()
 
 		SortBy->SetComboBoxEntries(MenuEntries);
 	}
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		Subsystem->ModBrowserInstance->GetDrawerController()->OnDrawerClosed.AddDynamic(this, &UModioSearchResultsView::OnDrawerClosed);
+	}
 }
 
 FReply UModioSearchResultsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(), EFocusCause::Navigation);
-
 
 	return FReply::Handled();
 }
@@ -209,17 +220,31 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 					return NewObj;
 				});
 				ResultsTileView->SetListItems(SearchResults);
+				ResultsTileView->SetAllNavigationRules(EUINavigationRule::Stop, TEXT("None"));
 				ResultsTileView->RequestRefresh();
-
 				if (NoResultsDialog)
 				{
 					if (SearchResults.Num() > 0)
 					{
 						NoResultsDialog->SetVisibility(ESlateVisibility::Collapsed);
+						RefineSearchButton->SetNavigationRuleBase(EUINavigation::Down, EUINavigationRule::Escape);
+						CurrentListIndex = 0;
+						for (auto& item : SearchResults)
+						{
+							if (UModioModTile* widget = Cast<UModioModTile>(ResultsTileView->GetEntryWidgetFromItem(item))) 
+							{
+								widget->SetAllNavigationRules(EUINavigationRule::Stop, TEXT("None"));
+							}
+						}
 					}
 					else
 					{
 						NoResultsDialog->SetVisibility(ESlateVisibility::Visible);
+						FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(),
+															  EFocusCause::Navigation);
+						RefineSearchButton->SetNavigationRuleBase(EUINavigation::Down, EUINavigationRule::Explicit);
+						RefineSearchButton->SetNavigationRuleExplicit(EUINavigation::Down, NoResultsRefineSearchButton);
+						NoResultsRefineSearchButton->SetKeyboardFocus();
 					}
 				}
 
@@ -234,6 +259,13 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 			}
 		}
 	}
+
+	if (SearchResultsCount)
+	{
+		FString Count = FString::Printf(TEXT("(%d)"), SearchResults.Num());
+		SearchResultsCount->SetText(FText::FromString(Count));
+	}
+
 	IModioUIModInfoReceiver::NativeOnListAllModsRequestCompleted(RequestIdentifier, ec, List);
 }
 
@@ -242,21 +274,32 @@ void UModioSearchResultsView::NativeOnSetDataSource()
 	Super::NativeOnSetDataSource();
 	if (UModioFilterParamsUI* Params = Cast<UModioFilterParamsUI>(DataSource))
 	{
-		if (SearchQuery)
-		{
-			SearchQuery->SetText(FText::Format(
-				ModQueryFormatText, FFormatNamedArguments {{"Query", FText::FromString(Algo::Accumulate(
-																		 Params->Underlying.SearchKeywords, FString(),
-																		 [](FString Accumulated, FString Input) {
-																			 return Accumulated + " " + Input;
-																		 }))}}));
-		}
 		if (SearchTags)
 		{
 			TArray<FModioModTag> ConvertedTags;
-			Algo::Transform(Params->Underlying.Tags, ConvertedTags,
-							[](const FString& InString) { return FModioModTag {InString}; });
-			SearchTags->SetTags(ConvertedTags);
+			TArray<FString> TagArray;
+
+			if (!SearchInputString.IsEmpty())
+			{
+				FString tagString = FText::Format(SearchInputTagFormatText,  FFormatNamedArguments {{FString("Input"), FFormatArgumentValue(FText::FromString(SearchInputString))}}).ToString();
+				TagArray.Add(tagString);
+				TagArray.Append(Params->Underlying.Tags);
+				Algo::Transform(TagArray, ConvertedTags, [](const FString& InString) { return FModioModTag {InString}; });
+				SearchTags->SetTags(ConvertedTags);
+			}
+			else if (Params->Underlying.Tags.Num() > 0)
+			{
+				Algo::Transform(Params->Underlying.Tags, ConvertedTags, [](const FString& InString) { return FModioModTag {InString}; });
+				SearchTags->SetTags(ConvertedTags);
+			}
+			else
+			{
+				TagNames.Empty();
+				DefaultTags.Empty();
+				TagNames.Add(DefaultTagText);
+				Algo::Transform(TagNames, DefaultTags, [](const FString& InString) { return FModioModTag {InString}; });
+				SearchTags->SetTags(DefaultTags);
+			}
 		}
 
 		// If we have a currently assigned sort delegate, then apply it
@@ -309,6 +352,129 @@ void UModioSearchResultsView::NativeRequestOperationRetry()
 	}
 }
 
+FReply UModioSearchResultsView::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (ProcessCommandForEvent(InKeyEvent))
+	{
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+}
+
+FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (!IsVisible())
+	{
+		return FReply::Unhandled();
+	}
+
+	// Had to do grid navigation manually since UE nav is seemingly random at times
+
+	float entryWidth = ResultsTileView->GetEntryWidth();
+	float viewWidth = ResultsTileView->GetCachedGeometry().GetLocalSize().X;
+	int itemsPerRow = FMath::FloorToInt(viewWidth / entryWidth);
+
+	int currentIndex = ResultsTileView->GetIndexForItem(ResultsTileView->GetSelectedItem());
+	if (CurrentRow + CurrentListIndex != currentIndex) 
+	{
+		if (currentIndex != -1)
+		{
+			CurrentRow = 0;
+			while (CurrentRow + itemsPerRow < currentIndex)
+			{
+				CurrentRow += itemsPerRow;
+			}
+			CurrentListIndex = currentIndex-CurrentRow;
+		}
+	}
+
+	if (UModioModTile* widget =
+			Cast<UModioModTile>(ResultsTileView->GetEntryWidgetFromItem(ResultsTileView->GetItemAt(CurrentListIndex + CurrentRow))))
+	{
+		if (!widget->AllowMouseHoverFocus())
+		{
+			return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
+		}
+	}
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+	{
+		if (CurrentRow == 0 && !SortBy->HasFocusedDescendants() && !RefineSearchButton->HasAnyUserFocus())
+		{
+			RefineSearchButton->SetKeyboardFocus();
+			return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
+		}
+
+		if (!SortBy->HasFocusedDescendants() && !RefineSearchButton->HasAnyUserFocus())
+		{
+			CurrentRow = (CurrentRow - itemsPerRow >= 0 ? CurrentRow - itemsPerRow : CurrentRow);
+			return TryNavigateGrid();
+		}
+	}
+	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+	{
+		
+		if (RefineSearchButton->HasAnyUserFocus() || (SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()))
+		{
+			CurrentRow = 0;
+			return TryNavigateGrid();
+		}
+		else if (SortBy->HasFocusedDescendants() && SortBy->IsComboBoxOpen())
+		{
+			return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
+		}
+		else
+		{
+			CurrentRow = (CurrentRow + itemsPerRow < ResultsTileView->GetNumItems() ? CurrentRow + itemsPerRow : CurrentRow);
+			return TryNavigateGrid();
+		}
+	}
+	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left)
+	{
+		
+		if (SortBy->HasFocusedDescendants()) 
+		{
+			SortBy->SetComboBoxOpen(false);
+			RefineSearchButton->SetKeyboardFocus();
+			return FReply::Handled();
+		}
+		else if ((!RefineSearchButton->HasAnyUserFocus() && !SortBy->HasFocusedDescendants())) 
+		{
+			CurrentListIndex = CurrentListIndex - 1 >= 0 ? CurrentListIndex - 1 : itemsPerRow - 1;
+			return TryNavigateGrid();
+		}
+	}
+	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right)
+	{
+		if (SortBy->HasFocusedDescendants())
+		{
+			SortBy->SetComboBoxOpen(false);
+		}
+
+		if ((!RefineSearchButton->HasAnyUserFocus() && !SortBy->HasFocusedDescendants())) 
+		{
+			CurrentListIndex = CurrentListIndex + 1 < itemsPerRow ? CurrentListIndex + 1 : 0;
+			return TryNavigateGrid();
+		}
+	}
+
+	return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
+}
+
+FReply UModioSearchResultsView::TryNavigateGrid() 
+{
+	if (CurrentListIndex + CurrentRow >= ResultsTileView->GetNumItems())
+	{
+		CurrentListIndex = 0;
+	}
+
+	// Index has to be selected manually since NavigateToIndex does not select the target
+	ResultsTileView->NavigateToIndex(CurrentListIndex + CurrentRow);
+	ResultsTileView->SetSelectedIndex(CurrentListIndex + CurrentRow);
+	return FReply::Handled();
+}
+
+
 void UModioSearchResultsView::OnRefineSearchButtonClicked()
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
@@ -317,31 +483,16 @@ void UModioSearchResultsView::OnRefineSearchButtonClicked()
 	}
 }
 
-TSharedRef<SWidget> UModioSearchResultsView::GetMenuTitleContent()
-{
-	// clang-format off
-	return SNew(SGridPanel) 
-		+SGridPanel::Slot(0, 0)
-		.HAlign(HAlign_Center)
-		[
-			SNew(SModioRichTextBlock).StyleReference(&TitleTextStyle).Text_UObject(this, &UModioSearchResultsView::GetPageTitle)
-		]
-		+SGridPanel::Slot(0,1)
-		.HAlign(HAlign_Center)
-		[
-			SNew(SModioRichTextBlock).StyleReference(&TitleTextStyle).Text_UObject(this, &UModioSearchResultsView::GetModCountText)
-		];
-	// clang-format on
-}
-
 FText UModioSearchResultsView::GetPageTitle() const
 {
 	return PageTitle;
 }
 
-FText UModioSearchResultsView::GetModCountText() const
+void UModioSearchResultsView::OnDrawerClosed() {}
+
+void UModioSearchResultsView::SetSearchInputString(FString input)
 {
-	return FText::FormatNamed(FTextFormat(ModCountFormatText), "ResultCount", FText::AsNumber(SearchResults.Num()));
+	SearchInputString = input;
 }
 
 #include "Loc/EndModioLocNamespace.h"

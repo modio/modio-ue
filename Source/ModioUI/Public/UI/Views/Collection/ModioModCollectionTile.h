@@ -39,6 +39,11 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 	virtual void NativeOnSetExpandedState(bool bExpanded) override;
 	virtual void NativeConstruct() override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	FReply NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	UFUNCTION()
 	void OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating);
 	UFUNCTION()
@@ -51,6 +56,11 @@ protected:
 	void ForceUninstall();
 	UFUNCTION()
 	void NativeMoreOptionsClicked();
+	UFUNCTION()
+	void NativeCollectionTileClicked();
+	UFUNCTION()
+	void ShowModDetails();
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* SizeOnDiskLabel;
 
@@ -63,6 +73,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* StatusLine;
 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* TileButton;
+
 	// We don't need a text for any other status because all mods are either subscribed for the local user or installed
 	// for another user
 
@@ -73,7 +86,6 @@ protected:
 	FText InstalledStatusText;
 
 	virtual void NativeOnInitialized() override;
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
 												  TOptional<FModioImageWrapper> Image) override;
@@ -86,4 +98,7 @@ protected:
 	virtual UModioModInfoUI* GetAsModInfoUIObject() override;
 
 	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
+
+public:
+	bool bHasFocus = false;
 };

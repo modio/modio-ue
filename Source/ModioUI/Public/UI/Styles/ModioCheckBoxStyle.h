@@ -22,6 +22,7 @@
 * Modio derived struct that defines the properties for a check box,
 * with name, text and styles to customize them
 **/
+
 USTRUCT(BlueprintType)
 struct MODIOUI_API FModioCheckBoxStyle : public FSlateWidgetStyle
 {
@@ -79,6 +80,12 @@ struct MODIOUI_API FModioCheckBoxStyle : public FSlateWidgetStyle
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	FModioWidgetBorderStyle CheckBoxBorderStyle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget", meta = (DisplayName = "Pressed Sound"))
+	FSlateSound PressedSlateSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget", meta = (DisplayName = "Hovered Sound"))
+	FSlateSound HoveredSlateSound;
 };
 
 /**
@@ -94,11 +101,6 @@ public:
 	**/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category = "Widget")
 	FModioCheckBoxStyle Style;
-
-	virtual void PostLoad() override
-	{
-		Super::PostLoad();
-	}
 
 	virtual const struct FSlateWidgetStyle* const GetStyle() const override
 	{

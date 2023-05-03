@@ -78,6 +78,11 @@ TArray<FString> UModioModDetailsPropertyInspector::GetPropertyValueStyleNames() 
 	return GetStyleNames(PropertyValueTextStyle);
 }
 
+TArray<FString> UModioModDetailsPropertyInspector::GetFillerStyleNames() const
+{
+	return GetStyleNames(FillerTextStyle);
+}
+
 const FModioRichTextStyle& UModioModDetailsPropertyInspector::GetTextStyle(FModioUIStyleRef TextStyle)
 {
 	if (const FModioRichTextStyle* Style = TextStyle.FindStyle<FModioRichTextStyle>())
@@ -112,7 +117,15 @@ void UModioModDetailsPropertyInspector::NativeOnUpdatePropertyDisplay()
 															   PropertyValueTextStyle);
 			PropertyValueBlock->SetText(GetPropertyText(PropDesc.Property));
 			PropertyGrid->AddChildToGrid(PropertyValueBlock, CurrentRowIndex, 1);
-			CurrentRowIndex++;
+
+			UModioRichTextBlock* FillerBlock = WidgetTree->ConstructWidget<UModioRichTextBlock>();
+			FillerBlock->SetDefaultStyleName(FillerStyleName);
+			FillerBlock->GetStyleDelegate().BindUObject(this, &UModioModDetailsPropertyInspector::GetTextStyle, FillerTextStyle);
+			FillerBlock->SetText(FillerText);
+			PropertyGrid->AddChildToGrid(FillerBlock, CurrentRowIndex + 1, 0);
+			PropertyGrid->AddChildToGrid(FillerBlock, CurrentRowIndex + 1, 1);
+
+			CurrentRowIndex = CurrentRowIndex + 2;
 		}
 	}
 }

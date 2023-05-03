@@ -36,15 +36,15 @@ protected:
 
 	void Refresh();
 
+	void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+
+public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* TagCategoryLabel;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioListViewString* CategoryTagList;
 
-	void NativeOnListItemObjectSet(UObject* ListItemObject) override;
-
-public:
 	UFUNCTION(BlueprintCallable, Category = "ModioTagSelectorWidgetBase")
 	TArray<FString> GetSelectedTags();
 	UFUNCTION(BlueprintCallable, Category = "ModioTagSelectorWidgetBase")

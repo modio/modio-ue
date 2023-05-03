@@ -85,6 +85,7 @@ protected:
 	virtual void NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState) override;
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 	UFUNCTION()
 	void SortAToZ();
@@ -111,5 +112,16 @@ protected:
 	UFUNCTION()
 	void OnModGroupChanged(FText SelectedItem, ESelectInfo::Type SelectionType);
 
-public:
+	bool bSearchInputFocused = false;
+
+	// This is initialized on blueprints, since it was a lot simpler there
+	UPROPERTY(BlueprintReadWrite, Category = "Widgets")
+	class UUserWidget* FirstTile;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText DefaultButtonLabel;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText SearchingButtonLabel;
+
 };

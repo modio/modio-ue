@@ -44,6 +44,9 @@ public:
 
 	void NativeOnInitialized() override;
 
+	virtual void NativeConstruct() override;
+	void SetDialogFocus();
+
 private:
 	UModioDialogBaseInternal* OwningDialog;
 

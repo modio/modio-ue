@@ -18,6 +18,7 @@ void UModioTagSelectorWidgetBase::NativeOnInitialized()
 	if (CategoryTagList)
 	{
 		CategoryTagList->OnItemSelectionChanged().AddUObject(this, &UModioTagSelectorWidgetBase::OnTagSelectionChanged);
+		bIsFocusable = false;
 	}
 }
 
@@ -53,11 +54,6 @@ void UModioTagSelectorWidgetBase::Refresh()
 			Algo::Transform(TagInfo->Underlying.TagGroupValues, TagListItemSource,
 							[](FString Value) { return MakeShared<FString>(Value); });
 			CategoryTagList->SetListItems(TagListItemSource);
-
-			for (const auto& Tag : TagInfo->SelectedTagValues)
-			{
-				CategoryTagList->SetItemSelection(Tag, true, ESelectInfo::Direct);
-			}
 		}
 	}
 }

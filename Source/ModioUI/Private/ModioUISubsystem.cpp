@@ -22,6 +22,7 @@
 #include "ModioErrorCondition.h"
 #include "ModioSubsystem.h"
 #include "Settings/ModioUISettings.h"
+#include "UI/ModioDefaultInputGlyphProvider.h"
 #include "UI/CommonComponents/ModioMenu.h"
 #include "UI/Interfaces/IModioUIAuthenticationDataProvider.h"
 #include "UI/Interfaces/IModioUIInputHintGlyphProvider.h"
@@ -37,6 +38,10 @@ void UModioUISubsystem::GetPreloadDependencies(TArray<UObject*>& OutDeps)
 	if (LoadedDefaultStyleSet != nullptr)
 	{
 		OutDeps.Add(LoadedDefaultStyleSet);
+		for (auto& object : LoadedDefaultStyleSet->GetAssetReferences())
+		{
+			OutDeps.Add(object);
+		}
 	}
 }
 
@@ -56,7 +61,7 @@ void UModioUISubsystem::RequestModEnabledState(FModioModID ID, bool bNewEnabledS
 {
 	if (OnModEnabledChanged.IsBound())
 	{
-		OnModEnabledChanged.Execute(ID, bNewEnabledState);
+		OnModEnabledChanged.Broadcast(ID, bNewEnabledState);
 	}
 }
 
@@ -362,8 +367,8 @@ UModioUIStyleSet* UModioUISubsystem::GetDefaultStyleSet()
 		UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
 
 		// Could we load the user's override?
-		if (Settings && !Settings->DefaultStyleSet.IsNull())
-		{
+        if (Settings && !Settings->DefaultStyleSet.IsNull())
+        {
 			LoadedDefaultStyleSet = Settings->DefaultStyleSet.LoadSynchronous();
 		}
 		else
@@ -383,25 +388,31 @@ UMaterialInterface* UModioUISubsystem::GetInputGlyphMaterialForInputType(FKey Vi
 {
 	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
 	{
+#if WITH_EDITOR
+		// This if for switching the glyphsets while testing. If it's set to Unknown in the settings,
+		// this will have no effect, otherwise it will override the glyphset
+		if (Settings->InputDevicesForTesting != EModioUIInputMode::Unknown)
+		{
+			InputType = Settings->InputDevicesForTesting;
+		}
+#endif
 		if (UClass* GlyphProviderClass = Settings->InputHintGlyphProvider.Get())
 		{
 			if (UObject* TmpProvider = NewObject<UObject>(this, GlyphProviderClass))
 			{
-				if (UMaterialInterface* GlyphMaterial =
-					IModioUIInputHintGlyphProvider::Execute_GetInputGlyphMaterialForInputType(
-						TmpProvider, VirtualInput, InputType))
-				{
-					return GlyphMaterial;
-				}
+				return IModioUIInputHintGlyphProvider::Execute_GetInputGlyphMaterialForInputType(
+					TmpProvider, VirtualInput, InputType);
+			}
+		}
+		else if (UClass* testClass = UModioDefaultInputGlyphProvider::StaticClass())
+		{
+			if (UObject* testProvider = NewObject<UObject>(this, testClass))
+			{
+				return IModioUIInputHintGlyphProvider::Execute_GetInputGlyphMaterialForInputType(testProvider, VirtualInput, InputType);
 			}
 		}
 	}
-
-	UModioUIStyleSet* DefaultStyleSet = GetDefaultStyleSet();
-	if (DefaultStyleSet)
-	{
-		return DefaultStyleSet->GetInputGlyphMaterialForInputType(VirtualInput, InputType);
-	}
+	
 	return nullptr;
 }
 
@@ -414,6 +425,16 @@ TArray<FName> UModioUISubsystem::GetAllNamedStyleNames()
 		StyleNames = DefaultStyleSet->GetAllStyleNames();
 	}
 	return StyleNames;
+}
+
+void UModioUISubsystem::SetCurrentFocusTarget(UWidget* currentTarget) 
+{
+	CurrentFocusTarget = currentTarget;
+}
+
+UWidget* UModioUISubsystem::GetCurrentFocusTarget()
+{
+	return CurrentFocusTarget;
 }
 
 void UModioUISubsystem::SetControllerOverrideType(EModioUIInputMode NewOverride)
@@ -464,6 +485,7 @@ void UModioUISubsystem::CloseModBrowserUI()
 		ModBrowserInstance->RemoveFromViewport();
 		ModBrowserInstance->ConditionalBeginDestroy();
 		ModBrowserInstance = nullptr;
+		LoadedDefaultStyleSet->ClearMaterialCache();
 	}
 }
 
@@ -733,6 +755,11 @@ void UModioUISubsystem::OnLogoutComplete(FModioErrorCode ec)
 void UModioUISubsystem::CloseSearchDrawer()
 {
 	ModBrowserInstance->ForceCloseSearchDrawer();
+}
+
+void UModioUISubsystem::CloseDownloadDrawer()
+{
+	ModBrowserInstance->ForceCloseDownloadDrawer();
 }
 
 void UModioUISubsystem::ShowModReportDialog(UObject* DialogDataSource)

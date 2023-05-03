@@ -50,6 +50,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioAsyncOpWrapperWidget* FeaturedViewContent;
 
+	UPROPERTY(meta = (BindWidget))
+	class UModioGridPanel* PrimaryCategoryGridPanel;
+
 	// Holds the featured items so that they don't go out of scope
 	UPROPERTY()
 	TArray<UObject*> CachedFeaturedItems;
@@ -68,6 +71,14 @@ protected:
 												const FNavigationEvent& InNavigationEvent) override;
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Widgets")
+	void SetFocusToPrimaryCategory();
+
+	UFUNCTION(BlueprintCallable, Category = "Widgets")
+	void SetFocusToAdditionalCategory();
+
 	UFUNCTION()
 	int32 GetSelectionIndex();
 	UFUNCTION()

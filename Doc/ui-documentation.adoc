@@ -90,14 +90,7 @@ To configure these mappings, expand the `Modio to Project Input Mappings` sectio
 
 image::img/plugin_ui_styleset.png[]
 
-The mod.io Mod Browser uses the asset specified here to define 
-
-* Global Color palette for the UI
-* Styles for each of the default widget implementations
-* Named pseudo-vector glyphs for symbols used in the UI
-* Default input glyphs for input hints
-
-NOTE: It is currently not recommended to alter this variable to point to a new style sheet, but simply alter the existing one to meet your needs. Stylesheets are currently binary assets with a lot of internal cross-references (to allow multiple styles to share a single named material for a brush, for instance) and there's substantial improvements coming with this system.
+The Styleset defines colors, styling, audio and other properties of the UI that can be changed. Each of these style types are split into separate assets to be managed individually. When styling your UI, its recommended that you duplicate the existing ModioUIDefaultStyle asset and any child assets that you want to change, rather than overriding the properties in the existing style assets. This will ensure that future UI updates will not cause conflicts with your changes.
 
 ==== NavigationConfig Factory
 
@@ -217,15 +210,9 @@ If you want to use the provided audio, then you can use the S_Modio_UI sound cla
 
 === Known Issues
 
-The mod.io Mod Browser is currently considered a beta release and therefore is shipping with several known issues.
+This release of the UI contains some known issues that are currently being improved.
 
 * Unreal Engine 5 is not officially supported, therefore there may be some display or functionality issues related to the mod browser.
-* Gamepad navigation is only partially implemented and not yet officially supported. There is a limited set of controller functionality available.
-* When using a gamepad, some input hint glyphs may not be available.
-* Input hint glyphs are not available when keyboard input is used.
 * Offline mode is not supported. If there are connectivity issues to the mod.io API then the UI behavior is currently undefined.
-* The "Search and Filter" tag list may not display a scrollbar with a large list of tags.
-* When making style set or configuration changes inside of the editor, some options may not be re-loaded correctly, and therefore stale state inside of PIE may be possible.
 * Changing users by logging out and logging back in as a new user may result in some inconsistent UI state related to mod collections. This does not occur after restarting.
 * Transparent PNGs retrieved for mod galleries, logos etc may not display correctly
-* Colors directly referenced in Materials or Material Instances that exist as project assets (rather than being generated on-the-fly as a Named Brush Material) currently require manual updates if you change the color palette.

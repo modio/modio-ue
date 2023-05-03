@@ -19,6 +19,7 @@
 #include "Types/ModioEditModParams.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
+#include "Types/ModioGameInfo.h"
 #include "Types/ModioImageWrapper.h"
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioModCollectionEntry.h"
@@ -33,8 +34,8 @@
 #include "Types/ModioReportParams.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioUser.h"
-#include "Types/ModioValidationError.h"
 #include "Types/ModioUserList.h"
+#include "Types/ModioValidationError.h"
 
 #include "ModioSubsystem.generated.h"
 
@@ -43,6 +44,7 @@ DECLARE_DELEGATE_OneParam(FOnErrorOnlyDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_OneParam(FOnModManagementDelegateFast, FModioModManagementEvent);
 DECLARE_DELEGATE_TwoParams(FOnListAllModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnGetModInfoDelegateFast, FModioErrorCode, TOptional<FModioModInfo>);
+DECLARE_DELEGATE_TwoParams(FOnGetGameInfoDelegateFast, FModioErrorCode, TOptional<FModioGameInfo>);
 DECLARE_DELEGATE_TwoParams(FOnGetMediaDelegateFast, FModioErrorCode, TOptional<FModioImageWrapper>);
 DECLARE_DELEGATE_TwoParams(FOnGetModTagOptionsDelegateFast, FModioErrorCode, TOptional<FModioModTagOptions>);
 DECLARE_DELEGATE_TwoParams(FOnGetTermsOfUseDelegateFast, FModioErrorCode, TOptional<FModioTerms>);
@@ -61,6 +63,9 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListAllModsDelegate, FModioErrorCode, Erro
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModInfoDelegate, FModioErrorCode, ErrorCode, FModioOptionalModInfo, ModInfo);
 
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetGameInfoDelegate, FModioErrorCode, ErrorCode, FModioOptionalGameInfo,
+								   GameInfo);
+
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetMediaDelegate, FModioErrorCode, ErrorCode, FModioOptionalImage, Path);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModTagOptionsDelegate, FModioErrorCode, ErrorCode, FModioOptionalModTagOptions,
@@ -72,7 +77,8 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModDependenciesDelegate, FModioErrorCod
 								   FModioOptionalModDependencyList, Dependencies);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnSubmitNewModDelegate, FModioErrorCode, ErrorCode, FModioOptionalModID, NewModID);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnMuteUsersDelegate, FModioErrorCode, ErrorCode, FModioOptionalUserList, NewUserList);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnMuteUsersDelegate, FModioErrorCode, ErrorCode, FModioOptionalUserList,
+								   NewUserList);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCode, ErrorCode,
 								   FModioOptionalModInfoList, Result);
@@ -287,6 +293,19 @@ public:
 	 * @error GenericError::SDKNotInitialized|SDK not initialized
 	 */
 	MODIO_API void ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegateFast Callback);
+
+	/**
+	 * @brief Fetches detailed information about the specified game
+	 * @param GameID Game ID of the game data to fetch
+	 * @param Callback Callback providing a status code and an optional Modio::GameInfo object with the game's extended
+	 * information
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified game does not exist
+	 **/
+	MODIO_API void GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegateFast Callback);
 
 	/**
 	 * @brief Fetches detailed information about the specified mod, including description and file metadata for the
@@ -624,7 +643,7 @@ public:
 	 * @error UserDataError::InvalidUser|No authenticated user
 	 */
 	MODIO_API void GetMutedUsersAsync(FOnMuteUsersDelegateFast Callback);
-	
+
 	/**
 	 * @brief Provides a list of mods that the user has submitted, or is a team member for, for the current game,
 	 * applying the parameters specified in the filter.
@@ -754,11 +773,25 @@ public:
 	MODIO_API void K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegate Callback);
 
 	/**
+	 * @brief Fetches detailed information about the specified game
+	 * @param GameID Game ID of the game data to fetch
+	 * @param Callback Callback providing a status code and an optional Modio::GameInfo object with the game's extended
+	 * information
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified game does not exist
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "GetGameInfoAsync", Category = "mod.io|Game")
+	MODIO_API void K2_GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegate Callback);
+
+	/**
 	 * @brief Fetches detailed information about the specified mod, including description and file metadata for the
 	 * most recent release
 	 * @param ModId Mod ID of the mod to fetch data
-	 * @param Callback Callback providing a status code and an optional Modio::ModInfo object with the mod's extended
-	 * information
+	 * @param Callback Callback providing a status code and an optional Modio::ModInfo object with the mod's
+	 *extended information
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
@@ -1056,8 +1089,8 @@ public:
 
 	/*
 	 * @brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
-	 * exist should you choose to restore it at a later date. Archiving is restricted to team managers and administrators
-	 * only. Note that restoration and permanent deletion of a mod is possible only via web interface.
+	 * exist should you choose to restore it at a later date. Archiving is restricted to team managers and
+	 * administrators only. Note that restoration and permanent deletion of a mod is possible only via web interface.
 	 * @param Mod The mod to be archived.
 	 * @requires authenticated-user
 	 * @requires initialized-sdk

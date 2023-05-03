@@ -22,6 +22,26 @@ void UModioDefaultPopupMenuContent::NativeConstruct()
 
 	bIsFocusable = true;
 }
+void UModioDefaultPopupMenuContent::SelectListIndex(int index) 
+{
+	if (!CurrentMenuEntries.IsValidIndex(index)) 
+	{
+		return;
+	}
+
+	MyList->SetSelection(CurrentMenuEntries[index], ESelectInfo::OnKeyPress);
+}
+
+void UModioDefaultPopupMenuContent::SelectCurrentIndex() 
+{
+	TArray<TSharedPtr<FModioUIMenuEntry>> items = MyList->GetSelectedItems();
+	if (!items.IsValidIndex(0))
+	{
+		return;
+	}
+	MyList->SetSelection(items[0], ESelectInfo::OnKeyPress);
+}
+
 FOptionalSize UModioDefaultPopupMenuContent::GetDesiredItemWidth() const
 {
 	return DesiredSizeFromParentMenu.X;
@@ -90,6 +110,12 @@ void UModioDefaultPopupMenuContent::UpdateBoundValues()
 void UModioDefaultPopupMenuContent::OnEntrySelected(TSharedPtr<FModioUIMenuEntry> SelectedEntry,
 													ESelectInfo::Type SelectionType)
 {
+
+	if (SelectionType == ESelectInfo::Type::OnNavigation || SelectionType == ESelectInfo::Type::Direct) 
+	{
+		FSlateApplication::Get().PlaySound(ItemHoverSound);
+		return;
+	}
 	NativeGetContentCloseDelegate().ExecuteIfBound();
 
 	for (auto It = CurrentCommandList.MappedActions.CreateIterator(); It; ++It)
@@ -118,6 +144,7 @@ TSharedRef<ITableRow> UModioDefaultPopupMenuContent::GenerateMenuEntryWidget(
 	TSharedPtr<FModioUIMenuEntry> Item, const TSharedRef<STableViewBase>& OwnerTable)
 {
 	// clang-format off
+
 	auto Row = SNew(SModioTableRowBase<TSharedPtr<FModioUIMenuEntry>>, OwnerTable)
 	.Style(FModioUIStyleRef{"DefaultPopupRowStyle"})
 	.Content()
@@ -127,7 +154,13 @@ TSharedRef<ITableRow> UModioDefaultPopupMenuContent::GenerateMenuEntryWidget(
 		.HAlign(HAlign_Center)
 		.Padding(FMargin(20,8)) //This really should be fetched from the style of the button instead
 		[
-			SNew(SModioRichTextBlock).Text(Item->MenuEntryLabel).StyleReference_UObject(this, &UModioDefaultPopupMenuContent::GetTextStyle)
+			SNew(SBorder)
+			.BorderImage(FCoreStyle::Get().GetBrush("NoBorder"))
+            .Padding(0.f)
+			.Content()
+            [    
+				SNew(SModioRichTextBlock).Text(Item->MenuEntryLabel).StyleReference(&TextStyle)
+			]
 		]
 	];
 	// clang-format on
@@ -195,7 +228,6 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 	// clang-format off
 	MyBox = SNew(SBox)
 		.WidthOverride_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredItemWidth)
-		.HeightOverride_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredMenuHeight)
 		[
 			SAssignNew(MyBorder, SRetainerWidget)
 			.Phase(0)
@@ -206,10 +238,12 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 				SAssignNew(MyList, SModioListView<TSharedPtr<FModioUIMenuEntry>>)
 								.ListItemsSource(&CurrentMenuEntries)
 								.SelectionMode(ESelectionMode::Single)
-								.ItemHeight_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredItemHeight)
+								.ItemHeight(DesiredSizeFromParentMenu.Y)
 								.OnSelectionChanged_UObject(this, &UModioDefaultPopupMenuContent::OnEntrySelected)
 								.OnGenerateRow_UObject(this, &UModioDefaultPopupMenuContent::GenerateMenuEntryWidget)
 								.AllowOverscroll(EAllowOverscroll::No)
+								.HandleDirectionalNavigation(true)
+								.HandleGamepadEvents(true)
 								.IsFocusable(true)
 			]
 		];
@@ -231,6 +265,10 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 FReply UModioDefaultPopupMenuContent::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	FSlateApplication::Get().SetUserFocus(0, MyList, EFocusCause::SetDirectly);
-
+	if (CurrentMenuEntries.IsValidIndex(0)) 
+	{
+		MyList->SetSelection(CurrentMenuEntries[0]);
+	}
+	
 	return FReply::Handled();
 }

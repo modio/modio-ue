@@ -30,7 +30,6 @@ class MODIOUI_API UModioReportButtonGroupWidget : public UWidget,
 												  public IModioUIDataSourceWidget
 {
 	GENERATED_BODY()
-
 private:
 	UPROPERTY()
 	UObject* DataSource;
@@ -50,8 +49,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "DefaultDialogButtonStyle"), Category = "Widgets")
 	FModioUIStyleRef ButtonStyle {"DefaultDialogButtonStyle"};
-
-	TArray<TSharedPtr<SButton>> Buttons;
 
 	const FModioUIStyleRef* GetButtonTextStyle() const;
 

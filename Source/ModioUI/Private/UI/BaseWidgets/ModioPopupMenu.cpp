@@ -11,6 +11,7 @@
 #include "UI/BaseWidgets/ModioPopupMenu.h"
 #include "Core/Input/ModioInputKeys.h"
 #include "UI/BaseWidgets/ModioDefaultPopupMenuContent.h"
+#include "UI/CommonComponents/ModioModTile.h"
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/Interfaces/IModioUIPopupMenuContentWidget.h"
 #include "UI/Styles/ModioPopupMenuStyle.h"
@@ -42,7 +43,7 @@ UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 				Interface->GetContentCloseDelegate().BindUObject(this, &UModioPopupMenu::OnContentClose);
 			}
 		}
-
+		CurrentContent = ConcreteWidget;
 		return ConcreteWidget;
 	}
 	else
@@ -61,7 +62,7 @@ UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 				Interface->GetContentCloseDelegate().BindUObject(this, &UModioPopupMenu::OnContentClose);
 			}
 		}
-
+		CurrentContent = ConcreteWidget;
 		return ConcreteWidget;
 	}
 }
@@ -72,13 +73,14 @@ TSharedRef<SWidget> UModioPopupMenu::RebuildWidget()
 	MenuButton->SetButtonStyle(ButtonStyle, true);
 	MenuButton->SetJustification(ButtonLabelJustification);
 	MenuButton->SetLabel(ButtonLabel);
-	MenuButton->OnClicked.AddDynamic(this, &UModioPopupMenu::HandleButtonClicked);
+	MenuButton->OnPressed.AddDynamic(this, &UModioPopupMenu::HandleButtonClicked);
+	MenuButton->DisplayHintForInputHandler(KeyForInputHint);
 	// Refactor and expose on the popup menu?
 	// Temporary fix since this function seems to have not been implemented correctly or is missing features
 	// MenuButton->DisplayHintForInputHandler(FModioInputKeys::MoreOptions);
 	TSharedRef<SWidget> Widget = SAssignNew(MyMenuAnchor, SMenuAnchor)
 									 .Placement(Placement)
-									 .FitInWindow(bFitInWindow)
+									 .FitInWindow(true)
 									 .Method(EPopupMethod::UseCurrentWindow)
 									 .OnGetMenuContent(BIND_UOBJECT_DELEGATE(FOnGetContent, HandleGetMenuContent))
 									 .OnMenuOpenChanged(BIND_UOBJECT_DELEGATE(FOnIsOpenChanged, HandleMenuOpenChanged))
@@ -95,15 +97,45 @@ void UModioPopupMenu::ReleaseSlateResources(bool bReleaseChildren)
 
 void UModioPopupMenu::HandleButtonClicked()
 {
-	ToggleOpen(true);
+	UModioModTile* parent = Cast<UModioModTile>(GetOuter());
+	if (parent && !parent->AllowMouseHoverFocus())
+	{
+		return;
+	}
+	ToggleOpen(false);
 }
 
 void UModioPopupMenu::OnContentClose()
 {
+	UModioModTile* parent = Cast<UModioModTile>(GetOuter());
+	if (parent && !parent->AllowMouseHoverFocus()) 
+	{
+		return;
+	}
 	Close();
 }
 
 void UModioPopupMenu::SetMenuEntries(FModioUIMenuCommandList Entries)
 {
 	CurrentEntries = Entries;
+}
+
+void UModioPopupMenu::SelectCurrentMenuItem() 
+{
+	UModioDefaultPopupMenuContent* widget = Cast<UModioDefaultPopupMenuContent>(CurrentContent);
+	if (!IsValid(widget)) 
+	{
+		return;
+	}
+
+	widget->SelectCurrentIndex();
+}
+
+bool UModioPopupMenu::GetIsMenuOpen()
+{
+	if (!MyMenuAnchor) 
+	{
+		return false;
+	}
+	return MyMenuAnchor->IsOpen();
 }

@@ -35,7 +35,6 @@ protected:
 	bool CenterPanelItems;
 
 	virtual void OnItemHoveredChanged(UObject* Item, bool bNewSelectionState);
-
 	virtual void SynchronizeProperties() override;
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 	TSharedRef<STableViewBase> RebuildListWidget() override;
@@ -53,7 +52,6 @@ protected:
 
 public:
 	void SetConsumeMouseWheel(EConsumeMouseWheel NewValue);
-
 	float GetScrollOffset();
 
 	UFUNCTION(BlueprintCallable, Category = "mod.io|TileView")

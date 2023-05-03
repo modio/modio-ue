@@ -14,7 +14,7 @@
 #include "CoreMinimal.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
 #include "UI/BaseWidgets/Slate/SModioWidgetCarouselBase.h"
-
+#include "TimerManager.h"
 #include "ModioWidgetCarousel.generated.h"
 
 /**
@@ -51,7 +51,6 @@ protected:
 	virtual void SynchronizeProperties() override;
 
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
-
 	// These may need to be reassigned after each scroll on the internal widget;
 
 	UPROPERTY(Transient, BlueprintReadOnly, EditAnywhere, Category = "Carousel")
@@ -159,5 +158,17 @@ public:
 	void ScrollRight()
 	{
 		MyCarousel->ScrollRight();
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "ModioWidgetCarousel")
+	void SetFocusToCurrentElement() 
+	{
+		FTimerHandle timer;
+		if (!MyCarousel  || (!MyCarousel->SetFocusToContent() && !MyCarousel->HasFocusedDescendants()))
+		{
+			// Easiest way to ensure the focus is set to some target when this function is called
+			// Prevents focus lost on Login/Logout
+			GetWorld()->GetTimerManager().SetTimer(timer, this, &UModioWidgetCarousel::SetFocusToCurrentElement, 0.1f, false);
+		}
 	}
 };

@@ -38,9 +38,9 @@ public:
 	{
 		if (StyleToSearch)
 		{
-			if (StyleToSearch->ColorPresets.Contains(*ColorName.Get()))
+			if (StyleToSearch->GetColorPaletteData()->ColorPresets.Contains(*ColorName.Get()))
 			{
-				FModioUIColor& PreviewColor = StyleToSearch->ColorPresets[*ColorName.Get()];
+				FModioUIColor& PreviewColor = StyleToSearch->GetColorPaletteData()->ColorPresets[*ColorName.Get()];
 				return SNew(SHorizontalBox) +
 					   SHorizontalBox::Slot()
 						   .HAlign(HAlign_Fill)
@@ -197,7 +197,7 @@ public:
 	{
 		ColorPresetNames.Empty();
 
-		Algo::Transform(StyleBeingEdited->ColorPresets, ColorPresetNames,
+		Algo::Transform(StyleBeingEdited->GetColorPaletteData()->ColorPresets, ColorPresetNames,
 						[](const TPair<FName, FModioUIColor>& Preset) { return MakeShared<FName>(Preset.Key); });
 	}
 
@@ -205,7 +205,8 @@ public:
 	{
 		FStructProperty* UnderlyingStruct = CastField<FStructProperty>(UnderlyingColorRefPropHandle->GetProperty());
 
-		if (ColorName.IsValid() && UnderlyingStruct && StyleBeingEdited->ColorPresets.Contains(*ColorName.Get()))
+		if (ColorName.IsValid() && UnderlyingStruct &&
+			StyleBeingEdited->GetColorPaletteData()->ColorPresets.Contains(*ColorName.Get()))
 		{
 			UnderlyingColorRefPropHandle->NotifyPreChange();
 			void* DataPointer;

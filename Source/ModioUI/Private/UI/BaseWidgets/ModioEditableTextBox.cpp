@@ -11,6 +11,7 @@
 #include "UI/BaseWidgets/ModioEditableTextBox.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Core/Input/ModioInputKeys.h"
 #include "UI/Styles/ModioEditableTextBoxStyle.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Images/SImage.h"
@@ -24,6 +25,22 @@ UModioEditableTextBox::UModioEditableTextBox(const FObjectInitializer& Initializ
 	MinimumDesiredWidth = 200;
 }
 
+void UModioEditableTextBox::StartInput() 
+{
+	if (MyEditableTextBlock.IsValid())
+	{
+		FWidgetPath WidgetToFocusPath;
+		
+		FSlateApplication::Get().GeneratePathToWidgetUnchecked(MyEditableTextBlock.ToSharedRef(), WidgetToFocusPath);
+		FSlateApplication::Get().SetKeyboardFocus(WidgetToFocusPath, EFocusCause::SetDirectly);
+		if (!WidgetToFocusPath.IsValid()) 
+		{
+			return;
+		}
+		WidgetToFocusPath.GetWindow()->SetWidgetToFocusOnActivate(MyEditableTextBlock);
+	}
+}
+
 void UModioEditableTextBox::SynchronizeProperties()
 {
 	UEditableTextBox::SynchronizeProperties();
@@ -33,6 +50,7 @@ void UModioEditableTextBox::SynchronizeProperties()
 		MyEditableTextBlock->SetStyle(ResolvedStyle);
 	}
 }
+
 FString UModioEditableTextBox::NativeGatherInput()
 {
 	return MyEditableTextBlock.IsValid() ? MyEditableTextBlock->GetText().ToString() : FString {};
@@ -68,7 +86,8 @@ TSharedRef<SWidget> UModioEditableTextBox::RebuildWidget()
 			] 
 			+SGridPanel::Slot(1, 0)
 			[
-				MyEditableTextBlock.ToSharedRef()
+				SAssignNew(MyEditableTextBlock, SEditableTextBox)
+				.OnKeyDownHandler_UObject(this, &UModioEditableTextBox::OnKeyDownHandler)
 			]
 		]
 	];
@@ -172,6 +191,33 @@ void UModioEditableTextBox::NativeSetValidationError(FText ErrorText)
 	{
 		MyErrorTextBlock->SetText(ErrorText);
 	}
+}
+
+FReply UModioEditableTextBox::OnKeyDownHandler(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (InKeyEvent.GetKey() == EKeys::Enter)
+	{
+		OnSubmit.Broadcast();
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+	{
+		OnNavigateDown.Broadcast();
+	}
+
+	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+
+	if ((GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Next || GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Previous) && subsystem->GetLastInputDevice() != EModioUIInputMode::Keyboard)
+	{
+		return FReply::Unhandled();
+	}
+
+	return FReply::Handled();
+}
+
+TSharedPtr<SEditableTextBox> UModioEditableTextBox::GetMyEditableTextBlock()
+{
+	return MyEditableTextBlock;
 }
 
 void UModioEditableTextBox::HandleOnTextChanged(const FText& InText)

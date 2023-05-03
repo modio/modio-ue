@@ -70,6 +70,11 @@ public:
 	UModioUISettings(const FObjectInitializer& Initializer);
 
 	/**
+	 * Used to fetch properties that weren't properly set in the constructor function 
+	 **/
+	virtual void PostInitProperties() override;
+
+	/**
 	* Map your project 's input axes and actions to mod.io UI ' virtual keys' here
 	**/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, EditFixedSize, Category = "ModioUISettings")
@@ -100,21 +105,27 @@ public:
 	* Stored property of the glyph provider for input actions
 	**/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioUIInputHintGlyphProvider"),
-		Category = "ModioUISettings")
+			  Category = "ModioUISettings")
 	TSubclassOf<UObject> InputHintGlyphProvider;
-
-	/**
-	* Stored property of the image provider to place as background
-	**/
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, meta = (MustImplement = "ModioMenuBackgroundProvider"),
-		Category = "ModioUISettings")
-	TSubclassOf<UObject> BackgroundImageProvider;
 
 	/**
 	* Stored soft pointer property to the browser configuration
 	**/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	TSoftObjectPtr<UModioModBrowserParams> BrowserCategoryConfiguration;
+
+	/**
+	 * Stored property of input devices for testing
+	 **/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
+	EModioUIInputMode InputDevicesForTesting;
+
+	/**
+	* Turn on if target platform does not support MSDF materials or there are some other issues with MSDF materials.
+	* This is turned on by default for XboxOne and Playstation 4.
+	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
+	bool bOverridePlatformMaterials = false;
 
 	#if WITH_EDITOR
 	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override

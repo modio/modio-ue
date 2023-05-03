@@ -55,8 +55,6 @@ protected:
 
 	FSlateColor GetButtonTextColor() const;
 
-	const FModioUIStyleRef* GetTextStyle() const;
-
 	void OnSelectionChangedHandler(TSharedPtr<FText> NewSelection, ESelectInfo::Type SelectionType);
 
 	virtual TSharedRef<SWidget> GenerateButtonContent(TSharedPtr<FText> Item);
@@ -85,11 +83,10 @@ protected:
 
 	// TODO: @modio-ue4 move into the ComboBoxStyle
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
-	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
-
+	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultButtonRichTextStyleWhite"};
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Widgets")
-	FMargin ContentPadding = FMargin(20.0f, 8);
+	FMargin ContentPadding = FMargin(20.0f, 12.0f);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool bPreviewOpen = false;
@@ -114,6 +111,8 @@ public:
 	{
 		CurrentEntries = Entries;
 	}
+
+	bool IsComboBoxOpen();
 
 	virtual FOnSelectionChanged& GetOnSelectionChanged()
 	{
@@ -143,4 +142,9 @@ public:
 			MyComboBox->SetSelectedItemIndex(Index);
 		}
 	}
+
+	void SetComboBoxOpen(bool bOpen);
+
+	
+	void SetFocusToButton();
 };

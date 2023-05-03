@@ -61,35 +61,35 @@ TArray<FKey> IModioInputMappingAccessor::GetModioInputKeys()
 
 TArray<FKey> IModioInputMappingAccessor::GetKeyForModioInputName(const FName Name)
 {
-	/*UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass());
-	if (!CurrentUISettings)
-	{
-		return {};
-	}
-	FModioInputMapping* ModioInputMapping = CurrentUISettings->ModioToProjectInputMappings.FindByPredicate(
-		[&Name](FModioInputMapping& Mapping) { return Mapping.ModioInputName == Name; });
-	if (ModioInputMapping)
-	{
-		UInputSettings* CurrentInputSettings = UInputSettings::GetInputSettings();
-		if (!CurrentInputSettings)
-		{
-			return {};
-		}
-		TArray<FKey> MappedKeys;
-		TArray<FInputActionKeyMapping> Actions;
-		TArray<FInputAxisKeyMapping> Axes;
-		CurrentInputSettings->GetActionMappingByName(ModioInputMapping->ProjectInputName, Actions);
-		CurrentInputSettings->GetAxisMappingByName(ModioInputMapping->ProjectInputName, Axes);
-		for (FInputActionKeyMapping Mapping : Actions)
-		{
-			MappedKeys.Add(Mapping.Key);
-		}
-		for (FInputAxisKeyMapping Mapping : Axes)
-		{
-			MappedKeys.Add(Mapping.Key);
-		}
-		return MappedKeys;
-	}*/
+	//UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass());
+	//if (!CurrentUISettings)
+	//{
+	//	return {};
+	//}
+	//FModioInputMapping* ModioInputMapping = CurrentUISettings->ModioToProjectInputMappings.FindByPredicate(
+	//	[&Name](FModioInputMapping& Mapping) { return Mapping.ModioInputName == Name; });
+	//if (ModioInputMapping)
+	//{
+	//	UInputSettings* CurrentInputSettings = UInputSettings::GetInputSettings();
+	//	if (!CurrentInputSettings)
+	//	{
+	//		return {};
+	//	}
+	//	TArray<FKey> MappedKeys;
+	//	TArray<FInputActionKeyMapping> Actions;
+	//	TArray<FInputAxisKeyMapping> Axes;
+	//	CurrentInputSettings->GetActionMappingByName(ModioInputMapping->ProjectInputName, Actions);
+	//	CurrentInputSettings->GetAxisMappingByName(ModioInputMapping->ProjectInputName, Axes);
+	//	for (FInputActionKeyMapping Mapping : Actions)
+	//	{
+	//		MappedKeys.Add(Mapping.Key);
+	//	}
+	//	for (FInputAxisKeyMapping Mapping : Axes)
+	//	{
+	//		MappedKeys.Add(Mapping.Key);
+	//	}
+	//	return MappedKeys;
+	//}
 	return {};
 }
 PRAGMA_DISABLE_OPTIMIZATION

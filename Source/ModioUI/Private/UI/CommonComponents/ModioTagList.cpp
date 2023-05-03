@@ -23,6 +23,8 @@ void UModioTagList::SynchronizeProperties()
 
 void UModioTagList::UpdateTagWidgets()
 {
+	NumberOfTagsToShow = Tags.Num();
+
 	if (*TagWidgetClass)
 	{
 		ClearChildren();
@@ -40,7 +42,7 @@ void UModioTagList::UpdateTagWidgets()
 		{
 #if WITH_EDITORONLY_DATA
 			if (MyFlowDirectionPreference == EFlowDirectionPreference::RightToLeft &&
-				NumberOfPreviewTags > NumberOfTagsToShow)
+				NumberOfPreviewTags < NumberOfTagsToShow)
 			{
 				UModioRichTextBlock* AdditionalTagsWidget = NewObject<UModioRichTextBlock>(this);
 				FFormatNamedArguments Args;
@@ -56,7 +58,7 @@ void UModioTagList::UpdateTagWidgets()
 				AddChildToWrapBox(TagWidget);
 			}
 			if (MyFlowDirectionPreference != EFlowDirectionPreference::RightToLeft &&
-				NumberOfPreviewTags > NumberOfTagsToShow)
+				NumberOfPreviewTags < NumberOfTagsToShow)
 			{
 				UModioRichTextBlock* AdditionalTagsWidget = NewObject<UModioRichTextBlock>(this);
 				FFormatNamedArguments Args;
@@ -77,6 +79,7 @@ void UModioTagList::UpdateTagWidgets()
 				AddChildToWrapBox(AdditionalTagsWidget)->SetVerticalAlignment(VAlign_Center);
 			}
 			int32 ClampedTagDisplayCount = FMath::Min(Tags.Num(), NumberOfTagsToShow);
+
 			for (int32 DisplayTagIndex = 0; DisplayTagIndex < ClampedTagDisplayCount; DisplayTagIndex++)
 			{
 				const FModioModTag& CurrentTag = Tags[DisplayTagIndex];
@@ -118,7 +121,11 @@ void UModioTagList::SetTags(TArray<FModioModTag> NewTags)
 	{
 		TagOptions = Subsystem->GetTagOptionsList();
 	}
-
 	Tags = MoveTemp(NewTags);
 	UpdateTagWidgets();
+}
+
+TSubclassOf<UModioTagWidgetBase> UModioTagList::GetTagWidgetClass()
+{
+	return TagWidgetClass;
 }

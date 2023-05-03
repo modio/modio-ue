@@ -12,6 +12,7 @@
 
 #include "Algo/Transform.h"
 #include "Core/ModioModInfoUI.h"
+#include "Core/Input/ModioInputKeys.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "UI/BaseWidgets/ModioListView.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
@@ -20,6 +21,7 @@
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/CommonComponents/ModioUserProfileButton.h"
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueOpProgress.h"
+#include "UI/Drawers/DownloadQueue/ModioDownloadQueueEntry.h"
 #include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
 #include "UI/Interfaces/IModioUIDownloadQueueWidget.h"
 
@@ -44,6 +46,7 @@ protected:
 
 	virtual void NativeOnInitialized()
 	{
+		bIsFocusable = true;
 		IModioUIUserChangedReceiver::Register<UModioDownloadQueueDrawer>();
 		if (LogOutButton)
 		{
@@ -56,21 +59,95 @@ protected:
 			CurrentOpProgress->OperationCompletedDelegate().BindDynamic(
 				this, &UModioDownloadQueueDrawer::HandleOperationCompleted);
 		}
-
 		UModioUserWidgetBase::NativeOnInitialized();
-		bIsFocusable = true;
 	}
+
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	{
 		Super::NativeTick(MyGeometry, InDeltaTime);
-
-		// We might want to move this into the actual Download progress widget itself?
-		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+		if (CurrentOpProgress)
 		{
-			if (TOptional<FModioModProgressInfo> CurrentProgress = Subsystem->QueryCurrentModUpdate())
+			UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+			switch (CurrentOpProgress->CurrentStatus)
 			{
-				Execute_RefreshDownloadQueue(this);
+				case EModioModManagementEventType::BeginInstall:
+				case EModioModManagementEventType::BeginUninstall:
+				case EModioModManagementEventType::BeginUpdate:
+				case EModioModManagementEventType::BeginUpload:
+					if (Subsystem)
+					{
+						if (TOptional<FModioModProgressInfo> CurrentProgress = Subsystem->QueryCurrentModUpdate())
+						{
+							Execute_RefreshDownloadQueue(this);
+						}
+					}
+					break;
+				default:
+					break;
 			}
+		}
+	}
+
+	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override
+	{
+		ConstructNavigationPath();
+		if (CurrentNavIndex >= NavigationPath.Num())
+		{
+			CurrentNavIndex = 0;
+		}
+		
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down) {
+
+			if (NavigationPath.IsValidIndex(CurrentNavIndex + 1)) {
+
+				CurrentNavIndex += 1;
+			}
+			if (NavigationPath.IsValidIndex(CurrentNavIndex))
+			{
+				NavigationPath[CurrentNavIndex]->SetFocus();
+			}
+			return FReply::Handled();
+		}
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+		{
+			if (NavigationPath.IsValidIndex(CurrentNavIndex - 1))
+			{
+				CurrentNavIndex -= 1;
+			}
+			if (NavigationPath.IsValidIndex(CurrentNavIndex))
+			{
+				NavigationPath[CurrentNavIndex]->SetFocus();
+			}
+			return FReply::Handled();
+		}
+		return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
+	}
+
+	void ConstructNavigationPath()
+	{
+		NavigationPath.Empty();
+		NavigationPath.Add(LogOutButton);
+		if (CurrentOpProgress->GetVisibility() != ESlateVisibility::Collapsed)
+		{
+			NavigationPath.Add(CurrentOpProgress->UnsubscribeButton);
+		}
+		for (auto& queueItems : OperationQueue->QueueList->GetDisplayedEntryWidgets())
+		{
+			UModioDownloadQueueEntry* queueEntry = Cast<UModioDownloadQueueEntry>(queueItems);
+			if (!queueEntry)
+			{
+				continue;
+			}
+			NavigationPath.Add(queueEntry);
+		}
+		for (auto& completedItems : CompletedQueue->QueueList->GetDisplayedEntryWidgets())
+		{
+			UModioDownloadQueueEntry* completedEntry = Cast<UModioDownloadQueueEntry>(completedItems);
+			if (!completedEntry)
+			{
+				continue;
+			}
+			NavigationPath.Add(completedEntry);
 		}
 	}
 
@@ -86,7 +163,7 @@ protected:
 	UFUNCTION()
 	void HandleOperationCompleted()
 	{
-		Execute_RefreshDownloadQueue(this);
+		RefreshOperationQueue();
 	}
 
 	TArray<UModioModInfoUI*> PendingDownloads;
@@ -126,6 +203,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText NoDownloadText = FText::FromString("There is no mod being downloaded");
 
+	TArray<UWidget*> NavigationPath;
+	int CurrentNavIndex = 0;
 	/// @brief Shows the newly updated user as the profile badge, name etc
 	/// @param NewUser The new user to display, will be empty if no user is yet logged in
 	virtual void NativeDisplayUserInfo(FModioOptionalUser NewUser) override
@@ -148,13 +227,21 @@ protected:
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override 
 	{
-		FSlateApplication::Get().SetUserFocus(0, LogOutButton->TakeWidget(), EFocusCause::SetDirectly);
+		RefreshOperationQueue();
+		ConstructNavigationPath();
+		CurrentNavIndex = 0;
+		if (NavigationPath.IsValidIndex(CurrentNavIndex))
+		{
+			NavigationPath[CurrentNavIndex]->SetFocus();
+		}
 		return FReply::Handled();
 	}
 
 	/// @brief Notifies the widget to fetch the current op and any queued ops for display, is this necessary?
+public:
 	virtual void NativeRefreshDownloadQueue() override
 	{
+
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
 			TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
@@ -173,6 +260,7 @@ protected:
 						NewModInfoWrapper->Underlying = UserSubscriptions[CurrentProgress->ID].GetModProfile();
 						CurrentOpProgress->SetDataSource(NewModInfoWrapper);
 						CurrentOpProgress->SetVisibility(ESlateVisibility::Visible);
+						CurrentOpProgress->UnsubscribeButton->IsFocusable = true;
 					}
 				}
 				if (StatusText)
@@ -216,60 +304,79 @@ protected:
 				}
 			}
 
-			if (OperationQueue)
-			{
-				// Rebuild the Pending Downloads list
-				PendingDownloads.Empty();
-				TArray<FModioModCollectionEntry> Entries;
-				UserSubscriptions.GenerateValueArray(Entries);
-				Algo::TransformIf(
-					Entries, PendingDownloads,
-					[](const FModioModCollectionEntry& Entry) {
-						// Filter all mods that are either installed, have uninstallations pending
-						// or currently being downloaded
-						return ((Entry.GetModState() != EModioModState::Installed) &&
-								(Entry.GetModState() != EModioModState::UninstallPending) &&
-								(Entry.GetModState() != EModioModState::Downloading) &&
-								(Entry.GetModState() != EModioModState::Extracting));
-					},
-					[](FModioModCollectionEntry Entry) {
-						UModioModInfoUI* EntryWrapper = NewObject<UModioModInfoUI>();
-						if (EntryWrapper)
-						{
-							EntryWrapper->Underlying = Entry.GetModProfile();
-						}
-						return EntryWrapper;
-					});
-
-				OperationQueue->UpdateListItems(PendingDownloads);
-
-				// Rebuild the Completed Downloads list
-				CompletedDownloads.Empty();
-
-				TArray<FModioModCollectionEntry> CompletedDownloadEntries;
-				UserSubscriptions.GenerateValueArray(Entries);
-				Algo::TransformIf(
-					Entries, CompletedDownloads,
-					[](const FModioModCollectionEntry& Entry) {
-						// Filter all mods that were installed this session
-						if (UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-						{
-							return ((Entry.GetModState() == EModioModState::Installed) &&
-									UISubsystem->ModsDownloadedThisSession.Contains(Entry.GetID()));
-						}
-						return false;
-					},
-					[](FModioModCollectionEntry Entry) {
-						UModioModInfoUI* EntryWrapper = NewObject<UModioModInfoUI>();
-						if (EntryWrapper)
-						{
-							EntryWrapper->Underlying = Entry.GetModProfile();
-						}
-						return EntryWrapper;
-					});
-
-				CompletedQueue->UpdateListItems(CompletedDownloads);
-			}
 		}
+	}
+
+	void RefreshOperationQueue()
+	{
+		UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+		if (!Subsystem)
+		{
+			return;
+		}
+		
+		TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+
+		// Early out if we do not find any subscriptions
+		if (UserSubscriptions.Num() == 0)
+		{
+			return;
+		}
+		
+
+		if (OperationQueue)
+		{
+			// Rebuild the Pending Downloads list
+			PendingDownloads.Empty();
+			TArray<FModioModCollectionEntry> Entries;
+			UserSubscriptions.GenerateValueArray(Entries);
+			Algo::TransformIf(
+				Entries, PendingDownloads,
+				[](const FModioModCollectionEntry& Entry) {
+					// Filter all mods that are either installed, have uninstallations pending
+					// or currently being downloaded
+					return ((Entry.GetModState() != EModioModState::Installed) &&
+							(Entry.GetModState() != EModioModState::UninstallPending) &&
+							(Entry.GetModState() != EModioModState::Downloading) &&
+							(Entry.GetModState() != EModioModState::Extracting));
+				},
+				[](FModioModCollectionEntry Entry) {
+					UModioModInfoUI* EntryWrapper = NewObject<UModioModInfoUI>();
+					if (EntryWrapper)
+					{
+						EntryWrapper->Underlying = Entry.GetModProfile();
+					}
+					return EntryWrapper;
+				});
+
+			OperationQueue->UpdateListItems(PendingDownloads);
+
+			// Rebuild the Completed Downloads list
+			CompletedDownloads.Empty();
+
+			TArray<FModioModCollectionEntry> CompletedDownloadEntries;
+			UserSubscriptions.GenerateValueArray(Entries);
+			Algo::TransformIf(
+				Entries, CompletedDownloads,
+				[](const FModioModCollectionEntry& Entry) {
+					// Filter all mods that were installed this session
+					if (UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+					{
+						return ((Entry.GetModState() == EModioModState::Installed) &&
+								UISubsystem->ModsDownloadedThisSession.Contains(Entry.GetID()));
+					}
+					return false;
+				},
+				[](FModioModCollectionEntry Entry) {
+					UModioModInfoUI* EntryWrapper = NewObject<UModioModInfoUI>();
+					if (EntryWrapper)
+					{
+						EntryWrapper->Underlying = Entry.GetModProfile();
+					}
+					return EntryWrapper;
+				});
+			CompletedQueue->UpdateListItems(CompletedDownloads);
+		}
+
 	}
 };

@@ -12,6 +12,7 @@
 
 #include "Components/CheckBox.h"
 #include "CoreMinimal.h"
+#include "UI/Styles/ModioCheckBoxStyle.h"
 #include "UI/Styles/ModioUIStyleRef.h"
 
 #include "ModioCheckBox.generated.h"
@@ -29,7 +30,7 @@ protected:
 	void SynchronizeProperties() override;
 	const struct FCheckBoxStyle* GetCheckboxStyle() const;
 	const struct FModioUIStyleRef* GetLabelStyleRef() const;
-	FText GetLabelText() const;
+
 	virtual TSharedRef<SWidget> GetContentWidget();
 	FMargin GetCheckboxContentPadding() const;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
@@ -46,5 +47,7 @@ public:
 	* Change the label for this Check Box
 	* @param InText The new string to display
 	**/
+	FText GetLabelText() const;
 	void SetLabelText(FText InText);
+	void SetStyle(const FModioCheckBoxStyle* InStyle);
 };

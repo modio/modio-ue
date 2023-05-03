@@ -207,15 +207,18 @@ TOptional<TArray<uint8>> GetImageData(TSharedPtr<IImageWrapper> ImageWrapper, ER
 	{
 		// Copy out the data
 		RawData = *OriginalRawData;
+		return RawData;
 	}
 	#else // 4.25 ->
 	TArray<uint8> OriginalRawData;
 	if (ImageWrapper->GetRaw(InFormat, 8, OriginalRawData))
 	{
 		RawData = MoveTemp(OriginalRawData);
+		return RawData;
 	}
 	#endif
-	return RawData;
+
+	return {};
 }
 
 #endif

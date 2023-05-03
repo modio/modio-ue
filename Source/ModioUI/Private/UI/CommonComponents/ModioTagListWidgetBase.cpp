@@ -9,8 +9,11 @@
  */
 
 #include "UI/CommonComponents/ModioTagListWidgetBase.h"
+#include "UI/CommonComponents/ModioTagSelectorWidgetBase.h"
+#include "UI/CommonComponents/ModioTagList.h"
 #include "Core/ModioTagOptionsUI.h"
 #include "TimerManager.h"
+#include "UI/CommonComponents/ModioSelectableTag.h"
 
 void UModioTagListWidgetBase::NativeOnSetDataSource()
 {
@@ -20,7 +23,9 @@ void UModioTagListWidgetBase::NativeOnSetDataSource()
 		if (UModioTagOptionsUI* TagOptions = Cast<UModioTagOptionsUI>(DataSource))
 		{
 			TagSelectorList->SetListItems(TagOptions->GetTagCategoriesForUI());
-			TagSelectorList->SetScrollOffset(0);
+			TagSelectorList->SetScrollOffset(0);	
+			TagSelectorList->SetSelectionMode(ESelectionMode::Single);
+
 			if (GetWorld())
 			{
 				GetWorld()->GetTimerManager().SetTimerForNextTick(
@@ -31,16 +36,10 @@ void UModioTagListWidgetBase::NativeOnSetDataSource()
 	InvalidateLayoutAndVolatility();
 }
 
-FReply UModioTagListWidgetBase::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
-{
-	FSlateApplication::Get().SetUserFocus(0, TagSelectorList->TakeWidget(), EFocusCause::SetDirectly);
-
-	return FReply::Handled();
-}
-
 void UModioTagListWidgetBase::NativePreConstruct()
 {
 	Super::NativePreConstruct();
+	bIsFocusable = false;
 }
 
 void UModioTagListWidgetBase::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -51,15 +50,32 @@ void UModioTagListWidgetBase::NativeTick(const FGeometry& MyGeometry, float InDe
 TArray<FString> UModioTagListWidgetBase::GetSelectedTags()
 {
 	TArray<FString> CombinedSelectedTags;
-	if (UModioTagOptionsUI* TagOptions = Cast<UModioTagOptionsUI>(DataSource))
+	for (auto& widget : TagSelectorList->GetDisplayedEntryWidgets())
 	{
-		for (UModioTagInfoUI* TagInfo : TagOptions->GetTagCategoriesForUI())
+		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(widget);
+		if (!tagSelector)
 		{
-			Algo::Transform(TagInfo->SelectedTagValues, CombinedSelectedTags,
-							[](TSharedPtr<FString> InString) { return *InString; });
+			continue;
 		}
-		TagCategoryCount = TagOptions->Underlying.GetRawList().Num();
+
+		for (auto& item : tagSelector->CategoryTagList->GetDisplayedEntryWidgets())
+		{
+			UModioSelectableTag* tag = Cast<UModioSelectableTag>(item);
+			if (tag && tag->IsCheckboxChecked())
+			{
+				CombinedSelectedTags.Add(tag->GetTagString());
+			}
+		}
+		
 	}
+
+	int index = 0;
+	for (auto& tag : CombinedSelectedTags) 
+	{
+		GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Blue, *tag);
+		index++;
+	}
+	
 	return CombinedSelectedTags;
 }
 
@@ -73,28 +89,21 @@ void UModioTagListWidgetBase::ClearSelectedTags()
 		}
 		if (TagSelectorList)
 		{
-			TagSelectorList->RegenerateAllEntries();
+			for (auto& widget : TagSelectorList->GetDisplayedEntryWidgets())
+			{
+				UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(widget);
+				if (!tagSelector)
+				{
+					continue;
+				}
+
+				for (auto& item : tagSelector->CategoryTagList->GetDisplayedEntryWidgets())
+				{
+					UModioSelectableTag* tag = Cast<UModioSelectableTag>(item);
+					tag->TagSelectedCheckbox->SetCheckedState(ECheckBoxState::Unchecked);
+				}
+			}
 		}
 	}
 }
 
-void UModioTagListWidgetBase::DisplayNextTagCategory()
-{
-	if (TagSelectorList)
-	{
-		CurrentlyDisplayedTagCategoryIndex = (CurrentlyDisplayedTagCategoryIndex + 1) % TagCategoryCount;
-		TagSelectorList->NavigateToIndex(CurrentlyDisplayedTagCategoryIndex);
-	}
-}
-
-void UModioTagListWidgetBase::DisplayPrevTagCategory()
-{
-	if (TagSelectorList)
-	{
-		if (CurrentlyDisplayedTagCategoryIndex == 0)
-		{
-			CurrentlyDisplayedTagCategoryIndex = TagCategoryCount - 1;
-			TagSelectorList->NavigateToIndex(CurrentlyDisplayedTagCategoryIndex);
-		}
-	}
-}

@@ -23,7 +23,6 @@
 #include "UI/Styles/ModioPopupMenuStyle.h"
 #include "Widgets/Views/STableRow.h"
 #include "Widgets/Views/STableViewBase.h"
-
 #include "ModioDefaultPopupMenuContent.generated.h"
 
 /**
@@ -31,9 +30,14 @@
 * and a style for text or its border
 **/
 UCLASS()
-class MODIOUI_API UModioDefaultPopupMenuContent : public UUserWidget, public IModioUIPopupMenuContentWidget
+class MODIOUI_API UModioDefaultPopupMenuContent : public UUserWidget,
+												  public IModioUIPopupMenuContentWidget
 {
 	GENERATED_BODY()
+public:
+	void SelectListIndex(int index);
+	void SelectCurrentIndex();
+
 protected:
 	FVector2D DesiredSizeFromParentMenu = FVector2D(32, 32);
 
@@ -48,16 +52,12 @@ protected:
 	virtual void SynchronizeProperties() override;
 	virtual void UpdateBoundValues();
 	virtual void OnEntrySelected(TSharedPtr<FModioUIMenuEntry> SelectedEntry, ESelectInfo::Type SelectionType);
-	const FModioUIStyleRef* GetTextStyle() const
-	{
-		return &TextStyle;
-	}
 
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
-	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultRichTextStyle"};
+	FModioUIStyleRef TextStyle = FModioUIStyleRef {"DefaultButtonRichTextStyleWhite"};
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FModioUIStyleRef BorderStyle = FModioUIStyleRef {"DefaultPopupBorderStyle"};

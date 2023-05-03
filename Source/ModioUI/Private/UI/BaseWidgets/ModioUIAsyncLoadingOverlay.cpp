@@ -20,10 +20,21 @@ void UModioUIAsyncLoadingOverlay::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+
+}
+
+void UModioUIAsyncLoadingOverlay::NativeConstruct() 
+{
+	Super::NativeConstruct();
 	if (CancelButton)
 	{
-		CancelButton->OnClicked.AddDynamic(this, &UModioUIAsyncLoadingOverlay::Close);
+		CancelButton->OnPressed.AddUniqueDynamic(this, &UModioUIAsyncLoadingOverlay::Close);
 	}
+}
+
+void UModioUIAsyncLoadingOverlay::SetDialogFocus()
+{
+	CancelButton->SetKeyboardFocus();
 }
 
 TSharedRef<SWidget> UModioUIAsyncLoadingOverlay::RebuildWidget()

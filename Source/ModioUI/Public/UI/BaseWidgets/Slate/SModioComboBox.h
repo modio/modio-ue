@@ -32,7 +32,7 @@ public:
 		  _OnGenerateWidget(),
 		  _InitiallySelectedItem(nullptr),
 		  _Method(),
-		  _MaxListHeight(450.0f),
+		  _MaxListHeight(0.0f),
 		  _HasDownArrow(true),
 		  _EnableGamepadNavigationMode(false),
 		  _IsFocusable(true)
@@ -58,8 +58,6 @@ public:
 	/** Called when combo box is opened, before list is actually created */
 	SLATE_EVENT(FOnComboBoxOpening, OnComboBoxOpening)
 
-	/** The custom scrollbar to use in the ListView */
-	SLATE_ARGUMENT(TSharedPtr<SScrollBar>, CustomScrollbar)
 
 	/** The option that should be selected when the combo box is first created */
 	SLATE_ARGUMENT(NullableOptionType, InitiallySelectedItem)
@@ -113,7 +111,6 @@ public:
 											 .OnSelectionChanged(InArgs._OnSelectionChanged)
 											 .OnGenerateWidget(InArgs._OnGenerateWidget)
 											 .OnComboBoxOpening(InArgs._OnComboBoxOpening)
-											 .CustomScrollbar(InArgs._CustomScrollbar)
 											 .InitiallySelectedItem(InArgs._InitiallySelectedItem)
 											 .Method(InArgs._Method)
 											 .MaxListHeight(InArgs._MaxListHeight)

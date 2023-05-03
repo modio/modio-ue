@@ -10,6 +10,11 @@
 
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "Core/Input/ModioInputKeys.h"
+#include "UI/Styles/ModioSpecifiedMaterialParams.h"
+#include "UI/Styles/ModioRoundedRectangleMaterialParams.h"
+#include "UI/Styles/ModioCheckBoxMaterialParams.h"
+#include "UI/Styles/ModioWidgetStyleData.h"
+#include "UI/Styles/ModioNamedGlyphsDataAsset.h"
 #include "Engine/Texture.h"
 #include "Engine/Texture2D.h"
 #include "PropertyPathHelpers.h"
@@ -24,15 +29,21 @@ const FSlateWidgetStyle* UModioUIStyleSet::GetWidgetStyleInternal(const FName De
 																  const FName StyleName) const
 #endif
 {
-	USlateWidgetStyleContainerBase* const* FoundStyle = WidgetStyles.Find(StyleName);
+	USlateWidgetStyleContainerBase* FoundStyle = nullptr;
+	for (auto& asset : WidgetStyleAssets)
+	{
+		FoundStyle = asset->WidgetStyles.FindRef(StyleName);
+		if (FoundStyle)
+		{
+			break;
+		}
+	}
+
 	if (FoundStyle)
 	{
-		return (*FoundStyle)->GetStyle();
+		return FoundStyle->GetStyle();
 	}
-	else
-	{
-		return nullptr;
-	}
+	return nullptr;
 }
 
 void UModioUIStyleSet::Log(EStyleMessageSeverity Severity, const FText& Message) const {}
@@ -40,9 +51,10 @@ void UModioUIStyleSet::Log(EStyleMessageSeverity Severity, const FText& Message)
 void UModioUIStyleSet::PostLoad()
 {
 	Super::PostLoad();
+
 	for (const auto& Prop : PropertyPathToColorPresetMap)
 	{
-		if (OldColorPresets.Contains(Prop.Value))
+		if (ColorPresetsData && ColorPresetsData->ColorPresets.Contains(Prop.Value))
 		{
 			FCachedPropertyPath PropertyPath = FCachedPropertyPath(Prop.Key);
 			if (PropertyPath.Resolve(this))
@@ -53,7 +65,7 @@ void UModioUIStyleSet::PostLoad()
 					return;
 				}
 
-				PropertyPathHelpers::SetPropertyValue(this, PropertyPath, OldColorPresets[Prop.Value]);
+				PropertyPathHelpers::SetPropertyValue(this, PropertyPath, ColorPresetsData->ColorPresets[Prop.Value]);
 			}
 		}
 	}
@@ -76,13 +88,14 @@ void UModioUIStyleSet::PostLoad()
 	}
 }
 
-void UModioUIStyleSet::ResetInputMappingGlyphs()
+void UModioUIStyleSet::ClearMaterialCache()
 {
-	InputMappingGlyphs.Empty();
-	for (const FKey& InputKey : FModioInputKeys::GetAll())
+	for (auto& material : MaterialInstanceCache)
 	{
-		InputMappingGlyphs.Add(InputKey, FModioInputMappingGlyph {});
+		material.Value->RemoveFromRoot();
 	}
+
+	MaterialInstanceCache.Empty();
 }
 
 TSet<FName> UModioUIStyleSet::GetStyleKeys() const
@@ -111,7 +124,33 @@ void UModioUIStyleSet::LogMissingResource(EStyleMessageSeverity Severity, const 
 
 UModioUIStyleSet::UModioUIStyleSet(const FObjectInitializer& Initializer) : UDataAsset(Initializer)
 {
-	ResetInputMappingGlyphs();
+
+}
+
+TArray<UObject*> UModioUIStyleSet::GetAssetReferences()
+{
+	TArray<UObject*> objects;
+	objects.Add(MaterialData);
+	objects.Add(NamedGlyphsAsset);
+	objects.Add(ColorPresetsData);
+	for (auto& style : WidgetStyleAssets)
+	{
+		objects.Add(style);
+	}
+	return objects;
+}
+
+void UModioUIStyleSet::RefreshStyleMaterials(FName StyleName) 
+{
+	for (auto& asset : WidgetStyleAssets)
+	{
+		UModioUIWidgetStyleContainer* style = Cast<UModioUIWidgetStyleContainer>(asset->WidgetStyles.FindRef(StyleName));
+		if (style)
+		{
+			style->LoadBrushMaterials();
+			return;
+		}
+	}
 }
 
 const FName& UModioUIStyleSet::GetStyleSetName() const
@@ -153,9 +192,10 @@ const FSlateColor UModioUIStyleSet::GetSlateColor(
 	const FSlateColor& DefaultValue /*= FStyleDefaults::GetSlateColor()*/ MODIO_UE5_REQUESTING_STYLE) const
 {
 	const FName ColorName = Join(PropertyName, Specifier);
-	if (ColorPresets.Contains(ColorName))
+
+	if (ColorPresetsData && ColorPresetsData->ColorPresets.Contains(ColorName))
 	{
-		return ColorPresets[ColorName];
+		return ColorPresetsData->ColorPresets[ColorName];
 	}
 	return DefaultValue;
 }
@@ -170,55 +210,86 @@ const FMargin& UModioUIStyleSet::GetMargin(
 
 UMaterialInterface* UModioUIStyleSet::GetNamedMaterial(const FName PropertyName, TOptional<FString> Specifier)
 {
-	FName ActualName = PropertyName;
-	if (Specifier.IsSet())
+	UMaterialInterface* material = nullptr; 
+	if (MaterialData)
 	{
-		ActualName = FName(PropertyName.ToString() + Specifier.GetValue());
+		if (MaterialData->NamedBrushMaterialsNew.Contains(PropertyName))
+		{
+			material = MaterialData->NamedBrushMaterialsNew[PropertyName]->GetMaterialInstance();
+		}
+		else if (MaterialData->RoundedRectangleParams.Contains(PropertyName))
+		{
+			material = MaterialData->RoundedRectangleParams[PropertyName]->GetMaterialInstance();
+		}
+		else if (MaterialData->CheckBoxMaterialParams.Contains(PropertyName))
+		{
+			material = MaterialData->CheckBoxMaterialParams[PropertyName]->GetMaterialInstance();
+		}
 	}
 
-	if (MaterialInstanceCache.Contains(ActualName))
+	if (material && !MaterialInstanceCache.Contains(PropertyName))
 	{
-		return MaterialInstanceCache[ActualName];
+		MaterialInstanceCache.Add(PropertyName, material);
+		material->AddToRoot(); // Material instances get garbage collected without this 
 	}
-	else if (NamedBrushMaterialsNew.Contains(PropertyName))
+
+	if (MaterialInstanceCache.Contains(PropertyName))
 	{
-		if (UMaterialInterface* NamedMaterial = NamedBrushMaterialsNew[PropertyName]->GetMaterialInstance())
-		{
-			if (UMaterialInstanceDynamic* AsDynamicMaterial = Cast<UMaterialInstanceDynamic>(NamedMaterial))
-			{
-				UMaterialInstanceDynamic* NewInstance =
-					UMaterialInstanceDynamic::Create(AsDynamicMaterial->Parent, this);
-				NewInstance->CopyInterpParameters(AsDynamicMaterial);
-				MaterialInstanceCache.Add(ActualName, NewInstance);
-				return NewInstance;
-			}
-			else
-			{
-				UMaterialInstanceDynamic* NewMaterialInstance = UMaterialInstanceDynamic::Create(NamedMaterial, this);
-				MaterialInstanceCache.Add(ActualName, NewMaterialInstance);
-				return NewMaterialInstance;
-			}
-		}
+		return MaterialInstanceCache.FindRef(PropertyName);
+	}
+
+	return material;
+}
+
+UMaterialInterface* UModioUIStyleSet::GetDefaultRoundedRectangleMaterial()
+{
+	if (MaterialData)
+	{
+		return MaterialData->DefaultRoundedRectangleMaterial;
+	}
+	return nullptr;
+}
+
+UMaterialInterface* UModioUIStyleSet::GetDefaultCheckboxMaterial()
+{
+	if (MaterialData)
+	{
+		return MaterialData->DefaultCheckboxMaterial;
 	}
 	return nullptr;
 }
 
 UMaterialInterface* UModioUIStyleSet::GetGlyphMaterial(const FName PropertyName)
 {
-	UMaterialInterface* GlyphMaterial = GetNamedMaterial(FName("DefaultGlyphMaterial"), PropertyName.ToString());
-	if (GlyphMaterial)
+	UMaterialInterface* GlyphMaterial = nullptr;
+	if (!MaterialData || !MaterialData->GetGlyphMaterial(bOverridePlatformMaterials))
 	{
-		UMaterialInstanceDynamic* GlyphMaterialInstance = Cast<UMaterialInstanceDynamic>(GlyphMaterial);
-		if (GlyphMaterialInstance)
-		{
-			if (NamedGlyphs.Contains(PropertyName))
-			{
-				GlyphMaterialInstance->SetTextureParameterValue(FName("Texture"), NamedGlyphs[PropertyName]);
-			}
-		}
+		return nullptr;
+	}
+	if (NamedGlyphsAsset)
+	{
+		GlyphMaterial = MaterialData->GetGlyphMaterial(bOverridePlatformMaterials);
 	}
 
-	return GlyphMaterial;
+	if (GlyphMaterial)
+	{
+		UMaterialInstanceDynamic* GlyphMaterialInstance;
+		GlyphMaterialInstance = UMaterialInstanceDynamic::Create(GlyphMaterial, NULL);
+
+		if (GlyphMaterialInstance && NamedGlyphsAsset)
+		{
+			if (NamedGlyphsAsset->GetNamedGlyph(PropertyName))
+			{
+				GlyphMaterialInstance->SetTextureParameterValue(FName("Texture"),
+																NamedGlyphsAsset->GetNamedGlyph(PropertyName, bOverridePlatformMaterials));
+			}
+			return GlyphMaterialInstance;
+		}
+
+		return GlyphMaterial;
+		
+	}
+	return nullptr;
 }
 
 const FSlateBrush* UModioUIStyleSet::GetBrush(const FName PropertyName,
@@ -232,16 +303,22 @@ const FSlateBrush* UModioUIStyleSet::GetBrush(const FName PropertyName,
 
 const TSharedPtr<FSlateBrush> UModioUIStyleSet::GetGlyphBrush(const FName PropertyName, const FVector2D& Size)
 {
-	if (NamedGlyphs.Contains(PropertyName) && DefaultGlyphMaterial)
+	UMaterialInterface* material = nullptr;
+	if (!MaterialData)
 	{
-		TSharedPtr<FSlateBrush> MaterialBrush = GetMaterialBrushInternal(PropertyName, DefaultGlyphMaterial, Size);
+		return nullptr;
+	}
+	if (NamedGlyphsAsset)
+	{
+		material = MaterialData->GetGlyphMaterial(bOverridePlatformMaterials);
+		TSharedPtr<FSlateBrush> MaterialBrush = GetMaterialBrushInternal(PropertyName, material, Size);
 		UMaterialInstanceDynamic* GlyphMaterialInstance =
 			Cast<UMaterialInstanceDynamic>(MaterialBrush->GetResourceObject());
 		checkf(GlyphMaterialInstance, TEXT("Could not create material instance for glyph %s for some reason!"),
 			   *PropertyName.ToString());
-		if (GlyphMaterialInstance)
+		if (GlyphMaterialInstance && NamedGlyphsAsset->GetNamedGlyph(PropertyName, bOverridePlatformMaterials))
 		{
-			GlyphMaterialInstance->SetTextureParameterValue(FName("Texture"), NamedGlyphs[PropertyName]);
+			GlyphMaterialInstance->SetTextureParameterValue(FName("Texture"), NamedGlyphsAsset->GetNamedGlyph(PropertyName, bOverridePlatformMaterials));
 			return MaterialBrush;
 		}
 	}
@@ -251,11 +328,12 @@ const TSharedPtr<FSlateBrush> UModioUIStyleSet::GetGlyphBrush(const FName Proper
 const TSharedPtr<FSlateBrush> UModioUIStyleSet::GetMaterialBrush(const FName PropertyName, TOptional<FString> Specifier,
 																 const FVector2D& Size)
 {
-	if (NamedBrushMaterialsNew.Contains(PropertyName))
+	if (MaterialData && MaterialData->NamedBrushMaterialsNew.Contains(PropertyName))
 	{
 		if (Specifier.IsSet())
 		{
-			if (UMaterialInterface* NamedMaterial = NamedBrushMaterialsNew[PropertyName]->GetMaterialInstance())
+			if (UMaterialInterface* NamedMaterial =
+					MaterialData->NamedBrushMaterialsNew[PropertyName]->GetMaterialInstance())
 			{
 				return GetMaterialBrushInternal(FName(PropertyName.ToString() + Specifier.GetValue()), NamedMaterial,
 												Size);
@@ -263,7 +341,8 @@ const TSharedPtr<FSlateBrush> UModioUIStyleSet::GetMaterialBrush(const FName Pro
 		}
 		else
 		{
-			if (UMaterialInterface* NamedMaterial = NamedBrushMaterialsNew[PropertyName]->GetMaterialInstance())
+			if (UMaterialInterface* NamedMaterial =
+					MaterialData->NamedBrushMaterialsNew[PropertyName]->GetMaterialInstance())
 			{
 				return GetMaterialBrushInternal(PropertyName, NamedMaterial, Size);
 			}
@@ -282,9 +361,14 @@ const TSharedPtr<FSlateBrush> UModioUIStyleSet::GetMaterialBrushInternal(const F
 	}
 	else
 	{
-		UMaterialInstanceDynamic* NewMaterialInstance = UMaterialInstanceDynamic::Create(ParentMaterial, this);
-		MaterialInstanceCache.Add(PropertyName, NewMaterialInstance);
-		TSharedPtr<FModioSlateMaterialBrush> NewBrush = MakeShared<FModioSlateMaterialBrush>(NewMaterialInstance, Size);
+		UMaterialInstanceDynamic* NewMaterialInstance = UMaterialInstanceDynamic::Create(ParentMaterial, NULL);
+		if (!MaterialInstanceCache.Contains(PropertyName))
+		{
+			NewMaterialInstance->AddToRoot();
+			MaterialInstanceCache.Add(PropertyName, NewMaterialInstance);
+		}
+		TSharedPtr<FModioSlateMaterialBrush> NewBrush =
+			MakeShared<FModioSlateMaterialBrush>(MaterialInstanceCache.FindRef(PropertyName), Size);
 		MaterialBrushCache.Add(PropertyName, NewBrush);
 
 		return StaticCastSharedPtr<FSlateBrush>(NewBrush);
@@ -296,9 +380,10 @@ const FSlateBrush* UModioUIStyleSet::GetSlateColorBrush(const FName PropertyName
 														const FSlateBrush* const DefaultBrush)
 {
 	const FName ColorName = Join(PropertyName, Specifier);
-	if (ColorPresets.Contains(ColorName))
+
+	if (ColorPresetsData->ColorPresets.Contains(ColorName))
 	{
-		return ColorPresets[ColorName].GetBrush();
+		return ColorPresetsData->ColorPresets[ColorName].GetBrush();
 	}
 	return DefaultBrush;
 }
@@ -363,7 +448,13 @@ void UModioUIStyleSet::NativeSerializeStyleReference(FString PathToProperty, FNa
 TArray<FName> UModioUIStyleSet::GetAllStyleNames() const
 {
 	TArray<FName> StyleNames;
-	WidgetStyles.GetKeys(StyleNames);
+	for (auto& asset : WidgetStyleAssets)
+	{
+		for (auto& style : asset->WidgetStyles)
+		{
+			StyleNames.Add(style.Key);
+		}
+	}
 	return StyleNames;
 }
 
@@ -377,46 +468,42 @@ TArray<FName> UModioUIStyleSet::GetNamedBrushNames()
 TArray<FName> UModioUIStyleSet::GetMaterialNames()
 {
 	TArray<FName> MaterialNames;
-	NamedBrushMaterialsNew.GetKeys(MaterialNames);
+
+	if (MaterialData)
+	{
+		MaterialData->NamedBrushMaterialsNew.GetKeys(MaterialNames);
+		for (auto& value : MaterialData->RoundedRectangleParams)
+		{
+			MaterialNames.Add(value.Key);
+		}
+		for (auto& value : MaterialData->CheckBoxMaterialParams)
+		{
+			MaterialNames.Add(value.Key);
+		}
+	}
 	return MaterialNames;
 }
 
 TArray<FName> UModioUIStyleSet::GetGlyphNames()
 {
 	TArray<FName> GlyphNames;
-	NamedGlyphs.GetKeys(GlyphNames);
+	if (!NamedGlyphsAsset)
+	{
+		return GlyphNames;
+	}
+	NamedGlyphsAsset->NamedGlyphs.GetKeys(GlyphNames);
 	return GlyphNames;
 }
 
-UMaterialInterface* UModioUIStyleSet::GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType)
+void UModioUIStyleSet::ModifyRoundedRectangle(FName InName, UMaterialInstanceDynamic* MaterialInstance) 
 {
-	UMaterialInterface* GlyphMaterial = GetNamedMaterial(
-		FName("DefaultGlyphMaterial"),
-		FString::Printf(TEXT("%s%d"), *VirtualInput.GetFName().ToString(), static_cast<uint8>(InputType)));
-	if (GlyphMaterial)
+	if (MaterialData && MaterialData->RoundedRectangleParams.Contains(InName))
 	{
-		UMaterialInstanceDynamic* GlyphMaterialInstance = Cast<UMaterialInstanceDynamic>(GlyphMaterial);
-		if (GlyphMaterialInstance)
-		{
-			if (UTexture2D* InputGlyphTexture = GetInputGlyphForInputType(VirtualInput, InputType))
-			{
-				GlyphMaterialInstance->SetTextureParameterValue(FName("Texture"), InputGlyphTexture);
-			}
-			return GlyphMaterialInstance;
-		}
+		MaterialData->RoundedRectangleParams[InName]->ModifyMaterial(MaterialInstance);
 	}
-
-	return nullptr;
 }
 
-UTexture2D* UModioUIStyleSet::GetInputGlyphForInputType(FKey VirtualInput, EModioUIInputMode InputType)
+UModioColorPresets* UModioUIStyleSet::GetColorPaletteData()
 {
-	if (InputMappingGlyphs.Contains(VirtualInput))
-	{
-		return InputMappingGlyphs[VirtualInput].GetInputGlyph(InputType);
-	}
-	else
-	{
-		return nullptr;
-	}
+	return ColorPresetsData;
 }

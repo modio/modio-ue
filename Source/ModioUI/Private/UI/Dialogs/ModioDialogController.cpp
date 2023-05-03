@@ -9,11 +9,17 @@
  */
 
 #include "UI/Dialogs/ModioDialogController.h"
+#include "UI/CommonComponents/ModioMenu.h"
 #include "Core/ModioAuthenticationContextUI.h"
 #include "Libraries/ModioErrorConditionLibrary.h"
 #include "ModioUISubsystem.h"
+#include "UI/BaseWidgets/Slate/SModioButtonBase.h"
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
 #include "UI/Interfaces/IModioUITextValidator.h"
+#include "UI/Interfaces/IModioUIDialogButtonWidget.h"
+#include "UI/Styles/ModioButtonStyle.h"
+#include "UI/Styles/ModioUIStyleRef.h"
+#include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBackgroundBlur.h"
 
 void UModioDialogController::SynchronizeProperties()
@@ -36,6 +42,36 @@ void UModioDialogController::ReleaseSlateResources(bool bReleaseChildren)
 {
 	Super::ReleaseSlateResources(bReleaseChildren);
 	MyBackgroundBlur.Reset();
+	MyBackgroundBox.Reset();
+	MyBackgroundButton.Reset();
+	ClickDisableButton.Reset();
+}
+
+FReply UModioDialogController::OnBackgroundButtonClicked()
+{
+	FinalizeDialog();
+	return FReply::Handled();
+}
+
+UModioDialogBaseInternal* UModioDialogController::GetActualDialog()
+{
+	if (ActualDialog)
+	{
+		return ActualDialog;
+	}
+	else
+		return nullptr;
+}
+
+bool UModioDialogController::TrySetFocusToActiveDialog()
+{
+	if (DialogStack.Num() && ActualDialog && !ActualDialog->HasFocusedDescendants())
+	{
+		ActualDialog->SetDialogFocus();
+		return true;
+	}
+
+	return DialogStack.Num() && ActualDialog && ActualDialog->HasFocusedDescendants();
 }
 
 float UModioDialogController::GetBlurStrength() const
@@ -57,13 +93,50 @@ TSharedRef<SWidget> UModioDialogController::RebuildWidget()
 		ActualDialog->SetDialogController(this);
 	}
 	// clang-format off
-	return SAssignNew(MyBackgroundBlur, SBackgroundBlur)
-		.HAlign(HAlign_Center)
-		.VAlign(VAlign_Center)
-		.BlurStrength_UObject(this, &UModioDialogController::GetBlurStrength)
-		[
-			ActualDialog->TakeWidget()
-		];
+				
+	MyBackgroundBox = SNew(SBox)
+			.VAlign(VAlign_Fill)
+			.HAlign(HAlign_Fill)
+			[
+				SAssignNew(MyBackgroundButton, SModioButtonBase)
+				.VAlign(VAlign_Fill)
+				.HAlign(HAlign_Fill)
+				.ContentPadding(0.0f)
+				.IsFocusable(true)
+				.ClickMethod(EButtonClickMethod::DownAndUp)
+
+				.OnClicked_UObject(this, &UModioDialogController::OnBackgroundButtonClicked)
+				[
+					SAssignNew(MyBackgroundBlur, SBackgroundBlur)
+					.HAlign(HAlign_Fill)
+					.VAlign(VAlign_Fill)
+					.Padding(0.0f)
+					.BlurStrength_UObject(this, &UModioDialogController::GetBlurStrength)
+					[
+						SNew(SBox)
+						.VAlign(VAlign_Center)
+						.HAlign(HAlign_Center)
+						[
+							SAssignNew(ClickDisableButton, SModioButtonBase)
+							.IsFocusable(false)
+							.VAlign(VAlign_Fill)
+							.HAlign(HAlign_Fill)
+							[
+								ActualDialog->TakeWidget()
+							]
+						]
+					]
+				]
+
+			];
+
+	if (const FModioButtonStyle* ResolvedButtonStyle = InvisibleButtonStyleRef.FindStyle<FModioButtonStyle>())
+	{
+		MyBackgroundButton->SetButtonStyle(&ResolvedButtonStyle->ButtonStyle);
+		ClickDisableButton->SetButtonStyle(&ResolvedButtonStyle->ButtonStyle);
+	}
+
+	return MyBackgroundBox.ToSharedRef();
 	// clang-format on
 }
 
@@ -112,6 +185,50 @@ void UModioDialogController::HandleEmailRequestSent(FModioErrorCode ec, UModioDi
 	}
 }
 
+void UModioDialogController::HandleAuthCodeRequestSent(FModioErrorCode ec)
+{
+	ActualDialog->HideLoadingSpinner();
+	if (ec)
+	{
+		// If the dialog has an input widget, check if we can surface an error on it
+		if (ActualDialog->InputWidget)
+		{
+			if (ActualDialog->InputWidget->Implements<UModioUITextValidator>())
+			{
+				// Initialize error message in case below ifs fail
+				FText Error = FText::FromString("An unknown error occurred");
+
+				if (UModioErrorConditionLibrary::ErrorCodeMatches(ec, EModioErrorCondition::InvalidArgsError))
+				{
+					if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+					{
+						TArray<FModioValidationError> LastValidationError = Subsystem->GetLastValidationError();
+						if (LastValidationError.Num())
+						{
+							// todo: @modio-ui support localization
+							Error = FText::FromString(LastValidationError[0].ValidationFailureDescription);
+						}
+					}
+				}
+				else
+				{
+					Error = FText::FromString(ec.GetErrorMessage());
+				}
+				IModioUITextValidator::Execute_SetValidationError(ActualDialog->InputWidget, Error);
+			}
+		}
+	}
+	else
+	{
+		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+		{
+			Subsystem->FetchExternalUpdatesAsync(
+				FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::OnFetchExternalCompleted));
+			FinalizeDialog();
+		}
+	}
+}
+
 void UModioDialogController::SendEmailCodeRequest(FString EmailAddress, UModioDialogInfo* DestinationOnSuccess)
 {
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
@@ -123,7 +240,7 @@ void UModioDialogController::SendEmailCodeRequest(FString EmailAddress, UModioDi
 	}
 }
 
-void UModioDialogController::SubmitEmailAuthCode(FString Code, UModioDialogInfo* DestinationOnSuccess)
+void UModioDialogController::SubmitEmailAuthCode(FString Code)
 {
 	// Proxy the request through the UI subsystem instead of hitting the UI subsystem directly so it broadcasts events
 	// to the UI as well as notifying us
@@ -131,8 +248,7 @@ void UModioDialogController::SubmitEmailAuthCode(FString Code, UModioDialogInfo*
 	{
 		Subsystem->RequestEmailAuthentication(
 			FModioEmailAuthCode(Code),
-			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleEmailRequestSent,
-													DestinationOnSuccess));
+			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleAuthCodeRequestSent));
 	}
 }
 
@@ -143,17 +259,34 @@ void UModioDialogController::PopDialog()
 		DialogStack.Pop();
 		DialogInputValues.Pop();
 	}
+
 	// If there was an underlying dialog to show, display it again and restore the state;
 	if (DialogStack.Num())
 	{
 		ActualDialog->InitializeFromDialogInfo(DialogStack.Top());
 		ActualDialog->SetInputWidgetString(DialogInputValues.Top());
+		ActualDialog->SetDialogFocus();
 	}
 	else
 	{
 		bCurrentlyDisplayingDialog = false;
 	}
+
 	SetVisibility(bCurrentlyDisplayingDialog ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	if (bCurrentlyDisplayingDialog) 
+	{
+		return;
+	}
+	
+	UModioUISubsystem* UISubsystem = Cast<UModioUISubsystem>(GEngine->GetEngineSubsystem<UModioUISubsystem>());
+	if (UISubsystem && UISubsystem->GetCurrentFocusTarget() && UISubsystem->GetCurrentFocusTarget()->IsVisible()) 
+	{
+		UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
+	}
+	else if (UISubsystem && UISubsystem->ModBrowserInstance) 
+	{
+		UISubsystem->ModBrowserInstance->SetFocus();
+	}
 }
 
 void UModioDialogController::FinalizeDialog(EModioDialogReply Reply)
@@ -170,6 +303,18 @@ void UModioDialogController::FinalizeDialog(EModioDialogReply Reply)
 		case EModioDialogReply::Cancel:
 			break;
 	}
+
+	UModioUISubsystem* UISubsystem = Cast<UModioUISubsystem>(GEngine->GetEngineSubsystem<UModioUISubsystem>());
+	if (UISubsystem && UISubsystem->GetCurrentFocusTarget() && UISubsystem->GetCurrentFocusTarget()->IsVisible())
+	{
+		UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
+	}
+	else if (UISubsystem && UISubsystem->ModBrowserInstance)
+	{
+		UISubsystem->ModBrowserInstance->SetFocus();
+	}
+
+	OnDialogClosed.Broadcast();
 }
 
 void UModioDialogController::PushDialog(UModioDialogInfo* InitialDialog, UObject* DialogDataSource)
@@ -185,6 +330,7 @@ void UModioDialogController::PushDialog(UModioDialogInfo* InitialDialog, UObject
 		DialogStack.Push(InitialDialog);
 		DialogInputValues.Push("");
 		ActualDialog->InitializeFromDialogInfo(InitialDialog, false, DialogDataSource);
+		ActualDialog->SetDialogFocus();
 		MyBackgroundBlur->Invalidate(EInvalidateWidgetReason::PaintAndVolatility | EInvalidateWidgetReason::Visibility |
 									 EInvalidateWidgetReason::Layout);
 	}
@@ -193,7 +339,7 @@ void UModioDialogController::PushDialog(UModioDialogInfo* InitialDialog, UObject
 
 void UModioDialogController::ShowAuthenticationChoiceDialog()
 {
-	if (!AuthenticationChoiceDialog.IsNull())
+	if (!AuthenticationChoiceDialog.IsNull() && !DialogStack.Contains(AuthenticationChoiceDialog))
 	{
 		PushDialog(AuthenticationChoiceDialog.LoadSynchronous());
 	}
@@ -277,6 +423,7 @@ void UModioDialogController::ShowLoadingDialog()
 {
 	ActualDialog->TakeWidget();
 	ActualDialog->ShowLoadingSpinner();
+	ActualDialog->SetDialogFocus();
 }
 
 void UModioDialogController::RequestUnsubscribe(const FModioModID& ModId, UModioDialogInfo* DestinationOnSuccess)

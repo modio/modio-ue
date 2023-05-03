@@ -45,13 +45,14 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual void NativeOnEntryReleased() override;
-	/*virtual void NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;*/
+	virtual void NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnSetExpandedState(bool bExpandedState) override;
-	virtual FNavigationReply NativeOnNavigation(const FGeometry& InGeometry,
-												const FNavigationEvent& InNavigationEvent) override;
+	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
+	virtual void NativeTileClicked() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 	void OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating);
 
 	UFUNCTION()
@@ -69,6 +70,9 @@ protected:
 	UFUNCTION()
 	void NativeReportClicked();
 
+	virtual FReply NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry,
+												  const FPointerEvent& InMouseEvent) override;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioPopupMenu* MoreOptionsMenu;
 
@@ -81,8 +85,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileActiveFrame;
 
+	float truncateDivider = 1.0f;
 
-	FString TruncateLongModName(FString inputStr);
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -97,4 +101,7 @@ public:
 	**/
 	UFUNCTION()
 	void SetSizeOverride(FVector2D NewSize);
+
+	bool AllowMouseHoverFocus();
+	bool bMoreOptionsMenuUpdated = false;
 };

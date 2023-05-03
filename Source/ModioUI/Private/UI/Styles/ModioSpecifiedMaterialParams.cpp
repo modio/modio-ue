@@ -13,18 +13,10 @@
 
 UMaterialInterface* UModioSpecifiedMaterialParams::GetMaterialInstance()
 {
-	if (!SpecifiedMaterial.IsNull())
-	{
-		if (UMaterialInterface* LoadedMaterial = SpecifiedMaterial.LoadSynchronous())
-		{
-			return LoadedMaterial;
-		}
-	}
-	return nullptr;
+	return SpecifiedMaterial;
 }
 
 void UModioSpecifiedMaterialParams::PostLoad()
 {
 	Super::PostLoad();
-	// GetMaterialInstance();
 }

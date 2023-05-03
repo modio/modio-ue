@@ -645,12 +645,18 @@ public:
 		MoveInDirection(EModioUIDirection::MoveRight);
 	};
 
+	virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent) override 
+	{
+		SetFocusToContent();
+		return FReply::Handled();
+	}
+
 	virtual FNavigationReply OnNavigation(const FGeometry& MyGeometry,
 										  const FNavigationEvent& InNavigationEvent) override
 	{
 		// Possibly call OnNavigation first, then handle what would be 'escape' with the below code
 		EUINavigation NavType = InNavigationEvent.GetNavigationType();
-
+		
 		if (NavType == EUINavigation::Left || NavType == EUINavigation::Previous)
 		{
 			ScrollLeft();
@@ -664,6 +670,16 @@ public:
 			return FNavigationReply::Explicit(CenterCarouselWidget->GetContent());
 		}
 		return SCompoundWidget::OnNavigation(MyGeometry, InNavigationEvent);
+	}
+
+	bool SetFocusToContent() 
+	{
+		if (!CenterCarouselWidget || !CenterCarouselWidget->GetContent())
+		{
+			return false;
+		}
+		
+		return FSlateApplication::Get().SetUserFocus(0, CenterCarouselWidget->GetContent(), EFocusCause::Navigation);
 	}
 
 	void SetItemSource(TArray<ItemType> InWidgetItemsSource)
@@ -711,3 +727,4 @@ public:
 
 	// delegates for begin transition and end transition;
 };
+

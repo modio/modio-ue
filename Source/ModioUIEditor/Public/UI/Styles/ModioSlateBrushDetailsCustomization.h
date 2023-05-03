@@ -146,7 +146,7 @@ public:
 				UMaterialInterface* ActualMaterial = Material->ResolveReference();
 				if (ActualMaterial)
 				{
-					UnderlyingBrushResourcePropHandle->SetValue(ActualMaterial);
+					UnderlyingBrushResourcePropHandle->SetValue(ActualMaterial->GetMaterial());
 				}
 				else
 				{
@@ -154,9 +154,9 @@ public:
 				}
 			}
 		}
-		// checkf(ActualReference, TEXT("Color reference somehow went out of scope!"));
-		// TSharedPtr<FName> ColorName = MakeShared<FName>(ActualReference->ColorName);
-		// UpdateUnderlyingSlateColor(ColorName, ESelectInfo::Direct);
+		 /*checkf(ActualReference, TEXT("Color reference somehow went out of scope!"));
+		 TSharedPtr<FName> ColorName = MakeShared<FName>(ActualReference->ColorName);
+		 UpdateUnderlyingSlateColor(ColorName, ESelectInfo::Direct);*/
 	}
 	void OnMaterialRefResetToDefault(TSharedPtr<IPropertyHandle> PropertyBeingReset)
 	{

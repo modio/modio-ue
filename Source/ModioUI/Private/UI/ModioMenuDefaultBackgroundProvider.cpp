@@ -12,7 +12,8 @@
 
 UMaterialInterface* UModioMenuDefaultBackgroundProvider::NativeGetBackgroundMaterial()
 {
-	FSoftObjectPath Fallback("/Modio/UI/Materials/M_UI_Background_Waves");
+	FSoftObjectPath Fallback("/modio/UI/Materials/M_UI_Background_Waves.M_UI_Background_Waves");
+
 	BackgroundMaterial = Cast<UMaterialInterface>(Fallback.TryLoad());
 	return BackgroundMaterial;
 }

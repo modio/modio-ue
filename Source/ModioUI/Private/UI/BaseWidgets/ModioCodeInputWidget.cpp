@@ -35,15 +35,11 @@ FEventReply UModioCodeInputWidget::ValidateCodeInputCharacter_Implementation(con
 void UModioCodeInputWidget::SynchronizeProperties()
 {
 	UWidget::SynchronizeProperties();
-	const FModioCodeInputStyle* ResolvedStyle = Style.FindStyle<FModioCodeInputStyle>();
-	MyInput->SetStyle(ResolvedStyle ? ResolvedStyle : &FModioCodeInputStyle::GetDefault());
-	MyInput->SetNumChildren(NumberOfCharacters);
 }
 
 TSharedRef<SWidget> UModioCodeInputWidget::RebuildWidget()
 {
 	const FModioCodeInputStyle* ResolvedStyle = Style.FindStyle<FModioCodeInputStyle>();
-
 	return SAssignNew(MyVerticalBox, SVerticalBox) +
 		   SVerticalBox::Slot()
 			   .AutoHeight()[SAssignNew(MyInput, SModioCodeInput)
@@ -90,4 +86,9 @@ void UModioCodeInputWidget::NativeSetValidationError(FText ErrorText)
 	{
 		MyErrorTextBlock->SetText(ErrorText);
 	}
+}
+
+TSharedPtr<SModioCodeInput> UModioCodeInputWidget::GetMyInput()
+{
+	return MyInput;
 }

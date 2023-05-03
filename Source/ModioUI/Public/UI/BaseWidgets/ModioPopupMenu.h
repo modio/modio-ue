@@ -43,10 +43,18 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TEnumAsByte<ETextJustify::Type> ButtonLabelJustification = ETextJustify::Center;
 
-	UPROPERTY(Transient)
-	class UModioRichTextButton* MenuButton;
+	UPROPERTY()
+	class UUserWidget* CurrentContent;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ModioPopupMenu")
+	void SetMenuEntries(FModioUIMenuCommandList Entries);
+
+	void SelectCurrentMenuItem();
+
+	UPROPERTY()
+	class UModioRichTextButton* MenuButton;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild),
 			  Category = "Widgets")
 	FModioUIStyleRef ButtonStyle = FModioUIStyleRef {"DefaultButtonStyle"};
@@ -54,13 +62,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioPopupMenuStyle", DesignerRebuild),Category = "Widgets")
 	FModioUIStyleRef PopupMenuStyle = FModioUIStyleRef {"DefaultPopupMenuStyle"};
 
-	UFUNCTION(BlueprintCallable, Category="ModioPopupMenu")
-	void SetMenuEntries(FModioUIMenuCommandList Entries);
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUIPopupMenuContentWidget"),
 			  Category = "Widgets")
 	TSubclassOf<UUserWidget> MenuContentWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	FKey KeyForInputHint;
+
+	bool GetIsMenuOpen();
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	bool bPreviewOpened = false;

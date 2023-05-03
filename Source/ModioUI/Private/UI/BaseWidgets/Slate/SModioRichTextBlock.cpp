@@ -64,7 +64,7 @@ void SModioRichTextBlock::Construct(const FArguments& InArgs)
 
 	ItemHoverSound = InArgs._HoveredSound;
 
-	SetOnMouseEnter(FNoReplyPointerEventHandler::CreateSP(this, &SModioRichTextBlock::PlayHoveredSound));
+	//SetOnMouseEnter(FNoReplyPointerEventHandler::CreateSP(this, &SModioRichTextBlock::PlayHoveredSound));
 }
 
 void SModioRichTextBlock::ReapplyStyle()

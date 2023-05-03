@@ -12,6 +12,7 @@
 
 #include "UI/Styles/ModioDialogStyle.h"
 #include "UObject/Interface.h"
+#include "Widgets/Input/SButton.h"
 
 #include "IModioUIDialogButtonWidget.generated.h"
 
@@ -30,6 +31,8 @@ protected:
 	virtual void NativeSetDialogController(class UModioDialogController* Controller) {};
 
 public:
+	TArray<TSharedPtr<SButton>> Buttons;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIDialogButtonWidget")
 	void SetStyle(const FModioDialogStyle& Style);
 

@@ -15,6 +15,7 @@
 #include "UI/BaseWidgets/ModioInputBindingImage.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/Interfaces/IModioUIInputHintDisplayWidget.h"
+#include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/Layout/SGridPanel.h"
 
 #include "ModioRichTextButton.generated.h"
@@ -45,8 +46,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	UModioInputBindingImage* InputHintImage;
 
-	TOptional<FKey> KeyForInputHint;
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText ButtonLabel;
 
@@ -65,6 +64,8 @@ protected:
 	ESlateVisibility GetInputHintVisibility(EModioUIInputMode InputMode);
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	FKey KeyForInputHint;
 	/**
 	* Retrieve the rich text style in use for this instance
 	* @return The text style used

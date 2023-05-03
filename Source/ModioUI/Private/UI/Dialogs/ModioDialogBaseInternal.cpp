@@ -19,7 +19,14 @@
 #include "UI/BaseWidgets/ModioLoadingSpinner.h"
 #include "UI/BaseWidgets/ModioUIAsyncLoadingOverlay.h"
 #include "UI/BaseWidgets/Slate/SModioRichTextBlock.h"
+#include "UI/BaseWidgets/Slate/SModioButtonBase.h"
+#include "UI/BaseWidgets/Slate/SModioTileView.h"
+#include "UI/BaseWidgets/ModioReportButtonGroupWidget.h"
+#include "UI/BaseWidgets/ModioEditableTextBox.h"
+#include "UI/BaseWidgets/ModioCodeInputWidget.h"
+#include "UI/BaseWidgets/Slate/SModioCodeInput.h"
 #include "UI/Commands/ModioCommonUICommands.h"
+#include "UI/CommonComponents/ModioAuthenticationMethodSelector.h"
 #include "UI/Dialogs/ModioDialogController.h"
 #include "UI/Dialogs/ModioDialogInfo.h"
 #include "UI/Interfaces/IModioAuthenticationContextUIDetails.h"
@@ -32,6 +39,7 @@
 #include "UI/Styles/ModioRichTextStyle.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SButton.h"
+#include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Layout/SGridPanel.h"
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/SOverlay.h"
@@ -52,8 +60,9 @@ void UModioDialogBaseInternal::BuildCommandList(TSharedRef<FUICommandList> InCom
 
 TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 {
-	FMargin BackgroundPadding;
+	ButtonInfos.Empty();
 
+	FMargin BackgroundPadding;
 	if (Controller.IsValid() && Controller->LoadingOverlay)
 	{
 		if (!LoadingSpinner)
@@ -82,11 +91,13 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 			.HAlign(HAlign_Fill)
 			.VAlign(VAlign_Fill)
 			.MaxDesiredWidth(880.0f)
+			//.MinDesiredWidth(880.0f)
 			[
 				SAssignNew(ContentPanel, SGridPanel)
 				.FillRow(1, 1)
-				+ SGridPanel::Slot(0,0)
+				+ SGridPanel::Slot(0, 0)
 				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
 				.Padding(0,0,0,24)
 				[
 					SAssignNew(HeadingTextBlock, SModioRichTextBlock)
@@ -123,13 +134,17 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 				.HAlign(HAlign_Center)
 				.Padding(0, 24, 0, 0)
 				[
-					SAssignNew(DialogButtons, STileView<TSharedPtr<FModioDialogButtonInfo>>)
+					SAssignNew(DialogButtons, SModioTileView<TSharedPtr<FModioDialogButtonInfo>>)
 					.Orientation(Orient_Horizontal)
 					.ListItemsSource(&ButtonParams)
 					.ItemHeight(0)
 					.ItemWidth(0)
 					.IsFocusable(false)						// There should be no reason to be able to focus on a slot element
 					.SelectionMode(ESelectionMode::None)
+					.WrapHorizontalNavigation(false)
+					.HandleGamepadEvents(false)
+					.HandleDirectionalNavigation(false)
+					.AllowOverscroll(EAllowOverscroll::No)
 					.Visibility_UObject(this, &UModioDialogBaseInternal::GetButtonListVisibility)
 					.OnGenerateTile_UObject(this, &UModioDialogBaseInternal::OnGenerateButton)
 				]
@@ -149,12 +164,10 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 			SNullWidget::NullWidget
 		];
 
-		
 	if (!bUsingCustomButtons) {
 		auto Button = DialogButtons->GetChildren()->GetChildAt(0);
 		FSlateApplication::Get().SetUserFocus(0, Button, EFocusCause::SetDirectly);
 	}
-
 
 	return DialogInternalRoot.ToSharedRef();
 	// clang-format on
@@ -169,6 +182,11 @@ void UModioDialogBaseInternal::ShowLoadingSpinner()
 			ContentPanel->SetVisibility(EVisibility::Collapsed);
 		}
 		LoadingSpinnerOverlaySlot->AttachWidget(LoadingSpinner->TakeWidget());
+
+		if (UModioUIAsyncLoadingOverlay* spinner = Cast<UModioUIAsyncLoadingOverlay>(LoadingSpinner))
+		{
+			spinner->SetDialogFocus();
+		}
 	}
 }
 
@@ -292,7 +310,7 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 							if (IsInputValid())
 							{
 								Controller->ShowLoadingDialog();
-								Controller->SubmitEmailAuthCode(Input.GetValue(), Button->Destination);
+								Controller->SubmitEmailAuthCode(Input.GetValue());
 							}
 						}
 						break;
@@ -416,6 +434,8 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 	TSharedPtr<struct FModioDialogButtonInfo> ButtonInfo, const TSharedRef<class STableViewBase>& OwnerTableView)
 {
+	ButtonInfos.Add(ButtonInfo);
+
 	TSharedPtr<SButton> RowButton;
 	TSharedPtr<SModioRichTextBlock> RowTextBlock;
 #if UE_VERSION_NEWER_THAN(5, 0, 0)
@@ -434,7 +454,7 @@ TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 	#endif 
 		.Content()
 		[
-			SAssignNew(RowButton, SButton)
+			SAssignNew(RowButton, SModioButtonBase)
 			.OnClicked_UObject(this, &UModioDialogBaseInternal::OnButtonClicked, ButtonInfo)
 			.HAlign(HAlign_Center)
 			.VAlign(VAlign_Center)
@@ -446,6 +466,8 @@ TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 			]
 		];
 	// clang-format on
+	GeneratedButtons.Add(RowButton);
+	SetDialogFocus();
 	const FModioDialogStyle* ResolvedDialogStyle = DialogStyle.FindStyle<FModioDialogStyle>();
 	if (ResolvedDialogStyle)
 	{
@@ -475,6 +497,57 @@ const FModioUIStyleRef* UModioDialogBaseInternal::GetButtonTextStyle() const
 	return nullptr;
 }
 
+void UModioDialogBaseInternal::OnNavigateDownFromCodeInputWidget()
+{
+	if (bUsingCustomButtons)
+	{
+		IModioUIDialogButtonWidget* buttons = Cast<IModioUIDialogButtonWidget>(ButtonWidget);
+		if (buttons && buttons->Buttons.IsValidIndex(0))
+		{
+			FSlateApplication::Get().SetKeyboardFocus(buttons->Buttons[0]);
+			return;
+		}
+	}
+	else if (GeneratedButtons.IsValidIndex(0))
+	{
+		FSlateApplication::Get().SetKeyboardFocus(GeneratedButtons[0]);
+	}
+}
+
+void UModioDialogBaseInternal::OnSubmitKeyPressed()
+{
+	TOptional<FString> Input = GetInputWidgetString();
+	if (!Input || !IsInputValid())
+	{
+		return;
+	}
+
+	UModioEditableTextBox* inputWidget = Cast<UModioEditableTextBox>(InputWidget);
+	if (inputWidget)
+	{
+		for (auto& button : ButtonInfos)
+		{
+			if (button->AsyncCallType == EModioDialogAsyncCall::AuthSubmitEmail && IsValid(button->Destination))
+			{
+				Controller->ShowLoadingDialog();
+				Controller->SendEmailCodeRequest(Input.GetValue(), button->Destination);
+				return;
+			}
+		}
+	}
+
+	UModioCodeInputWidget* codeInput = Cast<UModioCodeInputWidget>(InputWidget);
+	if (codeInput)
+	{
+		TSharedPtr<SModioCodeInput> EditableTextBox = codeInput->GetMyInput();
+		if (EditableTextBox)
+		{
+			Controller->ShowLoadingDialog();
+			Controller->SubmitEmailAuthCode(Input.GetValue());
+		}
+	}
+}
+
 void UModioDialogBaseInternal::SetDialogController(UModioDialogController* DialogController)
 {
 	Controller = DialogController;
@@ -484,6 +557,8 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 														UObject* DialogDataSource)
 {
 	bBeingPreviewed = bIsPreview;
+	GeneratedButtons.Empty();
+	InputWidget = nullptr;
 	if (DialogDescriptor)
 	{
 		if (DialogDataSource != nullptr)
@@ -571,7 +646,6 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 			if (DialogDescriptor->InputWidget)
 			{
 				UClass* InputWidgetClass = DialogDescriptor->InputWidget.Get();
-				InputWidget = nullptr;
 				if (InputWidgetClass->IsChildOf(UUserWidget::StaticClass()))
 				{
 					InputWidget = CreateWidget<UUserWidget>(this, InputWidgetClass);
@@ -630,7 +704,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 			if (DialogDescriptor->ButtonAreaWidget)
 			{
 				UClass* ButtonWidgetClass = DialogDescriptor->ButtonAreaWidget.Get();
-				UWidget* ButtonWidget = nullptr;
+				ButtonWidget = nullptr;
 
 				if (ButtonWidgetClass->IsChildOf(UUserWidget::StaticClass()))
 				{
@@ -652,7 +726,6 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 					ModioUIHelpers::SetVerticalAlignment(*ButtonWidgetSlot, DialogDescriptor->ButtonAreaWidgetVAlign);
 
 					ButtonWidgetSlot->AttachWidget(ButtonWidget->TakeWidget());
-
 #if UE_VERSION_OLDER_THAN(5, 0, 0)
 					ButtonWidgetSlot->NotifySlotChanged(false);
 #endif
@@ -688,6 +761,32 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 			}
 		}
 	}
+
+	if (InputWidget) 
+	{
+		FCustomWidgetNavigationDelegate navDelegate;
+		navDelegate.BindUFunction(this, "OnNavigateDownFromCodeInputWidget");
+		InputWidget->SetNavigationRuleCustom(EUINavigation::Down, navDelegate);
+	}	
+
+	UModioEditableTextBox* inputWidget = Cast<UModioEditableTextBox>(InputWidget);
+	if (inputWidget)
+	{
+		inputWidget->OnSubmit.AddUFunction(this, FName("OnSubmitKeyPressed"));
+		inputWidget->OnNavigateDown.AddUFunction(this, FName("OnNavigateDownFromCodeInputWidget"));
+	}
+
+	UModioCodeInputWidget* codeInput = Cast<UModioCodeInputWidget>(InputWidget);
+	if (codeInput)
+	{
+		TSharedPtr<SModioCodeInput> EditableTextBox = codeInput->GetMyInput();
+		if (EditableTextBox)
+		{
+			EditableTextBox->OnSubmit.AddUFunction(this, FName("OnSubmitKeyPressed"));
+			EditableTextBox->OnNavigateDown.AddUFunction(this, FName("OnNavigateDownFromCodeInputWidget"));
+		}
+	}
+
 
 	ApplyStyling();
 }
@@ -748,4 +847,41 @@ void UModioDialogBaseInternal::SetContentText(FText text)
 	}
 
 	DialogTextBlock->SetText(text);
+}
+
+void UModioDialogBaseInternal::SetDialogFocus()
+{
+	UModioEditableTextBox* inputWidget = Cast<UModioEditableTextBox>(InputWidget);
+	UModioCodeInputWidget* codeInput = Cast<UModioCodeInputWidget>(InputWidget);
+
+	if (inputWidget)
+	{
+		TSharedPtr<SEditableTextBox> EditableTextBox = inputWidget->GetMyEditableTextBlock();
+		FSlateApplication::Get().SetKeyboardFocus(EditableTextBox);		
+		return;
+	}
+
+	else if (codeInput)
+	{
+		TSharedPtr<SModioCodeInput> EditableTextBox = codeInput->GetMyInput();
+		FSlateApplication::Get().SetKeyboardFocus(EditableTextBox);
+		return;
+	}
+
+	else
+	{
+		if (bUsingCustomButtons)
+		{
+			IModioUIDialogButtonWidget* buttons = Cast<IModioUIDialogButtonWidget>(ButtonWidget);
+			if (buttons && buttons->Buttons.IsValidIndex(0))
+			{
+				FSlateApplication::Get().SetKeyboardFocus(buttons->Buttons[0]);
+				return;
+			}
+		}
+		else if (GeneratedButtons.IsValidIndex(0))
+		{
+			FSlateApplication::Get().SetKeyboardFocus(GeneratedButtons[0]);
+		}
+	}
 }

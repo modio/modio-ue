@@ -51,8 +51,7 @@ void UModioTabController::NativeConstruct()
 
 ESlateVisibility UModioTabController::GetInputHintVisibility(EModioUIInputMode InputMode)
 {
-	if (InputMode == EModioUIInputMode::Mouse || InputMode == EModioUIInputMode::Unknown ||
-		InputMode == EModioUIInputMode::Keyboard)
+	if (InputMode == EModioUIInputMode::Mouse || InputMode == EModioUIInputMode::Unknown)
 	{
 		return ESlateVisibility::Collapsed;
 	}

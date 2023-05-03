@@ -25,9 +25,9 @@ void UModioUserProfileButton::NativePreConstruct()
 	UModioModManagementWidgetBase::NativePreConstruct();
 	// We don't need to update the brush here in a live context because the initial value should have been set during
 	// edit-time
-	if (IsDesignTime() && ProfileImage && !NoUserBrushMaterial.IsNull())
+	if (IsDesignTime() && ProfileImage && NoUserBrushMaterial)
 	{
-		ProfileImage->SetBrushFromMaterial(NoUserBrushMaterial.LoadSynchronous());
+		ProfileImage->SetBrushFromMaterial(NoUserBrushMaterial);
 	}
 	if (ProfileButton)
 	{
@@ -92,7 +92,7 @@ void UModioUserProfileButton::NativeUserChanged(TOptional<FModioUser> NewUser)
 	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
 	CurrentUser = NewUser;
 
-	if (ProfileImage && !NoUserBrushMaterial.IsNull())
+	if (ProfileImage && NoUserBrushMaterial)
 	{
 		ProfileImage->SetBrushFromSoftMaterial(NoUserBrushMaterial);
 	}
@@ -117,13 +117,13 @@ void UModioUserProfileButton::NativeOnUserAvatarDownloadCompleted(FModioErrorCod
 	IModioUIUserAvatarDownloadCompletedReceiver::NativeOnUserAvatarDownloadCompleted(ec, Image);
 	if (!ec && ProfileImage)
 	{
-		if (UserBrushMaterial.IsNull())
+		if (!UserBrushMaterial)
 		{
 			ProfileImage->LoadImageFromFileAsync(Image.GetValue());
 		}
 		else
 		{
-			GCMaterial = UserBrushMaterial.LoadSynchronous();
+			GCMaterial = UserBrushMaterial;
 
 			if (GCMaterial)
 			{
@@ -134,6 +134,6 @@ void UModioUserProfileButton::NativeOnUserAvatarDownloadCompleted(FModioErrorCod
 	}
 	else if (ProfileImage)
 	{
-		ProfileImage->SetBrushFromSoftMaterial(NoUserBrushMaterial);
+		ProfileImage->SetBrushFromMaterial(NoUserBrushMaterial);
 	}
 }

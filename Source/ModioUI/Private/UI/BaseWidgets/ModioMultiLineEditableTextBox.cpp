@@ -37,7 +37,7 @@ TSharedRef<SWidget> UModioMultiLineEditableTextBox::RebuildWidget()
 	MyEditableTextBlock = SNew(SMultiLineEditableTextBox)
 							  .Style(&WidgetStyle)
 #if !UE_VERSION_OLDER_THAN(5,1,0)
-		.TextStyle(&WidgetStyle.TextStyle
+							  .TextStyle(&WidgetStyle.TextStyle)
 #else
 							  .TextStyle(&TextStyle)
 #endif
@@ -124,7 +124,7 @@ void UModioMultiLineEditableTextBox::SynchronizeProperties()
 	if (ResolvedStyle)
 	{
 		MyEditableTextBlock->SetStyle(ResolvedStyle);
-		const FTextBlockStyle* ResolvedTextStyle = ResolvedStyle->TextStyleRef.FindStyle<FTextBlockStyle>();
+		const FTextBlockStyle* ResolvedTextStyle = ResolvedStyle->ModioTextStyle.FindStyle<FTextBlockStyle>();
 		if (ResolvedTextStyle)
 		{
 			MyEditableTextBlock->SetTextStyle(ResolvedTextStyle);

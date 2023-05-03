@@ -103,6 +103,9 @@ public:
 	float InnerGradientOpacity;
 
 	virtual UMaterialInterface* GetMaterialInstance() override;
+
+
+	void ModifyMaterial(UMaterialInstanceDynamic* MaterialToModify);
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif

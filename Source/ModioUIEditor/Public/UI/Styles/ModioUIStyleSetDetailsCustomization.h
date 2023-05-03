@@ -94,35 +94,43 @@ public:
 	void UpdateColorPresetList()
 	{
 		ColorPresetNames.Empty();
-
-		Algo::Transform(StyleBeingEdited->OldColorPresets, ColorPresetNames,
-						[](const TPair<FName, FLinearColor>& Preset) { return MakeShared<FName>(Preset.Key); });
+		TMap<FName, FLinearColor*> LinearColors;
+		for (auto& ColorPreset : StyleBeingEdited->GetColorPaletteData()->ColorPresets)
+		{
+			FLinearColor* InternalColor = ColorPreset.Value.GetInternalColor();
+			LinearColors.Add(ColorPreset.Key, InternalColor);
+		}
+		Algo::Transform(LinearColors, ColorPresetNames,
+						[](const TPair<FName, FLinearColor*>& Preset) { return MakeShared<FName>(Preset.Key); });
 	}
 	void UpdateUnderlyingSlateColorOld(TSharedPtr<FName> ColorName, ESelectInfo::Type)
 	{
 		FStructProperty* UnderlyingStruct = CastField<FStructProperty>(UnderlyingSlateColorPropHandle->GetProperty());
 
-		if (ColorName.IsValid() && UnderlyingStruct && StyleBeingEdited->OldColorPresets.Contains(*ColorName.Get()))
+		if (ColorName.IsValid() && UnderlyingStruct &&
+			StyleBeingEdited->GetColorPaletteData()->ColorPresets.Contains(*ColorName.Get()))
 		{
 			UnderlyingSlateColorPropHandle->NotifyPreChange();
 			void* DataPointer;
 			UnderlyingSlateColorPropHandle->GetValueData(DataPointer);
 			FSlateColor* ActualColor = static_cast<FSlateColor*>(DataPointer);
-			*ActualColor = FSlateColor(StyleBeingEdited->OldColorPresets[*ColorName.Get()]);
+			*ActualColor = FSlateColor(StyleBeingEdited->GetColorPaletteData()->ColorPresets[*ColorName.Get()]);
 			UnderlyingSlateColorPropHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		}
 	}
 	void UpdateUnderlyingSlateColor(TSharedPtr<FName> ColorName, ESelectInfo::Type)
 	{
+
 		FStructProperty* UnderlyingStruct = CastField<FStructProperty>(UnderlyingSlateColorPropHandle->GetProperty());
 
-		if (ColorName.IsValid() && UnderlyingStruct && StyleBeingEdited->ColorPresets.Contains(*ColorName.Get()))
+		if (ColorName.IsValid() && UnderlyingStruct &&
+			StyleBeingEdited->GetColorPaletteData()->ColorPresets.Contains(*ColorName.Get()))
 		{
 			UnderlyingSlateColorPropHandle->NotifyPreChange();
 			void* DataPointer;
 			UnderlyingSlateColorPropHandle->GetValueData(DataPointer);
 			FSlateColor* ActualColor = static_cast<FSlateColor*>(DataPointer);
-			*ActualColor = FSlateColor(StyleBeingEdited->ColorPresets[*ColorName.Get()]);
+			*ActualColor = FSlateColor(StyleBeingEdited->GetColorPaletteData()->ColorPresets[*ColorName.Get()]);
 			UnderlyingSlateColorPropHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		}
 	}
@@ -381,15 +389,20 @@ public:
 	void UpdateColorPresetList()
 	{
 		ColorPresetNames.Empty();
-
-		Algo::Transform(StyleBeingEdited->OldColorPresets, ColorPresetNames,
-						[](const TPair<FName, FLinearColor>& Preset) { return MakeShared<FName>(Preset.Key); });
+		TMap<FName, FLinearColor*> LinearColors;
+		for (auto& ColorPreset : StyleBeingEdited->GetColorPaletteData()->ColorPresets) {
+			FLinearColor* InternalColor = ColorPreset.Value.GetInternalColor();
+			LinearColors.Add(ColorPreset.Key, InternalColor);
+		}
+		Algo::Transform(LinearColors, ColorPresetNames,
+						[](const TPair<FName, FLinearColor*>& Preset) { return MakeShared<FName>(Preset.Key); });
 	}
 	void UpdateUnderlyingSlateColor(TSharedPtr<FName> ColorName, ESelectInfo::Type)
 	{
 		FStructProperty* UnderlyingStruct = CastField<FStructProperty>(UnderlyingSlateColorPropHandle->GetProperty());
 
-		if (ColorName.IsValid() && UnderlyingStruct && StyleBeingEdited->OldColorPresets.Contains(*ColorName.Get()))
+		if (ColorName.IsValid() && UnderlyingStruct &&
+			StyleBeingEdited->GetColorPaletteData()->ColorPresets.Contains(*ColorName.Get()))
 		{
 			void* DataPointer;
 			if (UnderlyingSlateColorPropHandle->GetValueData(DataPointer) == FPropertyAccess::Success)
@@ -414,7 +427,7 @@ public:
 				}
 
 				FLinearColor* ActualColor = static_cast<FLinearColor*>(DataPointer);
-				*ActualColor = FLinearColor(StyleBeingEdited->OldColorPresets[*ColorName.Get()]);
+				*ActualColor = FLinearColor(StyleBeingEdited->GetColorPaletteData()->ColorPresets[*ColorName.Get()]);
 			}
 		}
 	}
@@ -465,7 +478,7 @@ public:
 		if (UnderlyingStruct)
 		{
 			void* DataPointer;
-			if (PropertyHandle->GetProperty()->GetFName() == FName("OldColorPresets"))
+			if (PropertyHandle->GetProperty()->GetFName() == FName("ColorPresets"))
 			{
 				HeaderRow
 					.ValueContent()[SNew(SColorBlock)
@@ -483,6 +496,7 @@ public:
 										.Size(FVector2D(35.0f, 12.0f))];
 				return;
 			}
+
 			PropertyHandle->GetValueData(DataPointer);
 			FLinearColor* ActualColor = static_cast<FLinearColor*>(DataPointer);
 			// clang-format off

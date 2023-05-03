@@ -9,10 +9,11 @@
  */
 
 #include "Libraries/ModioOptionalLibrary.h"
+#include "Types/ModioGameInfo.h"
+#include "Types/ModioModDependencyList.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioUser.h"
-#include "Types/ModioModDependencyList.h"
 
 template<typename BPOptionalType>
 bool IsSetInternal(const BPOptionalType& Optional)
@@ -52,6 +53,17 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalModInfo(const FModioOptionalMo
 														  FModioModInfo& ModInfo)
 {
 	return GetValueInternal(OptionalModInfo, ModInfo);
+}
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalGameInfo(const FModioOptionalGameInfo& OptionalGameInfo)
+{
+	return IsSetInternal(OptionalGameInfo);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalGameInfo(const FModioOptionalGameInfo& OptionalGameInfo,
+														   FModioGameInfo& GameInfo)
+{
+	return GetValueInternal(OptionalGameInfo, GameInfo);
 }
 
 bool UModioOptionalLibrary::IsSet_ModioOptionalUser(const struct FModioOptionalUser& OptionalUser)
@@ -123,7 +135,7 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalModDependencyList(
 	return GetValueInternal(OptionalDependencyList, DependencyList);
 }
 
-bool UModioOptionalLibrary::IsSet_ModioOptionalModID(const struct FModioOptionalModID& OptionalID) 
+bool UModioOptionalLibrary::IsSet_ModioOptionalModID(const struct FModioOptionalModID& OptionalID)
 {
 	return IsSetInternal(OptionalID);
 }

@@ -15,12 +15,13 @@
 #include "Styling/SlateTypes.h"
 #include "UI/BaseWidgets/ModioImage.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
+#include "UI/BaseWidgets/ModioRoundedImage.h"
 #include "UI/CommonComponents/ModioImageGalleryBase.h"
 #include "UI/CommonComponents/ModioListViewInteger.h"
 #include "UI/Interfaces/IModioInputMappingAccessor.h"
-#include "UI/Styles/ModioDynamicImageStyle.h"
-#include "UI/Styles/ModioUIColorRef.h"
 #include "UI/Styles/ModioUIStyleRef.h"
+#include "UI/Styles/ModioUIColorRef.h"
+#include "UI/Styles/ModioDynamicImageStyle.h"
 
 #include "ModioModDetailsImageGallery.generated.h"
 
@@ -62,6 +63,7 @@ class MODIOUI_API UModioModDetailsImageGallery : public UModioUserWidgetBase,
 protected:
 	int32 CurrentImageIndex = 0;
 	int32 ImageCount = 0;
+
 	UFUNCTION()
 	void OnGalleryImageLoad(class UTexture2DDynamic* LoadedImage, FModioModID ModID, int32 Index);
 
@@ -74,7 +76,11 @@ protected:
 												  TOptional<FModioImageWrapper> Image) override;
 	virtual void NativeOnModGalleryImageDownloadCompleted(FModioModID ModID, FModioErrorCode ec, int32 ImageIndex,
 														  TOptional<FModioImageWrapper> Image) override;
-	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
+	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+
 	UFUNCTION()
 	virtual void PrevImage();
 	UFUNCTION()
@@ -97,6 +103,16 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioDynamicImageStyle"), Category = "Widgets")
 	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultDynamicImageStyle"};
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioRoundedImage* ActiveBackground;
+
+public:
+	UPROPERTY(BlueprintReadWrite, Category="Widgets")
+	bool bIsFocused = false;
+
+	// function for changing image on controller/keyboard
+	void ChangeImage(const FKey& InputKey);
 };
 
 /**

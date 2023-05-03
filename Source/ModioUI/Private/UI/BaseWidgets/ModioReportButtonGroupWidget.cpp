@@ -16,6 +16,7 @@
 #include "ModioUISubsystem.h"
 #include "UI/BaseWidgets/ModioWidgetBase.h"
 #include "UI/BaseWidgets/Slate/SModioRichTextBlock.h"
+#include "UI/BaseWidgets/Slate/SModioButtonBase.h"
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/Dialogs/ModioDialogController.h"
 #include "UI/Interfaces/IModioUIDialogButtonWidget.h"
@@ -129,7 +130,7 @@ TSharedRef<SButton> UModioReportButtonGroupWidget::CreateButton(EModioReportType
 	TSharedPtr<SButton> Button;
 
 	// clang-format off
-	SAssignNew(Button, SButton)
+	SAssignNew(Button, SModioButtonBase)
 	.OnClicked_UObject(this, &UModioReportButtonGroupWidget::OnReportButtonClicked, ReportType)
 	.HAlign(HAlign_Center)
 	.VAlign(VAlign_Center)

@@ -23,6 +23,7 @@
 #include "UI/Styles/ModioTagWidgetStyle.h"
 #include "UI/Styles/ModioTextBlockStyleOverride.h"
 #include "UI/Styles/ModioModTileStyle.h"
+#include "UI/Styles/ModioDynamicImageStyle.h"
 #include "UI/Styles/ModioPopupMenuStyle.h"
 
 const FName FModioButtonStyle::TypeName = FName("ModioButtonStyle");
@@ -40,3 +41,4 @@ const FName FModioCheckBoxStyle::TypeName = FName("ModioCheckBoxStyle");
 const FName FModioNotificationStyle::TypeName = FName("ModioNotificationStyle");
 const FName FModioModTileStyle::TypeName = FName("ModioModTileStyle");
 const FName FModioPopupMenuStyle::TypeName = FName("ModioPopupMenuStyle");
+const FName FModioDynamicImageStyle::TypeName = FName("ModioDynamicImageStyle");

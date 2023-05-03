@@ -61,7 +61,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetails, TScriptInterface<IModi
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetailsForID, const FModioModID&);
 
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnGetModEnabled, FModioModID, Mod);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnModEnabledChanged, FModioModID, Mod, bool, bNewStateIsEnabled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnModEnabledChanged, FModioModID, Mod, bool, bNewStateIsEnabled);
 
 DECLARE_DYNAMIC_DELEGATE(FOnModBrowserClosed);
 
@@ -90,11 +90,6 @@ protected:
 	friend class IModioUIModDetailsDisplay;
 
 	FOnGetModEnabled GetModEnabledDelegate;
-	FOnModEnabledChanged OnModEnabledChanged;
-
-	bool QueryIsModEnabled(FModioModID ID);
-
-	void RequestModEnabledState(FModioModID ID, bool bNewEnabledState);
 
 	UFUNCTION()
 	void SubscriptionHandler(FModioErrorCode ec, FModioModID ID);
@@ -143,14 +138,12 @@ protected:
 
 	EModioUIInputMode LastInputMode;
 
+	UPROPERTY()
+	UWidget* CurrentFocusTarget;
+
 	UFUNCTION()
 	void HandleInputModeChanged(EModioUIInputMode NewDevice);
 	FOnInputDeviceChanged OnInputDeviceChanged;
-
-	EModioUIInputMode GetLastInputDevice()
-	{
-		return LastInputMode;
-	}
 
 	FOnDisplayNotificationWidget OnDisplayNotificationWidget;
 	FOnDisplayNotificationParams OnDisplayErrorNotification;
@@ -165,7 +158,6 @@ public:
 
 	UPROPERTY()
 	class UModioMenu* ModBrowserInstance;
-
 
 	void EnableModManagement();
 	void DisableModManagement();
@@ -186,6 +178,16 @@ public:
 	void ShowLogoutDialog();
 	void ShowModReportDialog(UObject* DialogDataSource);
 
+	// Executed each time the mod enabled state changes
+	UPROPERTY(BlueprintAssignable, Category = "ModioUISubsystem")
+	FOnModEnabledChanged OnModEnabledChanged;
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	bool QueryIsModEnabled(FModioModID ID);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void RequestModEnabledState(FModioModID ID, bool bNewEnabledState);
+
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestSubscriptionForModID(FModioModID ID);
 
@@ -200,10 +202,16 @@ public:
 	void SetActiveTabIndex(int TabIndex);
 	void OnLogoutComplete(FModioErrorCode ModioErrorCode);
 	void CloseSearchDrawer();
+	void CloseDownloadDrawer();
 	void LogOut(FOnErrorOnlyDelegateFast DedicatedCallback);
 	void ShowReportEmailDialog(UObject* DialogDataSource);
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
 
+	
+	EModioUIInputMode GetLastInputDevice()
+	{
+		return LastInputMode;
+	}
 	// Delegate for the subscription success or fail
 	FOnSubscriptionCompleted OnSubscriptionRequestCompleted;
 
@@ -259,6 +267,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	TArray<FName> GetAllNamedStyleNames();
 
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void SetCurrentFocusTarget(UWidget* currentTarget);
+	
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	UWidget* GetCurrentFocusTarget();
+
 	void SetControllerOverrideType(EModioUIInputMode NewOverride);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
@@ -284,6 +298,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayNotification(UPARAM(ref) TScriptInterface<IModioUINotification>& Notification);
+
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
 

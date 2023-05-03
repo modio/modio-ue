@@ -72,34 +72,6 @@ struct MODIO_API FModioModProgressInfo
 		return Out;
 	}
 #endif
-	// UHT, y u no support multiline UPROPERTY decls?
-	// clang-format off
-	/**
-	 * Total size of the downloaded file
-	 **/
-	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.1 release. Please use <<GetTotalProgress>>(EModioModProgressState::Downloading) instead."))
-	FModioUnsigned64 TotalDownloadSize_DEPRECATED;
-
-	/**
-	 * Current amount downloaded in bytes
-	 **/
-	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.1 release. Please use <<GetCurrentProgress>>(EModioModProgressState::Downloading) instead."))
-	FModioUnsigned64 CurrentlyDownloadedBytes_DEPRECATED;
-
-	/**
-	 * Total size on disk when fully extracted
-	 **/
-	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.1 release. Please use <<GetTotalProgress>>(EModioModProgressState::Extracting) instead."))
-	FModioUnsigned64 TotalExtractedSizeOnDisk_DEPRECATED;
-
-	/**
-	 * Amount of data currently extracted
-	 **/
-	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.1 release. Please use <<GetCurrentProgress>>(EModioModProgressState::Extracting) instead."))
-	FModioUnsigned64 CurrentlyExtractedBytes_DEPRECATED;
-
-	// clang-format on
-
 	/**
 	 * The mod ID of the mod being processed
 	 **/

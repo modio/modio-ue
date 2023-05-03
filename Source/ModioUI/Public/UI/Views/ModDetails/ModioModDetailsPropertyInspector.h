@@ -38,6 +38,9 @@ protected:
 	TArray<FString> GetPropertyValueStyleNames() const;
 
 	UFUNCTION()
+	TArray<FString> GetFillerStyleNames() const;
+
+	UFUNCTION()
 	const FModioRichTextStyle& GetTextStyle(FModioUIStyleRef TextStyle);
 
 	virtual void NativeOnUpdatePropertyDisplay() override;
@@ -63,4 +66,14 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Appearance|Property Value Style",
 			  meta = (GetOptions = "GetPropertyValueStyleNames"))
 	FName DefaultPropertyValueStyleName = FName("default");
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Appearance|Property Filler Style",
+			  meta = (StyleClass = "ModioRichTextStyle"))
+	FModioUIStyleRef FillerTextStyle;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Appearance|Property Filler Style",
+			  meta = (GetOptions = "GetFillerStyleNames"))
+	FName FillerStyleName = FName("default");
+
+	FText FillerText = FText::FromString(" ");
 };

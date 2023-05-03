@@ -14,7 +14,7 @@ FName const FModioWidgetBorderStyle::TypeName = FName("FModioWidgetBorderStyle")
 
 void ApplyModioBorderStyle(UMaterialInstanceDynamic* WidgetMaterial, const FModioWidgetBorderStyle* NewStyle)
 {
-	if (NewStyle && NewStyle->bMaskWithMaterial)
+	if (NewStyle && NewStyle->bMaskWithMaterial && WidgetMaterial)
 	{
 		WidgetMaterial->SetScalarParameterValue(FName("RelativeRadius"), NewStyle->bRelativeRadius ? 1 : 0);
 		WidgetMaterial->SetScalarParameterValue(FName("EnableBorder"), NewStyle->bEnableBorder ? 1 : 0);

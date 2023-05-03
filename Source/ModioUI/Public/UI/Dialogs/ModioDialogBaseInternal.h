@@ -75,12 +75,26 @@ protected:
 												 const TSharedRef<class STableViewBase>& OwnerTableView);
 	const FModioUIStyleRef* GetButtonTextStyle() const;
 
+	UFUNCTION()
+	void OnNavigateDownFromCodeInputWidget();
+
+	UFUNCTION()
+	void OnSubmitKeyPressed();
+
 	UPROPERTY()
 	TWeakObjectPtr<class UModioDialogController> Controller;
+
+	FCustomWidgetNavigationDelegate NavDelegate;
 
 public:
 	UPROPERTY()
 	UWidget* InputWidget;
+
+	UPROPERTY()
+	UWidget* ButtonWidget;
+
+	TArray<TSharedPtr<SWidget>> GeneratedButtons;
+	TArray<TSharedPtr<struct FModioDialogButtonInfo>> ButtonInfos;
 
 	void ShowLoadingSpinner();
 	void HideLoadingSpinner();
@@ -90,7 +104,10 @@ public:
 								  UObject* DialogDataSource = nullptr);
 	TOptional<FString> GetInputWidgetString();
 	void SetInputWidgetString(FString Input);
-
+	
 	void SetHeaderText(FText text);
 	void SetContentText(FText text);
+
+	UFUNCTION(Category = "Widgets")
+	void SetDialogFocus();
 };

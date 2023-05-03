@@ -9,8 +9,11 @@
  */
 
 #include "UI/Views/Collection/ModioCollectionView.h"
+#include "UI/Views/Collection/ModioModCollectionTile.h"
 #include "Algo/Transform.h"
+#include "Widgets/Input/SEditableTextBox.h"
 #include "Core/ModioModCollectionEntryUI.h"
+#include "Core/Input/ModioInputKeys.h"
 #include "Engine/Engine.h"
 #include "Loc/BeginModioLocNamespace.h"
 #include "ModioSubsystem.h"
@@ -37,6 +40,7 @@ void UModioCollectionView::NativeOnInitialized()
 	}
 	if (FetchButton)
 	{
+		FetchButton->SetLabel(DefaultButtonLabel);
 		FetchButton->OnClicked.AddDynamic(this, &UModioCollectionView::OnFetchUpdatesClicked);
 	}
 
@@ -69,7 +73,6 @@ void UModioCollectionView::NativeOnInitialized()
 
 		SortBy->SetComboBoxEntries(MenuEntries);
 	}
-
 	IModioUISubscriptionsChangedReceiver::Register<UModioCollectionView>();
 	IModioUIModManagementEventReceiver::Register<UModioCollectionView>();
 }
@@ -86,6 +89,10 @@ void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
 	{
 		UpdateCachedCollection();
 		ApplyFiltersToCollection();
+		FetchButton->SetLabel(DefaultButtonLabel);
+		// focus is lost after search probably because collection list items are not quite there yet when getting here, so
+		// setting the focus to searchinput:
+		SearchInput->StartInput();
 	}
 	else
 	{
@@ -130,6 +137,7 @@ void UModioCollectionView::OnFetchUpdatesClicked()
 	{
 		Subsystem->FetchExternalUpdatesAsync(
 			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCollectionView::OnFetchExternalCompleted));
+		FetchButton->SetLabel(SearchingButtonLabel);
 	}
 }
 
@@ -260,9 +268,66 @@ void UModioCollectionView::OnModGroupChanged(FText SelectedItem, ESelectInfo::Ty
 
 FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	return FReply::Handled()
-		.SetNavigation(CollectionList->TakeWidget(), ENavigationGenesis::User)
-		.SetUserFocus(CollectionList->TakeWidget(), EFocusCause::SetDirectly);
+	if (CollectionList->GetDisplayedEntryWidgets().Num() > 0)
+	{
+		CollectionList->NavigateToIndex(0);
+	}
+	else
+	{
+		SearchInput->StartInput();
+	}
+	return FReply::Handled();
+}
+
+FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (!HasFocusedDescendants()) 
+	{
+		SearchInput->StartInput();
+		return FReply::Handled();
+	}
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::RefineSearch && (!SearchInput->HasFocusedDescendants() || InKeyEvent.GetKey().IsGamepadKey()))
+		{
+			OnFetchUpdatesClicked();
+			return FReply::Handled();
+		}
+
+		UModioModCollectionTile* firstTile = Cast<UModioModCollectionTile>(FirstTile);
+
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+		{
+			if ((SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()) ||
+				(ModGroupSelection->HasFocusedDescendants() && !ModGroupSelection->IsComboBoxOpen()))
+			{
+				if (CollectionList->GetDisplayedEntryWidgets().Num() > 0)
+				{
+					CollectionList->NavigateToIndex(0);
+					return FReply::Handled();
+				}
+			}
+
+			// first time needs force to navigate down
+			if (firstTile && firstTile->bHasFocus && CollectionList->GetDisplayedEntryWidgets().Num() > 1) {
+				CollectionList->NavigateToIndex(1);
+				return FReply::Handled();
+			}
+		}
+
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right && SearchInput->GetMyEditableTextBlock().Get()->HasKeyboardFocus())
+		{
+			ModGroupSelection->SetFocusToButton();
+			return FReply::Handled();
+		}
+
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up && firstTile && firstTile->bHasFocus)
+		{
+			SearchInput->StartInput();
+			return FReply::Handled();
+		}
+	}
+	return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 }
 
 #include "Loc/EndModioLocNamespace.h"

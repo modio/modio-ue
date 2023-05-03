@@ -16,6 +16,7 @@
 #include "UI/BaseWidgets/ModioImage.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
+#include "UI/BaseWidgets/ModioRoundedImage.h"
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/EventHandlers/IModioUIMediaDownloadCompletedReceiver.h"
 #include "UI/Styles/ModioUIStyleRef.h"
@@ -41,10 +42,12 @@ protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
-	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-												  TOptional<FModioImageWrapper> Image) override;
-	virtual void NativeOnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
-	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec, TOptional<FModioImageWrapper> Image) override;
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent);
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 	UFUNCTION()
 	FEventReply OnEntryPressed(FGeometry MyGeometry, const FPointerEvent& MouseEvent);
@@ -66,9 +69,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModStatusLabel;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
-	UBorder* EntryBorder;
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioDownloadQueueEntryStyle"),
 			  Category = "Widgets")
 	FModioUIStyleRef EntryStyle;
@@ -76,4 +76,10 @@ protected:
 	FSlateSound PressedSound;
 
 	FSlateSound HoveredSound;
+
+	float truncateDivider = 1.0f;
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
+	UBorder* EntryBorder;
 };

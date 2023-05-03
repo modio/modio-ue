@@ -17,8 +17,11 @@
 #include "Styling/ISlateStyle.h"
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateWidgetStyleContainerBase.h"
+#include "UI/Interfaces/IModioMenuBackgroundProvider.h"
+#include "UI/Styles/ModioColorPresets.h"
 #include "UI/Styles/ModioComboBoxStyle.h"
 #include "UI/Styles/ModioInputMappingGlyph.h"
+#include "UI/Styles/ModioMaterialData.h"
 #include "UI/Styles/ModioProceduralBrushParams.h"
 #include "UI/Styles/ModioSlateMaterialBrush.h"
 #include "UI/Styles/ModioUIColor.h"
@@ -35,6 +38,8 @@ struct FModioLinearColor : public FLinearColor
 	GENERATED_BODY()
 };
 
+
+
 #if UE_VERSION_NEWER_THAN(5, 0, 0)
 	#define MODIO_UE5_REQUESTING_STYLE , const ISlateStyle* RequestingStyle
 	#define MODIO_UE5_REQUESTING_STYLE_PARAM MODIO_UE5_REQUESTING_STYLE = nullptr
@@ -48,10 +53,16 @@ struct FModioLinearColor : public FLinearColor
 #endif
 
 UCLASS(BlueprintType, meta = (MaterialSerialize = "SerializedMaterials", ColorSerialize = "SerializedColors"))
-class MODIOUI_API UModioUIStyleSet : public UDataAsset, public ISlateStyle, public IModioUIStyleRefSerializer
+class MODIOUI_API UModioUIStyleSet : public UDataAsset, public ISlateStyle, public IModioUIStyleRefSerializer, public IModioMenuBackgroundProvider
 {
 	GENERATED_BODY()
 protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
+	UMaterialInterface* DefaultBackgroundMaterial;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
+	class UModioColorPresets* ColorPresetsData;
+
 	mutable TSet<FName> MissingResources;
 
 	UPROPERTY(meta = (ShowOnlyInnerProperties))
@@ -66,31 +77,20 @@ protected:
 	UPROPERTY()
 	TMap<FString, FName> PropertyPathToColorPresetMap;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, meta = (ShowOnlyInnerProperties), Category = "Style")
-	TMap<FName, USlateWidgetStyleContainerBase*> WidgetStyles;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ShowOnlyInnerProperties), Category = "Style")
+	TArray<class UModioWidgetStyleData*> WidgetStyleAssets;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ShowOnlyInnerProperties), Category = "Style")
 	TMap<FName, FSlateBrush> NamedBrushes;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ShowOnlyInnerProperties), Category = "Style")
-	TMap<FName, UTexture2D*> NamedGlyphs;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced, Meta = (ShowOnlyInnerProperties), Category = "Style")
-	TMap<FName, UModioProceduralBrushParams*> NamedBrushMaterialsNew;
+	class UModioNamedGlyphsDataAsset* NamedGlyphsAsset;
 
 	// We can probably clear this cache in a ModioUISubsystem::Shutdown call?
 	TMap<FName, TSharedPtr<struct FModioSlateMaterialBrush>> MaterialBrushCache;
 
 	UPROPERTY(Transient)
-	TMap<FName, UMaterialInstanceDynamic*> MaterialInstanceCache;
-
-	UPROPERTY(EditAnywhere,
-			  meta = (ReadOnlyKeys, EditFixedSize, EditFixedOrder, CustomReset = "ResetInputMappingGlyphs"),
-			  Category = "Style")
-	TMap<FKey, FModioInputMappingGlyph> InputMappingGlyphs;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
-	UMaterialInterface* DefaultGlyphMaterial;
+	TMap<FName, UMaterialInterface*> MaterialInstanceCache;
 
 #if UE_VERSION_NEWER_THAN(5, 0, 0)
 	const FSlateWidgetStyle* GetWidgetStyleInternal(const FName DesiredTypeName, const FName StyleName,
@@ -108,8 +108,6 @@ protected:
 
 	friend class FModioUIStyleRefDetailsCustomization;
 
-	void ResetInputMappingGlyphs();
-
 	virtual TSet<FName> GetStyleKeys() const MODIO_UE5_OVERRIDE;
 	virtual FString GetContentRootDir() const MODIO_UE5_OVERRIDE;
 
@@ -117,16 +115,22 @@ protected:
 									const FName& MissingResource) const MODIO_UE5_OVERRIDE;
 
 public:
+
+	void ClearMaterialCache();
+
 	UModioUIStyleSet(const FObjectInitializer& Initializer);
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
-	TMap<FName, FModioUIColor> ColorPresets;
+	TArray<UObject*> GetAssetReferences();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
-	TMap<FName, FLinearColor> OldColorPresets;
+	void RefreshStyleMaterials(FName StyleName);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
 	FModioComboBoxStyle DefaultComboBoxStyle;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
+	class UModioMaterialData* MaterialData;
+
+	bool bOverridePlatformMaterials = false;
 
 	const FName& GetStyleSetName() const override;
 
@@ -154,6 +158,8 @@ public:
 								 MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 
 	UMaterialInterface* GetNamedMaterial(const FName PropertyName, TOptional<FString> Specifier);
+	UMaterialInterface* GetDefaultRoundedRectangleMaterial();
+	UMaterialInterface* GetDefaultCheckboxMaterial();
 	UMaterialInterface* GetGlyphMaterial(const FName PropertyName);
 	const FSlateBrush* GetBrush(const FName PropertyName,
 								const ANSICHAR* Specifier = nullptr MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
@@ -205,6 +211,17 @@ public:
 
 	TArray<FName> GetGlyphNames();
 
-	UMaterialInterface* GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType);
-	UTexture2D* GetInputGlyphForInputType(FKey VirtualInput, EModioUIInputMode InputType);
+	void ModifyRoundedRectangle(FName InName, UMaterialInstanceDynamic* MaterialInstance);
+
+	class UModioColorPresets* GetColorPaletteData();
+
+	UMaterialInterface* NativeGetBackgroundMaterial()
+	{
+		if (!DefaultBackgroundMaterial)
+		{
+			FSoftObjectPath Fallback("/modio/UI/Materials/M_UI_Background_Waves.M_UI_Background_Waves");
+			DefaultBackgroundMaterial = Cast<UMaterialInterface>(Fallback.TryLoad());
+		}
+		return DefaultBackgroundMaterial;
+	}
 };

@@ -31,10 +31,13 @@ UMaterialInterface* FModioUIMaterialRef::ResolveReference(UModioUIStyleSet* Over
 		if (DefaultStyleSet)
 		{
 			return DefaultStyleSet->GetNamedMaterial(MaterialName, AdditionalSpecifier != NAME_None
-																	   ? AdditionalSpecifier.ToString()
-																	   : TOptional<FString> {});
+														? AdditionalSpecifier.ToString()
+														: TOptional<FString> {});
 		}
 	}
 
 	return nullptr;
 }
+
+
+

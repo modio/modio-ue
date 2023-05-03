@@ -48,12 +48,6 @@ FORCEINLINE FModioModProgressInfo ToUnreal(const Modio::ModProgressInfo& In)
 	Out.UploadCurrent = In.GetCurrentProgress(Modio::ModProgressInfo::EModProgressState::Uploading);
 	Out.CurrentState = ToUnreal(In.GetCurrentState());
 
-	//Deprecated members
-	Out.CurrentlyDownloadedBytes_DEPRECATED = FModioUnsigned64(Out.DownloadCurrent);
-	Out.CurrentlyExtractedBytes_DEPRECATED = FModioUnsigned64(Out.ExtractCurrent);
-	Out.TotalDownloadSize_DEPRECATED = FModioUnsigned64(Out.DownloadTotal);
-	Out.TotalExtractedSizeOnDisk_DEPRECATED = FModioUnsigned64(Out.ExtractTotal);
-
 	Out.ID = ToUnreal(In.ID);
 	return Out;
 }

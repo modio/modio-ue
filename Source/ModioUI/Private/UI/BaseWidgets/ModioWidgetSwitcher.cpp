@@ -9,6 +9,7 @@
  */
 
 #include "UI/BaseWidgets/ModioWidgetSwitcher.h"
+#include "Framework/Application/SlateApplication.h"
 
 void UModioWidgetSwitcher::PushActiveWidgetIndex(int32 Index)
 {
@@ -38,6 +39,11 @@ void UModioWidgetSwitcher::SetActiveWidgetIndex(int32 Index)
 		// Ensure the index is clamped to a valid range.
 		int32 SafeIndex = FMath::Clamp(ActiveWidgetIndex, 0, FMath::Max(0, Slots.Num() - 1));
 		MyWidgetSwitcher->SetActiveWidgetIndex(SafeIndex);
+		if (MyWidgetSwitcher && MyWidgetSwitcher->GetActiveWidget()) 
+		{
+			FSlateApplication::Get().SetUserFocus(0, MyWidgetSwitcher->GetActiveWidget());
+		}
+		
 		if (OnActiveWidgetChanged.IsBound())
 		{
 			OnActiveWidgetChanged.Broadcast(SafeIndex);

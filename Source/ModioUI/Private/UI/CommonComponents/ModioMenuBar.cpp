@@ -11,6 +11,7 @@
 #include "UI/CommonComponents/ModioMenuBar.h"
 #include "Core/Input/ModioInputKeys.h"
 #include "GameFramework/InputSettings.h"
+#include "UI/Commands/ModioCommonUICommands.h"
 #include "ModioUISubsystem.h"
 #include "Settings/ModioUISettings.h"
 
@@ -25,6 +26,7 @@ void UModioMenuBar::NativeOnInitialized()
 	if (SearchButton)
 	{
 		SearchButton->OnClicked.AddDynamic(this, &UModioMenuBar::OnSearchClicked);
+		SearchButton->DisplayHintForInputHandler(FModioInputKeys::RefineSearch);
 	}
 	if (BackButton)
 	{

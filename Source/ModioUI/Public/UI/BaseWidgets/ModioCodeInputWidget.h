@@ -75,4 +75,7 @@ protected:
 
 	// layout: TileView/ListView
 	// parameter for spacing which gets fed to tileview
+
+public:
+	TSharedPtr<SModioCodeInput> GetMyInput();
 };

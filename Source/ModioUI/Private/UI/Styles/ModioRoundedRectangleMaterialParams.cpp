@@ -16,48 +16,52 @@
 
 UMaterialInterface* UModioRoundedRectangleMaterialParams::GetMaterialInstance()
 {
+
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
+
 		if (DefaultStyleSet)
 		{
-			UMaterialInterface* NamedMaterial =
-				DefaultStyleSet->GetNamedMaterial(FName("RoundedRectangle"), GetFName().ToString());
-			if (UMaterialInstanceDynamic* NewInstance = Cast<UMaterialInstanceDynamic>(NamedMaterial))
+			UMaterialInterface* roundedRectangleMaterial = DefaultStyleSet->GetDefaultRoundedRectangleMaterial();
+			if (!roundedRectangleMaterial)
 			{
-				NewInstance->SetScalarParameterValue(FName("RelativeRadius"), bRelativeRadius ? 1 : 0);
-				NewInstance->SetScalarParameterValue(FName("EnableBorder"), bEnableBorder ? 1 : 0);
-				NewInstance->SetScalarParameterValue(FName("BorderOpacity"), 1);
-				NewInstance->SetScalarParameterValue(FName("Thickness"), BorderThickness);
-				NewInstance->SetScalarParameterValue(FName("Radius"), CornerRadius);
-				NewInstance->SetVectorParameterValue(FName("Color"),
-													 NormalBorderColor.ResolveReference().GetSpecifiedColor());
-				NewInstance->SetVectorParameterValue(FName("HoverColor"),
-													 FocusedBorderColor.ResolveReference().GetSpecifiedColor());
-				NewInstance->SetScalarParameterValue(FName("Hovered"), 0);
-				NewInstance->SetVectorParameterValue(FName("ActiveColor"),
-													 FocusedBorderColor.ResolveReference().GetSpecifiedColor());
-				NewInstance->SetScalarParameterValue(FName("UseRenderTarget"), 0);
-				NewInstance->SetVectorParameterValue(FName("InnerColor"),
-													 InnerColor.ResolveReference().GetSpecifiedColor());
-				NewInstance->SetScalarParameterValue(FName("EnableButtonGradients"), bEnableButtonGradients ? 1 : 0);
-				NewInstance->SetScalarParameterValue(FName("BorderGradientOpacity"), BorderGradientOpacity);
-				NewInstance->SetScalarParameterValue(FName("InnerGradientOpacity"), InnerGradientOpacity);
-				NewInstance->SetVectorParameterValue(FName("BorderGradientColor"),
-													 BorderGradientColor.ResolveReference().GetSpecifiedColor());
-				NewInstance->SetVectorParameterValue(FName("InnerGradientColor"),
-													 InnerGradientColor.ResolveReference().GetSpecifiedColor());
-
-				return NewInstance;
+				return nullptr;
 			}
+
+			UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(roundedRectangleMaterial, NULL);
+			if (IsValid(material))
+			{
+				ModifyMaterial(material);
+			}
+			return material;
+			
 		}
 	}
 	return nullptr;
+}
+void UModioRoundedRectangleMaterialParams::ModifyMaterial(UMaterialInstanceDynamic* MaterialToModify) 
+{
+		MaterialToModify->SetScalarParameterValue(FName("RelativeRadius"), bRelativeRadius ? 1 : 0);
+		MaterialToModify->SetScalarParameterValue(FName("EnableBorder"), bEnableBorder ? 1 : 0);
+		MaterialToModify->SetScalarParameterValue(FName("BorderOpacity"), 1);
+		MaterialToModify->SetScalarParameterValue(FName("Thickness"), BorderThickness);
+		MaterialToModify->SetScalarParameterValue(FName("Radius"), CornerRadius);
+		MaterialToModify->SetVectorParameterValue(FName("Color"), NormalBorderColor.ResolveReference().GetSpecifiedColor());
+		MaterialToModify->SetVectorParameterValue(FName("HoverColor"), FocusedBorderColor.ResolveReference().GetSpecifiedColor());
+		MaterialToModify->SetScalarParameterValue(FName("Hovered"), 0);
+		MaterialToModify->SetVectorParameterValue(FName("ActiveColor"), FocusedBorderColor.ResolveReference().GetSpecifiedColor());
+		MaterialToModify->SetScalarParameterValue(FName("UseRenderTarget"), 0);
+		MaterialToModify->SetVectorParameterValue(FName("InnerColor"), InnerColor.ResolveReference().GetSpecifiedColor());
+		MaterialToModify->SetScalarParameterValue(FName("EnableButtonGradients"), bEnableButtonGradients ? 1 : 0);
+		MaterialToModify->SetScalarParameterValue(FName("BorderGradientOpacity"), BorderGradientOpacity);
+		MaterialToModify->SetScalarParameterValue(FName("InnerGradientOpacity"), InnerGradientOpacity);
+		MaterialToModify->SetVectorParameterValue(FName("BorderGradientColor"), BorderGradientColor.ResolveReference().GetSpecifiedColor());
+		MaterialToModify->SetVectorParameterValue(FName("InnerGradientColor"), InnerGradientColor.ResolveReference().GetSpecifiedColor());
 }
 #if WITH_EDITOR
 void UModioRoundedRectangleMaterialParams::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-	GetMaterialInstance();
 }
 #endif

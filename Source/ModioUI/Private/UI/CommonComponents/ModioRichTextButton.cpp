@@ -16,6 +16,7 @@
 #include "UI/BaseWidgets/ModioRichTextBlockDecorator.h"
 #include "UI/Styles/ModioButtonStyle.h"
 #include "UI/Styles/ModioRichTextStyle.h"
+#include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/Input/SButton.h"
 
 void UModioRichTextButton::SynchronizeProperties()
@@ -41,37 +42,52 @@ TSharedRef<SWidget> UModioRichTextButton::RebuildWidget()
 	{
 		InputHintImage = NewObject<UModioInputBindingImage>(this);
 #if UE_VERSION_NEWER_THAN(5, 0, 0)
-		InputHintImage->SetDesiredSizeOverride(FVector2D(20));
+		InputHintImage->SetDesiredSizeOverride(FVector2D(32));
 #else
-		InputHintImage->SetBrushSize(FVector2D(20));
+		InputHintImage->SetBrushSize(FVector2D(24));
 #endif
 		InputHintImage->SetVisibility(ESlateVisibility::Collapsed);
 		InputHintImage->GetInputModeVisibilityDelegate().BindDynamic(this,
 																	 &UModioRichTextButton::GetInputHintVisibility);
+
+		if (KeyForInputHint.IsValid())
+		{
+			InputHintImage->SetKeyToShow(KeyForInputHint);
+		}
 	}
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 
 	ButtonContent->SetText(Subsystem ? Subsystem->FormatText(ButtonLabel) : ButtonLabel);
 	ButtonContent->AddDecorator(UModioRichTextBlockDecorator::StaticClass());
 	ButtonContent->GetStyleDelegate().BindUObject(this, &UModioRichTextButton::GetRichTextStyle);
-
 	// clang-format off
 	SAssignNew(MyContentGrid, SGridPanel)
 	+ SGridPanel::Slot(0, 0)
 	.VAlign(VAlign_Center)
 	[
-		ButtonContent->TakeWidget()
+		SNew(SScaleBox)
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Center)
+		.Stretch(EStretch::ScaleToFitX)
+		.StretchDirection(EStretchDirection::DownOnly)
+		[
+			ButtonContent->TakeWidget()
+		]
 	]
 	+ SGridPanel::Slot(1,0)
+	.HAlign(HAlign_Right)
+	.VAlign(VAlign_Center)
+	.Padding(FMargin(8, 0, 0, 0))
 	.Expose(MyHintImageSlot)
 	[
 		InputHintImage->TakeWidget()
 	];
 	// clang-format on
 	MyContentGrid->SetColumnFill(0, 1);
-
+	 
 	MyButton->SetContent(MyContentGrid.ToSharedRef());
 	MyButton->SetHAlign(HAlign_Fill);
+	MyButton->SetVAlign(VAlign_Center);
 	return Widget;
 }
 
@@ -97,17 +113,17 @@ void UModioRichTextButton::NativeDisplayHintForInput(FKey VirtualKey)
 {
 	IModioUIInputHintDisplayWidget::NativeDisplayHintForInput(VirtualKey);
 	KeyForInputHint = VirtualKey;
-	if (InputHintImage)
+	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (InputHintImage && subsystem && KeyForInputHint.IsValid())
 	{
-		InputHintImage->SetKeyToShow(VirtualKey);
-		InputHintImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		InputHintImage->LastDeviceType = subsystem->GetLastInputDevice();
+		InputHintImage->SetKeyToShow(KeyForInputHint);
 	}
 }
 
 ESlateVisibility UModioRichTextButton::GetInputHintVisibility(EModioUIInputMode InputMode)
 {
-	if (InputMode == EModioUIInputMode::Mouse || InputMode == EModioUIInputMode::Unknown ||
-		InputMode == EModioUIInputMode::Keyboard)
+	if (InputMode == EModioUIInputMode::Mouse || InputMode == EModioUIInputMode::Unknown)
 	{
 		return ESlateVisibility::Collapsed;
 	}
