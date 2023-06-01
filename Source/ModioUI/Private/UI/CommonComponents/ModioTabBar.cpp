@@ -25,6 +25,13 @@
 TSharedRef<SWidget> UModioTabBar::RebuildWidget()
 {
 	UpdateBoundValues();
+	if (GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		GEngine->GetEngineSubsystem<UModioUISubsystem>()->OnMenuTabIndexChanged.AddUniqueDynamic(
+			this, &UModioTabBar::OnTabIndexChanged);
+	}
+	GeneratedButtons.Empty();
+	GeneratedButtonTexts.Empty();
 	return SAssignNew(MyListView, SModioTileView<TSharedPtr<FText>>)
 		.ListItemsSource(&BoundValues)
 		.ItemHeight(ItemSize.Y)
@@ -91,6 +98,8 @@ TSharedRef<ITableRow> UModioTabBar::OnGenerateTabButton(TSharedPtr<FText> TabNam
 		}
 	}
 	TableRow->SetPadding(FMargin(24, 24, 24, 24));
+	GeneratedButtons.Add(RowButton);
+	GeneratedButtonTexts.Add(RowTextBlock);
 
 	return TableRow;
 }
@@ -143,6 +152,25 @@ void UModioTabBar::UpdateBoundValues()
 {
 	BoundValues.Empty();
 	Algo::Transform(TabNames, BoundValues, [](const FText& InValue) { return MakeShared<FText>(InValue); });
+}
+
+void UModioTabBar::OnTabIndexChanged(int TabIndex) 
+{
+	if (GeneratedButtons.Num() <= 0 || GeneratedButtonTexts.Num() <= 0)
+	{
+		return;
+	}
+
+	// it should not be possible for generated buttons and texts to have different amount of entries
+	for (int i = 0; i < GeneratedButtons.Num(); i++)
+	{
+		ApplyStyle(InactiveTabButtonStyle, GeneratedButtonTexts[i], GeneratedButtons[i]);
+	}
+
+	if (GeneratedButtonTexts.IsValidIndex(TabIndex) && GeneratedButtons.IsValidIndex(TabIndex))
+	{
+		ApplyStyle(TabButtonStyle, GeneratedButtonTexts[TabIndex], GeneratedButtons[TabIndex]);
+	}
 }
 
 void UModioTabBar::PostLoad()

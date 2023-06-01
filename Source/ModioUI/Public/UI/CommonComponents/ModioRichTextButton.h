@@ -80,6 +80,11 @@ public:
 	void SetLabel(FText NewLabel);
 
 	/**
+	 * Get the label displayed in this button
+	 **/
+	FString GetLabel();
+
+	/**
 	* Change the text orientation in this button
 	* @param NewJustification Update text orientation
 	**/

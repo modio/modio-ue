@@ -71,6 +71,7 @@ protected:
 	virtual void NativeSetHintText(FText InHintText) override;
 	virtual FString NativeGatherInput() override;
 	const FSlateBrush* GetHintGlyph() const;
+	bool SupportsKeyboardFocus() const{return true;};
 	bool HasValidationError() const;
 	const FSlateBrush* GetBorderImage() const;
 	EVisibility GetHintGlyphVisibility() const;

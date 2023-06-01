@@ -61,20 +61,14 @@ void UModioMenu::ChangePagePrevious()
 {
 	// Takes advantage of the two pages we want to swap between being index 0 and 1. If we add additional pages this
 	// will have to change
-	if (ViewController)
-	{
-		ViewController->SetActiveWidgetIndex(!ViewController->ActiveWidgetIndex);
-	}
+	GEngine->GetEngineSubsystem<UModioUISubsystem>()->SetActiveTabIndex(!ViewController->ActiveWidgetIndex);
 }
 
 void UModioMenu::ChangePageNext()
 {
 	// Takes advantage of the two pages we want to swap between being index 0 and 1. If we add additional pages this
 	// will have to change
-	if (ViewController)
-	{
-		ViewController->SetActiveWidgetIndex(!ViewController->ActiveWidgetIndex);
-	}
+	GEngine->GetEngineSubsystem<UModioUISubsystem>()->SetActiveTabIndex(!ViewController->ActiveWidgetIndex);
 }
 
 void UModioMenu::SetPageIndex(int Index)
@@ -272,6 +266,11 @@ void UModioMenu::NativeConstruct()
 				// ScrollWrapper->ScrollWhenFocusChanges = EScrollWhenFocusChanges::AnimatedScroll;
 				// ScrollWrapper->AddChild(CollectionViewInstance);
 				ViewController->AddChild(CollectionViewInstance);
+				UModioCollectionView* collectionView = Cast<UModioCollectionView>(CollectionViewInstance);
+				if (collectionView)
+				{
+					collectionView->OnProfileOpened.AddUObject(this, &UModioMenu::ToggleDownloadQueueDrawer);
+				}
 			}
 			UModioMenuView* SearchResultsViewInstance = CreateWidget<UModioMenuView>(this, SearchResultsView);
 			if (SearchResultsViewInstance)
@@ -410,12 +409,9 @@ void UModioMenu::ShowDetailsForMod(FModioModID ID)
 	int32 UnderlyingWidgetIndex = (int32) EModioMenuScreen::EMMS_ModDetails;
 
 	ViewController->PushActiveWidgetIndex(UnderlyingWidgetIndex);
-	if (UWidget* ActiveWidget = ViewController->GetActiveWidget())
+	if (UModioModDetailsView* View = Cast<UModioModDetailsView>(ViewController->GetActiveWidget()))
 	{
-		if (UModioModDetailsView* View = Cast<UModioModDetailsView>(ActiveWidget))
-		{
-			View->ShowDetailsForMod(ID);
-		}
+		View->ShowDetailsForMod(ID);
 	}
 }
 
@@ -452,7 +448,7 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 {
 	bRoutedOnViewChanged = true;
 	OnViewChanged(ViewIndex);
-	if (ViewController && MenuTitleContent)
+	if (ViewController)
 	{
 		UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (subsystem)
@@ -467,25 +463,31 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 			OuterScrollBox->SetScrollBarVisibility(ESlateVisibility::Collapsed);
 			if (UModioMenuView* MenuView = Cast<UModioMenuView>(OuterScrollBox->GetChildAt(0)))
 			{
-				MenuTitleContent->SetContent(MenuView->GetMenuTitleContent());
+				ActiveViewWidget = MenuView;
 				if (MenuBar)
 				{
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
 				}
-				FSlateApplication::Get().SetUserFocus(0, MenuView->GetMenuTitleContent(), EFocusCause::Navigation);
+				ModioMenuBarWidget->SetVisibility(MenuView->ShouldShowTopNavBar() ? ESlateVisibility::Visible
+																				  : ESlateVisibility::Collapsed);
+				MenuView->SetKeyboardFocus();
 			}
 		}
-		UWidget* ActiveWidget = ViewController->GetActiveWidget();
-		if (ActiveWidget)
+		UWidget* widget = ViewController->GetActiveWidget();
+		if (widget)
 		{
-			if (UModioMenuView* MenuView = Cast<UModioMenuView>(ActiveWidget))
+			if (UModioMenuView* MenuView = Cast<UModioMenuView>(widget))
 			{
-				MenuTitleContent->SetContent(MenuView->GetMenuTitleContent());
+				ActiveViewWidget = MenuView;
 				if (MenuBar)
 				{
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
 				}
-				FSlateApplication::Get().SetUserFocus(0, MenuView->GetMenuTitleContent(), EFocusCause::Navigation);
+
+				ModioMenuBarWidget->SetVisibility(MenuView->ShouldShowTopNavBar() ? ESlateVisibility::Visible
+																				  : ESlateVisibility::Collapsed);
+
+				MenuView->SetKeyboardFocus();
 			}
 		}
 	}
@@ -511,7 +513,10 @@ void UModioMenu::NativeTick(const FGeometry& InGeometry, float DeltaTime)
 	if (!bMenuFocused) 
 	{	
 		bMenuFocused = true;
-		FSlateApplication::Get().SetUserFocus(0, MenuTitleContent->GetContent(), EFocusCause::Navigation);
+		if (ActiveViewWidget)
+		{
+			ActiveViewWidget->SetKeyboardFocus();
+		}
 	}
 }
 
@@ -528,25 +533,13 @@ FReply UModioMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent&
 FReply UModioMenu::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	// If we ever receive full focus on the Menu, forward it to the correct menu
-	UModioScrollBox* OuterScrollBox = Cast<UModioScrollBox>(ViewController->GetActiveWidget());
-	if (OuterScrollBox)
+	if (ActiveViewWidget)
 	{
-		if (UModioMenuView* MenuView = Cast<UModioMenuView>(OuterScrollBox->GetChildAt(0)))
-		{
-			FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
-		}
-	}
-	UWidget* ActiveWidget = ViewController->GetActiveWidget();
-	if (ActiveWidget)
-	{
-		if (UModioMenuView* MenuView = Cast<UModioMenuView>(ActiveWidget))
-		{
-			FSlateApplication::Get().SetUserFocus(0, MenuView->TakeWidget(), EFocusCause::Navigation);
-		}
+		ActiveViewWidget->SetKeyboardFocus();
 	}
 	DialogController->TrySetFocusToActiveDialog();
 
-	return FReply::Handled();
+	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
 void UModioMenu::ShowAuthenticationChoiceDialog()

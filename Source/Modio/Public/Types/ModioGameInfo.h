@@ -90,13 +90,17 @@ struct MODIO_API FModioGameInfo
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
 	FModioTheme Theme = {};
 
-	///** @brief Numerous aggregate stats for the game */
+	/** @brief Numerous aggregate stats for the game */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
 	FModioGameStats Stats;
 
-	///** @brief Creator defined URLs to share */
+	/** @brief Creator defined URLs to share */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
 	TArray<FModioOtherUrl> OtherUrls = {};
+
+	/** @brief Platforms that are supported by this title */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	TArray<EModioModfilePlatform> Platforms = {};
 
 	friend struct FModioGameInfo ToUnreal(const struct Modio::GameInfo& In);
 };

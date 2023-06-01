@@ -58,6 +58,7 @@ protected:
 	virtual void NativeOnEntryReleased() override;
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
 												  TOptional<FModioImageWrapper> Image) override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 	virtual void SynchronizeProperties() override;
 	virtual void NativeOnSetExpandedState(bool bExpanded);
@@ -117,8 +118,12 @@ protected:
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent);
 	virtual void NativeOnAuthenticationChanged(TOptional<FModioUser> User);
 
+	FModioModID CurrentModId;
+	FTimerHandle SetFocusTimerHandle;
 	bool bIsUserAuthenticated;
 	bool GetSubscriptionState();
+	UFUNCTION()
+	void EnableSubscribeButton();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText SubscribeLabel;

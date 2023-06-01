@@ -14,6 +14,7 @@
 #include "CoreMinimal.h"
 #include "Delegates/DelegateCombinations.h"
 #include "ModioFeaturedCategoryParams.h"
+#include "TimerManager.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
@@ -47,6 +48,8 @@ class MODIOUI_API UModioFeaturedCategory : public UModioUserWidgetBase,
 
 protected:
 	bool bEmitSelectionEvents = true;
+	bool bModsFound = false;
+	// Because GetDisplayedEntryWidgets returns all widgets rather than the displayed ones 
 
 	FOnGetSelectionIndex SelectionIndexDelegate;
 
@@ -65,6 +68,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets",
 			  meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"))
 	UWidget* TileLoader;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
+	class UModioErrorRetryWidget* ModioErrorWithRetryWidget;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioButton* SeeAllButton;
@@ -114,10 +120,7 @@ protected:
 
 		if (ItemList)
 		{
-			int32 ItemIndex = FMath::Max(ItemList->GetScrollOffset() - ItemList->GetDisplayedEntryWidgets().Num(), 0.f);
-			ItemList->NavigateToIndex(ItemIndex);
-			ItemList->ClearSelection();
-			ItemList->SetSelectedIndex(ItemIndex + ItemList->GetDisplayedEntryWidgets().Num() - 1);
+			int32 ItemIndex = FMath::Max(ItemList->GetScrollOffset() - ArrowButtonScrollAmount, 0.f);
 			ItemList->SetScrollOffset(ItemIndex);
 		}
 	}
@@ -132,18 +135,10 @@ protected:
 
 		if (ItemList)
 		{
-			int32 ItemIndex = FMath::Min(ItemList->GetScrollOffset() + ItemList->GetDisplayedEntryWidgets().Num(),
+			int32 ItemIndex = FMath::Min(ItemList->GetScrollOffset() + ArrowButtonScrollAmount, 
 										 (float) ItemList->GetNumItems() - 1);
 
-			ItemList->ClearSelection();
-			ItemList->SetSelectedIndex(ItemIndex);
-			ItemList->NavigateToIndex(ItemIndex);
-
-			// Only scroll right if we have not reached the end of the category list
-			if (ItemIndex <= (ItemList->GetNumItems() - ItemList->GetDisplayedEntryWidgets().Num()))
-			{
-				ItemList->SetScrollOffset(ItemIndex);
-			}
+			ItemList->SetScrollOffset(ItemIndex);
 		}
 	}
 
@@ -183,6 +178,10 @@ public:
 	{
 		return SelectionChangedDelegate;
 	}
+
+	// Sets how many tiles the side buttons will scroll
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	int ArrowButtonScrollAmount = 3;
 
 	UFUNCTION(BlueprintCallable, Category = "ModioFeaturedCategory")
 	void SetSelectionIndexDelegate(FOnGetSelectionIndex Delegate);

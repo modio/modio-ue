@@ -131,3 +131,8 @@ void UModioMultiLineEditableTextBox::SynchronizeProperties()
 		}
 	}
 }
+
+TSharedPtr<SMultiLineEditableTextBox> UModioMultiLineEditableTextBox::GetEditableTextBox()
+{
+	return MyEditableTextBlock;
+}

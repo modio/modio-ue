@@ -70,7 +70,8 @@ enum class EModioModfilePlatform : uint8
 	PS4,
 	PS5,
 	Switch,
-	Oculus
+	Oculus,
+	Source
 };
 
 /**

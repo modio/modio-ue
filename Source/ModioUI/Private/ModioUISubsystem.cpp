@@ -362,10 +362,9 @@ FText UModioUISubsystem::FormatText(FText Input)
 
 UModioUIStyleSet* UModioUISubsystem::GetDefaultStyleSet()
 {
+	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
 	if (!LoadedDefaultStyleSet)
 	{
-		UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
-
 		// Could we load the user's override?
         if (Settings && !Settings->DefaultStyleSet.IsNull())
         {
@@ -380,7 +379,10 @@ UModioUIStyleSet* UModioUISubsystem::GetDefaultStyleSet()
 
 	checkf(LoadedDefaultStyleSet, TEXT("Unable to load default style set for the Modio UI module. Please ensure this "
 		       "is set in your project settings window."));
-
+	if (Settings)
+	{
+		LoadedDefaultStyleSet->bOverridePlatformMaterials = Settings->bOverridePlatformMaterials;
+	}
 	return LoadedDefaultStyleSet;
 }
 
@@ -485,7 +487,8 @@ void UModioUISubsystem::CloseModBrowserUI()
 		ModBrowserInstance->RemoveFromViewport();
 		ModBrowserInstance->ConditionalBeginDestroy();
 		ModBrowserInstance = nullptr;
-		LoadedDefaultStyleSet->ClearMaterialCache();
+		// Fix for GC error after closing the browser, materials cannot really be released due to how some of the styles are implemented
+		//LoadedDefaultStyleSet->ClearMaterialCache();
 	}
 }
 
@@ -532,6 +535,16 @@ void UModioUISubsystem::DisplayNotification(TScriptInterface<IModioUINotificatio
 void UModioUISubsystem::DisplayErrorNotification(const FModioNotificationParams& Params)
 {
 	OnDisplayErrorNotification.Broadcast(Params);
+}
+
+void UModioUISubsystem::DisplayErrorDialog(FModioErrorCode ec) 
+{
+	if (!ModBrowserInstance || !ModBrowserInstance->GetDialogController())
+	{
+		return;
+	}
+
+	ModBrowserInstance->GetDialogController()->ShowErrorDialog(ec);
 }
 
 void UModioUISubsystem::LogoDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image, FModioModID ID)
@@ -698,6 +711,7 @@ void UModioUISubsystem::SetActiveTabIndex(int TabIndex)
 {
 	if (ModBrowserInstance)
 	{
+		OnMenuTabIndexChanged.Broadcast(TabIndex);
 		ModBrowserInstance->SetPageIndex(TabIndex);
 	}
 }

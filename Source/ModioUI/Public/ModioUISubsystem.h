@@ -59,6 +59,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayNotificationParams, const FModioNo
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetails, TScriptInterface<IModioModInfoUIDetails>&);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetailsForID, const FModioModID&);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMenuTabIndexChanged, int, TabIndex);
 
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnGetModEnabled, FModioModID, Mod);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnModEnabledChanged, FModioModID, Mod, bool, bNewStateIsEnabled);
@@ -215,6 +216,8 @@ public:
 	// Delegate for the subscription success or fail
 	FOnSubscriptionCompleted OnSubscriptionRequestCompleted;
 
+	FOnMenuTabIndexChanged OnMenuTabIndexChanged;
+
 	// Perhaps this should also carry the error code and a TOptional<bool> for the newly changed state?
 	FOnModSubscriptionStatusChanged OnSubscriptionStatusChanged;
 
@@ -301,6 +304,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void DisplayErrorDialog(FModioErrorCode ec);
 
 	void ExecuteOnModBrowserClosedDelegate();
 

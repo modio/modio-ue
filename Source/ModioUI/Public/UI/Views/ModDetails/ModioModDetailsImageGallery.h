@@ -107,6 +107,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRoundedImage* ActiveBackground;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
+	class UModioGridPanel* NavButtonGridPanel;
+
 public:
 	UPROPERTY(BlueprintReadWrite, Category="Widgets")
 	bool bIsFocused = false;

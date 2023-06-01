@@ -9,10 +9,15 @@
  */
 
 #include "UI/EventHandlers/IModioUIModInfoReceiver.h"
+#include "ModioUISubsystem.h"
 
 void IModioUIModInfoReceiver::ModInfoRequestHandler(FModioModID ModID, FModioErrorCode ec,
 													TOptional<FModioModInfo> Info)
 {
+	if (ec)
+	{
+		GEngine->GetEngineSubsystem<UModioUISubsystem>()->DisplayErrorDialog(ec);
+	}
 	bRoutedUIModInfoReceiver = false;
 	NativeOnModInfoRequestCompleted(ModID, ec, Info);
 	checkf(bRoutedUIModInfoReceiver,
@@ -23,6 +28,10 @@ void IModioUIModInfoReceiver::ModInfoRequestHandler(FModioModID ModID, FModioErr
 void IModioUIModInfoReceiver::ListAllModsRequestHandler(FString RequestIdentifier, FModioErrorCode ec,
 														TOptional<FModioModInfoList> List)
 {
+	if (ec)
+	{
+		GEngine->GetEngineSubsystem<UModioUISubsystem>()->DisplayErrorDialog(ec);
+	}
 	bRoutedUIModInfoReceiver = false;
 	NativeOnListAllModsRequestCompleted(RequestIdentifier, ec, List);
 	checkf(bRoutedUIModInfoReceiver,
@@ -33,12 +42,20 @@ void IModioUIModInfoReceiver::ListAllModsRequestHandler(FString RequestIdentifie
 void IModioUIModInfoReceiver::NativeOnModInfoRequestCompleted(FModioModID ModID, FModioErrorCode ec,
 															  TOptional<FModioModInfo> Info)
 {
+	if (ec)
+	{
+		GEngine->GetEngineSubsystem<UModioUISubsystem>()->DisplayErrorDialog(ec);
+	}
 	bRoutedUIModInfoReceiver = true;
 	Execute_OnModInfoRequestCompleted(Cast<UObject>(this), ModID, ec, FModioOptionalModInfo {Info});
 }
 void IModioUIModInfoReceiver::NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,
 																  TOptional<FModioModInfoList> List)
 {
+	if (ec)
+	{
+		GEngine->GetEngineSubsystem<UModioUISubsystem>()->DisplayErrorDialog(ec);
+	}
 	bRoutedUIModInfoReceiver = true;
 	Execute_OnListAllModsRequestCompleted(Cast<UObject>(this), RequestIdentifier, ec,
 										  FModioOptionalModInfoList(MoveTemp(List)));

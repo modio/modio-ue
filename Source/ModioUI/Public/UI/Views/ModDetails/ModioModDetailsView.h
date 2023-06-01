@@ -39,7 +39,8 @@ UCLASS()
 class MODIOUI_API UModioModDetailsView : public UModioMenuView,
 										 public IModioUIModInfoReceiver,
 										 public IModioUIModDetailsDisplay,
-										 public IModioUIAsyncOperationWidget
+										 public IModioUIAsyncOperationWidget,
+										 public IModioUIAuthenticationChangedReceiver
 {
 	GENERATED_BODY()
 protected:
@@ -50,6 +51,7 @@ protected:
 	virtual void NativeDisplayModDetailsForId(const FModioModID& ModID) override;
 	virtual void NativeRequestOperationRetry() override;
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual void NativeOnAuthenticationChanged(TOptional<FModioUser> User);
 
 	UFUNCTION()
 	void RateUpClicked();
@@ -106,6 +108,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ModFullDescriptionTextBlock;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
+	class UModioErrorRetryWidget* ModioErrorWithRetryWidget;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioTagList* ModTags;
 
@@ -132,7 +137,10 @@ protected:
 	UModioModInfoUI* EditorPreviewDataSource;
 #endif
 
+	bool bIsUserAuthenticated;
 	bool bCachedSubscriptionState;
+	bool bRateUpProcess = false;
+	bool bRateDownProcess = false;
 
 	UFUNCTION()
 	virtual void OnModSubscriptionStatusChanged(FModioModID ID, bool Subscribed);
@@ -161,6 +169,8 @@ protected:
 	void OnDialogClosed();
 	UFUNCTION()
 	void OnDownloadQueueClosed();
+	UFUNCTION()
+	void EnableSubscribeButton();
 
 public:
 	/**

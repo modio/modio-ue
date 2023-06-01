@@ -66,7 +66,7 @@ void UModioMenuBar::SetSearchButtonVisibility(bool bVisible)
 {
 	if (SearchButton)
 	{
-		SearchButton->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		SearchButton->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 }
 
@@ -74,7 +74,7 @@ void UModioMenuBar::SetBackButtonVisibility(bool bVisible)
 {
 	if (BackButton)
 	{
-		BackButton->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		BackButton->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 }
 
@@ -82,6 +82,6 @@ void UModioMenuBar::SetProfileButtonVisibility(bool bVisible)
 {
 	if (UserProfileButton)
 	{
-		UserProfileButton->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UserProfileButton->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 }

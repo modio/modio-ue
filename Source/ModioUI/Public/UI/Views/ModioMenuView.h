@@ -24,7 +24,7 @@ class MODIOUI_API UModioMenuView : public UModioUserWidgetBase
 	GENERATED_BODY()
 protected:
 	UPROPERTY()
-	UWidget* CachedMenuTitleContentWidget;
+	UUserWidget* CachedMenuTitleContentWidget;
 
 	/// @brief Displayed on the associated menu bar
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
@@ -33,11 +33,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UUserWidget> TitleContentClass;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
+	bool bShouldShowTopNavBar = true;
+
 public:
 
 	const FText& GetName();
 	// function here to get the index inside our view switcher?
 
-	virtual TSharedRef<SWidget> GetMenuTitleContent();
+	virtual UUserWidget* GetMenuTitleContent();
 	virtual bool ShouldShowSearchButtonForMenu();
+	virtual bool ShouldShowTopNavBar();
 };

@@ -25,10 +25,19 @@ void UModioErrorRetryWidget::SynchronizeProperties()
 
 	if (RetryButton)
 	{
-		RetryButton->OnClicked.AddUniqueDynamic(this, &UModioErrorRetryWidget::OnRetryClicked);
+		RetryButton->OnPressed.AddUniqueDynamic(this, &UModioErrorRetryWidget::OnRetryClicked);
 	}
 
 	Super::SynchronizeProperties();
+}
+
+FReply UModioErrorRetryWidget::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
+{
+	if (RetryButton)
+	{
+		RetryButton->SetKeyboardFocus();
+	}
+	return FReply::Handled();
 }
 
 void UModioErrorRetryWidget::OnRetryClicked()

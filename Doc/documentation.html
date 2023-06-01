@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
+<meta name="generator" content="Asciidoctor 2.0.20">
 <title>mod.io Unreal Engine Plugin Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -208,13 +208,10 @@ table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
 .admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
 .admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
 .exampleblock>.content{border:1px solid #e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;border-radius:4px}
-.exampleblock>.content>:first-child{margin-top:0}
-.exampleblock>.content>:last-child{margin-bottom:0}
 .sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
-.sidebarblock>:first-child{margin-top:0}
-.sidebarblock>:last-child{margin-bottom:0}
 .sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
-.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content>:first-child,.sidebarblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child,.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
 .literalblock pre,.listingblock>.content>pre{border-radius:4px;overflow-x:auto;padding:1em;font-size:.8125em}
 @media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
 @media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
@@ -393,7 +390,7 @@ b.conum *{color:inherit!important}
 dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
 h1,h2,p,td.content,span.alt,summary{letter-spacing:-.01em}
 p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
-p,blockquote,dt,td.content,span.alt,summary{font-size:1.0625rem}
+p,blockquote,dt,td.content,td.hdlist1,span.alt,summary{font-size:1.0625rem}
 p{margin-bottom:1.25rem}
 .sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
 .exampleblock>.content{background:#fffef7;border-color:#e0e0dc;box-shadow:0 1px 4px #e0e0dc}
@@ -831,21 +828,22 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_configuration_2">Configuration</a>
 <ul class="sectlevel3">
 <li><a href="#_input_mappings">Input Mappings</a></li>
-<li><a href="#_ui_styleset">UI StyleSet</a></li>
+<li><a href="#_ui_style_set">UI Style Set</a></li>
 <li><a href="#_navigationconfig_factory">NavigationConfig Factory</a></li>
 <li><a href="#_authentication_data_provider">Authentication Data Provider</a></li>
 <li><a href="#_input_hint_glyph_provider">Input Hint Glyph Provider</a></li>
 <li><a href="#_featured_rows_categories">Featured Rows &amp; Categories</a></li>
-<li><a href="#_background_customization">Background Customization</a></li>
 </ul>
 </li>
 <li><a href="#_styling_and_customization">Styling and Customization</a>
 <ul class="sectlevel3">
-<li><a href="#_color_material_style_references">Color, Material, Style References</a></li>
-<li><a href="#_customizing_colors">Customizing Colors</a></li>
-<li><a href="#_customizing_materials">Customizing Materials</a></li>
-<li><a href="#_customizing_styles">Customizing Styles</a></li>
+<li><a href="#_color_material_and_style_references">Color, Material, and Style References</a></li>
+<li><a href="#_default_background_material">Default Background Material</a></li>
+<li><a href="#_color_presets_data">Color Presets Data</a></li>
+<li><a href="#_widget_style_assets">Widget Style Assets</a></li>
 <li><a href="#_customizing_audio">Customizing Audio</a></li>
+<li><a href="#_named_glyphs_asset">Named Glyphs Asset</a></li>
+<li><a href="#_material_data">Material Data</a></li>
 </ul>
 </li>
 <li><a href="#_known_issues">Known Issues</a></li>
@@ -1187,6 +1185,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#DisplaySearchResults">Display Search Results</a></li>
 <li><a href="#DisplayNotification">Display Notification</a></li>
 <li><a href="#DisplayErrorNotification">Display Error Notification</a></li>
+<li><a href="#DisplayErrorDialog">Display Error Dialog</a></li>
 <li><a href="#CloseModBrowserUI">Close Mod Browser UI</a></li>
 </ul>
 </li>
@@ -1411,6 +1410,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 </li>
 <li><a href="#_enums">Enums</a>
 <ul class="sectlevel2">
+<li><a href="#_emodiomodserversidestatus"> EModioModServerSideStatus</a></li>
 <li><a href="#_emodiovirusstatus"> EModioVirusStatus</a></li>
 <li><a href="#_emodiovirusscanstatus"> EModioVirusScanStatus</a></li>
 <li><a href="#_emodiomaturityflags"> EModioMaturityFlags</a></li>
@@ -1935,12 +1935,12 @@ For best performance it should be called at least once per frame, so it should e
 <div class="sect2">
 <h3 id="_plugin_quick_start_user_authentication">Plugin quick-start: User Authentication</h3>
 <div class="paragraph">
-<p>Mod.io provides two ways for users to create an account to use the service: email authentication, and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.</p>
+<p>mod.io provides two ways for users to create an account to use the service: email authentication, and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.</p>
 </div>
 <div class="sect3">
 <h4 id="_email_authentication">Email authentication</h4>
 <div class="paragraph">
-<p>Mod.io allows users to create an account on the mod.io website using an email address. Once the user has accepted the mod.io Terms of Use and created an account, they can use that email address to log in and access mod.io services in your game.</p>
+<p>mod.io allows users to create an account on the mod.io website using an email address. Once the user has accepted the mod.io Terms of Use and created an account, they can use that email address to log in and access mod.io services in your game.</p>
 </div>
 <div class="paragraph">
 <p>Email authentication involves:
@@ -2041,7 +2041,7 @@ For best performance it should be called at least once per frame, so it should e
 <div class="sect3">
 <h4 id="_ssoexternal_authentication">SSO/External authentication</h4>
 <div class="paragraph">
-<p>Mod.io features single sign on authentication from a number of external providers. This currently includes:</p>
+<p>mod.io features single sign on authentication from a number of external providers. This currently includes:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2055,18 +2055,30 @@ For best performance it should be called at least once per frame, so it should e
 <p>GoG</p>
 </li>
 <li>
-<p>Itch</p>
+<p>itch.io</p>
 </li>
 <li>
-<p>Switch</p>
+<p>Nintendo Switch</p>
 </li>
 <li>
 <p>Discord</p>
 </li>
+<li>
+<p>PlayStation Network (PSN)</p>
+</li>
+<li>
+<p>Epic Games</p>
+</li>
+<li>
+<p>OpenID</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
-<p>In order to use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.</p>
+<p>Please note that the ability to authenticate players using OpenID is feature for advanced partners only. If you are interested in becoming an advanced partner, please contact <a href="mailto:developers@mod.io">developers@mod.io</a></p>
+</div>
+<div class="paragraph">
+<p>To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.</p>
 </div>
 <div class="paragraph">
 <p>This means the external authentication flow is the following:</p>
@@ -3036,14 +3048,14 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </div>
 </div>
 <div class="sect3">
-<h4 id="_ui_styleset">UI StyleSet</h4>
+<h4 id="_ui_style_set">UI Style Set</h4>
 <div class="imageblock">
 <div class="content">
 <img src="img/plugin_ui_styleset.png" alt="plugin ui styleset">
 </div>
 </div>
 <div class="paragraph">
-<p>The Styleset defines colors, styling, audio and other properties of the UI that can be changed. Each of these style types are split into separate assets to be managed individually. When styling your UI, its recommended that you duplicate the existing ModioUIDefaultStyle asset and any child assets that you want to change, rather than overriding the properties in the existing style assets. This will ensure that future UI updates will not cause conflicts with your changes.</p>
+<p>The Style Set defines UI properties such as colors, materials, widget styles, and more that can be altered to suit the aesthetic of your game. Each of these style types are split into separate assets to be managed individually, described further in <a href="#_styling_and_customization">Styling and Customization</a></p>
 </div>
 </div>
 <div class="sect3">
@@ -3080,7 +3092,7 @@ The FNavigationConfig class is a native-only class, so you will need to implemen
 </div>
 </div>
 <div class="paragraph">
-<p>mod.io supports a number of authentication providers, including email authentication, Steam, XBox Live, and so on.</p>
+<p>A number of authentication providers are supported by mod.io, including email authentication, Steam, Xbox Live, and so on.</p>
 </div>
 <div class="paragraph">
 <p>To tell the UI which authentication methods you wish to support, create a new class that implements <code>IModioUIAuthenticationDataProvider</code> and overrides the following functions:</p>
@@ -3155,25 +3167,24 @@ If you either don&#8217;t specify an authentication data provider, or your data 
 <p>By default, the browser contains a single Featured Mods row (based off daily downloads), and additional rows of Highest Rated, Most Popular, Most Subscribers, Recently Added and Recently Updated.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_background_customization">Background Customization</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_backgroundprovider.png" alt="plugin ui backgroundprovider">
-</div>
-</div>
-<div class="paragraph">
-<p>The mod.io Mod Browser supports a custom background or removal of a background altogether. Classes implementing <code>IModioMenuBackgroundProvider</code> allow the UI to query your project for a specific material to be used for the background. This is configurable in the mod.io UI Settings.</p>
-</div>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_styling_and_customization">Styling and Customization</h3>
-<div class="sect3">
-<h4 id="_color_material_style_references">Color, Material, Style References</h4>
 <div class="paragraph">
-<p>Palettized Colors, Materials and Widget Styles use special FName-based references so that visual elements of the UI can 'pull' information from the central Style Sheet asset at runtime.
-These references are visible in the Editor and use Details Customizations so that you can select from a dropdown list of valid elements to reference.</p>
+<p>For easier management of styling customization, <code>ModioUIDefaultStyle</code> contains multiple assets such that you can independently customize different aspects of the mod.io UI.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_defaultstyle.png" alt="plugin ui defaultstyle">
+</div>
+</div>
+<div class="paragraph">
+<p>When styling your UI, we recommend duplicating the existing <code>ModioUIDefaultStyle</code> asset and any child assets you wish to alter, rather than overriding the properties in the existing style assets. This will ensure that future UI updates will not cause conflicts with your changes.</p>
+</div>
+<div class="sect3">
+<h4 id="_color_material_and_style_references">Color, Material, and Style References</h4>
+<div class="paragraph">
+<p>Palettized Colors, Materials and Widget Styles use special FName-based references so that visual elements of the UI can 'pull' information from the central Style Sheet asset at runtime.  These references are visible in the Editor and use Details Customizations so that you can select from a dropdown list of valid elements to reference.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3214,9 +3225,20 @@ These references are visible in the Editor and use Details Customizations so tha
 </div>
 </div>
 <div class="sect3">
-<h4 id="_customizing_colors">Customizing Colors</h4>
+<h4 id="_default_background_material">Default Background Material</h4>
 <div class="paragraph">
-<p>Widgets in the Mod Browser reference a centrally defined color palette in the style sheet. You can alter these colors by changing entries in the 'Color Presets' list there.</p>
+<p>The mod.io Mod Browser supports a custom background, or removal of a background altogether. <code>ModioUIDefaultStyle</code> implements a <code>UMaterialInterface* DefaultBackgroundMaterial</code> which can be set to your chosen Material or Material Instance.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_backgroundmaterial.png" alt="plugin ui backgroundmaterial">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_color_presets_data">Color Presets Data</h4>
+<div class="paragraph">
+<p>Widgets in the Mod Browser reference a centrally defined color palette, <code>ModioUIColorPresets</code>. You can alter these colors by changing entries in the 'Color Presets' list.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -3233,12 +3255,84 @@ Changing the names of the existing colors will break references in widgets. You 
 <div class="paragraph">
 <p>Referencing a palette entry in a widget style is simple - just click the 'Color Presets' dropdown and select the new palette entry you wish to reference.</p>
 </div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_colorpresets.png" alt="plugin ui colorpresets">
+</div>
+</div>
 </div>
 <div class="sect3">
-<h4 id="_customizing_materials">Customizing Materials</h4>
+<h4 id="_widget_style_assets">Widget Style Assets</h4>
 <div class="paragraph">
-<p>The Mod Browser style sheet maintains a list of named materials and named material instance parameters that can be referenced by name in styles and therefore easily shared between multiple widgets.
-The parameters for a named material are exposed in the <code>Named Brush Materials</code> property. There&#8217;s currently 3 different types of parameters that can be specified:</p>
+<p>Multiple Widget Style Assets have been created for different widget types.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_widgetstyleassets.png" alt="plugin ui widgetstyleassets">
+</div>
+</div>
+<div class="paragraph">
+<p>Each Widget Style Asset groups together a set of styles for a given asset type:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Borders</p>
+</li>
+<li>
+<p>Buttons</p>
+</li>
+<li>
+<p>Input (editable text boxes, checkboxes)</p>
+</li>
+<li>
+<p>Panels (notifications, pop-ups, tiles, tables)</p>
+</li>
+<li>
+<p>Status (progress bars, subscription indicators)</p>
+</li>
+<li>
+<p>Text</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For example, <code>ButtonStyles</code> (below) contains a map of styles that could be applied to a button depending on that button&#8217;s function.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_editstyle.png" alt="plugin ui editstyle">
+</div>
+</div>
+<div class="paragraph">
+<p>To customize a widget style, expand its entry in the relevant Widget Style Asset map and make changes as you see fit.</p>
+</div>
+<div class="paragraph">
+<p>Similarly, to create a new widget style for a particular asset type, add a new entry to its widget style map and populate the values as required.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_customizing_audio">Customizing Audio</h4>
+<div class="paragraph">
+<p>The plugin ships with two default pieces of audio for rollover/focus and selection.</p>
+</div>
+<div class="paragraph">
+<p>Where relevant, these are configurable per-control for a given widget in its Widget Style Asset.  For example, each style in the previous <code>ButtonStyles</code> example above has entries <code>Pressed Sound</code> and <code>Hovered Sound</code> assigned to <code>UI_Click_Cue</code> and <code>UI_Rollover_Cue</code> respectively.</p>
+</div>
+<div class="paragraph">
+<p><code>S_Modio_UI</code> sound class can be used to control the volume of these default audio cues.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_named_glyphs_asset">Named Glyphs Asset</h4>
+<div class="paragraph">
+<p>This asset contains maps of <code>Named Glyphs</code> and <code>PNGGlyphs</code> that can be used to create a material instance of the specified SDF glyph or icon, which can then be referenced in other assets by name.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_material_data">Material Data</h4>
+<div class="paragraph">
+<p>The Mod Browser style sheet maintains a list of named materials and named material instance parameters that can be referenced by name by a style.  This allows materials and material instances to be easily shared between multiple widgets. The parameters for a named material are exposed in the <code>Named Brush Materials</code> property. There are currently 3 different types of parameters that can be specified:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3250,7 +3344,7 @@ The parameters for a named material are exposed in the <code>Named Brush Materia
 </div>
 </div>
 <div class="paragraph">
-<p>This parameter simply references a material from the project - it&#8217;s basically just a wrapper to allow us to easily refer to the material by a centralised FName key.</p>
+<p>This parameter simply references a material from the project - essentially a wrapper allowing us to easily refer to the material by a centralised FName key.</p>
 </div>
 </li>
 <li>
@@ -3264,41 +3358,7 @@ The parameters for a named material are exposed in the <code>Named Brush Materia
 <p>This parameter set specifies a dynamic material instance of the 'RoundedRectangle' named material. It sets the included parameters on the new material instance.</p>
 </div>
 </li>
-<li>
-<p>Named Glyph Material Params</p>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_glyphmaterial.png" alt="plugin ui glyphmaterial">
-</div>
-</div>
-<div class="paragraph">
-<p>This parameter set specifies a dynamic material instance of the DefaultGlyphMaterial which displays the specific named SDF glyph or icon.</p>
-</div>
-</li>
 </ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_customizing_styles">Customizing Styles</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_editstyle.png" alt="plugin ui editstyle">
-</div>
-</div>
-<div class="paragraph">
-<p>To create a new widget style, add a new entry to the <code>Widget Styles</code> map and select the type of style you wish to create, then populate the values as required.</p>
-</div>
-<div class="paragraph">
-<p>To customize a widget style, simply expand its entry in the <code>Widget Styles</code> map and make changes as you see fit.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_customizing_audio">Customizing Audio</h4>
-<div class="paragraph">
-<p>The plugin ships with two default pieces of audio for rollover/focus, and selection. These are configurable per-control as part of the Style Sheet.</p>
-</div>
-<div class="paragraph">
-<p>If you want to use the provided audio, then you can use the S_Modio_UI sound class to control the volume of the audio cues.</p>
 </div>
 </div>
 </div>
@@ -4274,7 +4334,7 @@ The parameters for a named material are exposed in the <code>Named Brush Materia
 </div>
 </div>
 <div class="paragraph">
-<p>Sends a request to the Mod.io server to remove the specified mod from the user&#8217;s list of subscriptions. If no other local users are subscribed to the specified mod this function will also mark the mod for uninstallation by the SDK.</p>
+<p>Sends a request to the mod.io server to remove the specified mod from the user&#8217;s list of subscriptions. If no other local users are subscribed to the specified mod this function will also mark the mod for uninstallation by the SDK.</p>
 </div>
 <h5 id="_parameters_12" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -4378,7 +4438,7 @@ The parameters for a named material are exposed in the <code>Named Brush Materia
 </div>
 </div>
 <div class="paragraph">
-<p>Sends a request to the Mod.io server to add the specified mod to the user&#8217;s list of subscriptions, and marks the mod for local installation by the SDK</p>
+<p>Sends a request to the mod.io server to add the specified mod to the user&#8217;s list of subscriptions, and marks the mod for local installation by the SDK</p>
 </div>
 <h5 id="_parameters_14" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -4782,7 +4842,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="paragraph">
-<p>Begins email authentication for the current session by requesting a one-time code be sent to the specified email address if it is associated with a Mod.io account</p>
+<p>Begins email authentication for the current session by requesting a one-time code be sent to the specified email address if it is associated with a mod.io account</p>
 </div>
 <h5 id="_requirements_8" class="discrete">Requirements</h5>
 <div class="ulist">
@@ -4832,7 +4892,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">UserAuthError::AlreadyAuthenticated</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Authenticated user already signed-in. Call ClearUserDataAsync to de-authenticate the old user, then Shutdown() and reinitialize the SDK first.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authenticated user already signed-in. Call ClearUserDataAsync() to de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">NetworkError</p></td>
@@ -4918,7 +4978,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="paragraph">
-<p>Fetches the currently authenticated Mod.io user profile if there is one associated with the current platform user</p>
+<p>Fetches the currently authenticated mod.io user profile if there is one associated with the current platform user</p>
 </div>
 <h5 id="_parameters_22" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -6113,7 +6173,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="paragraph">
-<p>De-authenticates the current Mod.io user for the current session, and clears all user-specific data stored on the current device. Any subscribed mods that are installed but do not have other local users subscribed will be uninstalled</p>
+<p>De-authenticates the current mod.io user for the current session, and clears all user-specific data stored on the current device. Any subscribed mods that are installed but do not have other local users subscribed will be uninstalled</p>
 </div>
 <h5 id="_requirements_23" class="discrete">Requirements</h5>
 <div class="ulist">
@@ -6178,7 +6238,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="paragraph">
-<p>Uses platform-specific authentication to associate a Mod.io user account with the current platform user</p>
+<p>Uses platform-specific authentication to associate a mod.io user account with the current platform user</p>
 </div>
 <h5 id="_requirements_24" class="discrete">Requirements</h5>
 <div class="ulist">
@@ -6232,7 +6292,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">UserAuthError::AlreadyAuthenticated</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Authenticated user already signed-in. Call ClearUserDataAsync to de-authenticate the old user, then Shutdown() and reinitialize the SDK first.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authenticated user already signed-in. Call ClearUserDataAsync() to de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">NetworkError</p></td>
@@ -6305,7 +6365,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">UserAuthError::AlreadyAuthenticated</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Authenticated user already signed-in. Call ClearUserDataAsync to de-authenticate the old user, then Shutdown() and reinitialize the SDK first.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Authenticated user already signed-in. Call ClearUserDataAsync() to de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">NetworkError</p></td>
@@ -7991,6 +8051,20 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="DisplayErrorDialog">Display Error Dialog</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_DisplayErrorDialog.png" alt="nd img DisplayErrorDialog">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayErrorDialog</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ec</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="CloseModBrowserUI">Close Mod Browser UI</h4>
 <div class="imageblock">
 <div class="content">
@@ -8382,6 +8456,11 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioModStats">FModioModStats</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Stats</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Stats and rating information for the mod</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioModServerSideStatus">EModioModServerSideStatus</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModStatus</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Status of the mod</p></td>
 </tr>
 </tbody>
 </table>
@@ -8959,6 +9038,11 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">OtherUrls</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Creator defined URLs to share</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;EModioModfilePlatform&gt;">TArray&lt;EModioModfilePlatform&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Platforms</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Platforms that are supported by this title</p></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -9217,12 +9301,12 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioGameID">FModioGameID</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GameId</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Mod.io-provided ID for the game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io-provided ID for the game</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioApiKey">FModioApiKey</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ApiKey</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Mod.io-provided API key for your application or game</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The mod.io-provided API key for your application or game</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioEnvironment">EModioEnvironment</a></span></p></td>
@@ -13251,11 +13335,36 @@ This class is part of an experimental feature and is subject to change.
 <div class="sectionbody">
 <hr>
 <div class="sect2">
+<h3 id="_emodiomodserversidestatus"><a id="EModioModServerSideStatus"></a> EModioModServerSideStatus</h3>
+<h4 id="_values" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NotAccepted</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Accepted</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Deleted</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_emodiovirusstatus"><a id="EModioVirusStatus"></a> EModioVirusStatus</h3>
 <div class="paragraph">
 <p>If the file has been found to be malicious or not</p>
 </div>
-<h4 id="_values" class="discrete">Values</h4>
+<h4 id="_values_2" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13279,7 +13388,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Current state of the scanned file</p>
 </div>
-<h4 id="_values_2" class="discrete">Values</h4>
+<h4 id="_values_3" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13316,7 +13425,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiomaturityflags"><a id="EModioMaturityFlags"></a> EModioMaturityFlags</h3>
-<h4 id="_values_3" class="discrete">Values</h4>
+<h4 id="_values_4" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13352,7 +13461,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>What type of event occurred</p>
 </div>
-<h4 id="_values_4" class="discrete">Values</h4>
+<h4 id="_values_5" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13400,7 +13509,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
-<h4 id="_values_5" class="discrete">Values</h4>
+<h4 id="_values_6" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13443,13 +13552,17 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Oculus</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">OpenID</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="sect2">
 <h3 id="_emodiolanguage"><a id="EModioLanguage"></a> EModioLanguage</h3>
-<h4 id="_values_6" class="discrete">Values</h4>
+<h4 id="_values_7" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13522,7 +13635,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiologlevel"><a id="EModioLogLevel"></a> EModioLogLevel</h3>
-<h4 id="_values_7" class="discrete">Values</h4>
+<h4 id="_values_8" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13551,7 +13664,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiogallerysize"><a id="EModioGallerySize"></a> EModioGallerySize</h3>
-<h4 id="_values_8" class="discrete">Values</h4>
+<h4 id="_values_9" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13572,7 +13685,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioavatarsize"><a id="EModioAvatarSize"></a> EModioAvatarSize</h3>
-<h4 id="_values_9" class="discrete">Values</h4>
+<h4 id="_values_10" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13597,7 +13710,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiologosize"><a id="EModioLogoSize"></a> EModioLogoSize</h3>
-<h4 id="_values_10" class="discrete">Values</h4>
+<h4 id="_values_11" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13626,7 +13739,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiomodfileplatform"><a id="EModioModfilePlatform"></a> EModioModfilePlatform</h3>
-<h4 id="_values_11" class="discrete">Values</h4>
+<h4 id="_values_12" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13677,13 +13790,17 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Oculus</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Source</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="sect2">
 <h3 id="_emodioportal"><a id="EModioPortal"></a> EModioPortal</h3>
-<h4 id="_values_12" class="discrete">Values</h4>
+<h4 id="_values_13" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13736,7 +13853,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioenvironment"><a id="EModioEnvironment"></a> EModioEnvironment</h3>
-<h4 id="_values_13" class="discrete">Values</h4>
+<h4 id="_values_14" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13757,7 +13874,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioerrorcondition"><a id="EModioErrorCondition"></a> EModioErrorCondition</h3>
-<h4 id="_values_14" class="discrete">Values</h4>
+<h4 id="_values_15" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13833,7 +13950,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum indicating which direction sorting should be applied</p>
 </div>
-<h4 id="_values_15" class="discrete">Values</h4>
+<h4 id="_values_16" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13857,7 +13974,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum indicating which field should be used to sort the results</p>
 </div>
-<h4 id="_values_16" class="discrete">Values</h4>
+<h4 id="_values_17" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13898,7 +14015,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioimagestate"><a id="EModioImageState"></a> EModioImageState</h3>
-<h4 id="_values_17" class="discrete">Values</h4>
+<h4 id="_values_18" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13930,7 +14047,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enum representing the current state of a mod</p>
 </div>
-<h4 id="_values_18" class="discrete">Values</h4>
+<h4 id="_values_19" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13967,7 +14084,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiomodprogressstate"><a id="EModioModProgressState"></a> EModioModProgressState</h3>
-<h4 id="_values_19" class="discrete">Values</h4>
+<h4 id="_values_20" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14000,7 +14117,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiorating"><a id="EModioRating"></a> EModioRating</h3>
-<h4 id="_values_20" class="discrete">Values</h4>
+<h4 id="_values_21" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14025,7 +14142,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioreporttype"><a id="EModioReportType"></a> EModioReportType</h3>
-<h4 id="_values_21" class="discrete">Values</h4>
+<h4 id="_values_22" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14070,7 +14187,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_efilesizeunit"><a id="EFileSizeUnit"></a> EFileSizeUnit</h3>
-<h4 id="_values_22" class="discrete">Values</h4>
+<h4 id="_values_23" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14103,7 +14220,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiouiinputmode"><a id="EModioUIInputMode"></a> EModioUIInputMode</h3>
-<h4 id="_values_23" class="discrete">Values</h4>
+<h4 id="_values_24" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14144,7 +14261,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiouiasyncoperationwidgetstate"><a id="EModioUIAsyncOperationWidgetState"></a> EModioUIAsyncOperationWidgetState</h3>
-<h4 id="_values_24" class="discrete">Values</h4>
+<h4 id="_values_25" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14169,7 +14286,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiouidirection"><a id="EModioUIDirection"></a> EModioUIDirection</h3>
-<h4 id="_values_25" class="discrete">Values</h4>
+<h4 id="_values_26" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14198,7 +14315,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiouimediadownloadeventtype"><a id="EModioUIMediaDownloadEventType"></a> EModioUIMediaDownloadEventType</h3>
-<h4 id="_values_26" class="discrete">Values</h4>
+<h4 id="_values_27" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14223,7 +14340,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiouimodinfoeventtype"><a id="EModioUIModInfoEventType"></a> EModioUIModInfoEventType</h3>
-<h4 id="_values_27" class="discrete">Values</h4>
+<h4 id="_values_28" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14244,7 +14361,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiotextvalidationrule"><a id="EModioTextValidationRule"></a> EModioTextValidationRule</h3>
-<h4 id="_values_28" class="discrete">Values</h4>
+<h4 id="_values_29" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14285,7 +14402,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiodialogreply"><a id="EModioDialogReply"></a> EModioDialogReply</h3>
-<h4 id="_values_29" class="discrete">Values</h4>
+<h4 id="_values_30" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14310,7 +14427,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiodialogoperationcall"><a id="EModioDialogOperationCall"></a> EModioDialogOperationCall</h3>
-<h4 id="_values_30" class="discrete">Values</h4>
+<h4 id="_values_31" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14331,7 +14448,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiodialogasynccall"><a id="EModioDialogAsyncCall"></a> EModioDialogAsyncCall</h3>
-<h4 id="_values_31" class="discrete">Values</h4>
+<h4 id="_values_32" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14376,7 +14493,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiodialogbuttoncommand"><a id="EModioDialogButtonCommand"></a> EModioDialogButtonCommand</h3>
-<h4 id="_values_32" class="discrete">Values</h4>
+<h4 id="_values_33" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14413,7 +14530,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiodrawercontrollerslotedge"><a id="EModioDrawerControllerSlotEdge"></a> EModioDrawerControllerSlotEdge</h3>
-<h4 id="_values_33" class="discrete">Values</h4>
+<h4 id="_values_34" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14442,7 +14559,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioinputvalidationtype"><a id="EModioInputValidationType"></a> EModioInputValidationType</h3>
-<h4 id="_values_34" class="discrete">Values</h4>
+<h4 id="_values_35" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14467,7 +14584,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiomenudrawer"><a id="EModioMenuDrawer"></a> EModioMenuDrawer</h3>
-<h4 id="_values_35" class="discrete">Values</h4>
+<h4 id="_values_36" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14488,7 +14605,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiomenuscreen"><a id="EModioMenuScreen"></a> EModioMenuScreen</h3>
-<h4 id="_values_36" class="discrete">Values</h4>
+<h4 id="_values_37" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14517,7 +14634,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiomodinfopropertytype"><a id="EModioModInfoPropertyType"></a> EModioModInfoPropertyType</h3>
-<h4 id="_values_37" class="discrete">Values</h4>
+<h4 id="_values_38" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14554,7 +14671,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodionotificationcontrollerslotedge"><a id="EModioNotificationControllerSlotEdge"></a> EModioNotificationControllerSlotEdge</h3>
-<h4 id="_values_38" class="discrete">Values</h4>
+<h4 id="_values_39" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14583,7 +14700,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiopopupplacement"><a id="EModioPopupPlacement"></a> EModioPopupPlacement</h3>
-<h4 id="_values_39" class="discrete">Values</h4>
+<h4 id="_values_40" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14604,7 +14721,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodioscrollboxbaralignment"><a id="EModioScrollBoxBarAlignment"></a> EModioScrollBoxBarAlignment</h3>
-<h4 id="_values_40" class="discrete">Values</h4>
+<h4 id="_values_41" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14637,7 +14754,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiowidgetcarouselsizeoverridetype"><a id="EModioWidgetCarouselSizeOverrideType"></a> EModioWidgetCarouselSizeOverrideType</h3>
-<h4 id="_values_41" class="discrete">Values</h4>
+<h4 id="_values_42" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14664,7 +14781,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-05-03 10:35:02 +1000
+Last updated 2023-06-01 12:20:01 +1000
 </div>
 </div>
 </body>

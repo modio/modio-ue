@@ -36,9 +36,7 @@ protected:
 	void OnRetryClicked();
 
 	virtual void SynchronizeProperties() override;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	UModioRichTextButton* RetryButton;
+	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* ErrorText;
@@ -51,6 +49,9 @@ public:
 	* Change the text error in this widget
 	* @param Error The updated string to store in this view
 	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioRichTextButton* RetryButton;
+
 	UFUNCTION()
 	void SetErrorText(FString Error)
 	{

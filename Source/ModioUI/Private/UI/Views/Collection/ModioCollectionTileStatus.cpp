@@ -31,7 +31,7 @@ void UModioCollectionTileStatus::NativeOnSetDataSource()
 	TMap<FModioModID, FModioModCollectionEntry> UserMods = Subsystem->QueryUserSubscriptions();
 	if (!UserMods.Contains(CollectionEntry->Underlying.GetID()))
 	{
-		SetVisibility(ESlateVisibility::Hidden);
+		SetVisibility(ESlateVisibility::Collapsed);
 		return;
 	}
 

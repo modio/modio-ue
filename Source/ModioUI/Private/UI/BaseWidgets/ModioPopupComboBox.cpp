@@ -16,6 +16,7 @@
 #include "UI/Styles/ModioCustomComboBoxStyle.h"
 #include "UI/Styles/ModioUIColorRef.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Views/STableRow.h"
 
@@ -63,6 +64,7 @@ TSharedRef<ITableRow> UModioPopupComboBox::GenerateOptionWidget(TSharedPtr<FText
 {
 	const FModioCustomComboBoxStyle* ComboStyle = ComboBoxStyle.FindStyle<FModioCustomComboBoxStyle>();
 	FFormatNamedArguments Args;
+
 	if (BoundValues.Num() && BoundValues[0]->EqualTo(*Item))
 	{
 		Args.Add("Description", Description);
@@ -72,6 +74,7 @@ TSharedRef<ITableRow> UModioPopupComboBox::GenerateOptionWidget(TSharedPtr<FText
 		Args.Add("Description", FText::GetEmpty());
 	}
 	Args.Add("Value", *Item);
+
 	// clang-format off
 	return SNew(SModioTableRowBase<TSharedPtr<FText>>, OwnerTable)
 		.Padding(ContentPadding)
@@ -111,6 +114,7 @@ TSharedRef<SWidget> UModioPopupComboBox::GenerateButtonContent(TSharedPtr<FText>
 	FFormatNamedArguments Args;
 	Args.Add("Description", Description);
 	Args.Add("Value", *Item);
+
 	// clang-format off
 	return SNew(SBox) 
 		.HAlign(HAlign_Right)

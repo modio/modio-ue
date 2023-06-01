@@ -16,10 +16,12 @@
 #include "ModioSubsystem.h"
 #include "Types/ModioRating.h"
 #include "Settings/ModioUISettings.h"
+#include "UI/CommonComponents/ModioErrorRetryWidget.h"
 #include "UI/CommonComponents/ModioMenu.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/EventHandlers/IModioUIAuthenticationChangedReceiver.h"
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
+#include "UI/Views/ModDetails/ModioModDetailsOpProgress.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "TimerManager.h"
 
@@ -89,9 +91,9 @@ void UModioModDetailsView::OnModSubscriptionStatusChanged(FModioModID ID, bool S
 			{
 				if (SubscribeButton)
 				{
-					// Show 'unsubscribe' text if we're displaying a mod the user is subscribed to
-					SubscribeButton->SetLabel(Subscribed ? UnsubscribeLabel : SubscribeLabel);
+					GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::EnableSubscribeButton, 0.6, false);
 				}
+
 				if (SubscriptionBadge)
 				{
 					SubscriptionBadge->SetVisibility(Subscribed ? ESlateVisibility::HitTestInvisible
@@ -101,11 +103,13 @@ void UModioModDetailsView::OnModSubscriptionStatusChanged(FModioModID ID, bool S
 			}
 		}
 	}
-	RateUpButton->SetKeyboardFocus();
 }
 
 void UModioModDetailsView::NativeSubscribeClicked()
 {
+	SubscribeButton->SetIsEnabled(false);
+	GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::EnableSubscribeButton, 0.6, false);
+
 	if (!bCachedSubscriptionState)
 	{
 		UModioModInfoUI* Data = Cast<UModioModInfoUI>(DataSource);
@@ -126,7 +130,7 @@ void UModioModDetailsView::NativeSubscribeClicked()
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 			if (Subsystem)
 			{
-				Subsystem->RequestRemoveSubscriptionForModID(Data->Underlying.ModId);				
+				Subsystem->RequestRemoveSubscriptionForModID(Data->Underlying.ModId);
 			}
 		}
 	}
@@ -225,7 +229,7 @@ FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		return FReply::Handled();
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Subscribe)
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Subscribe && !InKeyEvent.IsRepeat() && SubscribeButton && SubscribeButton->GetIsEnabled())
 	{
 		NativeSubscribeClicked();
 		return FReply::Handled();
@@ -234,9 +238,20 @@ FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 	return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 }
 
+void UModioModDetailsView::NativeOnAuthenticationChanged(TOptional<FModioUser> User)
+{
+	bIsUserAuthenticated = User.IsSet();
+}
+
 // These methods potentially need us to know about the user's ratings
 void UModioModDetailsView::RateUpClicked()
 {
+	// to disable button spamming
+	if (bRateUpProcess)
+	{
+		return;
+	}
+
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 	if (ModInfo)
 	{
@@ -248,12 +263,22 @@ void UModioModDetailsView::RateUpClicked()
 				ModInfo->Underlying.ModId,
 				FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioModDetailsView::OnRatingSubmissionComplete,
 														EModioRating::Positive));
+			if (bIsUserAuthenticated)
+			{
+				bRateUpProcess = true;
+				RateUpButton->SetIsEnabled(false);
+			}
 		}
 	}
 }
 
 void UModioModDetailsView::RateDownClicked()
 {
+	if (bRateDownProcess)
+	{
+		return;
+	}
+
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 	if (ModInfo)
 	{
@@ -265,6 +290,11 @@ void UModioModDetailsView::RateDownClicked()
 				ModInfo->Underlying.ModId,
 				FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioModDetailsView::OnRatingSubmissionComplete,
 														EModioRating::Negative));
+			if (bIsUserAuthenticated)
+			{
+				bRateDownProcess = true;
+				RateDownButton->SetIsEnabled(false);
+			}
 		}
 	}
 }
@@ -285,14 +315,31 @@ void UModioModDetailsView::OnRatingSubmissionComplete(FModioErrorCode ec, EModio
 		Subsystem->DisplayErrorNotification(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
 	}
 
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
+	FFormatNamedArguments FormatArgs;
+
 	if (!ec)
 	{
 		switch (SubmittedRating)
 		{
 			case EModioRating::Positive:
+				RateUpButton->SetIsEnabled(true);
+				bRateUpProcess = false;
+				if (ModInfo)
+				{
+					FormatArgs.Add("RatingPositive", ModInfo->Underlying.Stats.RatingPositive);
+					RateUpButton->SetLabel(FText::Format(RateUpTextFormat, FormatArgs));
+				}
+				break;
 			case EModioRating::Negative:
-			{
-			}
+				RateDownButton->SetIsEnabled(true);
+				bRateDownProcess = false;
+				if (ModInfo)
+				{
+					FormatArgs.Add("RatingNegative", ModInfo->Underlying.Stats.RatingNegative);
+					RateDownButton->SetLabel(FText::Format(RateDownTextFormat, FormatArgs));
+				}
+				break;
 			break;
 			case EModioRating::Neutral:
 				// ensure that neither button is highlighted
@@ -302,7 +349,9 @@ void UModioModDetailsView::OnRatingSubmissionComplete(FModioErrorCode ec, EModio
 		}
 	}
 	else
-	{}
+	{
+		GEngine->GetEngineSubsystem<UModioUISubsystem>()->DisplayErrorDialog(ec);
+	}
 }
 
 void UModioModDetailsView::NativeOnSetDataSource()
@@ -338,12 +387,6 @@ void UModioModDetailsView::NativeOnSetDataSource()
 		if (SubscriptionBadge)
 		{
 			SubscriptionBadge->SetDataSource(DataSource);
-		}
-
-		if (ProgressWidget)
-		{
-			// this doesn't work, needs to be made into a task
-			ProgressWidget->SetDataSource(DataSource);
 		}
 
 		if (ImageGallery)
@@ -411,7 +454,7 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 				NewDataSource->Underlying = Info.GetValue();
 				SetDataSource(NewDataSource);
 
-				GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::SetInitialFocus,0.2,false);
+				GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::SetInitialFocus, 0.6, false);
 			}
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																	   EModioUIAsyncOperationWidgetState::Success);
@@ -419,6 +462,7 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 		else
 		{
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::Error);
+			ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
 		}
 	}
 }
@@ -434,11 +478,24 @@ void UModioModDetailsView::FillScrollableWidgetsArray()
 
 void UModioModDetailsView::SetInitialFocus()
 {
-	FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+	if (SubscribeButton->GetIsEnabled())
+	{
+		FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+	}
+	else
+	{
+		ImageGallery->SetKeyboardFocus();
+	}
 }
 
 void UModioModDetailsView::OnDialogClosed()
 {
+	if (ModioErrorWithRetryWidget->IsVisible())
+	{
+		ModioErrorWithRetryWidget->SetKeyboardFocus();
+		return;
+	}
+
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	if (IsValid(Subsystem))
 	{
@@ -454,6 +511,15 @@ void UModioModDetailsView::OnDownloadQueueClosed()
 	FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
 }
 
+void UModioModDetailsView::EnableSubscribeButton()
+{
+	SubscribeButton->SetIsEnabled(true);
+	SubscribeButton->SetKeyboardFocus();
+
+	(SubscribeButton->GetLabel() == SubscribeLabel.ToString()) ? SubscribeButton->SetLabel(UnsubscribeLabel)
+																   : SubscribeButton->SetLabel(SubscribeLabel);
+}
+
 void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
 {
 	CurrentModID = ID;
@@ -464,7 +530,7 @@ void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
 	}
 	if (ImageGallery)
 	{
-		ImageGallery->SetVisibility(ESlateVisibility::Hidden);
+		ImageGallery->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
 	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
@@ -476,16 +542,21 @@ void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
 		{
 			(CurrentProgress->ID == CurrentModID)
 				? ProgressWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible)
-				: ProgressWidget->SetVisibility(ESlateVisibility::Hidden);
+				: ProgressWidget->SetVisibility(ESlateVisibility::Collapsed);
 		}
 		else
-			ProgressWidget->SetVisibility(ESlateVisibility::Hidden);
+			ProgressWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
 FReply UModioModDetailsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	return FReply::Handled();
+	SubscribeButton->SetKeyboardFocus();
+	if (ModioErrorWithRetryWidget->IsVisible())
+	{
+		ModioErrorWithRetryWidget->SetKeyboardFocus();
+	}
+	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
 #include "Loc/EndModioLocNamespace.h"

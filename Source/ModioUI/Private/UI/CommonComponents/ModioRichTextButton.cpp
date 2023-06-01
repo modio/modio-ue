@@ -17,6 +17,7 @@
 #include "UI/Styles/ModioButtonStyle.h"
 #include "UI/Styles/ModioRichTextStyle.h"
 #include "Widgets/Layout/SScaleBox.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/Input/SButton.h"
 
 void UModioRichTextButton::SynchronizeProperties()
@@ -65,13 +66,18 @@ TSharedRef<SWidget> UModioRichTextButton::RebuildWidget()
 	+ SGridPanel::Slot(0, 0)
 	.VAlign(VAlign_Center)
 	[
-		SNew(SScaleBox)
-		.HAlign(HAlign_Fill)
+		SNew(SBox)
 		.VAlign(VAlign_Center)
-		.Stretch(EStretch::ScaleToFitX)
-		.StretchDirection(EStretchDirection::DownOnly)
+		.HAlign(HAlign_Center)
 		[
-			ButtonContent->TakeWidget()
+			SNew(SScaleBox)
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			.Stretch(EStretch::ScaleToFitX)
+			.StretchDirection(EStretchDirection::DownOnly)
+			[
+				ButtonContent->TakeWidget()
+			]
 		]
 	]
 	+ SGridPanel::Slot(1,0)
@@ -162,6 +168,11 @@ void UModioRichTextButton::SetLabel(FText NewLabel)
 	{
 		ButtonContent->SetText(Subsystem ? Subsystem->FormatText(ButtonLabel) : ButtonLabel);
 	}
+}
+
+FString UModioRichTextButton::GetLabel()
+{
+	return ButtonLabel.ToString();
 }
 
 void UModioRichTextButton::SetJustification(ETextJustify::Type NewJustification)

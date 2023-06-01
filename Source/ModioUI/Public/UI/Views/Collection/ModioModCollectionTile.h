@@ -65,9 +65,6 @@ protected:
 	UModioRichTextBlock* SizeOnDiskLabel;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	UModioPopupMenu* MoreOptionsMenu;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioCollectionTileStatus* StatusWidget;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
@@ -100,5 +97,8 @@ protected:
 	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
 
 public:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioPopupMenu* MoreOptionsMenu;
+
 	bool bHasFocus = false;
 };

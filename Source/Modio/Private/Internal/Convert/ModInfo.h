@@ -62,5 +62,6 @@ FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 	Out.YoutubeURLs = ToUnreal(In.YoutubeURLs);
 	Out.SketchfabURLs = ToUnreal(In.SketchfabURLs);
 	Out.Stats = ToUnreal(In.Stats);
+	Out.ModStatus = (EModioModServerSideStatus) In.ModStatus;
 	return Out;
 }

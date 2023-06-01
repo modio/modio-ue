@@ -129,7 +129,6 @@ protected:
 
 	// Using switched from NativeOnKeyDown to NativeOnPreviewKeyDown to capture input event when the menu is hidden 
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
-
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -140,9 +139,6 @@ protected:
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Widgets", meta = (BindWidgetAnimOptional))
 	UWidgetAnimation* DialogAnim;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
-	UNativeWidgetHost* MenuTitleContent;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioWidgetSwitcher* ViewController;
@@ -163,6 +159,9 @@ protected:
 			  meta = (BindWidget, MustImplement = "ModioUINotificationController"))
 	UWidget* NotificationController;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
+	class UUserWidget* ModioMenuBarWidget;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioMenuView> FeaturedView;
 
@@ -180,6 +179,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioDrawer> RefineSearchDrawer;
+
+	UUserWidget* ActiveViewWidget;
 
 	virtual void NativeUserChanged(TOptional<FModioUser> NewUser) override;
 

@@ -79,7 +79,7 @@ void UModioModCollectionTile::NativeOnSetDataSource()
     {
         if (CollectionEntry->bCachedSubscriptionStatus == false)
         {
-            SubscribeButton->SetVisibility(ESlateVisibility::Hidden);
+			SubscribeButton->SetVisibility(ESlateVisibility::Collapsed);
         }
         else
         {
@@ -325,8 +325,7 @@ void UModioModCollectionTile::OnModSubscriptionStatusChanged(FModioModID ID, boo
 			{
 				if (SubscribeButton)
 				{
-					// Show 'unsubscribe' button if we're displaying a mod the user is subscribed to
-					SubscribeButton->SetVisibility(Subscribed ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+					SubscribeButton->SetVisibility(Subscribed ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 				}
 				if (SubscriptionIndicator)
 				{

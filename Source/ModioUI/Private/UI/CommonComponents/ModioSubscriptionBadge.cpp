@@ -36,7 +36,7 @@ void UModioSubscriptionBadge::NativeOnSetDataSource()
 	TMap<FModioModID, FModioModCollectionEntry> UserMods = Subsystem->QueryUserSubscriptions();
 	if (!UserMods.Contains(Data->Underlying.ModId))
 	{
-		SetVisibility(ESlateVisibility::Hidden);
+		SetVisibility(ESlateVisibility::Collapsed);
 		return;
 	}
 

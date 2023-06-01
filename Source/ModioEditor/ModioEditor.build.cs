@@ -21,5 +21,7 @@ public class ModioEditor : ModuleRules
  
         PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Public") });
         PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private") });
+
+		PrivateDependencyModuleNames.AddRange(new string[] { "Projects", "InputCore", "ToolMenus", "Slate", "SlateCore", "Modio", "HTTP"});
 	}
 }

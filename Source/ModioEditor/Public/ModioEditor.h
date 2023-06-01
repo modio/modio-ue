@@ -18,4 +18,14 @@ class FModioEditor : public IModuleInterface
 	static void DisplayGettingStarted_PostMainFrame(TSharedPtr<SWindow>, bool);
 
 	static void DisplayGettingStarted();
+
+	/** This function will be bound to Command (by default it will bring up plugin window) */
+	void PluginButtonClicked();
+
+	private:
+
+	void RegisterMenus();
+	TSharedRef<class SWidget> PopulateComboButton(TSharedPtr<class FUICommandList> Commands);
+	TSharedPtr<class FUICommandList> PluginCommands;
+
 };

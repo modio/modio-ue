@@ -49,7 +49,7 @@ FOptionalSize UModioDefaultPopupMenuContent::GetDesiredItemWidth() const
 
 FOptionalSize UModioDefaultPopupMenuContent::GetDesiredMenuHeight() const
 {
-	return CurrentMenuEntries.Num() * GetDesiredItemHeight();
+	return CurrentMenuEntries.Num() > 0 ? CurrentMenuEntries.Num() * GetDesiredItemHeight() : GetDesiredItemHeight(); 
 }
 
 float UModioDefaultPopupMenuContent::GetDesiredItemHeight() const
@@ -228,6 +228,7 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 	// clang-format off
 	MyBox = SNew(SBox)
 		.WidthOverride_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredItemWidth)
+		.HeightOverride_UObject(this, &UModioDefaultPopupMenuContent::GetDesiredMenuHeight)
 		[
 			SAssignNew(MyBorder, SRetainerWidget)
 			.Phase(0)
@@ -258,7 +259,6 @@ TSharedRef<SWidget> UModioDefaultPopupMenuContent::RebuildWidget()
 		MyBorder->SetTextureParameter(FName("WidgetTexture"));
 	}
 	MyList->RebuildList();
-	MyBorder->RequestRender();
 	return MyBox.ToSharedRef();
 }
 

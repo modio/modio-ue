@@ -24,7 +24,6 @@ using Tools.DotNETCommon;
 using System.Linq;
 
 
-
 public class Modio : ModuleRules
 {
     private bool PlatformMatches(UnrealTargetPlatform PlatformToCheck, string PlatformIdentifier)
@@ -298,7 +297,7 @@ public class Modio : ModuleRules
     private void AddCommonHeaderPaths(string GeneratedHeaderPath)
     {
         PublicIncludePaths.AddRange(new string[] {
-                Path.Combine(GeneratedHeaderPath, "Public")
+                Path.Combine(GeneratedHeaderPath, "Public") 
                 });
         ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedHeaderPath, "Public")));
         // Add common private includes from the Native SDK
@@ -372,6 +371,13 @@ public class Modio : ModuleRules
             PrivateDefinitions.Add("MODIO_RELEASE=1");
         }
 
+        // Enable Modio Profiling in non-shipping builds
+        if (Target.Configuration != UnrealTargetConfiguration.Shipping && DoesPlatformSupportProfiling(Target.Platform))
+        {
+            PrivateDefinitions.Add("MODIO_ENABLE_PROFILING=1");
+            PrivateDefinitions.Add("MODIO_UNREAL_PROFILING_SUPPORT=1");
+        }
+
         // Enable Unreal-specific headers in the native SDK
         PrivateDefinitions.Add("MODIO_PLATFORM_UNREAL");
         // Disable header-only mode
@@ -389,6 +395,17 @@ public class Modio : ModuleRules
 
         // Add dependency on version file so if it is changed we trigger a rebuild
         ExternalDependencies.Add(VersionFilePath);
+    }
+
+    private bool DoesPlatformSupportProfiling(UnrealTargetPlatform Platform)
+    {
+        // Only enable on Windows for now, we may want to modify this later for console support as well
+        if (Platform == UnrealTargetPlatform.Win64)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public Modio(ReadOnlyTargetRules Target) : base(Target)

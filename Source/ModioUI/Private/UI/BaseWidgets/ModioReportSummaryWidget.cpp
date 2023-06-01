@@ -12,6 +12,7 @@
 #include "Core/ModioReportInfoUI.h"
 #include "Loc/BeginModioLocNamespace.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
+#include "Widgets/Layout/SBox.h"
 
 TSharedRef<SWidget> UModioReportSummaryWidget::RebuildWidget()
 {
@@ -36,8 +37,8 @@ TSharedRef<SWidget> UModioReportSummaryWidget::RebuildWidget()
 	}
 
 	SetIsReadOnly(true);
-
-	return MyEditableTextBlock.ToSharedRef();
+	
+	return SNew(SBox).WidthOverride(700.0f).VAlign(VAlign_Fill).Content()[MyEditableTextBlock.ToSharedRef()];
 }
 
 #include "Loc/EndModioLocNamespace.h"

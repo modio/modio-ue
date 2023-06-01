@@ -38,6 +38,9 @@ bool FModioConvertDataToNativeFormatTest::RunTest(const FString& Parameters)
 	          Modio::AuthenticationProvider::Discord);
 	TestEqual("AuthProvider ToModio PSN", ToModio(EModioAuthenticationProvider::PSN),
 	          Modio::AuthenticationProvider::PSN);
+	TestEqual("AuthProvider ToModio OpenID", ToModio(EModioAuthenticationProvider::OpenID),
+			  Modio::AuthenticationProvider::OpenID);
+
 	return true;
 }
 

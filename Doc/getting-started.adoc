@@ -271,11 +271,11 @@ void UModioManager::OnShutdownCallback(FModioErrorCode ErrorCode)
 
 === Plugin quick-start: User Authentication
 
-Mod.io provides two ways for users to create an account to use the service: email authentication, and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.
+mod.io provides two ways for users to create an account to use the service: email authentication, and single sign on (SSO) through an external authentication partner. The flow for these is slightly different.
 
 ==== Email authentication
 
-Mod.io allows users to create an account on the mod.io website using an email address. Once the user has accepted the mod.io Terms of Use and created an account, they can use that email address to log in and access mod.io services in your game. 
+mod.io allows users to create an account on the mod.io website using an email address. Once the user has accepted the mod.io Terms of Use and created an account, they can use that email address to log in and access mod.io services in your game. 
 
 Email authentication involves:
     1. Submitting the user's email address
@@ -363,16 +363,21 @@ Once this completes successfully, the user is authenticated and you can then man
 
 ==== SSO/External authentication
 
-Mod.io features single sign on authentication from a number of external providers. This currently includes:
+mod.io features single sign on authentication from a number of external providers. This currently includes:
 
     * Xbox Live
-	* Steam
+    * Steam
     * GoG
-    * Itch
-    * Switch
+    * itch.io
+    * Nintendo Switch
     * Discord
+    * PlayStation Network (PSN)
+    * Epic Games
+    * OpenID
 
-In order to use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account. 
+Please note that the ability to authenticate players using OpenID is feature for advanced partners only. If you are interested in becoming an advanced partner, please contact developers@mod.io
+
+To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.
 
 This means the external authentication flow is the following:
 

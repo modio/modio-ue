@@ -16,6 +16,7 @@
 #include "Engine/Texture2DDynamic.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "ModioUISubsystem.h"
+#include "UI/BaseWidgets/ModioGridPanel.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/Interfaces/IModioUIImageDisplay.h"
 #include "UI/Styles/ModioUIStyleSet.h"
@@ -72,13 +73,23 @@ void UModioModDetailsImageGallery::NativeOnSetDataSource()
 				ImageInfo.Empty(ModInfo->Underlying.NumGalleryImages);
 				ImageInfo.SetNumZeroed(ModInfo->Underlying.NumGalleryImages);
 			}
-
 			// if there are no gallery images, ImageInfo will only have one member, modlogo
 			else
 			{
 				ImageInfo.Empty(1);
 				ImageInfo.SetNumZeroed(1);
 			}
+
+			if (ModInfo->Underlying.NumGalleryImages <= 1)
+			{
+				NavButtonGridPanel->SetVisibility(ESlateVisibility::Collapsed);
+			}
+			else
+			{
+				NavButtonGridPanel->SetVisibility(ESlateVisibility::Visible);
+			}
+
+			
 
 			TArray<TSharedPtr<int64>> ImageIndexes;
 			if (ModInfo->Underlying.NumGalleryImages == 0)

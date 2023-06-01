@@ -105,8 +105,8 @@ void UModioModTile::NativeOnSetExpandedState(bool bExpandedState)
 	bool bOldExpandedState = bCurrentExpandedState;
 
 	Super::NativeOnSetExpandedState(bExpandedState);
-	SubscribeButton->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-	MoreOptionsMenu->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	SubscribeButton->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	MoreOptionsMenu->SetVisibility(bExpandedState ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 
 	/*if (SizeOverride)
 	{
@@ -231,7 +231,7 @@ void UModioModTile::NativeOnInitialized()
 
 	if (SubscriptionIndicator)
 	{
-		SubscriptionIndicator->SetVisibility(ESlateVisibility::Hidden);
+		SubscriptionIndicator->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
@@ -322,6 +322,7 @@ void UModioModTile::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 	if (TileActiveFrame)
 	{
+		// Keep the non visible option as hidden, collapsed causes SRetainerWidget size 0 errors
 		ESlateVisibility FrameVisibility = bFocusOrFocusedDescendents && TileActiveFrame->GetRenderOpacity() >= 0.1f
 											   ? ESlateVisibility::Visible
 											   : ESlateVisibility::Hidden;

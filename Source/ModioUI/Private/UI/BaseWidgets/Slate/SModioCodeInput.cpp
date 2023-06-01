@@ -59,7 +59,7 @@ void SModioCodeInput::Construct(const FArguments& InArgs)
 		SNew(SVerticalBox)
 		+SVerticalBox::Slot()
 		.AutoHeight()
-		.HAlign(HAlign_Fill)
+		.HAlign(HAlign_Center)
 		.VAlign(VAlign_Fill)
 		[
 			SAssignNew(MyCharacterGrid, SUniformGridPanel)

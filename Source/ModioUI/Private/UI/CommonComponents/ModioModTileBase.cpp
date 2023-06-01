@@ -15,6 +15,7 @@
 #include "ModioUISubsystem.h"
 #include "Rendering/DrawElements.h"
 #include "Fonts/FontMeasure.h"
+#include "TimerManager.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 
 void UModioModTileBase::NativeConstruct()
@@ -52,6 +53,11 @@ bool UModioModTileBase::GetSubscriptionState()
 		}
 	}
 	return false;
+}
+
+void UModioModTileBase::EnableSubscribeButton()
+{
+	SubscribeButton->SetIsEnabled(true);
 }
 
 void UModioModTileBase::NativeOnInitialized()
@@ -144,6 +150,7 @@ void UModioModTileBase::NativeOnModLogoDownloadCompleted(FModioModID ModID, FMod
 	{
 		if (ModID == ModInfo->Underlying.ModId)
 		{
+			CurrentModId = ModID;
 			if (ec)
 			{
 				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
@@ -158,6 +165,17 @@ void UModioModTileBase::NativeOnModLogoDownloadCompleted(FModioModID ModID, FMod
 			}
 		}
 	}
+}
+
+FReply UModioModTileBase::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Subscribe && !InKeyEvent.IsRepeat() && SubscribeButton && SubscribeButton->GetIsEnabled())
+	{
+		NativeSubscribeClicked();
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
 void UModioModTileBase::SynchronizeProperties()
@@ -232,7 +250,6 @@ void UModioModTileBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FP
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
 	}
 	PlayAnimation(FocusTransition);
-	FSlateApplication::Get().PlaySound(HoveredSound);
 }
 
 FReply UModioModTileBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -349,15 +366,22 @@ void UModioModTileBase::OnModSubscriptionStatusChanged(FModioModID ID, bool Subs
 		{
 			if (Data->Underlying.ModId == ID)
 			{
-				if (SubscribeButton)
+				if (SubscribeButton && !Subscribed)
 				{
-					// Show 'unsubscribe' text if we're displaying a mod the user is subscribed to
-					SubscribeButton->SetLabel(Subscribed ? UnsubscribeLabel : SubscribeLabel);
+					SubscribeButton->SetLabel(SubscribeLabel);
+					GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this,
+													   &UModioModTileBase::EnableSubscribeButton, 0.6, false);
+				}
+				else if (SubscribeButton && Subscribed)
+				{
+					SubscribeButton->SetLabel(UnsubscribeLabel);
+					GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this,
+													   &UModioModTileBase::EnableSubscribeButton, 0.6, false);
 				}
 				if (SubscriptionIndicator)
 				{
 					SubscriptionIndicator->SetVisibility(Subscribed ? ESlateVisibility::HitTestInvisible
-																	: ESlateVisibility::Hidden);
+																	: ESlateVisibility::Collapsed);
 				}
 			}
 		}
@@ -366,6 +390,15 @@ void UModioModTileBase::OnModSubscriptionStatusChanged(FModioModID ID, bool Subs
 
 void UModioModTileBase::NativeSubscribeClicked()
 {
+	UModioModInfoUI* Data = GetAsModInfoUIObject();
+
+	if (CurrentModId == Data->Underlying.ModId)
+	{
+		SubscribeButton->SetIsEnabled(false);
+	}
+
+	GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModTileBase::EnableSubscribeButton, 0.6, false);
+
 	if (!bIsUserAuthenticated)
 	{
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
@@ -377,7 +410,6 @@ void UModioModTileBase::NativeSubscribeClicked()
 
 	if (!GetSubscriptionState())
 	{
-		UModioModInfoUI* Data = GetAsModInfoUIObject();
 		if (Data)
 		{
 			OnSubscribeClicked.Broadcast(Data);
@@ -390,13 +422,12 @@ void UModioModTileBase::NativeSubscribeClicked()
 	}
 	else
 	{
-		UModioModInfoUI* Data = GetAsModInfoUIObject();
 		if (Data)
 		{
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 			if (Subsystem)
 			{
-				Subsystem->RequestRemoveSubscriptionForModID(Data->Underlying.ModId);				
+				Subsystem->RequestRemoveSubscriptionForModID(Data->Underlying.ModId);
 			}
 		}
 	}
@@ -406,9 +437,6 @@ void UModioModTileBase::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 {
 	CommandList->MapAction(FModioCommonUICommands::Get().Confirm,
 						   FUIAction(FExecuteAction::CreateUObject(this, &UModioModTileBase::NativeTileClicked)));
-
-	CommandList->MapAction(FModioCommonUICommands::Get().Subscribe,
-						   FUIAction(FExecuteAction::CreateUObject(this, &UModioModTileBase::NativeSubscribeClicked)));
 }
 
 void UModioModTileBase::NativeTileClicked()

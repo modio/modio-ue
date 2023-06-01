@@ -18,6 +18,7 @@
 #include "TimerManager.h"
 #include "Types/ModioModInfo.h"
 #include "UI/CommonComponents/ModioModTile.h"
+#include "UI/CommonComponents/ModioErrorRetryWidget.h"
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
 #include "UI/Views/CategoryBrowser/ModioFeaturedCategoryParams.h"
 #include "UI/Views/ModDetails/ModioAsyncOpWrapperWidget.h"
@@ -255,12 +256,27 @@ void UModioFeaturedCategory::NativeOnRemovedFromFocusPath(const FFocusEvent& InF
 
 FReply UModioFeaturedCategory::NativeOnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent)
 {
+	if (InFocusEvent.GetCause() == EFocusCause::Mouse)
+	{
+		return FReply::Handled();
+	}
+
+	if (!bModsFound)
+	{
+		ModioErrorWithRetryWidget->SetKeyboardFocus();
+		return FReply::Handled();
+	}
+
+
 	if (SelectionIndexDelegate.IsBound() && ItemList)
 	{
 		int32 StartDisplayedIndex =
-			ItemList->GetDisplayedEntryWidgets().Num()
-				? ItemList->GetIndexForItem(*ItemList->ItemFromEntryWidget(*(ItemList->GetDisplayedEntryWidgets()[0])))
-				: 0;
+			// GetDisplayedEntryWidgets apparently gets scrambled on some point so this does not return the correct index after the list has been scrolled to the end.
+			// Setting this to 0 for now
+			//ItemList->GetDisplayedEntryWidgets().Num()
+			//	? ItemList->GetIndexForItem(*ItemList->ItemFromEntryWidget(*(ItemList->GetDisplayedEntryWidgets()[0])))
+			//	:
+			0;
 
 		ItemList->NavigateToIndex(StartDisplayedIndex);
 		ItemList->SetSelectedIndex(StartDisplayedIndex);
@@ -281,6 +297,7 @@ void UModioFeaturedCategory::NativeOnListAllModsRequestCompleted(FString Request
 	{
 		if (!ec)
 		{
+			bModsFound = true;
 			TArray<UModioModInfoUI*> WrappedModList;
 			Algo::Transform(List.GetValue().GetRawList(), WrappedModList, [](const FModioModInfo& In) {
 				UModioModInfoUI* WrappedMod = NewObject<UModioModInfoUI>();
@@ -293,6 +310,7 @@ void UModioFeaturedCategory::NativeOnListAllModsRequestCompleted(FString Request
 		}
 		else
 		{
+			bModsFound = false;
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::Error);
 		}
 	}

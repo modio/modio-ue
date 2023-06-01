@@ -28,7 +28,7 @@ void UModioDownloadQueueEntry::NativeOnSetDataSource()
 		}
 		if (ModStatusLabel)
 		{
-			ModStatusLabel->SetVisibility(ESlateVisibility::Hidden);
+			ModStatusLabel->SetVisibility(ESlateVisibility::Collapsed);
 		}
 		if (ModThumbnail)
 		{

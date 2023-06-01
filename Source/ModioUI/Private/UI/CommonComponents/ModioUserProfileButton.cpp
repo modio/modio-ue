@@ -67,6 +67,13 @@ void UModioUserProfileButton::NativeTick(const FGeometry& MyGeometry, float InDe
 void UModioUserProfileButton::UpdateProgress(const struct FModioModProgressInfo& ProgressInfo)
 {
 	UModioModManagementWidgetBase::UpdateProgress(ProgressInfo);
+
+	if (!CurrentUser.IsSet() && DownloadProgressIndicator)
+	{
+		DownloadProgressIndicator->SetProgress(0);
+		return;
+	}
+
 	if (DownloadProgressIndicator)
 	{
 		switch (ProgressInfo.GetCurrentState())

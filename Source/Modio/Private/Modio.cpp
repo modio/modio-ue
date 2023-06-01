@@ -9,13 +9,13 @@
  */
 
 #include "Modio.h"
-#include "HAL/PlatformMisc.h"
 #include "Math/Color.h"
 #include "Stats/Stats.h"
 #include "Containers/Array.h"
 
 DEFINE_LOG_CATEGORY(LogModio)
 
+DECLARE_STATS_GROUP(TEXT("ModioScoped"), STATGROUP_ModioScoped, STATCAT_Advanced);
 DECLARE_STATS_GROUP(TEXT("Modio"), STATGROUP_Modio, STATCAT_Advanced);
 
 #ifdef MODIO_UNREAL_PROFILING_SUPPORT
@@ -27,23 +27,40 @@ extern "C"
 		static TArray<FName> ScopeStorage;
 		return ScopeStorage;
 	}
-	static TStatId& GetOrCreateStat(FName StatName) {
+
+	static TStatId& GetOrCreateStatScoped(FName StatName) {
 		static TMap<FName, TStatId> StatIDs;
 		if (TStatId* FoundID = StatIDs.Find(StatName)) {
 			return *FoundID;
 		}
 		else
 		{
-			StatIDs.Add(StatName,FDynamicStats::CreateStatId<FStatGroup_STATGROUP_Modio>(StatName));
+			StatIDs.Add(StatName,FDynamicStats::CreateStatId<FStatGroup_STATGROUP_ModioScoped>(StatName));
 			return StatIDs[StatName];
 		}
 	}
+
+	static TStatId& GetOrCreateStat(FName StatName)
+	{
+		static TMap<FName, TStatId> StatIDs;
+		if (TStatId* FoundID = StatIDs.Find(StatName))
+		{
+			return *FoundID;
+		}
+		else
+		{
+			StatIDs.Add(StatName, FDynamicStats::CreateStatIdInt64<FStatGroup_STATGROUP_Modio>(StatName.ToString(), true));
+			return StatIDs[StatName];
+		}
+	}
+
+
 	PRAGMA_DISABLE_OPTIMIZATION
 	void modio_profile_scope_start(const char* Name, void** Data)
 	{
 		if (FThreadStats::IsCollectingData())
 		{
-			FThreadStats::AddMessage(GetOrCreateStat(FName(Name)).GetName(), EStatOperation::CycleScopeStart);
+			FThreadStats::AddMessage(GetOrCreateStatScoped(FName(Name)).GetName(), EStatOperation::CycleScopeStart);
 		}
 		FCpuProfilerTrace::OutputBeginEvent(FCpuProfilerTrace::OutputEventType(Name));
 	}
@@ -51,7 +68,7 @@ extern "C"
 	{
 		if (FThreadStats::IsCollectingData())
 		{
-			FThreadStats::AddMessage(GetOrCreateStat(FName(Name)).GetName(), EStatOperation::CycleScopeEnd);
+			FThreadStats::AddMessage(GetOrCreateStatScoped(FName(Name)).GetName(), EStatOperation::CycleScopeEnd);
 		}
 		FCpuProfilerTrace::OutputEndEvent();
 	}
@@ -63,6 +80,22 @@ extern "C"
 	{
 		//FCpuProfilerTrace::OutputEndEvent();
 	}
+
+	void modio_profile_counter_increment(const char* Name, uint64_t* Data)
+	{
+		FThreadStats::AddMessage(GetOrCreateStat(FName(Name)).GetName(), EStatOperation::Add, int64(1));	
+	}
+
+	void modio_profile_counter_decrement(const char* Name, uint64_t* Data)
+	{
+		FThreadStats::AddMessage(GetOrCreateStat(FName(Name)).GetName(), EStatOperation::Subtract, int64(1));
+	}
+
+	void modio_profile_counter_set(const char* Name, uint64_t Data)
+	{
+		FThreadStats::AddMessage(GetOrCreateStat(FName(Name)).GetName(), EStatOperation::Set, int64(Data));
+	}
+
 	PRAGMA_ENABLE_OPTIMIZATION
 }
 

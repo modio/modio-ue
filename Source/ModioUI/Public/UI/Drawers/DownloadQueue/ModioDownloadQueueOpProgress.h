@@ -38,7 +38,7 @@ public:
 	EModioModManagementEventType CurrentStatus = EModioModManagementEventType::Installed;
 
 protected:
-	float truncateDivider = 0.34f;
+	float truncateDivider = 1.0f;
 
 	FModioUnsigned64 PreviousProgressValue = FModioUnsigned64(0);
 	FDateTime PreviousUpdateTime;

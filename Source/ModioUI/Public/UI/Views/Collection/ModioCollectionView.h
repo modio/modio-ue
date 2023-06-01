@@ -31,6 +31,9 @@
 * Modio UI element that combines multiple views in a single class,
 * with references to text input, labels or popup elements
 **/
+
+DECLARE_MULTICAST_DELEGATE(FOnProfileOpened);
+
 UCLASS()
 class MODIOUI_API UModioCollectionView : public UModioMenuView,
 										 public IModioUISubscriptionsChangedReceiver,
@@ -74,6 +77,7 @@ protected:
 
 	FModioUIAction CurrentSortAction;
 	bool HasSortActionApplied;
+	int CurrentNavIndex = 0;
 
 	virtual void NativeOnInitialized() override;
 
@@ -84,6 +88,7 @@ protected:
 	virtual void ApplyFiltersToCollection();
 	virtual void NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState) override;
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
+	virtual void NativeConstruct() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
@@ -112,11 +117,12 @@ protected:
 	UFUNCTION()
 	void OnModGroupChanged(FText SelectedItem, ESelectInfo::Type SelectionType);
 
+	void ValidateAndSetFocus();
+
 	bool bSearchInputFocused = false;
 
-	// This is initialized on blueprints, since it was a lot simpler there
-	UPROPERTY(BlueprintReadWrite, Category = "Widgets")
-	class UUserWidget* FirstTile;
+	UPROPERTY()
+	class UModioModCollectionTile* CurrentTile;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText DefaultButtonLabel;
@@ -124,4 +130,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText SearchingButtonLabel;
 
+public:
+	FOnProfileOpened OnProfileOpened;
 };

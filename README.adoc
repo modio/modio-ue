@@ -5,13 +5,28 @@
 
 image:https://img.shields.io/badge/license-MIT-brightgreen.svg[alt="License", link="https://github.com/modio/modio-sdk/blob/master/LICENSE"]
 image:https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=discord&color=7289DA&labelColor=2C2F33[alt="Discord", link="https://discord.mod.io"]
-image:https://img.shields.io/badge/Unreal-4.26%2B-dea309[alt="Unreal", link="https://www.unrealengine.com"]
+image:https://img.shields.io/badge/docs-master-green.svg[alt="Master Docs", link="https://go.mod.io/ue-docs"]
+image:https://img.shields.io/badge/Unreal-4.26%2B-dea309[alt="Unreal Engine", link="https://www.unrealengine.com"]
 
-Welcome to the mod.io Unreal Engine Plugin public repository. It allows game developers to host and automatically install user-created mods in their games which use UE 4.26 or newer. It provides a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API]. We have a https://test.mod.io[test environment] available, and developers can create a game profile there to evaluate the plugin with. 
+Welcome to the mod.io Unreal Engine plugin repository. It allows game developers to host and automatically install user-created mods in their games which use *UE 4.26*, *UE 5.0* or newer. It provides a UI for mod discovery, installation and collection management, and a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API]. We have a https://test.mod.io[test environment] available, and developers can create a game profile there to evaluate the plugin with. 
 
 ++++
 <!--- <p align="center"><a href="https://www.unrealengine.com/marketplace/en-US/slug/mod-browser-manager"><img src="https://image.mod.io/members/c4ca/1/profileguides/unreal.png" alt="unreal" width="380" height="133"></a></p> --->
 ++++
+
+## Platform Support
+
+|===
+|Platform       | UE4.26 | UE4.27 | UE5.0 | UE5.1 | 
+|Windows        | ✔ | ✔ | ✔ | ✔ |
+|Windows (GDK)  | - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
+|XBox (GDK)     | - | ✔ | ✔ | - |<<contact-us,(Contact Us)>>
+|PlayStation 4  | - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
+|PlayStation 5  | - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
+|Nintendo Switch| - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
+|Linux          | ✔ | ✔ | ✔ | ✔ |
+|macOS          | ✔ | ✔ | ✔ | ✔ |
+|===
 
 ## Features
 
@@ -20,7 +35,7 @@ Welcome to the mod.io Unreal Engine Plugin public repository. It allows game dev
 * Async delegate-based interface
 * Non-blocking IO
 * Automatic downloads and updates
-* Email / Steam / GoG authentication
+* Email / Steam / EGS / Consoles / Custom SSO authentication
 * Mod Browsing / Filtering
 
 == Installation
@@ -30,7 +45,7 @@ Welcome to the mod.io Unreal Engine Plugin public repository. It allows game dev
 
 . Add this repository as a submodule to your repository in your project's `Plugins/Modio` directory
 +
-In the directory with your .uproject file: `git submodule add https://github.com/modio/modio-ue4 Plugins/Modio`
+In the directory with your .uproject file: `git submodule add https://github.com/modio/modio-ue Plugins/Modio`
 . Initialize our submodules with `git submodule update --init --recursive`
 
 ==== In a non-git project, or without submodules
@@ -78,24 +93,48 @@ In summary, here are the three steps:
 * Live Environment, Hidden: Used for quality assurance and pre-release mods
 * Live Environment, Public: It is open for everyone to see.
 
+== Setting up the Browser UI
+If you do not wish to create your own UI implementation you can use our default UI that comes built in to the plugin.
+
+* For UE 4, examples of how the UI looks are provided below, which can be themed by changing the colors.
+* For UE 5, a modular UI framework using Common UI is currently being developed.
+
+image::Doc/img/promo-plugin-ui.png[]
+
+image::Doc/img/promo-plugin-ui-collection.png[]
+
 == Further reading
 
-To begin using the Plugin, either from Blueprint or from C++, please read our link:Doc/getting-started.adoc[Getting Started Guide] for a detailed explanation of initialization and usage.
+To begin using the Plugin, either from Blueprint or from C++, please read our https://go.mod.io/ue-docs[Getting Started Guide] for a detailed explanation of initialization and usage.
 
-* link:Doc/getting-started.adoc#plugin-quick-start-initialization-and-teardown[SDK initialization and event loop]
-* link:Doc/getting-started.adoc#plugin-quick-start-user-authentication[Authentication]
-* link:Doc/getting-started.adoc#plugin-quick-start-browsing-available-mods[Mod Browsing]
-* link:Doc/getting-started.adoc#plugin-quick-start-mod-subscriptions-and-management[Mod Subscription Management]
+* https://go.mod.io/ue-docs#_plugin_quick_start_initialization_and_teardown[SDK initialization and event loop]
+* https://go.mod.io/ue-docs#_plugin_quick_start_user_authentication[Authentication]
+* https://go.mod.io/ue-docs#_plugin_quick_start_browsing_available_mods[Mod Browsing]
+* https://go.mod.io/ue-docs#_plugin_quick_start_mod_subscriptions_and_management[Mod Subscription Management]
 
-== Sample
+=== User Interface
+
+The plugin ships with a fully functional UI, featuring mod browsing, searching and collection management. If you want to use the UI in the game, you can read the link:Doc/ui-documentation.adoc[UI Documentation]
+
+=== Profiling
+
+The mod.io SDK ships with some profiling features that are integrated into Unreal's stat commands. You can read more about enabling profiling link:Doc/profiling.adoc[here].
+
+=== Sample Projects
 
 A UE4.26 and UE4.27-compatible sample is available at link:https://go.mod.io/ue-samples[this location].
 
-== Large studios and Publishers
-A private white label option is available to license, if you want a fully featured mod-platform that you can control and host in-house. mailto:developers@mod.io[Contact us,Whitelabel Inquiry] to discuss.
+For UE5.0 and 5.1, you can find a sample project at link:https://go.mod.io/ue5-sample[this location].
+
+== Game studios and Publishers [[contact-us]]
+
+If you need assistance with 1st party approvals, or require a private, white-label UGC solution. mailto:developers@mod.io[Contact us] to discuss.
 
 == Contributions Welcome
-Our SDK is public and open source. Game developers are welcome to utilize it directly, to add support for mods in their games, or fork it for their games customized use. Want to make changes to the SDK? Submit a pull request with your recommended changes to be reviewed.
+
+Our Unreal Engine plugin is public and open source. Game developers are welcome to utilize it directly, to add support for mods in their games, or fork it for their games customized use. Want to make changes to our plugin? Submit a pull request with your recommended changes to be reviewed.
 
 == Other Repositories
+
 Our aim with https://mod.io[mod.io], is to provide an https://docs.mod.io[open modding API]. You are welcome to https://github.com/modio[view, fork and contribute to our other codebases] in use.
+

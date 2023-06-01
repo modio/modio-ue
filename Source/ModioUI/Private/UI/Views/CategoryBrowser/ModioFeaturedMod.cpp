@@ -195,19 +195,19 @@ void UModioFeaturedMod::NativeOnItemSelectionChanged(bool bIsSelected)
 	bCurrentSelectionState = bIsSelected;
 	if (SubscribeButton)
 	{
-		SubscribeButton->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		SubscribeButton->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 	if (ModName)
 	{
-		ModName->SetVisibility(bIsSelected ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
+		ModName->SetVisibility(bIsSelected ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 	if (MoreOptionsMenu)
 	{
-		MoreOptionsMenu->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		MoreOptionsMenu->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 	if (TileActiveFrame)
 	{
-		TileActiveFrame->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		TileActiveFrame->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 }
 

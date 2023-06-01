@@ -166,8 +166,15 @@ public:
 		FTimerHandle timer;
 		if (!MyCarousel  || (!MyCarousel->SetFocusToContent() && !MyCarousel->HasFocusedDescendants()))
 		{
+			// In some rare cases GetWorld can return a nullptr
+			if (!GetWorld())
+			{
+				return;
+			}
+
 			// Easiest way to ensure the focus is set to some target when this function is called
 			// Prevents focus lost on Login/Logout
+			
 			GetWorld()->GetTimerManager().SetTimer(timer, this, &UModioWidgetCarousel::SetFocusToCurrentElement, 0.1f, false);
 		}
 	}

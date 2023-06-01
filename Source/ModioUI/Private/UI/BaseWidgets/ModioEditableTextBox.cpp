@@ -65,7 +65,7 @@ TSharedRef<SWidget> UModioEditableTextBox::RebuildWidget()
 	{
 		MyEditableTextBlock->SetStyle(ResolvedStyle);
 	}
-
+	MyEditableTextBlock->SetClearKeyboardFocusOnCommit(true);
 	// clang-format off
 	return SAssignNew(MyVerticalBox, SVerticalBox)
 	+SVerticalBox::Slot()
@@ -211,8 +211,7 @@ FReply UModioEditableTextBox::OnKeyDownHandler(const FGeometry& MyGeometry, cons
 	{
 		return FReply::Unhandled();
 	}
-
-	return FReply::Handled();
+	return FReply::Unhandled();
 }
 
 TSharedPtr<SEditableTextBox> UModioEditableTextBox::GetMyEditableTextBlock()

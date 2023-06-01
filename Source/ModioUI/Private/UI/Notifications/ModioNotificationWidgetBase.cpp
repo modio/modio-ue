@@ -62,7 +62,7 @@ void UModioNotificationErrorWidgetBase::NativeConfigure(const FModioNotification
 		}
 		else
 		{
-			NotificationMessage->SetVisibility(ESlateVisibility::Hidden);
+			NotificationMessage->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
 

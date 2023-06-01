@@ -18,6 +18,7 @@
 #include "Styling/SlateStyle.h"
 #include "UI/BaseWidgets/ModioLoadingSpinner.h"
 #include "UI/BaseWidgets/ModioUIAsyncLoadingOverlay.h"
+#include "UI/BaseWidgets/ModioMultiLineEditableTextBox.h"
 #include "UI/BaseWidgets/Slate/SModioRichTextBlock.h"
 #include "UI/BaseWidgets/Slate/SModioButtonBase.h"
 #include "UI/BaseWidgets/Slate/SModioTileView.h"
@@ -40,6 +41,7 @@
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/Input/SMultiLineEditableTextBox.h"
 #include "Widgets/Layout/SGridPanel.h"
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/SOverlay.h"
@@ -82,7 +84,7 @@ TSharedRef<SWidget> UModioDialogBaseInternal::RebuildWidget()
 		]
 		+SOverlay::Slot()
 		.Expose(DialogContentOverlaySlot)
-		.HAlign(HAlign_Fill)
+		.HAlign(HAlign_Center)
 		.VAlign(VAlign_Fill)
 		.Padding(BackgroundPadding)
 		[
@@ -428,6 +430,7 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 			break;
 		}
 	}
+	ButtonInfos.Empty();
 	return FReply::Handled();
 }
 
@@ -466,8 +469,8 @@ TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 			]
 		];
 	// clang-format on
+
 	GeneratedButtons.Add(RowButton);
-	SetDialogFocus();
 	const FModioDialogStyle* ResolvedDialogStyle = DialogStyle.FindStyle<FModioDialogStyle>();
 	if (ResolvedDialogStyle)
 	{
@@ -478,6 +481,7 @@ TSharedRef<class ITableRow> UModioDialogBaseInternal::OnGenerateButton(
 			RowButton->SetContentPadding(ResolvedButtonStyle->ContentPadding);
 		}
 	}
+
 	TableRow->SetPadding(16.f);
 
 	return TableRow;
@@ -527,10 +531,30 @@ void UModioDialogBaseInternal::OnSubmitKeyPressed()
 	{
 		for (auto& button : ButtonInfos)
 		{
-			if (button->AsyncCallType == EModioDialogAsyncCall::AuthSubmitEmail && IsValid(button->Destination))
+			if (button->AsyncCallType == EModioDialogAsyncCall::AuthSubmitEmail && IsValid(button->Destination) &&
+				button->ButtonCommand == EModioDialogButtonCommand::AsyncCallThenPushDialog)
 			{
 				Controller->ShowLoadingDialog();
 				Controller->SendEmailCodeRequest(Input.GetValue(), button->Destination);
+				ButtonInfos.Empty();
+				return;
+			}
+
+			else if (button->OperationCallType == EModioDialogOperationCall::SetReportEmailAddress &&
+				IsValid(button->Destination) && button->ButtonCommand == EModioDialogButtonCommand::PushDialogWithOperation)
+			{
+				if (GetInputWidgetString().IsSet())
+				{
+					Cast<UModioReportInfoUI>(DataSource)->ReportData.ReporterContact =
+						GetInputWidgetString().GetValue();
+				}
+
+				if (IsInputValid())
+				{
+					Controller->PushDialog(button->Destination);
+					ButtonInfos.Empty();
+				}
+
 				return;
 			}
 		}
@@ -559,6 +583,8 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 	bBeingPreviewed = bIsPreview;
 	GeneratedButtons.Empty();
 	InputWidget = nullptr;
+	ButtonWidget = nullptr;
+
 	if (DialogDescriptor)
 	{
 		if (DialogDataSource != nullptr)
@@ -600,7 +626,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 			ContentPanel->RemoveSlot(ButtonWidgetSlot->GetWidget());
 		}
 		ButtonWidgetSlot = ModioUIHelpers::AddSlot(ContentPanel.Get(), 0, 5);
-
+		
 		if (SubHeaderWidgetSlot)
 		{
 			if (DialogDescriptor->SubHeaderWidget)
@@ -851,8 +877,11 @@ void UModioDialogBaseInternal::SetContentText(FText text)
 
 void UModioDialogBaseInternal::SetDialogFocus()
 {
+	FSlateApplication::Get().SetKeyboardFocus(this->TakeWidget());
+
 	UModioEditableTextBox* inputWidget = Cast<UModioEditableTextBox>(InputWidget);
 	UModioCodeInputWidget* codeInput = Cast<UModioCodeInputWidget>(InputWidget);
+	UModioMultiLineEditableTextBox* multilineWidget = Cast<UModioMultiLineEditableTextBox>(InputWidget);
 
 	if (inputWidget)
 	{
@@ -860,7 +889,12 @@ void UModioDialogBaseInternal::SetDialogFocus()
 		FSlateApplication::Get().SetKeyboardFocus(EditableTextBox);		
 		return;
 	}
-
+	else if (multilineWidget)
+	{
+		TSharedPtr<SMultiLineEditableTextBox> EditableTextBox = multilineWidget->GetEditableTextBox();
+		FSlateApplication::Get().SetKeyboardFocus(EditableTextBox);
+		return;
+	}
 	else if (codeInput)
 	{
 		TSharedPtr<SModioCodeInput> EditableTextBox = codeInput->GetMyInput();
@@ -870,14 +904,11 @@ void UModioDialogBaseInternal::SetDialogFocus()
 
 	else
 	{
-		if (bUsingCustomButtons)
+		IModioUIDialogButtonWidget* buttons = Cast<IModioUIDialogButtonWidget>(ButtonWidget);
+		if (buttons && buttons->Buttons.IsValidIndex(0))
 		{
-			IModioUIDialogButtonWidget* buttons = Cast<IModioUIDialogButtonWidget>(ButtonWidget);
-			if (buttons && buttons->Buttons.IsValidIndex(0))
-			{
-				FSlateApplication::Get().SetKeyboardFocus(buttons->Buttons[0]);
-				return;
-			}
+			FSlateApplication::Get().SetKeyboardFocus(buttons->Buttons[0]);
+			return;
 		}
 		else if (GeneratedButtons.IsValidIndex(0))
 		{

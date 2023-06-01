@@ -217,6 +217,8 @@ Modio::ModfilePlatform ToModio(EModioModfilePlatform Platform)
 			return Modio::ModfilePlatform::XboxOne;
 		case EModioModfilePlatform::XboxSeriesX:
 			return Modio::ModfilePlatform::XboxSeriesX;
+		case EModioModfilePlatform::Source:
+			return Modio::ModfilePlatform::Source;
 	}
 	checkf(false, TEXT("Unhandled value in ToModio(EModioModfilePlatform Platform)"));
 	return Modio::ModfilePlatform::Windows;
@@ -314,4 +316,37 @@ FModioGameID ToUnreal(Modio::GameID Value)
 FModioFileMetadataID ToUnreal(Modio::FileMetadataID Value)
 {
 	return FModioFileMetadataID(Value);
+}
+
+EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& PlatformIn)
+{
+	switch (PlatformIn)
+	{
+		case Modio::ModfilePlatform::Windows:
+			return EModioModfilePlatform::Windows;
+		case Modio::ModfilePlatform::Mac:
+			return EModioModfilePlatform::Mac;
+		case Modio::ModfilePlatform::Linux:
+			return EModioModfilePlatform::Linux;
+		case Modio::ModfilePlatform::Android:
+			return EModioModfilePlatform::Android;
+		case Modio::ModfilePlatform::iOS:
+			return EModioModfilePlatform::iOS;
+		case Modio::ModfilePlatform::XboxOne:
+			return EModioModfilePlatform::XboxOne;
+		case Modio::ModfilePlatform::XboxSeriesX:
+			return EModioModfilePlatform::XboxSeriesX;
+		case Modio::ModfilePlatform::PS4:
+			return EModioModfilePlatform::PS4;
+		case Modio::ModfilePlatform::PS5:
+			return EModioModfilePlatform::PS5;
+		case Modio::ModfilePlatform::Switch:
+			return EModioModfilePlatform::Switch;
+		case Modio::ModfilePlatform::Oculus:
+			return EModioModfilePlatform::Oculus;
+		case Modio::ModfilePlatform::Source:
+			return EModioModfilePlatform::Source;
+	}
+	checkf(false, TEXT("Missed a case in ToUnreal(const Modio::ModfilePlatform& PlatformIn)"));
+	return EModioModfilePlatform::Windows;
 }

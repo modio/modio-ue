@@ -162,11 +162,13 @@ void UModioModDetailsOpProgress::NativeOnModManagementEvent(FModioModManagementE
 				{
 					switch (Event.Event)
 					{
+						case EModioModManagementEventType::BeginInstall:
+							break;
 						case EModioModManagementEventType::Installed:
 						case EModioModManagementEventType::Updated:
 							SetPercent(1);
 							UpdateTimeRemaining(FModioUnsigned64(), FModioUnsigned64(), 0);
-							SetVisibility(ESlateVisibility::Hidden);
+							SetVisibility(ESlateVisibility::Collapsed);
 							break;
 					}
 				}

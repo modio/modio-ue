@@ -26,7 +26,8 @@ enum class EModioAuthenticationProvider : uint8
 	Discord,
 	PSN, 
 	Epic,
-	Oculus
+	Oculus,
+	OpenID
 };
 
 /** @brief Simple struct to encapsulate data passed to external authentication systems */

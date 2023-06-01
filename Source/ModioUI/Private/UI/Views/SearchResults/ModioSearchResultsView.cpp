@@ -12,6 +12,7 @@
 #include "Algo/Accumulate.h"
 #include "Core/Input/ModioInputKeys.h"
 #include "Core/ModioFilterParamsUI.h"
+#include "Components/OverlaySlot.h"
 #include "UI/CommonComponents/ModioErrorRetryWidget.h"
 #include "UI/BaseWidgets/ModioButton.h"
 #include "UI/BaseWidgets/ModioGridPanel.h"
@@ -255,6 +256,7 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 			{
 				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																		   EModioUIAsyncOperationWidgetState::Error);
+				ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
 				// Show some kind of error?
 			}
 		}
@@ -416,6 +418,11 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 		
 		if (RefineSearchButton->HasAnyUserFocus() || (SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()))
 		{
+			if (ModioErrorWithRetryWidget->IsVisible())
+			{
+				ModioErrorWithRetryWidget->SetKeyboardFocus();
+				return FReply::Handled();
+			}
 			CurrentRow = 0;
 			return TryNavigateGrid();
 		}

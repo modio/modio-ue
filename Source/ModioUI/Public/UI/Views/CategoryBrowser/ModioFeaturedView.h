@@ -34,9 +34,13 @@ class MODIOUI_API UModioFeaturedView : public UModioMenuView,
 {
 	GENERATED_BODY()
 protected:
+	bool bModsFound = false;
 	int32 CurrentlySelectedCategoryColumn = INDEX_NONE;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioWidgetCarousel* PrimaryFeaturedCategory;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
+	class UModioErrorRetryWidget* ModioErrorWithRetryWidget;
 
 	/// @brief Widget implementing ModioUIAsyncHandlerWidget to handle swapping between error widget, loading widget, or
 	/// the Primary Featured Category

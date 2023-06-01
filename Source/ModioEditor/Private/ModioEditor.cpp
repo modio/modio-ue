@@ -8,6 +8,15 @@
 	#include "Editor.h"
 	#include "Interfaces/IMainFrameModule.h"
 	#include "EditorUtilitySubsystem.h"
+
+	#include "ModioEditorWindowStyle.h"
+	#include "ModioEditorWindowCommands.h"
+	#include "Libraries/ModioSDKLibrary.h"
+	#include "ToolMenus.h"
+	#include "Interfaces/IPluginManager.h"
+	#include "WindowManager.h"
+	#include "Misc/MessageDialog.h"
+	#include "GenericPlatform/GenericPlatformMisc.h"
 #endif
 
 DEFINE_LOG_CATEGORY(ModioEditor);
@@ -36,6 +45,19 @@ void FModioEditor::StartupModule()
 			MainFrameModule.OnMainFrameCreationFinished().AddStatic(&FModioEditor::DisplayGettingStarted_PostMainFrame);
 		}
 	}
+
+	FModioEditorWindowStyle::Initialize();
+	FModioEditorWindowStyle::ReloadTextures();
+
+	FModioEditorWindowCommands::Register();
+	
+	PluginCommands = MakeShareable(new FUICommandList);
+
+	PluginCommands->MapAction(FModioEditorWindowCommands::Get().OpenPluginWindow, FExecuteAction::CreateRaw(this, &FModioEditor::PluginButtonClicked), FCanExecuteAction());
+	
+	UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FModioEditor::RegisterMenus));
+
+	WindowManager::Get().RegisterObjectCustomizations();
 #endif
 }
 
@@ -46,6 +68,16 @@ void FModioEditor::ShutdownModule()
 	{
 		SettingsModule->UnregisterSettings("Project", "Plugins", "mod.io Editor");
 	}
+
+	UToolMenus::UnRegisterStartupCallback(this);
+
+	UToolMenus::UnregisterOwner(this);
+
+	FModioEditorWindowStyle::Shutdown();
+
+	FModioEditorWindowCommands::Unregister();
+
+	WindowManager::Get().UnregisterObjectCustomizations();
 #endif // WITH_EDITOR
 }
 
@@ -69,6 +101,72 @@ void FModioEditor::DisplayGettingStarted()
 		}
 	}
 #endif
+}
+
+
+void FModioEditor::PluginButtonClicked()
+{
+	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("1234"));
+	if (InitializeOptions.GameId.ToString().Equals("InvalidGameID") || InitializeOptions.ApiKey.ToString().Equals("InvalidApiKey"))
+	{
+		const FText Title = FText::FromString("mod.io");
+		const FText Message = FText::FromString("Please specify a valid Game Id and Api Key in 'Project Settings->Plugins->mod.io'");
+
+		UE_LOG(LogTemp, Error, TEXT("%s"), *Message.ToString());
+		EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, &Title);
+		if (UserSelection == EAppReturnType::Ok)
+		{
+			return;
+		}
+	}
+
+	TSharedPtr<SWindow> ModioWindow = WindowManager::Get().GetWindow();
+	if (ModioWindow.IsValid())
+	{
+		ModioWindow->ShowWindow();
+	}
+}
+
+void FModioEditor::RegisterMenus()
+{
+	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
+	FToolMenuOwnerScoped OwnerScoped(this);
+
+	{
+		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Window");
+		{
+			FToolMenuSection& Section = Menu->FindOrAddSection("WindowLayout");
+			Section.AddMenuEntryWithCommandList(FModioEditorWindowCommands::Get().OpenPluginWindow, PluginCommands);
+		}
+	}
+	{
+#if ENGINE_MAJOR_VERSION >= 5
+		FName ToolBarName = "LevelEditor.LevelEditorToolBar.PlayToolBar";
+		FName ExtensionPoint = "Play";
+#else
+		FName ToolBarName = "LevelEditor.LevelEditorToolBar";
+		FName ExtensionPoint = "Settings";
+#endif
+		UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu(ToolBarName);
+		{
+			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection(ExtensionPoint);
+			{
+				FToolMenuEntry& EntryComboButton = Section.AddEntry(FToolMenuEntry::InitComboButton("Modio", FUIAction(),
+					FNewToolMenuChoice(FOnGetContent::CreateRaw(this, &FModioEditor::PopulateComboButton, PluginCommands)),
+					LOCTEXT("modio", "mod.io"), 
+					LOCTEXT("modio", "mod.io"),
+					FModioEditorWindowCommands::Get().OpenPluginWindow->GetIcon(), false));
+				EntryComboButton.SetCommandList(PluginCommands);
+			}
+		}
+	}
+}
+
+TSharedRef<SWidget> FModioEditor::PopulateComboButton(TSharedPtr<FUICommandList> Commands)
+{
+	FMenuBuilder MenuBuilder(true, Commands);
+	MenuBuilder.AddMenuEntry(FModioEditorWindowCommands::Get().OpenPluginWindow);
+	return MenuBuilder.MakeWidget();
 }
 
 #undef LOCTEXT_NAMESPACE

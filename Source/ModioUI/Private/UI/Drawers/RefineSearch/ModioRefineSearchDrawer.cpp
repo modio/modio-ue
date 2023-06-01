@@ -42,7 +42,16 @@ void UModioRefineSearchDrawer::ConstructNavigationPath()
 	NavigationPath.Empty();
 	NavigationPath.Add(SearchInput);
 	
-	for (auto& item : TagSelector->TagSelectorList->GetDisplayedEntryWidgets()) 
+	// Can't use GetDisplayedEntryWidgets here as it appears to be cursed
+	// Suppose we should not use it anywhere since the results are rather random 
+
+	TArray<UUserWidget*> widgets;
+	for (auto& item : TagSelector->TagSelectorList->GetListItems())
+	{
+		widgets.Add(TagSelector->TagSelectorList->GetEntryWidgetFromItem(item));
+	}
+
+	for (auto& item : widgets) 
 	{
 		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
 		if (!tagSelector) 
@@ -50,9 +59,9 @@ void UModioRefineSearchDrawer::ConstructNavigationPath()
 			continue;
 		}
 
-		for (auto& widget : tagSelector->CategoryTagList->GetDisplayedEntryWidgets())
+		for (auto& stringItem : tagSelector->CategoryTagList->GetListItems())
 		{
-			UModioSelectableTag* tag = Cast<UModioSelectableTag>(widget);
+			UModioSelectableTag* tag = Cast<UModioSelectableTag>(tagSelector->CategoryTagList->GetEntryWidgetFromItem(stringItem));
 			if (!tag) 
 			{
 				continue;
@@ -75,8 +84,17 @@ void UModioRefineSearchDrawer::ValidateAndSetFocus()
 			return;
 		}
 		NavigationPath[CurrentNavIndex]->SetFocus();
+		
+		TArray<UUserWidget*> widgets;
+		for (auto& item : TagSelector->TagSelectorList->GetListItems())
+		{
+			widgets.Add(TagSelector->TagSelectorList->GetEntryWidgetFromItem(item));
+		}
 
-		for (auto& item : TagSelector->TagSelectorList->GetDisplayedEntryWidgets())
+		// NavPath widgets are not indexes of TagSelector list. TagSelector contains multiple lists so scrollindex is calculated with these in mind
+
+		int itemIndex = 0;
+		for (auto& item : widgets)
 		{
 			UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
 			if (!tagSelector)
@@ -87,8 +105,10 @@ void UModioRefineSearchDrawer::ValidateAndSetFocus()
 			if (tagSelector->HasFocusedDescendants())
 			{
 				TagSelector->CategoryTextBlock->SetText(tagSelector->TagCategoryLabel->GetText());
+				TagSelector->TagSelectorList->SetScrollOffset(itemIndex);
 				break;
 			}
+			itemIndex++;
 		}
 	}
 }
@@ -139,6 +159,22 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 		return FReply::Unhandled();
 	}
 
+	if (InKeyEvent.GetKey() == EKeys::Enter && CurrentNavIndex == 0)
+	{
+		OnApplyClicked();
+		return FReply::Handled();
+	}
+
+	if (InKeyEvent.GetKey() == EKeys::Tab && CurrentNavIndex == 0)
+	{
+		if (NavigationPath.IsValidIndex(CurrentNavIndex + 1))
+		{
+			CurrentNavIndex += 1;
+		}
+		ValidateAndSetFocus();
+		return FReply::Handled();	
+	}
+
 	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
 	{
 		if (NavigationPath.IsValidIndex(CurrentNavIndex + 1)) {
@@ -161,18 +197,16 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 		if (CurrentNavIndex == NavigationPath.Num() - 1) 
 		{
 			CurrentNavIndex -= 1;
+			ValidateAndSetFocus();
 		}
-		ValidateAndSetFocus();
-		return FReply::Handled();
 	}
 	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right) 
 	{
 		if (CurrentNavIndex == NavigationPath.Num() - 2)
 		{
 			CurrentNavIndex += 1;
+			ValidateAndSetFocus();
 		}
-		ValidateAndSetFocus();
-		return FReply::Handled();
 	}
 
 	return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
@@ -250,7 +284,6 @@ void UModioRefineSearchDrawer::BuildCommandList(TSharedRef<FUICommandList> InCom
 	InCommandList->MapAction(
 		FModioCommonUICommands::Get().MoreOptions,
 		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnClearClicked)));
-
 }
 
 FString UModioRefineSearchDrawer::NativeGetSearchString()

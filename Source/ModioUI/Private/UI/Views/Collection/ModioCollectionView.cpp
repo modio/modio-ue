@@ -89,7 +89,7 @@ void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
 	{
 		UpdateCachedCollection();
 		ApplyFiltersToCollection();
-		FetchButton->SetLabel(DefaultButtonLabel);
+
 		// focus is lost after search probably because collection list items are not quite there yet when getting here, so
 		// setting the focus to searchinput:
 		SearchInput->StartInput();
@@ -98,9 +98,12 @@ void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
 	{
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
+			
 			// Subsystem->DisplayNotification(LOCTEXT("FetchUpdatesFailed", "Fetch updates failed. Please retry"));
 		}
 	}
+
+	FetchButton->SetLabel(DefaultButtonLabel);
 }
 
 void UModioCollectionView::UpdateCachedCollection()
@@ -184,6 +187,8 @@ void UModioCollectionView::NativeOnSubscriptionsChanged(FModioModID ModID, bool 
 	IModioUISubscriptionsChangedReceiver::NativeOnSubscriptionsChanged(ModID, bNewSubscriptionState);
 	UpdateCachedCollection();
 	ApplyFiltersToCollection();
+	// to prevent weird focus jumping:
+	ValidateAndSetFocus();
 }
 
 void UModioCollectionView::NativeOnModManagementEvent(FModioModManagementEvent Event)
@@ -191,6 +196,14 @@ void UModioCollectionView::NativeOnModManagementEvent(FModioModManagementEvent E
 	IModioUIModManagementEventReceiver::NativeOnModManagementEvent(Event);
 	UpdateCachedCollection();
 	ApplyFiltersToCollection();
+	// to prevent weird focus jumping:
+	ValidateAndSetFocus();
+}
+
+void UModioCollectionView::NativeConstruct()
+{
+	Super::NativeConstruct();
+	CollectionList->SetScrollbarVisibility(ESlateVisibility::Collapsed);
 }
 
 void UModioCollectionView::SynchronizeProperties()
@@ -210,7 +223,7 @@ void UModioCollectionView::OnSelectionChanged(FModioUIAction ModioUIAction, ESel
 {
 	CurrentSortAction = ModioUIAction;
 	HasSortActionApplied = true;
-
+	
 	CurrentSortAction.ExecuteAction.ExecuteIfBound();
 }
 
@@ -266,11 +279,25 @@ void UModioCollectionView::OnModGroupChanged(FText SelectedItem, ESelectInfo::Ty
 	ApplyFiltersToCollection();
 }
 
+void UModioCollectionView::ValidateAndSetFocus()
+{
+	if (CurrentNavIndex < CollectionList->GetNumItems() && CurrentNavIndex >= 0) 
+	{
+		CollectionList->NavigateToIndex(CurrentNavIndex);
+		CollectionList->SetSelectedIndex(CurrentNavIndex);
+		CurrentTile = Cast<UModioModCollectionTile>(CollectionList->GetEntryWidgetFromItem(CollectionList->GetSelectedItem()));
+	}
+	else
+	{
+		SearchInput->StartInput();
+	}
+}
+
 FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	if (CollectionList->GetDisplayedEntryWidgets().Num() > 0)
+	if (CollectionList->GetNumItems() > 0)
 	{
-		CollectionList->NavigateToIndex(0);
+		ValidateAndSetFocus();
 	}
 	else
 	{
@@ -281,11 +308,34 @@ FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, 
 
 FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
+	if (ProcessCommandForEvent(InKeyEvent))
+	{
+		return FReply::Handled();
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::DownloadQueue && CurrentNavIndex != 0)
+	{
+		OnProfileOpened.Broadcast();
+	}
+
+	if (InKeyEvent.GetKey() == EKeys::Enter && SearchInput->HasFocusedDescendants())
+	{
+		OnFetchUpdatesClicked();
+		return FReply::Handled();
+	}
+
+	if (InKeyEvent.GetKey() == EKeys::Tab && CurrentNavIndex == 0)
+	{
+		ValidateAndSetFocus();
+		return FReply::Handled();
+	}
+
 	if (!HasFocusedDescendants()) 
 	{
 		SearchInput->StartInput();
 		return FReply::Handled();
 	}
+
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::RefineSearch && (!SearchInput->HasFocusedDescendants() || InKeyEvent.GetKey().IsGamepadKey()))
@@ -294,37 +344,54 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 			return FReply::Handled();
 		}
 
-		UModioModCollectionTile* firstTile = Cast<UModioModCollectionTile>(FirstTile);
-
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+		if (CollectionList->GetDisplayedEntryWidgets().IsValidIndex(0))
 		{
-			if ((SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()) ||
-				(ModGroupSelection->HasFocusedDescendants() && !ModGroupSelection->IsComboBoxOpen()))
+			int currentIndex = CollectionList->GetIndexForItem(CollectionList->GetSelectedItem());
+			if (CurrentNavIndex != currentIndex && currentIndex >= 0)
 			{
-				if (CollectionList->GetDisplayedEntryWidgets().Num() > 0)
+				CurrentNavIndex = currentIndex;
+			}
+			if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+			{
+				if (CurrentTile && CurrentTile->MoreOptionsMenu->GetIsMenuOpen())
 				{
-					CollectionList->NavigateToIndex(0);
+					return FReply::Unhandled();
+				}
+				else if ((SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()) ||
+					(ModGroupSelection->HasFocusedDescendants() && !ModGroupSelection->IsComboBoxOpen()) || SearchInput->HasFocusedDescendants())
+				{
+					CurrentNavIndex = 0;
+					ValidateAndSetFocus();
+					return FReply::Handled();
+				}
+				else if (CurrentNavIndex < CollectionList->GetNumItems() - 1 &&
+						 !ModGroupSelection->IsComboBoxOpen() && !SortBy->IsComboBoxOpen())
+				{
+					CurrentNavIndex++;
+					ValidateAndSetFocus();
 					return FReply::Handled();
 				}
 			}
 
-			// first time needs force to navigate down
-			if (firstTile && firstTile->bHasFocus && CollectionList->GetDisplayedEntryWidgets().Num() > 1) {
-				CollectionList->NavigateToIndex(1);
-				return FReply::Handled();
+			if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+			{
+				if (CurrentTile && CurrentTile->MoreOptionsMenu->GetIsMenuOpen())
+				{
+					return FReply::Unhandled();
+				}
+				else if (CurrentNavIndex == 0 && !SearchInput->HasFocusedDescendants() && !ModGroupSelection->HasFocusedDescendants() && !SortBy->HasFocusedDescendants())
+				{
+					SearchInput->StartInput();
+					return FReply::Handled();
+				}
+				else if (CollectionList->HasFocusedDescendants())
+				{
+					CurrentNavIndex--;
+					ValidateAndSetFocus();
+					return FReply::Handled();
+				}
 			}
-		}
-
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right && SearchInput->GetMyEditableTextBlock().Get()->HasKeyboardFocus())
-		{
-			ModGroupSelection->SetFocusToButton();
-			return FReply::Handled();
-		}
-
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up && firstTile && firstTile->bHasFocus)
-		{
-			SearchInput->StartInput();
-			return FReply::Handled();
+			
 		}
 	}
 	return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);

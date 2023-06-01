@@ -45,10 +45,17 @@ private:
 		TArray<uint8> RawData;
 		int32 Width;
 		int32 Height;
+
+		FTextureCreationData(TArray<uint8> InRawData, int32 InWidth, int32 InHeight)
+		{
+			RawData = InRawData;
+			Width = InWidth;
+			Height = InHeight;
+		}
 	};
 
 	/** Internal loader that will load the texture sync */
-	static TOptional<FTextureCreationData> LoadTextureDataFromDisk(const FString& ImagePath);
+	static TSharedPtr<FTextureCreationData> LoadTextureDataFromDisk(const FString& ImagePath);
 };
 
 /**

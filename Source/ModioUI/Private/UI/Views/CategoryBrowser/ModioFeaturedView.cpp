@@ -15,6 +15,9 @@
 #include "Engine/Engine.h"
 #include "ModioUISubsystem.h"
 #include "Settings/ModioUISettings.h"
+#include "UI/CommonComponents/ModioMenu.h"
+#include "UI/Dialogs/ModioDialogController.h"
+#include "UI/CommonComponents/ModioErrorRetryWidget.h"
 #include "UI/BaseWidgets/Slate/SModioTileView.h"
 #include "UI/BaseWidgets/ModioGridPanel.h"
 #include "UI/CommonComponents/ModioTabBar.h"
@@ -127,7 +130,7 @@ FReply UModioFeaturedView::NativeOnFocusReceived(const FGeometry& InGeometry, co
 	}
 	else
 	{
-		PrimaryFeaturedCategory->SetFocusToCurrentElement();
+		SetFocusToPrimaryCategory();
 	}
 	return FReply::Handled();
 }
@@ -140,9 +143,13 @@ FReply UModioFeaturedView::NativeOnKeyDown(const FGeometry& InGeometry, const FK
 
 void UModioFeaturedView::SetFocusToPrimaryCategory() 
 {
-	if (PrimaryFeaturedCategory)
+	if (PrimaryFeaturedCategory && bModsFound)
 	{
 		PrimaryFeaturedCategory->SetFocusToCurrentElement();
+	}
+	else
+	{
+		ModioErrorWithRetryWidget->SetKeyboardFocus();
 	}
 
 }
@@ -172,6 +179,7 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 	{
 		if (!ec)
 		{
+			bModsFound = true;
 			CachedFeaturedItems.Empty();
 			Algo::Transform(List.GetValue().GetRawList(), CachedFeaturedItems, [](const FModioModInfo& In) {
 				UModioModInfoUI* WrappedMod = NewObject<UModioModInfoUI>();
@@ -186,6 +194,12 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 		else
 		{
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::Error);
+			GEngine->GetEngineSubsystem<UModioUISubsystem>()->DisplayErrorDialog(ec);
+			if (ModioErrorWithRetryWidget)
+			{
+				bModsFound = false;
+				ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
+			}
 		}
 	}
 }

@@ -104,30 +104,27 @@ TSharedRef<SWidget> UModioDialogController::RebuildWidget()
 				.ContentPadding(0.0f)
 				.IsFocusable(true)
 				.ClickMethod(EButtonClickMethod::DownAndUp)
-
 				.OnClicked_UObject(this, &UModioDialogController::OnBackgroundButtonClicked)
 				[
 					SAssignNew(MyBackgroundBlur, SBackgroundBlur)
-					.HAlign(HAlign_Fill)
-					.VAlign(VAlign_Fill)
+					.HAlign(HAlign_Center)
+					.VAlign(VAlign_Center)
 					.Padding(0.0f)
 					.BlurStrength_UObject(this, &UModioDialogController::GetBlurStrength)
 					[
-						SNew(SBox)
+						SAssignNew(ClickDisableButton, SModioButtonBase)
+						.IsFocusable(false)
 						.VAlign(VAlign_Center)
 						.HAlign(HAlign_Center)
 						[
-							SAssignNew(ClickDisableButton, SModioButtonBase)
-							.IsFocusable(false)
-							.VAlign(VAlign_Fill)
-							.HAlign(HAlign_Fill)
+							SNew(SBox)
+							.WidthOverride(880.0f)
 							[
 								ActualDialog->TakeWidget()
 							]
 						]
 					]
 				]
-
 			];
 
 	if (const FModioButtonStyle* ResolvedButtonStyle = InvisibleButtonStyleRef.FindStyle<FModioButtonStyle>())
@@ -331,6 +328,7 @@ void UModioDialogController::PushDialog(UModioDialogInfo* InitialDialog, UObject
 		DialogInputValues.Push("");
 		ActualDialog->InitializeFromDialogInfo(InitialDialog, false, DialogDataSource);
 		ActualDialog->SetDialogFocus();
+
 		MyBackgroundBlur->Invalidate(EInvalidateWidgetReason::PaintAndVolatility | EInvalidateWidgetReason::Visibility |
 									 EInvalidateWidgetReason::Layout);
 	}

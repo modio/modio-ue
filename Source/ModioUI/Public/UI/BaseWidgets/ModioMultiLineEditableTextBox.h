@@ -29,6 +29,9 @@ class MODIOUI_API UModioMultiLineEditableTextBox : public UMultiLineEditableText
 												   public IModioUITextValidator
 {
 	GENERATED_BODY()
+public:
+	TSharedPtr<SMultiLineEditableTextBox> GetEditableTextBox();
+
 protected:
 	// Cached style set for input validation
 	TSharedPtr<FSlateStyleSet> ErrorStyleSet;

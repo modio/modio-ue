@@ -20,14 +20,16 @@
 void UModioPopupMenu::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
+	OnGetUserMenuContentEvent.Clear();
 	OnGetUserMenuContentEvent.BindDynamic(this, &UModioPopupMenu::GeneratePopupMenuContent);
 }
 
 UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 {
 	// Currently we only use the width so that the popup has the same width as the menu anchor itself
-	FGeometry PaintGeo = GetPaintSpaceGeometry();
+	FGeometry PaintGeo = GetCachedGeometry();
 	FVector2D ActualSize = PaintGeo.GetLocalSize();
+
 	if (MenuContentWidgetClass)
 	{
 		UUserWidget* ConcreteWidget = CreateWidget<UUserWidget>(this, MenuContentWidgetClass.Get());
@@ -40,6 +42,7 @@ UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 			
 			if (IModioUIPopupMenuContentWidget* Interface = Cast<IModioUIPopupMenuContentWidget>(ConcreteWidget))
 			{
+				Interface->GetContentCloseDelegate().Unbind();
 				Interface->GetContentCloseDelegate().BindUObject(this, &UModioPopupMenu::OnContentClose);
 			}
 		}
@@ -59,6 +62,7 @@ UUserWidget* UModioPopupMenu::GeneratePopupMenuContent()
 			// This below function isn't part of the UInterface so doesn't use the Execute_ method
 			if (IModioUIPopupMenuContentWidget* Interface = Cast<IModioUIPopupMenuContentWidget>(ConcreteWidget))
 			{
+				Interface->GetContentCloseDelegate().Unbind();
 				Interface->GetContentCloseDelegate().BindUObject(this, &UModioPopupMenu::OnContentClose);
 			}
 		}
@@ -73,7 +77,7 @@ TSharedRef<SWidget> UModioPopupMenu::RebuildWidget()
 	MenuButton->SetButtonStyle(ButtonStyle, true);
 	MenuButton->SetJustification(ButtonLabelJustification);
 	MenuButton->SetLabel(ButtonLabel);
-	MenuButton->OnPressed.AddDynamic(this, &UModioPopupMenu::HandleButtonClicked);
+	MenuButton->OnPressed.AddUniqueDynamic(this, &UModioPopupMenu::HandleButtonClicked);
 	MenuButton->DisplayHintForInputHandler(KeyForInputHint);
 	// Refactor and expose on the popup menu?
 	// Temporary fix since this function seems to have not been implemented correctly or is missing features

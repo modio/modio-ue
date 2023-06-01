@@ -42,6 +42,8 @@ protected:
 	void UpdateBoundValues();
 
 	TArray<TSharedPtr<FText>> BoundValues;
+	TArray<TSharedPtr<SButton>> GeneratedButtons;
+	TArray<TSharedPtr<SModioRichTextBlock>> GeneratedButtonTexts;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TArray<FText> TabNames;
@@ -68,6 +70,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	FVector2D ItemSize;
+
+	UFUNCTION()
+	void OnTabIndexChanged(int TabIndex);
 
 	virtual void PostLoad() override;
 

@@ -86,11 +86,11 @@ The mod.io Mod Browser requires you to map your project's input actions and axes
 
 To configure these mappings, expand the `Modio to Project Input Mappings` section. For each of our virtual keys, map at least one, but optionally more, Input Actions or Axes from your project. The UI will resolve any keypresses it receives, against the actions and axes you specify, to respond to user input. 
 
-==== UI StyleSet
+==== UI Style Set
 
 image::img/plugin_ui_styleset.png[]
 
-The Styleset defines colors, styling, audio and other properties of the UI that can be changed. Each of these style types are split into separate assets to be managed individually. When styling your UI, its recommended that you duplicate the existing ModioUIDefaultStyle asset and any child assets that you want to change, rather than overriding the properties in the existing style assets. This will ensure that future UI updates will not cause conflicts with your changes.
+The Style Set defines UI properties such as colors, materials, widget styles, and more that can be altered to suit the aesthetic of your game. Each of these style types are split into separate assets to be managed individually, described further in <<Styling and Customization>>
 
 ==== NavigationConfig Factory
 
@@ -106,7 +106,7 @@ NOTE: The FNavigationConfig class is a native-only class, so you will need to im
 
 image::img/plugin_ui_authprovider.png[]
 
-mod.io supports a number of authentication providers, including email authentication, Steam, XBox Live, and so on.
+A number of authentication providers are supported by mod.io, including email authentication, Steam, Xbox Live, and so on.
 
 To tell the UI which authentication methods you wish to support, create a new class that implements `IModioUIAuthenticationDataProvider` and overrides the following functions:
 
@@ -142,18 +142,17 @@ The mod.io Mod Browser allows you to customize the Featured row and secondary ca
 
 By default, the browser contains a single Featured Mods row (based off daily downloads), and additional rows of Highest Rated, Most Popular, Most Subscribers, Recently Added and Recently Updated.
 
-==== Background Customization
-
-image::img/plugin_ui_backgroundprovider.png[]
-
-The mod.io Mod Browser supports a custom background or removal of a background altogether. Classes implementing `IModioMenuBackgroundProvider` allow the UI to query your project for a specific material to be used for the background. This is configurable in the mod.io UI Settings.
-
 === Styling and Customization
 
-==== Color, Material, Style References
+For easier management of styling customization, `ModioUIDefaultStyle` contains multiple assets such that you can independently customize different aspects of the mod.io UI. 
 
-Palettized Colors, Materials and Widget Styles use special FName-based references so that visual elements of the UI can 'pull' information from the central Style Sheet asset at runtime.
-These references are visible in the Editor and use Details Customizations so that you can select from a dropdown list of valid elements to reference.
+image::img/plugin_ui_defaultstyle.png[]
+
+When styling your UI, we recommend duplicating the existing `ModioUIDefaultStyle` asset and any child assets you wish to alter, rather than overriding the properties in the existing style assets. This will ensure that future UI updates will not cause conflicts with your changes.
+
+==== Color, Material, and Style References
+
+Palettized Colors, Materials and Widget Styles use special FName-based references so that visual elements of the UI can 'pull' information from the central Style Sheet asset at runtime.  These references are visible in the Editor and use Details Customizations so that you can select from a dropdown list of valid elements to reference.
 
 * FModioUIStyleRef 
 +
@@ -168,45 +167,69 @@ This struct creates a reference to a specific named material from the `Named Bru
 image::img/plugin_ui_colorref.png[]
 This struct references a specific named color from the `Color Presets` table in the style sheet.
 
-==== Customizing Colors
+==== Default Background Material
 
-Widgets in the Mod Browser reference a centrally defined color palette in the style sheet. You can alter these colors by changing entries in the 'Color Presets' list there.
+The mod.io Mod Browser supports a custom background, or removal of a background altogether. `ModioUIDefaultStyle` implements a `UMaterialInterface* DefaultBackgroundMaterial` which can be set to your chosen Material or Material Instance. 
+
+image::img/plugin_ui_backgroundmaterial.png[]
+
+==== Color Presets Data
+
+Widgets in the Mod Browser reference a centrally defined color palette, `ModioUIColorPresets`. You can alter these colors by changing entries in the 'Color Presets' list.
 
 NOTE: Changing the names of the existing colors will break references in widgets. You can, however, add additional colors to the palette and reference them in widgets or styles.
 
 Referencing a palette entry in a widget style is simple - just click the 'Color Presets' dropdown and select the new palette entry you wish to reference.
 
-==== Customizing Materials
+image::img/plugin_ui_colorpresets.png[]
 
-The Mod Browser style sheet maintains a list of named materials and named material instance parameters that can be referenced by name in styles and therefore easily shared between multiple widgets. 
-The parameters for a named material are exposed in the `Named Brush Materials` property. There's currently 3 different types of parameters that can be specified:
+==== Widget Style Assets
+
+Multiple Widget Style Assets have been created for different widget types.  
+
+image::img/plugin_ui_widgetstyleassets.png[]
+
+Each Widget Style Asset groups together a set of styles for a given asset type: 
+
+* Borders 
+* Buttons
+* Input (editable text boxes, checkboxes)
+* Panels (notifications, pop-ups, tiles, tables)
+* Status (progress bars, subscription indicators)
+* Text
+
+For example, `ButtonStyles` (below) contains a map of styles that could be applied to a button depending on that button's function.
+
+image::img/plugin_ui_editstyle.png[]
+
+To customize a widget style, expand its entry in the relevant Widget Style Asset map and make changes as you see fit.
+
+Similarly, to create a new widget style for a particular asset type, add a new entry to its widget style map and populate the values as required.
+
+==== Customizing Audio
+
+The plugin ships with two default pieces of audio for rollover/focus and selection. 
+
+Where relevant, these are configurable per-control for a given widget in its Widget Style Asset.  For example, each style in the previous `ButtonStyles` example above has entries `Pressed Sound` and `Hovered Sound` assigned to `UI_Click_Cue` and `UI_Rollover_Cue` respectively.  
+
+`S_Modio_UI` sound class can be used to control the volume of these default audio cues.
+
+==== Named Glyphs Asset
+
+This asset contains maps of `Named Glyphs` and `PNGGlyphs` that can be used to create a material instance of the specified SDF glyph or icon, which can then be referenced in other assets by name.
+
+==== Material Data
+
+The Mod Browser style sheet maintains a list of named materials and named material instance parameters that can be referenced by name by a style.  This allows materials and material instances to be easily shared between multiple widgets. The parameters for a named material are exposed in the `Named Brush Materials` property. There are currently 3 different types of parameters that can be specified:
 
 * Specified Material Params
 +
 image::img/plugin_ui_specifiedmaterial.png[]
-This parameter simply references a material from the project - it's basically just a wrapper to allow us to easily refer to the material by a centralised FName key.
+This parameter simply references a material from the project - essentially a wrapper allowing us to easily refer to the material by a centralised FName key.
 * Rounded Rectangle Material Params
 +
 image::img/plugin_ui_roundedrectmaterial.png[]
 This parameter set specifies a dynamic material instance of the 'RoundedRectangle' named material. It sets the included parameters on the new material instance.
-* Named Glyph Material Params
-+ 
-image::img/plugin_ui_glyphmaterial.png[]
-This parameter set specifies a dynamic material instance of the DefaultGlyphMaterial which displays the specific named SDF glyph or icon.
-
-==== Customizing Styles
-
-image::img/plugin_ui_editstyle.png[]
-
-To create a new widget style, add a new entry to the `Widget Styles` map and select the type of style you wish to create, then populate the values as required.
-
-To customize a widget style, simply expand its entry in the `Widget Styles` map and make changes as you see fit.
-
-==== Customizing Audio
-
-The plugin ships with two default pieces of audio for rollover/focus, and selection. These are configurable per-control as part of the Style Sheet.
-
-If you want to use the provided audio, then you can use the S_Modio_UI sound class to control the volume of the audio cues.
 
 === Known Issues
 

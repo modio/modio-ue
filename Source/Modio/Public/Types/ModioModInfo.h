@@ -46,6 +46,17 @@ enum class EModioMaturityFlags : uint8
 	Explicit = 8
 };
 
+/**
+* Enumeration that represent mod server side status
+**/
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EModioModServerSideStatus : uint8
+{
+	NotAccepted = 0,
+	Accepted = 1,
+	Deleted = 3
+};
+
 /** 
 * Full mod profile including current release information, media links, and stats 
 **/
@@ -139,6 +150,10 @@ struct MODIO_API FModioModInfo
 	/** @brief Stats and rating information for the mod */
 	UPROPERTY(BlueprintReadOnly, Category = "Stats")
 	FModioModStats Stats;
+
+	/** @brief Status of the mod */
+	UPROPERTY(BlueprintReadOnly, Category = "Status")
+	EModioModServerSideStatus ModStatus {};
 
 	friend struct FModioModInfo ToUnreal(const struct Modio::ModInfo& In);
 };

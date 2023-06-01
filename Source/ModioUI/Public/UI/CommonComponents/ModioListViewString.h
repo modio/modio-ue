@@ -65,4 +65,5 @@ public:
 	* @param InListItems An array of TSharedPtr with the strings to modify the item list
 	**/
 	void SetListItems(const TArray<TSharedPtr<FString>>& InListItems);
+	TArray<TSharedPtr<FString>> GetListItems();
 };

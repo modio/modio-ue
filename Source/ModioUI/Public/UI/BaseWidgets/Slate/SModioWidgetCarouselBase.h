@@ -482,12 +482,20 @@ protected:
 
 	virtual void GenerateItemWidgets()
 	{
-		LeftCarouselWidget->SetContent(OnGenerateWidget.Execute(ItemsSource[GetLeftWidgetIndex(WidgetIndex)]));
-		CenterCarouselWidget->SetContent(OnGenerateWidget.Execute(ItemsSource[WidgetIndex]));
-		RightCarouselWidget->SetContent(OnGenerateWidget.Execute(ItemsSource[GetRightWidgetIndex(WidgetIndex)]));
-		// Incoming widget is just the next one again
-		IncomingWidget->SetContent(
-			OnGenerateWidget.Execute(ItemsSource[GetRightWidgetIndex(GetRightWidgetIndex(WidgetIndex))]));
+		const int32 LeftWidgetIndex = GetLeftWidgetIndex(WidgetIndex);
+		const int32 RightWidgetIndex = GetRightWidgetIndex(WidgetIndex);
+		const int32 IncomingWidgetIndex = GetRightWidgetIndex(RightWidgetIndex);
+
+		if (ItemsSource.IsValidIndex(WidgetIndex) && ItemsSource.IsValidIndex(LeftWidgetIndex) &&
+		    ItemsSource.IsValidIndex(RightWidgetIndex) && ItemsSource.IsValidIndex(IncomingWidgetIndex))
+		{
+			LeftCarouselWidget->SetContent(OnGenerateWidget.Execute(ItemsSource[LeftWidgetIndex]));
+			CenterCarouselWidget->SetContent(OnGenerateWidget.Execute(ItemsSource[WidgetIndex]));
+			RightCarouselWidget->SetContent(OnGenerateWidget.Execute(ItemsSource[RightWidgetIndex]));
+			// Incoming widget is just the next one again
+			IncomingWidget->SetContent(
+				OnGenerateWidget.Execute(ItemsSource[IncomingWidgetIndex]));
+		}
 		UpdateSelection();
 	}
 

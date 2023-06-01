@@ -100,3 +100,8 @@ void UModioListViewString::SetListItems(const TArray<TSharedPtr<FString>>& InLis
 	}
 	RequestRefresh();
 }
+
+TArray<TSharedPtr<FString>> UModioListViewString::GetListItems()
+{
+	return ListItems;
+}

@@ -51,7 +51,7 @@ void UModioDownloadQueueOpProgress::OnUnsubscribeClicked()
 	{
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
-			Subsystem->ShowModUnsubscribeDialog(ActualData);
+			Subsystem->RequestRemoveSubscriptionForModID(ActualData->Underlying.ModId);
 		}
 	}
 }

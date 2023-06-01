@@ -42,7 +42,7 @@ class UTexture2DDynamic* FModioImageWrapper::GetTexture() const
 	return Texture;
 }
 
-TOptional<FModioImageWrapper::FTextureCreationData> FModioImageWrapper::LoadTextureDataFromDisk(
+TSharedPtr<FModioImageWrapper::FTextureCreationData> FModioImageWrapper::LoadTextureDataFromDisk(
 	const FString& ImagePath)
 {
 #if !UE_SERVER
@@ -61,8 +61,9 @@ TOptional<FModioImageWrapper::FTextureCreationData> FModioImageWrapper::LoadText
 		{
 			if (TOptional<TArray<uint8>> RawData = GetImageData(ImageWrapper, GetDesiredErgbFormat()))
 			{
-				return FTextureCreationData {MoveTemp(RawData.GetValue()), ImageWrapper->GetWidth(),
-											 ImageWrapper->GetHeight()};
+				TSharedPtr<FTextureCreationData> data
+					(new FTextureCreationData(RawData.GetValue(), ImageWrapper->GetWidth(), ImageWrapper->GetHeight()));
+				return data;
 			}
 		}
 	}
@@ -96,27 +97,28 @@ void FModioImageWrapper::LoadAsync(FOnLoadImageDelegateFast Callback) const
 			ModioSubsystem->GetImageCache().UpdateImageState(ImagePath, EModioImageState::LoadingIntoMemory);
 		}
 		// Create a background task to load the texture in
-		AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [ImagePath = this->ImagePath, Callback]() {
-			TOptional<FTextureCreationData> TextureData = LoadTextureDataFromDisk(ImagePath);
-
-			TArray<uint8> RawTextureData;
-			UTexture2DDynamic* Texture = nullptr;
-			if (TextureData)
-			{
-				Texture = UTexture2DDynamic::Create(TextureData->Width, TextureData->Height);
-				if (Texture)
-				{
-					// Ensure that the texture won't get garbage collected until the client has been able to grab a
-					// reference to it as we are doing async calls
-					Texture->AddToRoot();
-					Texture->SRGB = true;
-					RawTextureData = MoveTemp(TextureData->RawData);
-				}
-			}
+		AsyncTask(ENamedThreads::AnyNormalThreadNormalTask, [ImagePath = this->ImagePath, Callback]() {
+			TSharedPtr<FTextureCreationData> TextureData = LoadTextureDataFromDisk(ImagePath);
+			
+			// NOTE: Creating UObjects outside of game thread will cause a crash when CancelAsyncLoading is called
 
 			// Send back data to game thread
-			AsyncTask(ENamedThreads::GameThread, [Callback, Texture, ImagePath,
-												  RawData = MoveTemp(RawTextureData)]() mutable {
+			AsyncTask(ENamedThreads::GameThread, [Callback, TextureData, ImagePath]() mutable {
+				TArray<uint8> RawTextureData;
+				UTexture2DDynamic* Texture = nullptr;
+				if (TextureData)
+				{
+					Texture = UTexture2DDynamic::Create(TextureData->Width, TextureData->Height);
+
+					if (Texture)
+					{
+						// Ensure that the texture won't get garbage collected until the client has been able to grab a
+						// reference to it as we are doing async calls
+						Texture->AddToRoot();
+						Texture->SRGB = true;
+						RawTextureData = MoveTemp(TextureData->RawData);
+					}
+				}
 				if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 				{
 					ModioSubsystem->GetImageCache().UpdateImageState(
@@ -140,12 +142,13 @@ void FModioImageWrapper::LoadAsync(FOnLoadImageDelegateFast Callback) const
 	#endif
 					ENQUEUE_RENDER_COMMAND(FWriteRawDataToTexture)
 					([TextureResource,
-					  RawDataRenderingThread = MoveTemp(RawData)](FRHICommandListImmediate& RHICmdList) {
+					  RawDataRenderingThread = MoveTemp(RawTextureData)](FRHICommandListImmediate& RHICmdList) {
 						WriteRawToTexture_RenderThread(TextureResource, RawDataRenderingThread);
 					});
 				}
 
 				Callback.ExecuteIfBound(Texture);
+				
 			});
 		});
 	}

@@ -16,18 +16,23 @@ const FText& UModioMenuView::GetName()
 	return MenuName;
 }
 
-TSharedRef<SWidget> UModioMenuView::GetMenuTitleContent()
+UUserWidget* UModioMenuView::GetMenuTitleContent()
 {
 	if (TitleContentClass)
 	{
 		CachedMenuTitleContentWidget = CreateWidget<UUserWidget>(this, TitleContentClass);
-		return CachedMenuTitleContentWidget->TakeWidget();
+		return CachedMenuTitleContentWidget;
 	}
 
-	return SNullWidget::NullWidget;
+	return nullptr;
 }
 
 bool UModioMenuView::ShouldShowSearchButtonForMenu()
 {
 	return false;
+}
+
+bool UModioMenuView::ShouldShowTopNavBar()
+{
+	return bShouldShowTopNavBar;
 }

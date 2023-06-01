@@ -41,6 +41,8 @@ FORCEINLINE Modio::AuthenticationProvider ToModio(EModioAuthenticationProvider P
 			return Modio::AuthenticationProvider::Epic;
 		case EModioAuthenticationProvider::Oculus:
 			return Modio::AuthenticationProvider::Oculus;
+		case EModioAuthenticationProvider::OpenID:
+			return Modio::AuthenticationProvider::OpenID;
 	}
 
 	return Modio::AuthenticationProvider::Steam;

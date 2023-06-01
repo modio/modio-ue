@@ -24,11 +24,11 @@ struct MODIO_API FModioInitializeOptions
 {
 	GENERATED_BODY()
 
-	/** @brief The Mod.io-provided ID for the game */
+	/** @brief The mod.io-provided ID for the game */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io", meta = (ShowOnlyInnerProperties))
 	FModioGameID GameId = FModioGameID::InvalidGameID();
 
-	/** @brief The Mod.io-provided API key for your application or game */
+	/** @brief The mod.io-provided API key for your application or game */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io", meta = (ShowOnlyInnerProperties))
 	FModioApiKey ApiKey = FModioApiKey::InvalidAPIKey();
 
