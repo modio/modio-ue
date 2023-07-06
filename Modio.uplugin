@@ -20,7 +20,8 @@
 			"WhitelistPlatforms": [
 				"Win64",
 				"Mac",
-				"Linux"
+				"Linux",
+				"PS4"
 			]
 		},
 		{
@@ -30,7 +31,8 @@
 			"WhitelistPlatforms": [
 				"Win64",
 				"Mac",
-				"Linux"
+				"Linux",
+				"PS4"
 			]
 		},
 		{
@@ -40,7 +42,8 @@
 			"WhitelistPlatforms": [
 				"Win64",
 				"Mac",
-				"Linux"
+				"Linux",
+				"PS4"
 			]
 		},
 		{

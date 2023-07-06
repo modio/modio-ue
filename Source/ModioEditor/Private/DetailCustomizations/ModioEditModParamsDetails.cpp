@@ -50,7 +50,11 @@ void ModioEditModParamsDetails::DrawEditMod(IDetailLayoutBuilder& DetailBuilder)
 	TSharedRef<IPropertyHandle> NameProperty = DetailBuilder.GetProperty("Name");
 	TSharedRef<IPropertyHandle> SummaryProperty = DetailBuilder.GetProperty("Summary");
 	TSharedRef<IPropertyHandle> NamePathProperty = DetailBuilder.GetProperty("NamePath");
-	TSharedRef<IPropertyHandle> VisibleProperty = DetailBuilder.GetProperty("bVisible");
+	
+	// Deprecated property, use VisibilityProperty
+	TSharedRef<IPropertyHandle> VisibleProperty_DEPRECATED = DetailBuilder.GetProperty("bVisible_DEPRECATED");
+	
+	TSharedRef<IPropertyHandle> Visibilityroperty = DetailBuilder.GetProperty("Visibility");
 	TSharedRef<IPropertyHandle> DescriptionProperty = DetailBuilder.GetProperty("Description");
 	TSharedRef<IPropertyHandle> HomepageURLProperty = DetailBuilder.GetProperty("HomepageURL");
 	TSharedRef<IPropertyHandle> MaturityFlagsProperty = DetailBuilder.GetProperty("MaturityFlags");
@@ -58,7 +62,11 @@ void ModioEditModParamsDetails::DrawEditMod(IDetailLayoutBuilder& DetailBuilder)
 	TSharedRef<IPropertyHandle> LogoPathProperty = DetailBuilder.GetProperty("LogoPath");
 	
 	DetailBuilder.HideProperty(NamePathProperty);
-	DetailBuilder.HideProperty(VisibleProperty);
+	
+	// Deprecated property, use VisibilityProperty
+	DetailBuilder.HideProperty(VisibleProperty_DEPRECATED);
+	
+	DetailBuilder.HideProperty(Visibilityroperty);
 	DetailBuilder.HideProperty(DescriptionProperty);
 	DetailBuilder.HideProperty(MaturityFlagsProperty);
 	DetailBuilder.HideProperty(MetadataBlobProperty);

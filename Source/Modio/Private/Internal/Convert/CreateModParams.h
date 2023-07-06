@@ -22,7 +22,12 @@ FORCEINLINE Modio::CreateModParams ToModio(const FModioCreateModParams& In)
 	Out.Name = ToModio(In.Name);
 	Out.Summary = ToModio(In.Summary);
 	Out.NamePath = ToModioOptional<std::string>(In.NamePath);
-	Out.bVisible = ToModioOptional<bool>(In.bVisible);
+
+	// Deprecated member, use Visibility
+	Out.bVisible = ToModioOptional<bool>(In.bVisible_DEPRECATED);
+
+	Out.Visibility = In.Visibility.IsSet() ? static_cast<Modio::ObjectVisibility>(In.Visibility.GetValue())
+											  : Modio::Optional<Modio::ObjectVisibility> {};
 	Out.Description = ToModioOptional<std::string>(In.Description);
 	Out.HomepageURL = ToModioOptional<std::string>(In.HomepageURL);
 	Out.Stock = ToModioOptional<int64>(In.QuantityAvailable);

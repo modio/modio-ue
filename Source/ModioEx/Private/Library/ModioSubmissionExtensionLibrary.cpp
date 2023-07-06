@@ -10,13 +10,20 @@
 
 #include "Library/ModioSubmissionExtensionLibrary.h"
 
+#include "ImageUtils.h"
 #include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "ModioEx.h"
 #include "ModioSubsystem.h"
+#include "Engine/Texture2D.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "Serialization/BufferArchive.h"
+#include "Engine/Engine.h"
 
-static const FString ModFileName(TEXT("Mod.uasset"));
+
+static const FString ModFileName(TEXT("Mod.modfile"));
+static const FString LogoFileName(TEXT("ModLogo.png"));
 
 bool UModioSubmissionExtensionLibrary::LoadModFileToMemory(UModioSubsystem* Target, FModioModID ModId,
 														   TArray<uint8>& ModData)
@@ -76,4 +83,50 @@ void UModioSubmissionExtensionLibrary::K2_SubmitNewModFileForModFromMemory(UModi
 																		   FModioCreateModFileMemoryParams Params)
 {
 	SubmitNewModFileForModFromMemory(Target, Mod, Params);
+}
+
+void UModioSubmissionExtensionLibrary::SubmitNewModFromMemoryAsync(FModioModCreationHandle Handle, FModioCreateModParams Params, TArray<uint8> PngData, FOnSubmitNewModDelegateFast Callback)
+{
+	const FString LogoTempDir =
+		FString(FPlatformProcess::UserTempDir()) + TEXT("ModioTemp/") + FGuid::NewGuid().ToString();
+	const FString FilePath = FPaths::Combine(*LogoTempDir, *LogoFileName);
+
+	if (FFileHelper::SaveArrayToFile(PngData, *FilePath))
+	{
+		Params.PathToLogoFile = FilePath;
+
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->SubmitNewModAsync(Handle, Params,Callback);
+	}
+}
+
+void UModioSubmissionExtensionLibrary::K2_SubmitNewModFromMemoryAsync(FModioModCreationHandle Handle, FModioCreateModParams Params, TArray<uint8> PngData, FOnSubmitNewModDelegate Callback)
+{
+	SubmitNewModFromMemoryAsync(
+		Handle, Params, PngData,
+		FOnSubmitNewModDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioModID> NewModID) {
+			Callback.ExecuteIfBound(ec, FModioOptionalModID {NewModID});
+		}));
+}
+
+void UModioSubmissionExtensionLibrary::K2_SubmitModChangesFromMemoryAsync(FModioModID Mod, FModioEditModParams Params, TArray<uint8> PngData, FOnGetModInfoDelegate Callback)
+{
+	SubmitModChangesFromMemoryAsync(
+		Mod, Params, PngData,
+		FOnGetModInfoDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioModInfo> MaybeModInfo) {
+			Callback.ExecuteIfBound(ec, FModioOptionalModInfo {MaybeModInfo});
+		}));
+}
+
+void UModioSubmissionExtensionLibrary::SubmitModChangesFromMemoryAsync(FModioModID Mod, FModioEditModParams Params, TArray<uint8> PngData, FOnGetModInfoDelegateFast Callback)
+{
+	const FString LogoTempDir =
+		FString(FPlatformProcess::UserTempDir()) + TEXT("ModioTemp/") + FGuid::NewGuid().ToString();
+	const FString FilePath = FPaths::Combine(*LogoTempDir, *LogoFileName);
+
+	if (FFileHelper::SaveArrayToFile(PngData, *FilePath))
+	{
+		Params.LogoPath = FilePath;
+
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->SubmitModChangesAsync(Mod, Params, Callback);
+	}
 }

@@ -25,9 +25,14 @@ void UModioEditModLibrary::SetNamePath(FModioEditModParams& In, FString NamePath
 	In.NamePath = NamePath;
 }
 
-void UModioEditModLibrary::SetVisibility(FModioEditModParams& In, bool Visibility)
+void UModioEditModLibrary::SetVisibility_DEPRECATED(FModioEditModParams& In, bool Visibility)
 {
-	In.bVisible = Visibility;
+	In.bVisible_DEPRECATED = Visibility;
+}
+
+void UModioEditModLibrary::SetVisibility(FModioEditModParams& In, EModioObjectVisibilityFlags Visibility)
+{
+	In.Visibility = Visibility;
 }
 
 void UModioEditModLibrary::SetDescription(FModioEditModParams& In, FString Description)

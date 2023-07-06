@@ -23,7 +23,12 @@ FORCEINLINE Modio::EditModParams ToModio(const FModioEditModParams& In)
 	Out.Name = ToModioOptional<std::string>(In.Name);
 	Out.Summary = ToModioOptional<std::string>(In.Summary);
 	Out.NamePath = ToModioOptional<std::string>(In.NamePath);
-	Out.bVisible = ToModioOptional<bool>(In.bVisible);
+	
+	// Deprecated member, use Visibility
+	Out.bVisible = ToModioOptional<bool>(In.bVisible_DEPRECATED);
+	
+	Out.Visibility = In.Visibility.IsSet() ? static_cast<Modio::ObjectVisibility>(In.Visibility.GetValue())
+										   : Modio::Optional<Modio::ObjectVisibility> {};
 	Out.Description = ToModioOptional<std::string>(In.Description);
 	Out.HomepageURL = ToModioOptional<std::string>(In.HomepageURL);
 	Out.MaturityRating = In.MaturityFlags.IsSet() ? static_cast<Modio::MaturityOption>(In.MaturityFlags.GetValue())

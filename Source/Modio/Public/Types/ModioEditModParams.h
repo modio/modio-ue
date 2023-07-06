@@ -41,8 +41,15 @@ public:
     
     /**
     * Optional override for the mod's visibility status. Defaults to true (visible)
-    **/
-    TOptional<bool> bVisible;
+    * @deprecated Use Visibility property instead
+	**/
+	TOptional<bool> bVisible_DEPRECATED;
+	
+	/**
+	* Enum parameter to signal the backend if the mod to upload would be publicly visible. Default 
+    * value is Public
+	**/
+	TOptional<EModioObjectVisibilityFlags> Visibility;
     
     /**
     * Optional long description of the mod

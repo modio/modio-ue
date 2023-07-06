@@ -62,6 +62,12 @@ protected:
 public:
 	void SetControllerOverrideType(EModioUIInputMode Override);
 
+	bool HasControllerOverrideType() const
+	{
+		return CurrentControllerTypeOverride.IsSet();
+	}
+
+	void ClearControllerOverride();
 	virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> Cursor) override
 	{
 		BroadcastInputModeChange();
@@ -100,32 +106,32 @@ public:
 
 	bool HandleMouseMoveEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override
 	{
-		HandleInputModeChange(EModioUIInputMode::Mouse);
+		HandleInputModeChange(CurrentControllerTypeOverride.Get(EModioUIInputMode::Mouse));
 		return false;
 	}
 
 	bool HandleMouseButtonDownEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override
 	{
-		HandleInputModeChange(EModioUIInputMode::Mouse);
+		HandleInputModeChange(CurrentControllerTypeOverride.Get(EModioUIInputMode::Mouse));
 		return false;
 	}
 
 	bool HandleMouseButtonUpEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override
 	{
-		HandleInputModeChange(EModioUIInputMode::Mouse);
+		HandleInputModeChange(CurrentControllerTypeOverride.Get(EModioUIInputMode::Mouse));
 		return false;
 	}
 
 	bool HandleMouseButtonDoubleClickEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override
 	{
-		HandleInputModeChange(EModioUIInputMode::Mouse);
+		HandleInputModeChange(CurrentControllerTypeOverride.Get(EModioUIInputMode::Mouse));
 		return false;
 	}
 
 	bool HandleMouseWheelOrGestureEvent(FSlateApplication& SlateApp, const FPointerEvent& InWheelEvent,
 										const FPointerEvent* InGestureEvent) override
 	{
-		HandleInputModeChange(EModioUIInputMode::Mouse);
+		HandleInputModeChange(CurrentControllerTypeOverride.Get(EModioUIInputMode::Mouse));
 		return false;
 	}
 };

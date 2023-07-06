@@ -96,7 +96,6 @@ void SModioEditorWindowCompoundWidget::Tick(const FGeometry& AllottedGeometry, c
 void SModioEditorWindowCompoundWidget::LoadResources()
 {
 	Percentage = 0.f;
-	IsModfileUploaded = false;
 
 	ResourcesPath = IPluginManager::Get().FindPlugin("Modio")->GetBaseDir() / TEXT("Source/ModioEditor/Resources/");
 	if (FPaths::DirectoryExists(ResourcesPath))
@@ -141,31 +140,49 @@ void SModioEditorWindowCompoundWidget::LoadModioSubsystem()
 	}
 }
 
+void SModioEditorWindowCompoundWidget::EnableModManagement()
+{
+	ModioSubsystem->EnableModManagement(FOnModManagementDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnModManagementCallback));
+}
+
+void SModioEditorWindowCompoundWidget::OnModManagementCallback(FModioModManagementEvent Event) 
+{
+	UE_LOG(LogTemp, Warning, TEXT("ModEvent: %d, ID: %s, Msg: %s"), (int)Event.Event, *Event.ID.ToString(), *Event.Status.GetErrorMessage());
+
+	if (Event.ID == UploadModID)
+	{
+		if (Event.Status.GetValue() != 0)
+		{
+			if (Event.Event == EModioModManagementEventType::BeginUpload || Event.Event == EModioModManagementEventType::Uploaded)
+			{
+				HideProgressBar();
+
+				FText Message = Localize("ModFileNotUploaded", FString::Printf(TEXT("Your mod file could not be uploaded, see error message below:\n\n%s\n\nErrorCode: %d, EventType: %d."), *Event.Status.GetErrorMessage(), Event.Status.GetValue(), (int)Event.Event));
+				FMessageDialog::Open(EAppMsgType::Ok, Message);
+				WindowManager::Get().GetWindow()->BringToFront();
+				
+				ModioSubsystem->DisableModManagement();
+				EnableModManagement();
+			}
+			return;
+		}
+
+		if (Event.Event == EModioModManagementEventType::Uploaded)
+		{
+			HideProgressBar();
+
+			FText Message = Localize("ModFileUploaded", "Your mod file has uploaded successfully.");
+			FMessageDialog::Open(EAppMsgType::Ok, Message);
+			WindowManager::Get().GetWindow()->BringToFront();
+		}
+	}
+}
+
 void SModioEditorWindowCompoundWidget::OnInitCallback(FModioErrorCode ErrorCode)
 {
 	if (ErrorCode.GetValue() == 0 || ErrorCode.GetValue() == 21769)
 	{
-		ModioSubsystem->EnableModManagement(FOnModManagementDelegateFast::CreateLambda([this](FModioModManagementEvent Event) 
-		{
-			if (IsModfileUploaded)
-			{
-				IsModfileUploaded = false;
-				HideProgressBar();
-
-				if (Event.Status.GetValue() == 0)
-				{
-					FText Message = Localize("ModFileUploaded", "Your mod file has uploaded successfully.");
-					FMessageDialog::Open(EAppMsgType::Ok, Message);
-					WindowManager::Get().GetWindow()->BringToFront();
-				}
-				else
-				{
-					FText Message = Localize("ModFileNotUploaded", FString::Printf(TEXT("Your mod file could not be uploaded, see error message below:\n\n%s."), *Event.Status.GetErrorMessage()));
-					FMessageDialog::Open(EAppMsgType::Ok, Message);
-					WindowManager::Get().GetWindow()->BringToFront();
-				}
-			}
-		}));
+		EnableModManagement();
 
 		ModioSubsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(), FOnGetGameInfoDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) 
 		{
@@ -1214,6 +1231,7 @@ void SModioEditorWindowCompoundWidget::DrawCreateOrEditModFileWidget(FModioModID
 					return FReply::Handled();
 				}
 
+				UploadModID = ModID;
 				ShowProgressBar();
 
 				FModioCreateModFileParams Params;
@@ -1439,11 +1457,6 @@ void SModioEditorWindowCompoundWidget::UpdateProgressBar()
 			ProgressTitle->SetText(Localize("UploadingModfile", "Uploading Modfile ..."));
 			ProgressBar->SetPercent(Percentage);
 			PercentageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), (int)(Percentage * 100)) + " %"));
-
-			if (CurrentProgress == TotalProgress)
-			{
-				IsModfileUploaded = true;
-			}
 		}
 	}
 }

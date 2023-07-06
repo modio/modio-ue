@@ -46,8 +46,15 @@ struct MODIO_API FModioCreateModParams
 	/**
 	* Boolean parameter to signal the backend if the mod to upload would be publicly visible. When
 	* it is false, the mod will remain hidden
+	* @deprecated Use Visibility property instead
 	**/
-	TOptional<bool> bVisible;
+	TOptional<bool> bVisible_DEPRECATED;
+	
+	/**
+	* Enum parameter to signal the backend if the mod to upload would be publicly visible. Default 
+	* value is Public
+	**/
+	TOptional<uint8> Visibility;
 	
 	/**
 	* Detailed description for the mod, which can include details such as 'About', 'Features', 

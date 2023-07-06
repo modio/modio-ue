@@ -29,6 +29,7 @@ struct FModioModInfo;
 struct FModioModID;
 struct FModioErrorCode;
 struct FModioBrowseModFileStruct;
+struct FModioModManagementEvent;
 
 /**
  * @brief A compound widget class used for Modio Editor Functionality to upload and edit mods with detail customizations.
@@ -91,11 +92,11 @@ public:
 	/** @brief Stored property to the back button on upload mod file widget. */
 	TSharedPtr<SButton> ModfileBackButton;
 
+	/** @brief The id of the mod that is being uploaded. */
+	FModioModID UploadModID;
+
 	/** @brief Percentage progress of the upload mod file. */
 	float Percentage;
-
-	/** @brief Determines if the mod file has uploaded successfully. */
-	bool IsModfileUploaded;
 
 	/** @brief Path to the root directory of resources. */
 	FString ResourcesPath;
@@ -126,6 +127,9 @@ public:
 
 	/** @brief Sets the ModioSubsystem for initialization. */
 	void LoadModioSubsystem();
+
+	void EnableModManagement();
+	void OnModManagementCallback(FModioModManagementEvent Event);
 
 	/**
 	 * @brief Callback to determine if Modio initialization was successful.

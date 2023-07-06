@@ -154,6 +154,7 @@ protected:
 
 	TOptional<FModioModTagOptions> CachedModTags;
 
+
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
@@ -277,6 +278,7 @@ public:
 	UWidget* GetCurrentFocusTarget();
 
 	void SetControllerOverrideType(EModioUIInputMode NewOverride);
+	void ClearControllerOverride();
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	UModioMenu* ShowModBrowserUIForPlayer(TSubclassOf<UModioMenu> MenuClass, APlayerController* Controller,

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include "Templates/UniquePtr.h"
 
 #include "ModioErrorCode.generated.h"

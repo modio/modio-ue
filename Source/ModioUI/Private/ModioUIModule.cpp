@@ -14,8 +14,10 @@
 #include "Core/Input/ModioInputKeys.h"
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
+#include "HAL/IConsoleManager.h"
 #include "Logging/LogVerbosity.h"
 #include "Misc/EngineVersionComparison.h"
+#include "ModioUISubsystem.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UObject/CoreRedirects.h"
 
@@ -61,11 +63,46 @@ void FModioUIModule::StartupModule()
 	EKeys::AddKey(FKeyDetails(FModioInputKeys::DownloadQueue, LOCTEXT("ModioInputKey_DownloadQueue", "DownloadQueue"),
 							  FKeyDetails::EKeyFlags::NotActionBindableKey, NAME_ModioInputKeys));
 	FModioCommonUICommands::Register();
+
+	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("InputGlyphPS4"), TEXT("Preview Input Glyphs for PS4"), FConsoleCommandDelegate::CreateLambda([]() {
+			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>()) {
+				Subsystem->SetControllerOverrideType(EModioUIInputMode::Playstation);
+			}
+		})));
+	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("InputGlyphXBox"), TEXT("Preview Input Glyphs for XBox"), FConsoleCommandDelegate::CreateLambda([]() {
+			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			{
+				Subsystem->SetControllerOverrideType(EModioUIInputMode::XBox);
+			}
+		})));
+	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("InputGlyphSwitch"), TEXT("Preview Input Glyphs for Switch"), FConsoleCommandDelegate::CreateLambda([]() {
+			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			{
+				Subsystem->SetControllerOverrideType(EModioUIInputMode::NintendoSwitch);
+			}
+		})));
+	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("InputGlyphClear"), TEXT("Clear Preview Input Glyph Override"), FConsoleCommandDelegate::CreateLambda([]() {
+			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			{
+				Subsystem->ClearControllerOverride();
+			}
+		})));
 }
 
 void FModioUIModule::ShutdownModule()
 {
 	FModioCommonUICommands::Unregister();
+
+	for (IConsoleCommand* Command : ConsoleCommands) {
+		if (Command) {
+			IConsoleManager::Get().UnregisterConsoleObject(Command);
+		}
+	}
+	ConsoleCommands.Empty();
 }
 
 #undef LOCTEXT_NAMESPACE

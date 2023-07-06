@@ -10,9 +10,14 @@
 
 #include "Libraries/ModioCreateModLibrary.h"
 
-void UModioCreateModLibrary::SetInitialVisibility(FModioCreateModParams& In, bool InitialVisibility)
+void UModioCreateModLibrary::SetInitialVisibility_DEPRECATED(FModioCreateModParams& In, bool InitialVisibility)
 {
-	In.bVisible = InitialVisibility;
+	In.bVisible_DEPRECATED = InitialVisibility;
+}
+
+void UModioCreateModLibrary::SetInitialVisibility(FModioCreateModParams& In, EModioObjectVisibilityFlags InitialVisibility)
+{
+	In.Visibility = (uint8)InitialVisibility;
 }
 
 void UModioCreateModLibrary::SetDescription(FModioCreateModParams& In, FString Description)

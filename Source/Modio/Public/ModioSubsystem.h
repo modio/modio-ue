@@ -440,7 +440,7 @@ public:
 	 * @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
 	 * values. Fields left empty on the Params object will not be updated.
 	 * @param Mod The ID of the mod you wish to edit
-	 * @params Params Descriptor containing the fields that should be altered.
+	 * @param Params Descriptor containing the fields that should be altered.
 	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
 	 * object if the edits were performed successfully
 	 * @requires initialized-sdk
@@ -1061,7 +1061,7 @@ public:
 	 * @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
 	 * values. Fields left empty on the Params object will not be updated.
 	 * @param Mod The ID of the mod you wish to edit
-	 * @params Params Descriptor containing the fields that should be altered.
+	 * @param Params Descriptor containing the fields that should be altered.
 	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
 	 * object if the edits were performed successfully
 	 * @requires initialized-sdk

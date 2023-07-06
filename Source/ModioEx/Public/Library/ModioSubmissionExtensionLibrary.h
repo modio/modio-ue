@@ -72,5 +72,61 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "LoadModFileToMemory", Category = "mod.io|Mods")
 	static MODIOEX_API bool K2_LoadModFileToMemory(UModioSubsystem* Target, FModioModID ModId, TArray<uint8>& ModData);
 
-	
+	/**
+	 * @brief Submit a new mod, with its logo data coming from an in-memory buffer rather than a file.
+	 * @param Handle Mod creation handle
+	 * @param Params Parameters to use when creating the mod
+	 * @param PngData In-memory buffer, representative of a PNG file to be used for upload
+	 * @param Callback Callback once operation has completed
+	 */
+	static MODIOEX_API void SubmitNewModFromMemoryAsync(FModioModCreationHandle Handle, FModioCreateModParams Params, TArray<uint8> PngData, FOnSubmitNewModDelegateFast Callback);
+
+	/**
+	 * @brief Submit a new mod, with its logo data coming from an in-memory buffer rather than a file.
+	 * @param Handle Mod creation handle
+	 * @param Params Parameters to use when creating the mod
+	 * @param PngData In-memory buffer, representative of a PNG file to be used for upload
+	 * @param Callback Callback once operation has completed
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModFromMemoryAsync", Category = "mod.io|Mods")
+	static MODIOEX_API void K2_SubmitNewModFromMemoryAsync(FModioModCreationHandle Handle, FModioCreateModParams Params, TArray<uint8> PngData, FOnSubmitNewModDelegate Callback);
+
+	/**
+	 * @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in,
+	 * values. Fields left empty on the Params object will not be updated. This method also accepts a Png binary file
+	 * for uploading a new logo.
+	 * @param Mod The ID of the mod you wish to edit
+	 * @param Params Descriptor containing the fields that should be altered.
+	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
+	 * object if the edits were performed successfully
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	MODIOEX_API void SubmitModChangesFromMemoryAsync(FModioModID Mod, FModioEditModParams Params, TArray<uint8> PngData,
+													 FOnGetModInfoDelegateFast Callback);
+
+	/**
+	 * @brief Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in
+	 * values. Fields left empty on the Params object will not be updated. This method also accepts a Png binary file
+	 * for uploading a new logo.
+	 * @param Mod The ID of the mod you wish to edit
+	 * @param Params Descriptor containing the fields that should be altered.
+	 *
+	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
+	 * object if the edits were performed successfully
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModChangesAsync", Category = "mod.io|Mods|Editing")
+	MODIOEX_API void K2_SubmitModChangesFromMemoryAsync(FModioModID Mod, FModioEditModParams Params, TArray<uint8> PngData, FOnGetModInfoDelegate Callback);
 };

@@ -24,7 +24,8 @@ public class ModioEx : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-			}
+                "Modio"
+            }
 			);
 
 	}

@@ -36,7 +36,7 @@ bool FModioUIInputProcessor::ShouldEmitDeviceChangeEventsForKeyEvent(const FKeyE
 
 void FModioUIInputProcessor::SetControllerOverrideType(EModioUIInputMode Override)
 {
-	if (Override == EModioUIInputMode::Playstation || Override == EModioUIInputMode::XBox)
+	if (Override == EModioUIInputMode::Playstation || Override == EModioUIInputMode::XBox || Override == EModioUIInputMode::NintendoSwitch)
 	{
 		CurrentControllerTypeOverride = Override;
 	}
@@ -44,4 +44,9 @@ void FModioUIInputProcessor::SetControllerOverrideType(EModioUIInputMode Overrid
 	{
 		CurrentControllerTypeOverride.Reset();
 	}
+}
+
+void FModioUIInputProcessor::ClearControllerOverride()
+{
+	CurrentControllerTypeOverride.Reset();
 }

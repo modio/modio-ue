@@ -28,6 +28,19 @@ namespace Modio
 * Enumeration that represent mature content for the mod to create
 **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EModioObjectVisibilityFlags : uint8
+{
+	/** Mod is concealed from users **/
+	Hidden = 0,
+	
+	/** Mod is openly available **/
+	Public = 1
+};
+
+/**
+* Enumeration that represent mature content for the mod to create
+**/
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioMaturityFlags : uint8
 {
 	/** No maturity **/
@@ -113,9 +126,18 @@ struct MODIO_API FModioModInfo
 	UPROPERTY(BlueprintReadOnly, Category = "Profile")
 	EModioMaturityFlags ProfileMaturityOption {};
 
-	/** @brief Is the mod marked as visible? */
+	/** @brief Is the mod marked as visible? 
+ 	* @deprecated Use Visibility property instead
+	*/
+	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.6 release. Please use the <<Visibility>> instead."))
+	bool bVisible_DEPRECATED {};
+	
+	/**
+	* @brief Enum parameter to signal the backend if the mod to upload would be publicly visible.  
+    * Default value is Public
+	**/
 	UPROPERTY(BlueprintReadOnly, Category = "Profile")
-	bool bVisible {};
+	EModioObjectVisibilityFlags Visibility {};
 
 	/**
 	* Stored property to the metadata string
