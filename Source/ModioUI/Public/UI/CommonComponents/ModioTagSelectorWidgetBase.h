@@ -22,31 +22,43 @@ class UModioTagSelectorWidgetBase : public UModioUserWidgetBase, public IUserObj
 	GENERATED_BODY()
 
 protected:
-	virtual void NativeOnInitialized() override;
-
-	// We need to support multiple selection so we ignore the parameter, we'll manually get the list of selected items
-	// in this function
-	virtual void OnTagSelectionChanged(TSharedPtr<FString>);
-
-	TArray<TSharedPtr<FString>> TagListItemSource;
-
+	
+	bool bCategoryCollapsed = false;
 	int32 CurrentTagIndex;
 
+	UPROPERTY()
+	class UModioTagInfoUI* CachedTagInfo;
+
 	virtual void NativeOnSetDataSource() override;
+	virtual void NativeOnInitialized() override;
 
 	void Refresh();
 
-	void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+	UFUNCTION()
+	void OnCheckboxChecked(class UModioSelectableTag* SourceTag, bool bIsChecked);
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* TagCategoryLabel;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	UModioListViewString* CategoryTagList;
+	class UModioButton* TagCategoryCollapseButton;
 
-	UFUNCTION(BlueprintCallable, Category = "ModioTagSelectorWidgetBase")
-	TArray<FString> GetSelectedTags();
-	UFUNCTION(BlueprintCallable, Category = "ModioTagSelectorWidgetBase")
-	void ClearSelectedTags();
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	class UModioImage* TagCategoryCollapseImage;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	class UModioInputBindingImage* TagCategoryInputHint;
+
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* CategoryVerticalBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UModioSelectableTag> TagWidgetTemplate;
+
+	void ToggleKeybindVisibility(bool bActive);
+	bool IsCollapsed();
+
+	UFUNCTION()
+	void OnCategoryCollapseToggled();
 };

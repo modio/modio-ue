@@ -52,7 +52,7 @@ protected:
 	virtual void NativeRequestOperationRetry() override;
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual void NativeOnAuthenticationChanged(TOptional<FModioUser> User);
-
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	UFUNCTION()
 	void RateUpClicked();
 	UFUNCTION()
@@ -156,11 +156,6 @@ protected:
 	
 	FTimerHandle SetFocusTimerHandle;
 
-	UPROPERTY()
-	TArray<UWidget*> ScrollableWidgets;
-
-	void FillScrollableWidgetsArray();
-
 	int CurrentIndex = 0;
 
 	UFUNCTION()
@@ -177,5 +172,15 @@ public:
 	* Display the mod details for a corresponding ModID
 	* @param ID The ModID to bring forward
 	**/
+
+	// Defines the speed of which you can scroll the mod description with
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	int ControllerScrollingMultiplier = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	float ScrollingSpeed = 10.0f;
+
+	bool bIsScrolling = false;
+
 	void ShowDetailsForMod(FModioModID ID);
 };

@@ -11,26 +11,29 @@
 #include "UI/CommonComponents/ModioTagListWidgetBase.h"
 #include "UI/CommonComponents/ModioTagSelectorWidgetBase.h"
 #include "UI/CommonComponents/ModioTagList.h"
+#include "Components/ScrollBox.h"
+#include "Components/VerticalBox.h"
 #include "Core/ModioTagOptionsUI.h"
 #include "TimerManager.h"
+#include "Engine.h"
 #include "UI/CommonComponents/ModioSelectableTag.h"
 
 void UModioTagListWidgetBase::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
-	if (TagSelectorList)
+	for (auto& widget : SelectorListScrollBox->GetAllChildren())
 	{
-		if (UModioTagOptionsUI* TagOptions = Cast<UModioTagOptionsUI>(DataSource))
-		{
-			TagSelectorList->SetListItems(TagOptions->GetTagCategoriesForUI());
-			TagSelectorList->SetScrollOffset(0);	
-			TagSelectorList->SetSelectionMode(ESelectionMode::Single);
+		SelectorListScrollBox->RemoveChild(widget);
+	}
 
-			if (GetWorld())
-			{
-				GetWorld()->GetTimerManager().SetTimerForNextTick(
-					[TagSelectorList = this->TagSelectorList]() { TagSelectorList->RequestRefresh(); });
-			}
+	if (UModioTagOptionsUI* TagOptions = Cast<UModioTagOptionsUI>(DataSource))
+	{
+		for (auto& item : TagOptions->GetTagCategoriesForUI())
+		{
+			UModioTagSelectorWidgetBase* widget =
+				CreateWidget<UModioTagSelectorWidgetBase>(this, TagSelectorListTemplate);
+			SelectorListScrollBox->AddChild(widget);
+			widget->SetDataSource(item);
 		}
 	}
 	InvalidateLayoutAndVolatility();
@@ -50,7 +53,7 @@ void UModioTagListWidgetBase::NativeTick(const FGeometry& MyGeometry, float InDe
 TArray<FString> UModioTagListWidgetBase::GetSelectedTags()
 {
 	TArray<FString> CombinedSelectedTags;
-	for (auto& widget : TagSelectorList->GetDisplayedEntryWidgets())
+	for (auto& widget : SelectorListScrollBox->GetAllChildren())
 	{
 		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(widget);
 		if (!tagSelector)
@@ -58,22 +61,14 @@ TArray<FString> UModioTagListWidgetBase::GetSelectedTags()
 			continue;
 		}
 
-		for (auto& item : tagSelector->CategoryTagList->GetDisplayedEntryWidgets())
+		for (auto& item : tagSelector->CategoryVerticalBox->GetAllChildren())
 		{
 			UModioSelectableTag* tag = Cast<UModioSelectableTag>(item);
 			if (tag && tag->IsCheckboxChecked())
 			{
-				CombinedSelectedTags.Add(tag->GetTagString());
+				CombinedSelectedTags.Add(tag->SearchString);
 			}
 		}
-		
-	}
-
-	int index = 0;
-	for (auto& tag : CombinedSelectedTags) 
-	{
-		GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Blue, *tag);
-		index++;
 	}
 	
 	return CombinedSelectedTags;
@@ -87,21 +82,23 @@ void UModioTagListWidgetBase::ClearSelectedTags()
 		{
 			TagInfo->SelectedTagValues.Empty();
 		}
-		if (TagSelectorList)
+		for (auto& widget : SelectorListScrollBox->GetAllChildren())
 		{
-			for (auto& widget : TagSelectorList->GetDisplayedEntryWidgets())
+			UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(widget);
+			if (!tagSelector)
 			{
-				UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(widget);
-				if (!tagSelector)
-				{
-					continue;
-				}
+				continue;
+			}
 
-				for (auto& item : tagSelector->CategoryTagList->GetDisplayedEntryWidgets())
-				{
-					UModioSelectableTag* tag = Cast<UModioSelectableTag>(item);
-					tag->TagSelectedCheckbox->SetCheckedState(ECheckBoxState::Unchecked);
-				}
+			if (tagSelector->IsCollapsed())
+			{
+				tagSelector->OnCategoryCollapseToggled();
+			}
+
+			for (auto& item : tagSelector->CategoryVerticalBox->GetAllChildren())
+			{
+				UModioSelectableTag* tag = Cast<UModioSelectableTag>(item);
+				tag->TagSelectedCheckbox->SetCheckedState(ECheckBoxState::Unchecked);
 			}
 		}
 	}

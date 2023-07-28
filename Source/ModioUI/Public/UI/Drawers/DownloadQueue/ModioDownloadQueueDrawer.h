@@ -59,6 +59,13 @@ protected:
 			CurrentOpProgress->OperationCompletedDelegate().BindDynamic(
 				this, &UModioDownloadQueueDrawer::HandleOperationCompleted);
 		}
+
+		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (IsValid(Subsystem))
+		{
+			Subsystem->OnSubscriptionStatusChanged.AddUObject(
+				this, &UModioDownloadQueueDrawer::OnSubsricptionChanged);
+		}
 		UModioUserWidgetBase::NativeOnInitialized();
 	}
 
@@ -166,6 +173,15 @@ protected:
 		RefreshOperationQueue();
 	}
 
+	UFUNCTION()
+	void OnSubsricptionChanged(FModioModID ID, bool Subscribed)
+	{
+		if (LogOutButton)
+		{
+			LogOutButton->SetKeyboardFocus();
+		}
+	}
+
 	TArray<UModioModInfoUI*> PendingDownloads;
 	TArray<UModioModInfoUI*> CompletedDownloads;
 
@@ -227,10 +243,13 @@ protected:
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override 
 	{
+		UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+
 		RefreshOperationQueue();
 		ConstructNavigationPath();
 		CurrentNavIndex = 0;
-		if (NavigationPath.IsValidIndex(CurrentNavIndex))
+
+		if (NavigationPath.IsValidIndex(CurrentNavIndex) && IsValid(UISubsystem) && !(UISubsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 		{
 			NavigationPath[CurrentNavIndex]->SetFocus();
 		}
@@ -377,6 +396,5 @@ public:
 				});
 			CompletedQueue->UpdateListItems(CompletedDownloads);
 		}
-
 	}
 };

@@ -20,8 +20,8 @@
 #include "IModioUIMediaDownloadCompletedReceiver.generated.h"
 
 /**
-* Enumerator with different events when an image is downloaded
-**/
+ * Enumerator with different events when an image is downloaded
+ **/
 UENUM(meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioUIMediaDownloadEventType : uint8
 {
@@ -47,9 +47,9 @@ class MODIOUI_API UModioUIMediaDownloadCompletedReceiver : public UInterface
 // methods interact with the blueprintimplementable ones etc
 
 /**
-* Modio UI element that keeps track of completed image download operations (logo, gallery or avatar). 
-* Subclass of IInterface
-**/
+ * Modio UI element that keeps track of completed image download operations (logo, gallery or avatar).
+ * Subclass of IInterface
+ **/
 class MODIOUI_API IModioUIMediaDownloadCompletedReceiver : public IInterface
 {
 	GENERATED_BODY()
@@ -58,7 +58,8 @@ class MODIOUI_API IModioUIMediaDownloadCompletedReceiver : public IInterface
 
 	void GalleryImageDownloadHandler(FModioModID ModID, FModioErrorCode ec, int32 Index,
 									 TOptional<FModioImageWrapper> Image);
-	void ModLogoDownloadHandler(FModioModID ModID, FModioErrorCode ec, TOptional<FModioImageWrapper> Image);
+	void ModLogoDownloadHandler(FModioModID ModID, FModioErrorCode ec, TOptional<FModioImageWrapper> Image,
+								EModioLogoSize LogoSize);
 
 	void CreatorAvatarDownloadHandler(FModioModID ModID, FModioErrorCode ec, TOptional<FModioImageWrapper> Image);
 
@@ -90,7 +91,7 @@ protected:
 	}
 
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-												  TOptional<FModioImageWrapper> Image);
+												  TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize);
 	virtual void NativeOnModGalleryImageDownloadCompleted(FModioModID ModID, FModioErrorCode ec, int32 ImageIndex,
 														  TOptional<FModioImageWrapper> Image);
 	virtual void NativeOnModCreatorAvatarDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
@@ -101,7 +102,7 @@ protected:
 											FModioOptionalImage Image);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec, FModioOptionalImage Image);
+	void OnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec, FModioOptionalImage Image, EModioLogoSize LogoSize);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnModCreatorAvatarDownloadCompleted(FModioModID ModID, FModioErrorCode ec, FModioOptionalImage Image);

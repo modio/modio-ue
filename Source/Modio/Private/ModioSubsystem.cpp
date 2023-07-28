@@ -57,6 +57,21 @@ void UModioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		UE_LOG(LogModio, Display, TEXT("Setting log level to %d"), (int32) Settings->LogLevel);
 	}
 	ImageCache = MakeUnique<FModioImageCache>();
+
+	LanguageMap.Add(TEXT("en"), EModioLanguage::English);
+	LanguageMap.Add(TEXT("bg"), EModioLanguage::Bulgarian);
+	LanguageMap.Add(TEXT("fr"), EModioLanguage::French);
+	LanguageMap.Add(TEXT("de"), EModioLanguage::German);
+	LanguageMap.Add(TEXT("it"), EModioLanguage::Italian);
+	LanguageMap.Add(TEXT("pl"), EModioLanguage::Polish);
+	LanguageMap.Add(TEXT("pt"), EModioLanguage::Portuguese);
+	LanguageMap.Add(TEXT("hu"), EModioLanguage::Hungarian);
+	LanguageMap.Add(TEXT("ja"), EModioLanguage::Japanese);
+	LanguageMap.Add(TEXT("ko"), EModioLanguage::Korean);
+	LanguageMap.Add(TEXT("ru"), EModioLanguage::Russian);
+	LanguageMap.Add(TEXT("es"), EModioLanguage::Spanish);
+	LanguageMap.Add(TEXT("th"), EModioLanguage::Thai);
+	LanguageMap.Add(TEXT("zh"), EModioLanguage::ChineseSimplified);
 }
 
 void UModioSubsystem::Deinitialize()
@@ -810,6 +825,20 @@ void UModioSubsystem::K2_GetMutedUsersAsync(FOnMuteUsersDelegate Callback)
 		FOnMuteUsersDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioUserList> Dependencies) {
 			Callback.ExecuteIfBound(ec, FModioOptionalUserList(MoveTempIfPossible(Dependencies)));
 		}));
+}
+
+EModioLanguage UModioSubsystem::ConvertLanguageCodeToModio(FString LanguageCode)
+{
+	if (LanguageMap.Contains(LanguageCode))
+	{
+		return LanguageMap[LanguageCode];
+	}
+	else
+	{
+		UE_LOG(LogModio, Log, TEXT("Language code %s does not correspond to a valid EModioLanguage value"),
+			   *LanguageCode);
+		return EModioLanguage::English;
+	}
 }
 
 /// File scope implementations

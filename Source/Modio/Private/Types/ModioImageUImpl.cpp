@@ -23,11 +23,19 @@
 #include "Modules/ModuleManager.h"
 #include "RenderingThread.h"
 
+#if UE_VERSION_NEWER_THAN(5,2,0)
+	#include "TextureResource.h"
+	#define MODIO_UE_TEXTURE_RESOURCE_TYPE FTextureResource
+#else 
+	#define MODIO_UE_TEXTURE_RESOURCE_TYPE FTexture2DDynamicResource
+#endif
+
 #if !UE_SERVER
 static TOptional<TArray<uint8>> GetImageData(TSharedPtr<IImageWrapper> ImageWrapper, ERGBFormat InFormat);
 static ERGBFormat GetDesiredErgbFormat();
 
-static void WriteRawToTexture_RenderThread(FTexture2DDynamicResource* TextureResource, const TArray<uint8>& RawData,
+static void WriteRawToTexture_RenderThread(MODIO_UE_TEXTURE_RESOURCE_TYPE* TextureResource,
+										   const TArray<uint8>& RawData,
 										   bool bUseSRGB = true);
 #endif
 
@@ -134,11 +142,11 @@ void FModioImageWrapper::LoadAsync(FOnLoadImageDelegateFast Callback) const
 
 					Texture->UpdateResource();
 	#if UE_VERSION_NEWER_THAN(5, 0, 0)
-					FTexture2DDynamicResource* TextureResource =
-						static_cast<FTexture2DDynamicResource*>(Texture->GetResource());
+					MODIO_UE_TEXTURE_RESOURCE_TYPE* TextureResource =
+						static_cast<MODIO_UE_TEXTURE_RESOURCE_TYPE*>(Texture->GetResource());
 	#else
-					FTexture2DDynamicResource* TextureResource =
-						static_cast<FTexture2DDynamicResource*>(Texture->Resource);
+					MODIO_UE_TEXTURE_RESOURCE_TYPE* TextureResource =
+						static_cast<MODIO_UE_TEXTURE_RESOURCE_TYPE*>(Texture->Resource);
 	#endif
 					ENQUEUE_RENDER_COMMAND(FWriteRawDataToTexture)
 					([TextureResource,
@@ -156,7 +164,7 @@ void FModioImageWrapper::LoadAsync(FOnLoadImageDelegateFast Callback) const
 }
 
 #if !UE_SERVER
-void WriteRawToTexture_RenderThread(FTexture2DDynamicResource* TextureResource, const TArray<uint8>& RawData,
+void WriteRawToTexture_RenderThread(MODIO_UE_TEXTURE_RESOURCE_TYPE* TextureResource, const TArray<uint8>& RawData,
 									bool bUseSRGB)
 {
 	check(IsInRenderingThread());

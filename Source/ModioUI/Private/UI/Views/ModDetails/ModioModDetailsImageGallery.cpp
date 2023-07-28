@@ -137,9 +137,9 @@ void UModioModDetailsImageGallery::NativeOnSetDataSource()
 }
 
 void UModioModDetailsImageGallery::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-																	TOptional<FModioImageWrapper> Image)
+																	TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize)
 {
-	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image);
+	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image, LogoSize);
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 
 	if (DataSource && ModInfo && ModInfo->Underlying.NumGalleryImages == 0)

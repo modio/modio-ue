@@ -19,6 +19,8 @@
 #include "ModioSubsystem.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioModCollectionEntry.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
 #include "UI/Views/SearchResults/ModioSearchResultsView.h"
 
 void UModioCollectionView::NativeOnInitialized()
@@ -73,6 +75,7 @@ void UModioCollectionView::NativeOnInitialized()
 
 		SortBy->SetComboBoxEntries(MenuEntries);
 	}
+
 	IModioUISubscriptionsChangedReceiver::Register<UModioCollectionView>();
 	IModioUIModManagementEventReceiver::Register<UModioCollectionView>();
 }
@@ -124,12 +127,6 @@ void UModioCollectionView::UpdateCachedCollection()
 						});
 		CollectionList->SetListItems(CachedCollection);
 		CollectionList->RegenerateAllEntries();
-
-		if (CollectionCount)
-		{
-			FString Count = FString::Printf(TEXT("(%d)"), CachedCollection.Num());
-			CollectionCount->SetText(FText::FromString(Count));
-		}
 	}
 }
 
@@ -180,6 +177,7 @@ void UModioCollectionView::ApplyFiltersToCollection()
 	{
 		SortAToZ();
 	}
+	UpdateModCount();
 }
 
 void UModioCollectionView::NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState)
@@ -279,6 +277,25 @@ void UModioCollectionView::OnModGroupChanged(FText SelectedItem, ESelectInfo::Ty
 	ApplyFiltersToCollection();
 }
 
+void UModioCollectionView::UpdateModCount()
+{
+	if (CollectionCount)
+	{
+		int numberOfVisibleMods = CollectionList->GetNumItems();
+		for (auto& item : CollectionList->GetListItems())
+		{
+			UModioModCollectionEntryUI* entry = Cast<UModioModCollectionEntryUI>(item);
+			if (entry->Underlying.GetModState() != EModioModState::Installed &&
+				!entry->bCachedSubscriptionStatus)
+			{
+				numberOfVisibleMods--;
+			}
+		}
+		FString Count = FString::Printf(TEXT("(%d)"), numberOfVisibleMods);
+		CollectionCount->SetText(FText::FromString(Count));
+	}
+}
+
 void UModioCollectionView::ValidateAndSetFocus()
 {
 	if (CurrentNavIndex < CollectionList->GetNumItems() && CurrentNavIndex >= 0) 
@@ -289,20 +306,30 @@ void UModioCollectionView::ValidateAndSetFocus()
 	}
 	else
 	{
-		SearchInput->StartInput();
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(SearchInput, "StartInput");
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
 	}
 }
 
 FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	if (CollectionList->GetNumItems() > 0)
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+
+	if (CollectionList->GetNumItems() > 0 && IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		ValidateAndSetFocus();
 	}
+
 	else
 	{
-		SearchInput->StartInput();
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindUFunction(SearchInput, "StartInput");
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
 	}
+
 	return FReply::Handled();
 }
 

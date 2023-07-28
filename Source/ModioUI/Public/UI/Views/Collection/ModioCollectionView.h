@@ -117,6 +117,8 @@ protected:
 	UFUNCTION()
 	void OnModGroupChanged(FText SelectedItem, ESelectInfo::Type SelectionType);
 
+	void UpdateModCount();
+
 	void ValidateAndSetFocus();
 
 	bool bSearchInputFocused = false;

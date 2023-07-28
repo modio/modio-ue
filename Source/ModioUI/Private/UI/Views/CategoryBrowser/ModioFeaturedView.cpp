@@ -124,14 +124,22 @@ FNavigationReply UModioFeaturedView::NativeOnNavigation(const FGeometry& InGeome
 FReply UModioFeaturedView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-	if (UISubsystem && UISubsystem->GetCurrentFocusTarget())
+	if (IsValid(UISubsystem) && !(UISubsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
-		UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
+		if (UISubsystem->GetCurrentFocusTarget())
+		{
+			UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
+		}
+		else
+		{
+			SetFocusToPrimaryCategory();
+		}
 	}
 	else
 	{
-		SetFocusToPrimaryCategory();
+		PrimaryFeaturedCategory->SetFocus();
 	}
+
 	return FReply::Handled();
 }
 
@@ -198,7 +206,11 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 			if (ModioErrorWithRetryWidget)
 			{
 				bModsFound = false;
-				ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
+				UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+				if (IsValid(UISubsystem) && !(UISubsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+				{
+					ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
+				}
 			}
 		}
 	}

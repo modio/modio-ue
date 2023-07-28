@@ -149,9 +149,9 @@ void UModioDownloadQueueEntry::NativeOnFocusLost(const FFocusEvent& InFocusEvent
 }
 
 void UModioDownloadQueueEntry::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-																TOptional<FModioImageWrapper> Image)
+																TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize)
 {
-	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image);
+	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image, LogoSize);
 	if (ec)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s - %d"), *ec.GetErrorMessage(), ec.GetValue());

@@ -127,6 +127,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	bool bOverridePlatformMaterials = false;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Config, Category = "ModioLocalization")
+	TMap<FString, FText> LocalizedTags;
+
 	#if WITH_EDITOR
 	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override
 	{

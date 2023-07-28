@@ -231,6 +231,16 @@ This parameter simply references a material from the project - essentially a wra
 image::img/plugin_ui_roundedrectmaterial.png[]
 This parameter set specifies a dynamic material instance of the 'RoundedRectangle' named material. It sets the included parameters on the new material instance.
 
+==== Localization
+
+ModioUISettings has a Modio Localization category with an empty map. When the user has a working project setup and enters PIE, every tag and category that exist in the game project is gathered to this map as a key-value pair. Every time a localized tag is requested from ModioUISubsystem and a tag is not found from this list, a new pair will be added. Values can be edited and formatted freely as well as removed from localization as there might be some tags such as numbers that do not need to be localized.
+
+image::img/plugin_ui_empty_taglist.png[]
+An empty map can be found from project settings before entering PIE for the first time with a proper API key.
+
+image::img/plugin_ui_localized_tags.png[]
+This is how the localized tags list should look like after entering PIE. The map should contain all categories and tags. Map values are saved as FText and can be edited normally. Keys should be left untouched.
+
 === Known Issues
 
 This release of the UI contains some known issues that are currently being improved.

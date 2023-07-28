@@ -11,6 +11,7 @@
 #include "UI/Interfaces/IModioUIModEnableWidget.h"
 #include "Engine/Engine.h"
 #include "ModioUISubsystem.h"
+#include "Loc/BeginModioLocNamespace.h"
 
 void IModioUIModEnableWidget::ModEnabledStateChangedHandler(FModioModID ModID, bool bNewSubscriptionState)
 {
@@ -43,6 +44,11 @@ void IModioUIModEnableWidget::RequestModEnabledState(FModioModID ModID, bool bNe
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->RequestModEnabledState(ModID, bNewStateIsEnabled);
+		bool bSuccess = Subsystem->RequestModEnabledState(ModID, bNewStateIsEnabled) && bNewStateIsEnabled;
+		Subsystem->DisplayErrorNotificationManual(
+			bSuccess ? LOCTEXT("ModEnabled", "Mod enabled") : LOCTEXT("ModDisabled", "Mod disabled"),
+												  FText(), !bSuccess);
 	}
 }
+
+#include "Loc/EndModioLocNamespace.h"

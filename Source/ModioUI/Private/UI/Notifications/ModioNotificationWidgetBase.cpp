@@ -109,6 +109,68 @@ void UModioNotificationErrorWidgetBase::NativeConfigure(const FModioNotification
 	}
 }
 
+void UModioNotificationErrorWidgetBase::NativeConfigureManual(const FText& title, const FText& message, bool bIsError)
+{
+#if WITH_EDITORONLY_DATA
+	if (IsDesignTime())
+	{
+		bIsError = bPreviewAsError;
+	}
+#endif
+
+	NotificationTitle->SetText(title);
+	if (NotificationMessage)
+	{
+		NotificationMessage->SetText(message);
+		NotificationMessage->SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+	
+	ExpiryDuration = 1.0f;
+	if (const FModioNotificationStyle* ResolvedStyle = NotificationStyle.FindStyle<FModioNotificationStyle>())
+	{
+		if (StatusIndicator)
+		{
+			UMaterialInterface* GlyphMaterial = nullptr;
+			if (bIsError)
+			{
+				GlyphMaterial = ResolvedStyle->ErrorFailureGlyph.ResolveReference();
+			}
+			else
+			{
+				GlyphMaterial = ResolvedStyle->ErrorSuccessGlyph.ResolveReference();
+			}
+			if (GlyphMaterial)
+			{
+				StatusIndicator->SetBrushFromMaterial(GlyphMaterial);
+			}
+		}
+		if (StatusColorBackground)
+		{
+			if (UMaterialInterface* BackgroundMaterial = ResolvedStyle->BackgroundMaterial.ResolveReference())
+			{
+				UMaterialInstanceDynamic* NewMaterialInstance =
+					UMaterialInstanceDynamic::Create(BackgroundMaterial, this);
+
+				if (NewMaterialInstance)
+				{
+					if (bIsError)
+					{
+						NewMaterialInstance->SetVectorParameterValue(
+							FName("Color"), ResolvedStyle->ErrorColor.ResolveReference().GetSpecifiedColor());
+					}
+					else
+					{
+						NewMaterialInstance->SetVectorParameterValue(
+							FName("Color"), ResolvedStyle->SuccessColor.ResolveReference().GetSpecifiedColor());
+					}
+					StatusColorBackground->SetBrushFromMaterial(NewMaterialInstance);
+				}
+			}
+		}
+	}
+}
+
+
 void UModioNotificationErrorWidgetBase::NativeOnDisplay()
 {
 	bDisplayStarted = true;
@@ -141,6 +203,7 @@ void UModioNotificationWidgetBase::NativeConfigure(const FModioNotificationParam
 		ExpiryDuration = Params.Duration;
 	}
 }
+
 #if WITH_EDITOR
 void UModioNotificationWidgetBase::SynchronizeProperties()
 {

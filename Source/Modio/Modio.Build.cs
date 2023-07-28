@@ -313,6 +313,7 @@ public class Modio : ModuleRules
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/ext/httpparser/src"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/platform/interface"),
                 Path.Combine(ModuleDirectory,  "../ThirdParty/NativeSDK/modio"),
+                Path.Combine(ModuleDirectory,  "../ThirdParty/concurrentqueue"),
  
                 Path.Combine(GeneratedHeaderPath, "Private"),
                 Path.Combine(GeneratedHeaderPath, "Public")

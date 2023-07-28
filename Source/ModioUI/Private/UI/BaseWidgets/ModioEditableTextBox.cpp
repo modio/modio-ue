@@ -33,6 +33,7 @@ void UModioEditableTextBox::StartInput()
 		
 		FSlateApplication::Get().GeneratePathToWidgetUnchecked(MyEditableTextBlock.ToSharedRef(), WidgetToFocusPath);
 		FSlateApplication::Get().SetKeyboardFocus(WidgetToFocusPath, EFocusCause::SetDirectly);
+
 		if (!WidgetToFocusPath.IsValid()) 
 		{
 			return;
@@ -88,6 +89,7 @@ TSharedRef<SWidget> UModioEditableTextBox::RebuildWidget()
 			[
 				SAssignNew(MyEditableTextBlock, SEditableTextBox)
 				.OnKeyDownHandler_UObject(this, &UModioEditableTextBox::OnKeyDownHandler)
+				.OnTextChanged_UObject(this, &UModioEditableTextBox::ClampMaxCharacters)
 			]
 		]
 	];
@@ -212,6 +214,17 @@ FReply UModioEditableTextBox::OnKeyDownHandler(const FGeometry& MyGeometry, cons
 		return FReply::Unhandled();
 	}
 	return FReply::Unhandled();
+}
+
+void UModioEditableTextBox::ClampMaxCharacters(const FText& InText)
+{
+	if (MaxCharacters > 0)
+	{
+		if (GetText().ToString().Len() > MaxCharacters)
+		{
+			SetText(FText::FromString(GetText().ToString().Left(MaxCharacters)));
+		}
+	}
 }
 
 TSharedPtr<SEditableTextBox> UModioEditableTextBox::GetMyEditableTextBlock()

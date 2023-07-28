@@ -13,6 +13,11 @@
 #include "UI/CommonComponents/ModioSelectableTag.h"
 #include "UI/BaseWidgets/ModioGridPanel.h"
 #include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Components/ScrollBox.h"
+#include "Components/VerticalBox.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
 #include "Types/ModioFilterParams.h"
 
 void UModioRefineSearchDrawer::NativeOnInitialized()
@@ -26,14 +31,26 @@ void UModioRefineSearchDrawer::NativeOnInitialized()
 	{
 		ClearButton->OnClicked.AddDynamic(this, &UModioRefineSearchDrawer::OnClearClicked);
 	}
+	if (SearchInput)
+	{
+		SearchInput->MaxCharacters = MaxCharacterAmount;
+	}
 
 	UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UISubsystem->OnInputDeviceChanged.AddUObject(this, &UModioRefineSearchDrawer::OnInputDeviceChanged);
 }
 
 FReply UModioRefineSearchDrawer::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	ConstructNavigationPath();
-	ValidateAndSetFocus();
+	BindCollapseButtons();
+
+	FTimerHandle TimerHandle;
+	FTimerDelegate TimerDelegate;
+
+	TimerDelegate.BindUFunction(SearchInput, "StartInput");
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
+
 	return FReply::Handled();
 }
 
@@ -46,9 +63,9 @@ void UModioRefineSearchDrawer::ConstructNavigationPath()
 	// Suppose we should not use it anywhere since the results are rather random 
 
 	TArray<UUserWidget*> widgets;
-	for (auto& item : TagSelector->TagSelectorList->GetListItems())
+	for (auto& item : TagSelector->SelectorListScrollBox->GetAllChildren())
 	{
-		widgets.Add(TagSelector->TagSelectorList->GetEntryWidgetFromItem(item));
+		widgets.Add(Cast<UUserWidget>(item));
 	}
 
 	for (auto& item : widgets) 
@@ -59,14 +76,19 @@ void UModioRefineSearchDrawer::ConstructNavigationPath()
 			continue;
 		}
 
-		for (auto& stringItem : tagSelector->CategoryTagList->GetListItems())
+		NavigationPath.Add(tagSelector->TagCategoryCollapseButton);
+
+		if (tagSelector->CategoryVerticalBox->GetVisibility() != ESlateVisibility::Collapsed)
 		{
-			UModioSelectableTag* tag = Cast<UModioSelectableTag>(tagSelector->CategoryTagList->GetEntryWidgetFromItem(stringItem));
-			if (!tag) 
+			for (auto& widget : tagSelector->CategoryVerticalBox->GetAllChildren())
 			{
-				continue;
+				UModioSelectableTag* tag = Cast<UModioSelectableTag>(widget);
+				if (!tag)
+				{
+					continue;
+				}
+				NavigationPath.Add(tag->TagSelectedCheckbox);
 			}
-			NavigationPath.Add(tag->TagSelectedCheckbox);
 		}
 	}
 
@@ -74,21 +96,49 @@ void UModioRefineSearchDrawer::ConstructNavigationPath()
 	NavigationPath.Add(ClearButton);
 }
 
+void UModioRefineSearchDrawer::BindCollapseButtons()
+{
+	TArray<UUserWidget*> widgets;
+	for (auto& item : TagSelector->SelectorListScrollBox->GetAllChildren())
+	{
+		widgets.Add(Cast<UUserWidget>(item));
+	}
+
+	for (auto& item : widgets)
+	{
+		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
+		if (!tagSelector)
+		{
+			continue;
+		}
+
+		tagSelector->TagCategoryCollapseButton->OnClicked.AddUniqueDynamic(this, &UModioRefineSearchDrawer::ConstructNavigationPath);
+	}
+}
+
 void UModioRefineSearchDrawer::ValidateAndSetFocus() 
 {
 	if (NavigationPath.IsValidIndex(CurrentNavIndex))
 	{
-		if (!NavigationPath[CurrentNavIndex]->TakeWidget()->SupportsKeyboardFocus()) 
+		if (!NavigationPath[CurrentNavIndex]->TakeWidget()->SupportsKeyboardFocus())
 		{
 			SearchInput->StartInput();
 			return;
 		}
+
 		NavigationPath[CurrentNavIndex]->SetFocus();
 		
 		TArray<UUserWidget*> widgets;
-		for (auto& item : TagSelector->TagSelectorList->GetListItems())
+		for (auto& item : TagSelector->SelectorListScrollBox->GetAllChildren())
 		{
-			widgets.Add(TagSelector->TagSelectorList->GetEntryWidgetFromItem(item));
+			widgets.Add(Cast<UUserWidget>(item));
+
+			UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
+			if (tagSelector)
+			{
+				tagSelector->ToggleKeybindVisibility(false);
+				CurrentActiveTagSelector = nullptr;
+			}
 		}
 
 		// NavPath widgets are not indexes of TagSelector list. TagSelector contains multiple lists so scrollindex is calculated with these in mind
@@ -105,7 +155,11 @@ void UModioRefineSearchDrawer::ValidateAndSetFocus()
 			if (tagSelector->HasFocusedDescendants())
 			{
 				TagSelector->CategoryTextBlock->SetText(tagSelector->TagCategoryLabel->GetText());
-				TagSelector->TagSelectorList->SetScrollOffset(itemIndex);
+				//TagSelector->TagSelectorList->SetScrollOffset(itemIndex);
+				TagSelector->SelectorListScrollBox->ScrollWidgetIntoView(item, true,
+																		 EDescendantScrollDestination::IntoView);
+				tagSelector->ToggleKeybindVisibility(true);
+				CurrentActiveTagSelector = tagSelector;
 				break;
 			}
 			itemIndex++;
@@ -113,8 +167,21 @@ void UModioRefineSearchDrawer::ValidateAndSetFocus()
 	}
 }
 
+void UModioRefineSearchDrawer::OnCollapse()
+{
+	if (IsValid(CurrentActiveTagSelector))
+	{
+		CurrentActiveTagSelector->OnCategoryCollapseToggled();
+	}
+}
+
 void UModioRefineSearchDrawer::OnClearClicked()
 {
+	if (GEngine->GetEngineSubsystem<UModioUISubsystem>()->GetLastInputDevice() == EModioUIInputMode::Mouse)
+	{
+		SetFocus();
+	}
+
 	if (TagSelector)
 	{
 		TagSelector->ClearSelectedTags();
@@ -231,7 +298,7 @@ void UModioRefineSearchDrawer::CategoryNav(bool bMoveForward)
 {
 	int currentCategoryIndex = 0;
 	bool bCategoryHasSelection = false;
-	for (auto& item : TagSelector->TagSelectorList->GetDisplayedEntryWidgets())
+	for (auto& item : TagSelector->SelectorListScrollBox->GetAllChildren())
 	{
 		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
 		if (!tagSelector)
@@ -252,19 +319,25 @@ void UModioRefineSearchDrawer::CategoryNav(bool bMoveForward)
 		currentCategoryIndex = 0;
 	}
 	currentCategoryIndex += bMoveForward ? 1 : -1;
-	if (TagSelector->TagSelectorList->GetDisplayedEntryWidgets().IsValidIndex(bCategoryHasSelection ? currentCategoryIndex : 0))
+	if (TagSelector->SelectorListScrollBox->GetAllChildren().IsValidIndex(bCategoryHasSelection ? currentCategoryIndex
+																								: 0))
 	{
 		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(
-			TagSelector->TagSelectorList->GetDisplayedEntryWidgets()[bCategoryHasSelection ? currentCategoryIndex : 0]);
-		if (tagSelector->CategoryTagList->GetDisplayedEntryWidgets().IsValidIndex(0))
+			TagSelector->SelectorListScrollBox->GetAllChildren()[bCategoryHasSelection ? currentCategoryIndex : 0]);
+		if (tagSelector->CategoryVerticalBox->GetAllChildren().IsValidIndex(0) && !tagSelector->IsCollapsed())
 		{
 			UModioSelectableTag* tag =
-				Cast<UModioSelectableTag>(tagSelector->CategoryTagList->GetDisplayedEntryWidgets()[0]);
+				Cast<UModioSelectableTag>(tagSelector->CategoryVerticalBox->GetAllChildren()[0]);
 			if (!tag)
 			{
 				return;
 			}
 			NavigationPath.Find(tag->TagSelectedCheckbox, CurrentNavIndex);
+			ValidateAndSetFocus();
+		}
+		else if (tagSelector->IsCollapsed())
+		{
+			NavigationPath.Find(tagSelector->TagCategoryCollapseButton, CurrentNavIndex);
 			ValidateAndSetFocus();
 		}
 	}
@@ -284,13 +357,26 @@ void UModioRefineSearchDrawer::BuildCommandList(TSharedRef<FUICommandList> InCom
 	InCommandList->MapAction(
 		FModioCommonUICommands::Get().MoreOptions,
 		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnClearClicked)));
+	InCommandList->MapAction(FModioCommonUICommands::Get().Collapse,
+		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnCollapse)));
 }
 
 FString UModioRefineSearchDrawer::NativeGetSearchString()
 {
 	if (SearchInput)
 	{
-		return SearchInput->GetText().ToString();
+		// return empty string if there are only spaces
+		FString testString = SearchInput->GetText().ToString();
+		testString.RemoveSpacesInline();
+		if (testString.IsEmpty())
+		{
+			return FString();
+		}
+
+		// remove spaces at the beginning
+		FString parsedString = SearchInput->GetText().ToString();
+		while (parsedString.RemoveFromStart(" "));
+		return parsedString;
 	}
 	return FString();
 }
@@ -337,4 +423,12 @@ void UModioRefineSearchDrawer::NativeRefreshTags()
 FOnSearchSettingsChanged& UModioRefineSearchDrawer::NativeGetOnSettingsChangedDelegate()
 {
 	return OnSettingsChanged;
+}
+
+void UModioRefineSearchDrawer::OnInputDeviceChanged(EModioUIInputMode NewDevice)
+{
+	if (NewDevice == EModioUIInputMode::Mouse)
+	{
+		SetFocus();
+	}
 }

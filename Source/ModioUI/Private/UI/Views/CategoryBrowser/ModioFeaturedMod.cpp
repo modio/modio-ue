@@ -11,8 +11,8 @@
 #include "UI/Views/CategoryBrowser/ModioFeaturedMod.h"
 #include "Core/ModioModInfoUI.h"
 #include "Engine/Engine.h"
-#include "UI/Commands/ModioCommonUICommands.h"
 #include "ModioUISubsystem.h"
+#include "UI/Commands/ModioCommonUICommands.h"
 
 #include "Loc/BeginModioLocNamespace.h"
 
@@ -160,7 +160,8 @@ void UModioFeaturedMod::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 {
 	Super::BuildCommandList(CommandList);
 
-	CommandList->MapAction(FModioCommonUICommands::Get().MoreOptions,
+	CommandList->MapAction(
+		FModioCommonUICommands::Get().MoreOptions,
 		FUIAction(FExecuteAction::CreateUObject(this, &UModioFeaturedMod::NativeMoreOptionsClicked)));
 }
 
@@ -175,17 +176,15 @@ FReply UModioFeaturedMod::NativeOnFocusReceived(const FGeometry& InGeometry, con
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
-void UModioFeaturedMod::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) 
+void UModioFeaturedMod::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
 {
+	TileActiveFrame->GetRenderOpacity() > 0.0f ? bShouldPlayAnimation = true : bShouldPlayAnimation = false;
 	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
-	if (FocusTransition)
-	{
-		PlayAnimationReverse(FocusTransition);
-	}
 }
 
 void UModioFeaturedMod::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
 {
+	TileActiveFrame->GetRenderOpacity() > 0.0f ? bShouldPlayAnimation = true : bShouldPlayAnimation = false;
 	Super::NativeOnFocusLost(InFocusEvent);
 }
 
@@ -225,10 +224,33 @@ void UModioFeaturedMod::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	}
 }
 
-void UModioFeaturedMod::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-														 TOptional<FModioImageWrapper> Image)
+void UModioFeaturedMod::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
-	Super::NativeOnModLogoDownloadCompleted(ModID, ec, Image);
+	TileActiveFrame->GetRenderOpacity() > 0.0f ? bShouldPlayAnimation = true : bShouldPlayAnimation = false;
+
+	Super::NativeOnMouseLeave(InMouseEvent);
+}
+
+void UModioFeaturedMod::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
+														 TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize)
+{
+	// Load image via call to Super if logo has not been set
+	if (!CurrentLogoSize.IsSet())
+	{
+		Super::NativeOnModLogoDownloadCompleted(ModID, ec, Image, LogoSize);
+		return;
+	}
+	else if (UModioModInfoUI* ModInfo = GetAsModInfoUIObject())
+	{
+		// Load image via call to Super if we're improving the image quality for the specified mod
+		if (ModID == ModInfo->Underlying.ModId && (LogoSize > *CurrentLogoSize))
+		{
+			Super::NativeOnModLogoDownloadCompleted(ModID, ec, Image, LogoSize);
+			return;
+		}
+	}
+	// No need to load image
+	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image, LogoSize);
 }
 
 FReply UModioFeaturedMod::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

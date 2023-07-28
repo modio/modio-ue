@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	bool bShouldShowTopNavBar = true;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
+	bool bShouldShowBackButton = true;
+
 public:
 
 	const FText& GetName();
@@ -43,5 +46,6 @@ public:
 
 	virtual UUserWidget* GetMenuTitleContent();
 	virtual bool ShouldShowSearchButtonForMenu();
+	virtual bool ShouldShowBackButtonForMenu();
 	virtual bool ShouldShowTopNavBar();
 };

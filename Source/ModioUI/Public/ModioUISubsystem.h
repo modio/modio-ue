@@ -31,8 +31,8 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSubscriptionCompleted, FModioErrorCode, 
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnModSubscriptionStatusChanged, FModioModID, bool);
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnModLogoDownloadCompleted, FModioModID, FModioErrorCode,
-									   TOptional<FModioImageWrapper>);
+DECLARE_MULTICAST_DELEGATE_FourParams(FOnModLogoDownloadCompleted, FModioModID, FModioErrorCode,
+									   TOptional<FModioImageWrapper>, EModioLogoSize);
 
 DECLARE_MULTICAST_DELEGATE_FourParams(FOnModGalleryImageDownloadCompleted, FModioModID, FModioErrorCode, int32,
 									  TOptional<FModioImageWrapper>);
@@ -56,6 +56,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnGetModTagOptionsCompleted, TOptional<FMod
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayNotificationWidget, TScriptInterface<IModioUINotification>&);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayNotificationParams, const FModioNotificationParams&);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnDisplayErrorManualParams,const FText&,const FText&, bool);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetails, TScriptInterface<IModioModInfoUIDetails>&);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetailsForID, const FModioModID&);
@@ -65,6 +66,8 @@ DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnGetModEnabled, FModioModID, Mo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnModEnabledChanged, FModioModID, Mod, bool, bNewStateIsEnabled);
 
 DECLARE_DYNAMIC_DELEGATE(FOnModBrowserClosed);
+
+
 
 /**
  *
@@ -90,7 +93,9 @@ protected:
 	friend class IModioUINotificationController;
 	friend class IModioUIModDetailsDisplay;
 
-	FOnGetModEnabled GetModEnabledDelegate;
+	bool QueryIsModEnabled(FModioModID ID);
+
+	bool RequestModEnabledState(FModioModID ID, bool bNewEnabledState);
 
 	UFUNCTION()
 	void SubscriptionHandler(FModioErrorCode ec, FModioModID ID);
@@ -105,7 +110,8 @@ protected:
 	TSharedPtr<class FModioUIInputProcessor> Processor;
 	FOnModLogoDownloadCompleted OnModLogoDownloadCompleted;
 	FOnUserAvatarDownloadCompleted OnUserAvatarDownloadCompleted;
-	void LogoDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image, FModioModID ID);
+	void LogoDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image, FModioModID ID,
+							 EModioLogoSize LogoSize);
 
 	void UserAvatarDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image);
 
@@ -144,16 +150,16 @@ protected:
 
 	UFUNCTION()
 	void HandleInputModeChanged(EModioUIInputMode NewDevice);
-	FOnInputDeviceChanged OnInputDeviceChanged;
 
 	FOnDisplayNotificationWidget OnDisplayNotificationWidget;
 	FOnDisplayNotificationParams OnDisplayErrorNotification;
-
+	FOnDisplayErrorManualParams OnDisplayErrorManualParams;
 	FOnDisplayModDetails OnDisplayModDetails;
 	FOnDisplayModDetailsForID OnDisplayModDetailsForID;
 
 	TOptional<FModioModTagOptions> CachedModTags;
 
+	FVector2D CachedMouseCursorLocation;
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -179,16 +185,6 @@ public:
 	void ShowModUnsubscribeDialog(UObject* DialogDataSource);
 	void ShowLogoutDialog();
 	void ShowModReportDialog(UObject* DialogDataSource);
-
-	// Executed each time the mod enabled state changes
-	UPROPERTY(BlueprintAssignable, Category = "ModioUISubsystem")
-	FOnModEnabledChanged OnModEnabledChanged;
-
-	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	bool QueryIsModEnabled(FModioModID ID);
-
-	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	void RequestModEnabledState(FModioModID ID, bool bNewEnabledState);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestSubscriptionForModID(FModioModID ID);
@@ -219,8 +215,17 @@ public:
 
 	FOnMenuTabIndexChanged OnMenuTabIndexChanged;
 
+	FOnInputDeviceChanged OnInputDeviceChanged;
+
 	// Perhaps this should also carry the error code and a TOptional<bool> for the newly changed state?
 	FOnModSubscriptionStatusChanged OnSubscriptionStatusChanged;
+
+	UPROPERTY(BlueprintAssignable, Category = "ModioUISubsystem")
+	FOnModEnabledChanged OnModEnabledChanged;
+	
+	// RetVal delegates can be accessed only by setting them BlueprintReadOnly
+	UPROPERTY(BlueprintReadWrite, Category = "ModioUISubsystem")
+	FOnGetModEnabled GetModEnabledDelegate;
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestUserAvatar();
@@ -266,6 +271,9 @@ public:
 	class UModioUIStyleSet* GetDefaultStyleSet();
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	FText GetLocalizedTag(FString InTag);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	UMaterialInterface* GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
@@ -308,7 +316,13 @@ public:
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void DisplayErrorNotificationManual(FText title, FText message, bool bIsError);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayErrorDialog(FModioErrorCode ec);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	FOnGetModEnabled GetOnModEnabled();
 
 	void ExecuteOnModBrowserClosedDelegate();
 

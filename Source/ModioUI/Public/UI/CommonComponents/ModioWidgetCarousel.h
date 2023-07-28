@@ -174,8 +174,12 @@ public:
 
 			// Easiest way to ensure the focus is set to some target when this function is called
 			// Prevents focus lost on Login/Logout
-			
-			GetWorld()->GetTimerManager().SetTimer(timer, this, &UModioWidgetCarousel::SetFocusToCurrentElement, 0.1f, false);
+			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+			if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+			{
+				GetWorld()->GetTimerManager().SetTimer(timer, this, &UModioWidgetCarousel::SetFocusToCurrentElement,
+													   0.1f, false);
+			}
 		}
 	}
 };

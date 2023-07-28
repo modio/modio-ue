@@ -30,6 +30,7 @@ class MODIOUI_API IModioUINotificationController : public IInterface
 
 protected:
 	virtual void NativeDisplayNotification(const TScriptInterface<class IModioUINotification>& Notification) {};
+
 	void DisplayNotification_Implementation(const TScriptInterface<IModioUINotification>& Notification)
 	{
 		NativeDisplayNotification(Notification);
@@ -39,6 +40,11 @@ protected:
 	void DisplayErrorNotification_Implementation(const FModioNotificationParams& Params)
 	{
 		NativeDisplayErrorNotification(Params);
+	}
+	virtual void NativeDisplayErrorNotificationManual(const FText& title, const FText& message, bool bIsError) {};
+	void DisplayErrorNotificationManual_Implementation(const FText& title, const FText& message, bool bIsError)
+	{
+		NativeDisplayErrorNotificationManual(title, message, bIsError);
 	}
 	UFUNCTION()
 	virtual void HandleDisplayErrorNotification(const FModioNotificationParams& Params)
@@ -50,6 +56,11 @@ protected:
 	{
 		Execute_DisplayNotification(Cast<UObject>(this), Notification);
 	}
+	UFUNCTION()
+	virtual void HandlDisplayErrorManual(const FText& title, const FText& message, bool bIsError)
+	{
+		Execute_DisplayErrorNotificationManual(Cast<UObject>(this), title, message, bIsError);
+	}
 
 	template<typename ImplementingType>
 	void Register()
@@ -60,6 +71,8 @@ protected:
 				Cast<ImplementingType>(this), &IModioUINotificationController::HandleDisplayErrorNotification);
 			Subsystem->OnDisplayNotificationWidget.AddUObject(
 				Cast<ImplementingType>(this), &IModioUINotificationController::HandleDisplayNotificationWidget);
+			Subsystem->OnDisplayErrorManualParams.AddUObject(
+				Cast<ImplementingType>(this), &IModioUINotificationController::HandlDisplayErrorManual);
 		}
 	}
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUINotificationController")
@@ -72,6 +85,9 @@ protected:
 															   FName("HandleDisplayErrorNotification"));
 			Subsystem->OnDisplayNotificationWidget.AddUFunction(ControllerWidget.GetObject(),
 																FName("HandleDisplayNotificationWidget"));
+			Subsystem->OnDisplayErrorManualParams.AddUFunction(ControllerWidget.GetObject(),
+																FName("HandleDisplayErrorManual"));
+
 		}
 	}
 
@@ -83,4 +99,7 @@ public:
 	/// @brief Function to display an error code notification widget
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUINotificationController")
 	void DisplayErrorNotification(const FModioNotificationParams& Params);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUINotificationController")
+	void DisplayErrorNotificationManual(const FText& title, const FText& message, bool bIsError);
 };

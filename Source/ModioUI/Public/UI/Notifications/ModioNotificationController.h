@@ -26,6 +26,10 @@ UCLASS(Abstract, BlueprintType)
 class MODIOUI_API UModioNotificationControllerBase : public UModioUserWidgetBase, public IModioUINotificationController
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	int MaxNotificationsOnScreen = 5;
+
 protected:
 	virtual void NativeOnInitialized() override;
 	UFUNCTION()
@@ -33,9 +37,9 @@ protected:
 
 	virtual void NativeDisplayNotification(const TScriptInterface<class IModioUINotification>& Notification) override;
 	virtual void NativeDisplayErrorNotification(const FModioNotificationParams& Params) override;
-
+	virtual void NativeDisplayErrorNotificationManual(const FText& title, const FText& message, bool bIsError) override;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUINotification"), Category = "Widgets")
-	TSubclassOf<UWidget> ErrorNotificationClass;
+	TSubclassOf<UUserWidget> ErrorNotificationClass;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	class UVerticalBox* NotificationList;

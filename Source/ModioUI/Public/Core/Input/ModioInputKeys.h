@@ -33,11 +33,13 @@ struct MODIOUI_API FModioInputNames
 	static const FName Back;
 	static const FName Subscribe;
 	static const FName DownloadQueue;
+	static const FName EnableDisableMod;
+	static const FName Collapse;
 
 	static TArray<FName> GetAll()
 	{
 		return {Up,          Down,         Left,    Right, Previous,  Next,
-				MoreOptions, RefineSearch, Confirm, Back,  Subscribe, DownloadQueue};
+				MoreOptions, RefineSearch, Confirm, Back,  Subscribe, DownloadQueue, Collapse, EnableDisableMod};
 	}
 	static TArray<FString> GetAllStrings()
 	{
@@ -61,10 +63,12 @@ struct MODIOUI_API FModioInputKeys
 	static const FKey Back;
 	static const FKey Subscribe;
 	static const FKey DownloadQueue;
+	static const FKey EnableDisableMod;
+	static const FKey Collapse;
 
 	static TArray<FKey> GetAll()
 	{
 		return {Up,          Down,         Left,    Right, Previous,  Next,
-				MoreOptions, RefineSearch, Confirm, Back,  Subscribe, DownloadQueue};
+				MoreOptions, RefineSearch, Confirm, Back,  Subscribe, DownloadQueue, Collapse, EnableDisableMod};
 	}
 };

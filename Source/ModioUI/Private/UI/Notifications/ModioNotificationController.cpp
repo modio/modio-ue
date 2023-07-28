@@ -39,6 +39,10 @@ void UModioNotificationControllerBase::NativeDisplayNotification(
 	{
 		UWidget* UnderlyingWidget = IModioUINotification::Execute_GetAsWidget(Notification.GetObject());
 		UVerticalBoxSlot* NewSlot = NotificationList->AddChildToVerticalBox(UnderlyingWidget);
+		if (NotificationList->GetChildrenCount() >= MaxNotificationsOnScreen)
+		{
+			NotificationList->RemoveChildAt(0);
+		}
 		FOnNotificationExpired ExpireDelegate;
 		ExpireDelegate.BindDynamic(this, &UModioNotificationControllerBase::OnNotificationExpired);
 		IModioUINotification::Execute_SetNotificationExpireHandler(UnderlyingWidget, ExpireDelegate);
@@ -67,5 +71,30 @@ void UModioNotificationControllerBase::NativeDisplayErrorNotification(const FMod
 			Execute_DisplayNotification(this,
 										UModioNotificationWidgetBase::CreateFromParams(ActualClass, Params, this));
 		}
+	}
+}
+
+void UModioNotificationControllerBase::NativeDisplayErrorNotificationManual(const FText& title, const FText& message,
+																			bool bIsError)
+{
+
+	if (NotificationList)
+	{
+		UUserWidget* UnderlyingWidget = CreateWidget<UUserWidget>(this, ErrorNotificationClass);
+		if (!UnderlyingWidget)
+		{
+			return;
+		}
+		IModioUINotification::Execute_ConfigureManual(UnderlyingWidget, title, message, bIsError);
+		UVerticalBoxSlot* NewSlot = NotificationList->AddChildToVerticalBox(UnderlyingWidget);
+		if (NotificationList->GetChildrenCount() >= MaxNotificationsOnScreen)
+		{
+			NotificationList->RemoveChildAt(0);
+		}
+		FOnNotificationExpired ExpireDelegate;
+		ExpireDelegate.BindDynamic(this, &UModioNotificationControllerBase::OnNotificationExpired);
+		IModioUINotification::Execute_SetNotificationExpireHandler(UnderlyingWidget, ExpireDelegate);
+		IModioUINotification::Execute_Display(UnderlyingWidget);
+		
 	}
 }

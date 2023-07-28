@@ -32,6 +32,11 @@ bool UModioMenuView::ShouldShowSearchButtonForMenu()
 	return false;
 }
 
+bool UModioMenuView::ShouldShowBackButtonForMenu()
+{
+	return bShouldShowBackButton;
+}
+
 bool UModioMenuView::ShouldShowTopNavBar()
 {
 	return bShouldShowTopNavBar;

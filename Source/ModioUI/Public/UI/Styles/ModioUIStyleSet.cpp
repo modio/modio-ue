@@ -507,3 +507,8 @@ UModioColorPresets* UModioUIStyleSet::GetColorPaletteData()
 {
 	return ColorPresetsData;
 }
+
+TSubclassOf<UUserWidget> UModioUIStyleSet::GetHideCursorWidgetClass()
+{
+	return HideCursorWidgetClass;
+}

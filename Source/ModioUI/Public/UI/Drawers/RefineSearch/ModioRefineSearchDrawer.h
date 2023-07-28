@@ -31,6 +31,7 @@ class MODIOUI_API UModioRefineSearchDrawer : public UModioUserWidgetBase,
 {
 	GENERATED_BODY()
 protected:
+	const int MaxCharacterAmount = 30;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioEditableTextBox* SearchInput;
@@ -56,20 +57,30 @@ protected:
 	UPROPERTY()
 	UModioUISubsystem* UISubsystem;
 
+	UPROPERTY()
+	class UModioTagSelectorWidgetBase* CurrentActiveTagSelector;
+
 	int CurrentNavIndex = 0;
 
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
 	virtual void BuildCommandList(TSharedRef<FUICommandList> InCommandList) override;
 
-	void ConstructNavigationPath();
+	void BindCollapseButtons();
 	void ValidateAndSetFocus();
 	UFUNCTION()
 	void OnClearClicked();
 	UFUNCTION()
 	void OnApplyClicked();
+	UFUNCTION()
+	void ConstructNavigationPath();
+	UFUNCTION()
+	void OnCollapse();
+	UFUNCTION()
+	void OnInputDeviceChanged(EModioUIInputMode NewDevice);
 
 
 	void NextTagCategory();

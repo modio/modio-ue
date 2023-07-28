@@ -18,8 +18,8 @@
 #include "ModioFeaturedMod.generated.h"
 
 /**
-* Class that bridges mod features with actions, like submit ratings and reports
-**/
+ * Class that bridges mod features with actions, like submit ratings and reports
+ **/
 UCLASS()
 class MODIOUI_API UModioFeaturedMod : public UModioModTileBase
 {
@@ -36,9 +36,10 @@ protected:
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-												  TOptional<FModioImageWrapper> Image);
+												  TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize);
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeTileClicked() override
 	{
@@ -52,7 +53,7 @@ protected:
 			Super::NativeTileClicked();
 		}
 	}
-	
+
 	UFUNCTION()
 	void NativeMoreOptionsClicked();
 

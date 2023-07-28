@@ -93,6 +93,7 @@ void UModioSearchResultsView::NativeOnInitialized()
 
 		SortBy->SetComboBoxEntries(MenuEntries);
 	}
+
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		Subsystem->ModBrowserInstance->GetDrawerController()->OnDrawerClosed.AddDynamic(this, &UModioSearchResultsView::OnDrawerClosed);
@@ -101,8 +102,15 @@ void UModioSearchResultsView::NativeOnInitialized()
 
 FReply UModioSearchResultsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(), EFocusCause::Navigation);
-
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+	{
+		FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(), EFocusCause::Navigation);
+	}
+	else
+	{
+		SetFocus();
+	}
 	return FReply::Handled();
 }
 
@@ -111,7 +119,7 @@ void UModioSearchResultsView::OnSelectionChanged(FModioUIAction ModioUIAction, E
 {
 	CurrentSortAction = ModioUIAction;
 	HasSortActionApplied = true;
-
+	NoResultsDialog->SetVisibility(ESlateVisibility::Collapsed);
 	CurrentSortAction.ExecuteAction.ExecuteIfBound();
 }
 
@@ -208,6 +216,8 @@ void UModioSearchResultsView::SortByLastUpdated()
 void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,
 																  TOptional<FModioModInfoList> List)
 {
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+
 	if (UModioFilterParamsUI* Params = Cast<UModioFilterParamsUI>(DataSource))
 	{
 		if (Params->Underlying.ToString() == RequestIdentifier)
@@ -237,15 +247,25 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 								widget->SetAllNavigationRules(EUINavigationRule::Stop, TEXT("None"));
 							}
 						}
+
+						if (PreviousRequestIdentifier != RequestIdentifier)
+						{
+							TryNavigateGrid();
+						}
 					}
 					else
 					{
 						NoResultsDialog->SetVisibility(ESlateVisibility::Visible);
-						FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(),
-															  EFocusCause::Navigation);
-						RefineSearchButton->SetNavigationRuleBase(EUINavigation::Down, EUINavigationRule::Explicit);
+						if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+						{
+							FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(),
+																  EFocusCause::Navigation);
+						}
 						RefineSearchButton->SetNavigationRuleExplicit(EUINavigation::Down, NoResultsRefineSearchButton);
-						NoResultsRefineSearchButton->SetKeyboardFocus();
+						if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+						{
+							NoResultsRefineSearchButton->SetKeyboardFocus();
+						}
 					}
 				}
 
@@ -256,9 +276,14 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 			{
 				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																		   EModioUIAsyncOperationWidgetState::Error);
-				ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
-				// Show some kind of error?
+				if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+				{
+					ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
+					// Show some kind of error?
+				}
 			}
+
+			PreviousRequestIdentifier = RequestIdentifier;
 		}
 	}
 

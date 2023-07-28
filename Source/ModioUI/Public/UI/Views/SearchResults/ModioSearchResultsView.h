@@ -137,6 +137,7 @@ protected:
 	TArray<FModioModTag> DefaultTags;
 	TArray<FString> TagNames;
 	FString SearchInputString;
+	FString PreviousRequestIdentifier;
 
 	UFUNCTION()
 	void OnDrawerClosed();

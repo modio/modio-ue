@@ -159,7 +159,6 @@ bool UModioDrawerController::SetFocusToActiveDrawer()
 			}
 			if (TargetSlot->GetExpandedState() && TargetSlot->Content && !TargetSlot->Content->HasFocusedDescendants())
 			{
-				TargetSlot->Content->SetFocus();
 				return true;
 			}
 		}

@@ -86,6 +86,8 @@ void UModioModTile::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 	{
 		return;
 	}
+	
+	TileActiveFrame->GetRenderOpacity() > 0.0f ? bShouldPlayAnimation = true : bShouldPlayAnimation = false;
 
 	Super::NativeOnMouseLeave(InMouseEvent);
 }
@@ -328,6 +330,11 @@ void UModioModTile::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 											   : ESlateVisibility::Hidden;
 		SubscribeButton->SetVisibility(FrameVisibility);
 		MoreOptionsMenu->SetVisibility(FrameVisibility);
+
+		if (!bFocusOrFocusedDescendents)
+		{
+			TileActiveFrame->SetRenderOpacity(0.0f);
+		}
 	}
 	Invalidate(EInvalidateWidgetReason::LayoutAndVolatility);
 
@@ -335,16 +342,17 @@ void UModioModTile::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	if (ModName && IsValid(ModInfo))
 	{
 		FString modName = ModInfo->Underlying.ProfileName;
-		modName = TruncateLongModName(modName, ModName, truncateDivider);
+		modName = TruncateLongModName(modName, ModName, TruncateDivider);
 		ModName->SetText(FText::FromString(modName));
 	}
 }
 
 void UModioModTile::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
 {
+	TileActiveFrame->GetRenderOpacity() > 0.0f ? bShouldPlayAnimation = true : bShouldPlayAnimation = false;
+
 	MoreOptionsMenu->Close();
 	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
-	
 }
 
 void UModioModTile::SetSizeOverride(FVector2D NewSize)

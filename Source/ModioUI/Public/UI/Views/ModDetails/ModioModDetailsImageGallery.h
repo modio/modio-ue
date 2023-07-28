@@ -73,7 +73,7 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeOnSetDataSource() override;
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-												  TOptional<FModioImageWrapper> Image) override;
+												  TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize) override;
 	virtual void NativeOnModGalleryImageDownloadCompleted(FModioModID ModID, FModioErrorCode ec, int32 ImageIndex,
 														  TOptional<FModioImageWrapper> Image) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;

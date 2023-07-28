@@ -37,8 +37,8 @@ void UModioModCollectionTile::NativeOnSetDataSource()
     }
 
     SetVisibility(ESlateVisibility::Visible);
-
-    if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+    if (Subsystem)
     {
         IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
                                                                    EModioUIAsyncOperationWidgetState::InProgress);
@@ -290,9 +290,9 @@ void UModioModCollectionTile::NativeOnInitialized()
 
 /// We override this for ModCollectionTile specifically because it wraps a ModCollectionEntry, not a ModInfo
 void UModioModCollectionTile::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-															   TOptional<FModioImageWrapper> Image)
+															   TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize)
 {
-	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image);
+	IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(ModID, ec, Image, LogoSize);
 
 	if (UModioModCollectionEntryUI* ModInfo = Cast<UModioModCollectionEntryUI>(DataSource))
 	{
@@ -391,6 +391,7 @@ void UModioModCollectionTile::BuildCommandList(TSharedRef<FUICommandList> Comman
 	CommandList->MapAction(
 		FModioCommonUICommands::Get().Confirm,
 		FUIAction(FExecuteAction::CreateUObject(this, &UModioModCollectionTile::NativeCollectionTileClicked)));
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 }
 
 void UModioModCollectionTile::NativeMoreOptionsClicked()

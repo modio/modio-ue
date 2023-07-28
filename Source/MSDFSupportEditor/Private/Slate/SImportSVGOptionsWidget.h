@@ -17,18 +17,19 @@
 #include "MaterialEditingLibrary.h"
 #include "MaterialEditorModule.h"
 #include "MaterialEditorUtilities.h"
+#include "MaterialExpressionHelpers.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Misc/NotifyHook.h"
 #include "Modules/ModuleManager.h"
 #include "PropertyEditorModule.h"
 #include "RenderMSDF.h"
 #include "SVGToSDF.h"
-#include "MaterialExpressionHelpers.h"
 #include "ShaderCompiler.h"
 #include "SlateMaterialBrush.h"
 #include "Templates/SharedPointer.h"
@@ -43,6 +44,10 @@
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Text/STextBlock.h"
+
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+	#include "MaterialDomain.h"
+#endif
 
 UENUM()
 enum class EImportSVGDialogReturnType : uint8

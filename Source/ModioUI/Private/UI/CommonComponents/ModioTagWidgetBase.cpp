@@ -30,8 +30,19 @@ void UModioTagWidgetBase::SynchronizeProperties()
 	{
 		FFormatNamedArguments Args;
 		// NOTE: @modio-core this requires server-side localization of tag categories and values
-		Args.Add("Value", FFormatArgumentValue(FText::FromString(TagValue)));
-		TagText->SetText(FText::Format(FTextFormat(TagTextFormat), Args));
+		// 
+		// String tables cannot have spaces in keys so removing spaces from lookup
+		UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (!subsystem)
+		{
+			Args.Add("Value", FFormatArgumentValue(FText::FromString(TagValue)));
+			TagText->SetText(FText::Format(FTextFormat(TagTextFormat), Args));
+		}
+		else
+		{
+			TagText->SetText(subsystem->GetLocalizedTag(TagValue));
+		}
+
 		if (TagText)
 		{
 			TagText->GetStyleDelegate().BindUObject(this, &UModioTagWidgetBase::GetTagTextStyle);

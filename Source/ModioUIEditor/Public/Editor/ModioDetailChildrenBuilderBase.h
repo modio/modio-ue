@@ -56,6 +56,13 @@ public:
 	{
 		return ParentBuilder.AddExternalObjects(Objects, UniqueIdName);
 	}
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+	virtual IDetailPropertyRow* AddExternalObjects(const TArray<UObject*>& Objects,
+												   const FAddPropertyParams& Params = FAddPropertyParams())
+	{
+		return ParentBuilder.AddExternalObjects(Objects, Params);
+	}
+#endif
 
 	virtual IDetailPropertyRow* AddExternalObjectProperty(
 		const TArray<UObject*>& Objects, FName PropertyName,

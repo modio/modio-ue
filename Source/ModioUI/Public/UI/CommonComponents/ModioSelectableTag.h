@@ -24,6 +24,10 @@
 * Modio UI element that represents a selectable tag using a checkbox as
 * visual indicator
 **/
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTagStateChanged, UModioSelectableTag*, SourceTag, bool, bCheckedState);
+
+
 UCLASS()
 class MODIOUI_API UModioSelectableTag : public UModioUserWidgetBase,
 										public IUserObjectListEntry,
@@ -40,15 +44,23 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCheckBoxStyle"), Category = "Widgets")
 	FModioUIStyleRef FocusedStyle;
 
+	UPROPERTY()
+	FString SearchString;
+
+	FOnTagStateChanged OnTagStateChanged;
+
 	bool IsCheckboxChecked();
 	FString GetTagString();
 
-protected:
-	virtual void NativeOnInitialized() override;
+	void SetTagLabel(FString InLabel);
 
 	UFUNCTION()
-	virtual void OnCheckboxStateChanged(bool bIsChecked);
+	void OnCheckboxCheckStateChanged(bool bIsChecked);
 
+
+protected:
+	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 	virtual void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 

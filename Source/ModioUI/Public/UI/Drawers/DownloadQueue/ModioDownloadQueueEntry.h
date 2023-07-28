@@ -43,7 +43,7 @@ protected:
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
-	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec, TOptional<FModioImageWrapper> Image) override;
+	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec, TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize) override;
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent);
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;

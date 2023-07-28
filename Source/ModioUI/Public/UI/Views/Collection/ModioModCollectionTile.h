@@ -29,6 +29,7 @@
 * collection tile status, and a text block. It also stores the subscribed 
 * or installed status of a mod
 **/
+
 UCLASS()
 class MODIOUI_API UModioModCollectionTile : public UModioModTileBase,
 											public IModioUIModEnableWidget,
@@ -71,7 +72,7 @@ protected:
 	UModioRichTextBlock* StatusLine;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* TileButton;
+	class UButton* TileButton; 
 
 	// We don't need a text for any other status because all mods are either subscribed for the local user or installed
 	// for another user
@@ -85,7 +86,7 @@ protected:
 	virtual void NativeOnInitialized() override;
 
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-												  TOptional<FModioImageWrapper> Image) override;
+												  TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize) override;
 
 	virtual void OnModSubscriptionStatusChanged(FModioModID ID, bool Subscribed) override;
 

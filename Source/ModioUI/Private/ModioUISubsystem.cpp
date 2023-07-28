@@ -57,12 +57,14 @@ bool UModioUISubsystem::QueryIsModEnabled(FModioModID ID)
 	}
 }
 
-void UModioUISubsystem::RequestModEnabledState(FModioModID ID, bool bNewEnabledState)
+bool UModioUISubsystem::RequestModEnabledState(FModioModID ID, bool bNewEnabledState)
 {
 	if (OnModEnabledChanged.IsBound())
 	{
 		OnModEnabledChanged.Broadcast(ID, bNewEnabledState);
+		return true;
 	}
+	return false;
 }
 
 void UModioUISubsystem::ShowUserAuthenticationDialog()
@@ -88,6 +90,7 @@ void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ec, FModioModID ID)
 	{
 		UE_LOG(LogModioUI, Warning, TEXT("Failed to subscribe to mod %s. Received error code %d: %s"), *(ID.ToString()),
 			   ec.GetValue(), *(ec.GetErrorMessage()));
+		DisplayErrorDialog(ec);
 	}
 	OnSubscriptionRequestCompleted.Broadcast(ec, ID);
 	if (!ec)
@@ -102,6 +105,10 @@ void UModioUISubsystem::UnsubscribeHandler(FModioErrorCode ec, FModioModID ID)
 	if (!ec)
 	{
 		OnSubscriptionStatusChanged.Broadcast(ID, false);
+	}
+	else
+	{
+		DisplayErrorDialog(ec);
 	}
 }
 
@@ -125,6 +132,7 @@ void UModioUISubsystem::ModManagementEventHandler(FModioModManagementEvent Event
 	if (Event.Event == EModioModManagementEventType::Installed)
 	{
 		ModsDownloadedThisSession.Add(Event.ID);
+		DisplayErrorNotification(UModioNotificationParamsLibrary::CreateInstallationNotification(Event.Status));
 	}
 
 	// If we're uninstalled a mod, remove it from the session details
@@ -318,7 +326,7 @@ void UModioUISubsystem::RequestLogoDownloadForModID(FModioModID ID,
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
 		Subsystem->GetModMediaAsync(
-			ID, LogoSize, FOnGetMediaDelegateFast::CreateUObject(this, &UModioUISubsystem::LogoDownloadHandler, ID));
+			ID, LogoSize, FOnGetMediaDelegateFast::CreateUObject(this, &UModioUISubsystem::LogoDownloadHandler, ID, LogoSize));
 	}
 }
 
@@ -384,6 +392,29 @@ UModioUIStyleSet* UModioUISubsystem::GetDefaultStyleSet()
 		LoadedDefaultStyleSet->bOverridePlatformMaterials = Settings->bOverridePlatformMaterials;
 	}
 	return LoadedDefaultStyleSet;
+}
+
+FText UModioUISubsystem::GetLocalizedTag(FString InTag)
+{
+	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
+	if (!Settings)
+	{
+		return FText();
+	}
+
+	FText localizedTag = Settings->LocalizedTags.FindRef(InTag);
+	if (localizedTag.IsEmpty())
+	{
+		// Workaround for NSLOCTEXT not accepting variables as values.
+		// This is required for created text to be gathered for localization,
+		// otherwise users will have to manually edit every FText variable to have them gathered for localization.
+		Settings->LocalizedTags.Add(InTag,
+									FInternationalization::ForUseOnlyByLocMacroAndGraphNodeTextLiterals_CreateText(
+										*InTag, TEXT("ModioLocalizedTags"), *InTag));
+		Settings->SaveConfig();
+		return Settings->LocalizedTags.FindRef(InTag);
+	}
+	return localizedTag;
 }
 
 UMaterialInterface* UModioUISubsystem::GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType)
@@ -548,6 +579,11 @@ void UModioUISubsystem::DisplayErrorNotification(const FModioNotificationParams&
 	OnDisplayErrorNotification.Broadcast(Params);
 }
 
+void UModioUISubsystem::DisplayErrorNotificationManual(FText title, FText message, bool bIsError)
+{
+	OnDisplayErrorManualParams.Broadcast(title, message, bIsError);
+}
+
 void UModioUISubsystem::DisplayErrorDialog(FModioErrorCode ec)
 {
 	if (!ModBrowserInstance || !ModBrowserInstance->GetDialogController())
@@ -558,9 +594,15 @@ void UModioUISubsystem::DisplayErrorDialog(FModioErrorCode ec)
 	ModBrowserInstance->GetDialogController()->ShowErrorDialog(ec);
 }
 
-void UModioUISubsystem::LogoDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image, FModioModID ID)
+FOnGetModEnabled UModioUISubsystem::GetOnModEnabled()
 {
-	OnModLogoDownloadCompleted.Broadcast(ID, ec, Image);
+	return GetModEnabledDelegate;
+}
+
+void UModioUISubsystem::LogoDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image, FModioModID ID,
+											EModioLogoSize LogoSize)
+{
+	OnModLogoDownloadCompleted.Broadcast(ID, ec, Image, LogoSize);
 }
 
 void UModioUISubsystem::UserAvatarDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image)
@@ -737,18 +779,16 @@ void UModioUISubsystem::HandleInputModeChanged(EModioUIInputMode NewDevice)
 	// a keyboard or controller
 	if (NewDevice == EModioUIInputMode::Controller || NewDevice == EModioUIInputMode::Keyboard)
 	{
-		auto* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("Slate.EnableSyntheticCursorMoves"));
-		if (CVar)
+		if (IsValid(ModBrowserInstance))
 		{
-			CVar->Set(0);
+			ModBrowserInstance->SetShowCursor(false);
 		}
 	}
 	else if (NewDevice == EModioUIInputMode::Mouse)
 	{
-		auto* CVar = IConsoleManager::Get().FindConsoleVariable(TEXT("Slate.EnableSyntheticCursorMoves"));
-		if (CVar)
+		if (IsValid(ModBrowserInstance))
 		{
-			CVar->Set(1);
+			ModBrowserInstance->SetShowCursor(true);
 		}
 	}
 }

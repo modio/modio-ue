@@ -27,6 +27,7 @@
 #include "UI/Views/SearchResults/ModioSearchResultsView.h"
 #include "UObject/WeakInterfacePtr.h"
 #include "Widgets/Notifications/SNotificationList.h"
+#include "Components/OverlaySlot.h"
 
 bool UModioMenu::CanExecutePageChange()
 {
@@ -94,6 +95,11 @@ int32 UModioMenu::GetPageIndex()
 
 void UModioMenu::ToggleRefineSearchDrawer()
 {
+	if (DialogController && DialogController->TrySetFocusToActiveDialog())
+	{
+		return;
+	}
+
 	if (DrawerController)
 	{
 		if (DrawerController->ToggleDrawerExpanded((int32) EModioMenuDrawer::EMMD_RefineSearch))
@@ -254,7 +260,6 @@ void UModioMenu::NativeConstruct()
 			if (FeaturedViewInstance)
 			{
 				UModioScrollBox* ScrollWrapper = WidgetTree->ConstructWidget<UModioScrollBox>();
-
 				ScrollWrapper->ScrollWhenFocusChanges = EScrollWhenFocusChanges::AnimatedScroll;
 				ScrollWrapper->AddChild(FeaturedViewInstance);
 				ViewController->AddChild(ScrollWrapper);
@@ -289,6 +294,9 @@ void UModioMenu::NativeConstruct()
 			ViewController->SetActiveWidgetIndex((int32) EModioMenuScreen::EMMS_Featured);
 		}
 	}
+
+	CachedBacgroundCursorType = Background->Cursor;
+
 	//if (DrawerController)
 	//{
 	//	if (WidgetTree)
@@ -353,6 +361,11 @@ void UModioMenu::NativeOnInitialized()
 	if (Subsystem && Subsystem->GetDefaultStyleSet())
 	{
 		Background->SetBrushFromMaterial(Subsystem->GetDefaultStyleSet()->NativeGetBackgroundMaterial());
+
+		if (IsValid(Subsystem->GetDefaultStyleSet()->GetHideCursorWidgetClass()))
+		{
+			CreateHideMouseCursorWidget(Subsystem->GetDefaultStyleSet()->GetHideCursorWidgetClass());
+		}
 	}
 }
 
@@ -467,6 +480,7 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 				if (MenuBar)
 				{
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
+					MenuBar->SetBackButtonVisibility(MenuView->ShouldShowBackButtonForMenu());
 				}
 				ModioMenuBarWidget->SetVisibility(MenuView->ShouldShowTopNavBar() ? ESlateVisibility::Visible
 																				  : ESlateVisibility::Collapsed);
@@ -482,6 +496,7 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 				if (MenuBar)
 				{
 					MenuBar->SetSearchButtonVisibility(MenuView->ShouldShowSearchButtonForMenu());
+					MenuBar->SetBackButtonVisibility(MenuView->ShouldShowBackButtonForMenu());
 				}
 
 				ModioMenuBarWidget->SetVisibility(MenuView->ShouldShowTopNavBar() ? ESlateVisibility::Visible
@@ -533,6 +548,11 @@ FReply UModioMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent&
 FReply UModioMenu::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	// If we ever receive full focus on the Menu, forward it to the correct menu
+	if (InFocusEvent.GetCause() == EFocusCause::Mouse)
+	{
+		return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
+	}
+
 	if (ActiveViewWidget)
 	{
 		ActiveViewWidget->SetKeyboardFocus();
@@ -636,4 +656,29 @@ void UModioMenu::NativeUserChanged(TOptional<FModioUser> NewUser)
 		}
 	}
 	return;
+}
+
+void UModioMenu::SetShowCursor(bool bShow)
+{
+	if (HideCursorWidget)
+	{
+		HideCursorWidget->SetVisibility(bShow ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+	}
+	
+
+	if (!bShow)
+	{
+		FVector2D mousePos;
+		GetOwningPlayer()->GetMousePosition(mousePos.X, mousePos.Y);
+
+		mousePos.Y == 0 ? GetOwningPlayer()->SetMouseLocation(mousePos.X, mousePos.Y + 1)
+						: GetOwningPlayer()->SetMouseLocation(mousePos.X, mousePos.Y - 1);
+	}
+}
+
+void UModioMenu::CreateHideMouseCursorWidget(TSubclassOf<UUserWidget> widgetClass)
+{
+	HideCursorWidget = CreateWidget<UUserWidget>(this->GetRootWidget(), widgetClass);
+	HideCursorWidget->AddToViewport(1000);
+	HideCursorWidget->SetVisibility(ESlateVisibility::Collapsed);
 }

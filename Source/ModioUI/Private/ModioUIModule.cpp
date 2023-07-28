@@ -62,6 +62,10 @@ void FModioUIModule::StartupModule()
 							  FKeyDetails::EKeyFlags::NotActionBindableKey, NAME_ModioInputKeys));
 	EKeys::AddKey(FKeyDetails(FModioInputKeys::DownloadQueue, LOCTEXT("ModioInputKey_DownloadQueue", "DownloadQueue"),
 							  FKeyDetails::EKeyFlags::NotActionBindableKey, NAME_ModioInputKeys));
+	EKeys::AddKey(FKeyDetails(FModioInputKeys::EnableDisableMod, LOCTEXT("ModioInputKey_EnableDisableMod", "EnableDisableMod"),
+							  FKeyDetails::EKeyFlags::NotActionBindableKey, NAME_ModioInputKeys));
+	EKeys::AddKey(FKeyDetails(FModioInputKeys::Collapse, LOCTEXT("ModioInputKey_Collapse", "Collapse"),
+							  FKeyDetails::EKeyFlags::NotActionBindableKey, NAME_ModioInputKeys));
 	FModioCommonUICommands::Register();
 
 	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(

@@ -61,6 +61,9 @@ protected:
 	UMaterialInterface* DefaultBackgroundMaterial;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
+	TSubclassOf<UUserWidget> HideCursorWidgetClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Style")
 	class UModioColorPresets* ColorPresetsData;
 
 	mutable TSet<FName> MissingResources;
@@ -161,6 +164,7 @@ public:
 	UMaterialInterface* GetDefaultRoundedRectangleMaterial();
 	UMaterialInterface* GetDefaultCheckboxMaterial();
 	UMaterialInterface* GetGlyphMaterial(const FName PropertyName);
+	TSubclassOf<UUserWidget> GetHideCursorWidgetClass();
 	const FSlateBrush* GetBrush(const FName PropertyName,
 								const ANSICHAR* Specifier = nullptr MODIO_UE5_REQUESTING_STYLE_PARAM) const override;
 

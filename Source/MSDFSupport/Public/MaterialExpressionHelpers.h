@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Misc/EngineVersionComparison.h"
+#include "Materials/Material.h"
 
 namespace MaterialExpressionHelpers
 {

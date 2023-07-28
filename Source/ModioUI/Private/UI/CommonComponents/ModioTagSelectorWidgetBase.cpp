@@ -9,28 +9,19 @@
  */
 
 #include "UI/CommonComponents/ModioTagSelectorWidgetBase.h"
+#include "UI/CommonComponents/ModioSelectableTag.h"
+#include "UI/BaseWidgets/ModioInputBindingImage.h"
+#include "UI/BaseWidgets/ModioButton.h"
+#include "UI/BaseWidgets/ModioImage.h"
+#include "Components/VerticalBox.h"
 #include "Algo/Transform.h"
 #include "Core/ModioTagOptionsUI.h"
 #include "Types/ModioModTagInfo.h"
 
 void UModioTagSelectorWidgetBase::NativeOnInitialized()
 {
-	if (CategoryTagList)
-	{
-		CategoryTagList->OnItemSelectionChanged().AddUObject(this, &UModioTagSelectorWidgetBase::OnTagSelectionChanged);
-		bIsFocusable = false;
-	}
-}
-
-void UModioTagSelectorWidgetBase::OnTagSelectionChanged(TSharedPtr<FString>)
-{
-	UModioTagInfoUI* TagInfo = Cast<UModioTagInfoUI>(DataSource);
-	if (TagInfo)
-	{
-		TArray<TSharedPtr<FString>> SelectedTagsForCategory;
-		CategoryTagList->GetSelectedItems(SelectedTagsForCategory);
-		TagInfo->SelectedTagValues = SelectedTagsForCategory;
-	}
+	bIsFocusable = false;
+	TagCategoryCollapseButton->OnClicked.AddUniqueDynamic(this, &UModioTagSelectorWidgetBase::OnCategoryCollapseToggled);
 }
 
 void UModioTagSelectorWidgetBase::NativeOnSetDataSource()
@@ -41,44 +32,77 @@ void UModioTagSelectorWidgetBase::NativeOnSetDataSource()
 
 void UModioTagSelectorWidgetBase::Refresh()
 {
-	UModioTagInfoUI* TagInfo = Cast<UModioTagInfoUI>(DataSource);
-	if (TagInfo)
+	CachedTagInfo = Cast<UModioTagInfoUI>(DataSource);
+	if (CachedTagInfo)
 	{
 		if (TagCategoryLabel)
 		{
-			TagCategoryLabel->SetText(FText::FromString(TagInfo->Underlying.TagGroupName));
+			UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+			if (!subsystem)
+			{
+				TagCategoryLabel->SetText(FText::FromString(CachedTagInfo->Underlying.TagGroupName));
+			}
+			else
+			{
+				TagCategoryLabel->SetText(subsystem->GetLocalizedTag(CachedTagInfo->Underlying.TagGroupName));
+			}
+			
 		}
-		if (CategoryTagList)
+
+		for (auto& child : CategoryVerticalBox->GetAllChildren())
 		{
-			TagListItemSource.Empty();
-			Algo::Transform(TagInfo->Underlying.TagGroupValues, TagListItemSource,
-							[](FString Value) { return MakeShared<FString>(Value); });
-			CategoryTagList->SetListItems(TagListItemSource);
+			CategoryVerticalBox->RemoveChild(child);
+		}
+		for (auto& item : CachedTagInfo->Underlying.TagGroupValues)
+		{
+			UModioSelectableTag* tagWidget = CreateWidget<UModioSelectableTag>(this, TagWidgetTemplate);
+			CategoryVerticalBox->AddChild(tagWidget);
+			tagWidget->SetTagLabel(item);
+			tagWidget->OnTagStateChanged.AddUniqueDynamic(this, &UModioTagSelectorWidgetBase::OnCheckboxChecked);
 		}
 	}
 }
 
-void UModioTagSelectorWidgetBase::NativeOnListItemObjectSet(UObject* ListItemObject)
+void UModioTagSelectorWidgetBase::OnCheckboxChecked(UModioSelectableTag* SourceTag, bool bIsChecked)
 {
-	SetDataSource(ListItemObject);
+	if (!CachedTagInfo || !bIsChecked)
+	{
+		return;
+	}
+	
+	if (CachedTagInfo->Underlying.bAllowMultipleSelection)
+	{
+		return;
+	}
+
+	for (auto& child : CategoryVerticalBox->GetAllChildren())
+	{
+		UModioSelectableTag* tagWidget = Cast<UModioSelectableTag>(child);
+		if (!tagWidget || tagWidget == SourceTag)
+		{
+			continue;
+		}
+
+		tagWidget->TagSelectedCheckbox->SetCheckedState(ECheckBoxState::Unchecked);
+	}
 }
 
-TArray<FString> UModioTagSelectorWidgetBase::GetSelectedTags()
+void UModioTagSelectorWidgetBase::OnCategoryCollapseToggled()
 {
-	TArray<FString> ConvertedTagList;
-	if (UModioTagInfoUI* TagInfo = Cast<UModioTagInfoUI>(DataSource))
-	{
-		Algo::Transform(TagInfo->SelectedTagValues, ConvertedTagList,
-						[](TSharedPtr<FString> InString) { return *InString; });
-	}
-	return ConvertedTagList;
+	bCategoryCollapsed = !bCategoryCollapsed;
+	FWidgetTransform transform;
+	transform.Angle = bCategoryCollapsed ? 0.0f : 180.0f;
+	transform.Scale = FVector2D(1.0f, 1.0f);
+	TagCategoryCollapseImage->SetRenderTransform(transform);
+	CategoryVerticalBox->SetVisibility(bCategoryCollapsed ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
 }
 
-void UModioTagSelectorWidgetBase::ClearSelectedTags()
+void UModioTagSelectorWidgetBase::ToggleKeybindVisibility(bool bActive)
 {
-	if (UModioTagInfoUI* TagInfo = Cast<UModioTagInfoUI>(DataSource))
-	{
-		TagInfo->SelectedTagValues.Empty();
-	}
-	Refresh();
+	TagCategoryInputHint->SetRenderOpacity(bActive ? 1.0f : 0.0f);
+}
+
+bool UModioTagSelectorWidgetBase::IsCollapsed()
+{
+	return bCategoryCollapsed;
 }

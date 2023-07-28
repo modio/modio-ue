@@ -22,10 +22,11 @@ void IModioUIMediaDownloadCompletedReceiver::GalleryImageDownloadHandler(FModioM
 }
 
 void IModioUIMediaDownloadCompletedReceiver::ModLogoDownloadHandler(FModioModID ModID, FModioErrorCode ec,
-																	TOptional<FModioImageWrapper> Image)
+																	TOptional<FModioImageWrapper> Image,
+																	EModioLogoSize LogoSize)
 {
 	bRoutedMediaDownloadCompleted = false;
-	NativeOnModLogoDownloadCompleted(ModID, ec, Image);
+	NativeOnModLogoDownloadCompleted(ModID, ec, Image, LogoSize);
 	checkf(bRoutedMediaDownloadCompleted, TEXT("NativeOnModLogoDownloadCompleted should call "
 											   "Super::NativeOnModLogoDownloadCompleted to route events to blueprint"));
 }
@@ -41,10 +42,11 @@ void IModioUIMediaDownloadCompletedReceiver::CreatorAvatarDownloadHandler(FModio
 }
 
 void IModioUIMediaDownloadCompletedReceiver::NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-																			  TOptional<FModioImageWrapper> Image)
+																			  TOptional<FModioImageWrapper> Image,
+																			  EModioLogoSize LogoSize)
 {
 	bRoutedMediaDownloadCompleted = true;
-	Execute_OnModLogoDownloadCompleted(Cast<UObject>(this), ModID, ec, FModioOptionalImage {Image});
+	Execute_OnModLogoDownloadCompleted(Cast<UObject>(this), ModID, ec, FModioOptionalImage {Image}, LogoSize);
 }
 
 void IModioUIMediaDownloadCompletedReceiver::NativeOnModGalleryImageDownloadCompleted(

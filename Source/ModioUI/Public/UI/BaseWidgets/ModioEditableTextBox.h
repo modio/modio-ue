@@ -56,10 +56,15 @@ class MODIOUI_API UModioEditableTextBox : public UEditableTextBox,
 {
 	GENERATED_BODY()
 public:
+	UFUNCTION()
 	void StartInput();
 	TSharedPtr<SEditableTextBox> GetMyEditableTextBlock();
 	FOnSubmit OnSubmit;
 	FOnNavigateDown OnNavigateDown;
+
+	// Anything over 0 will cut max amount of characters
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "TextBox")
+	int MaxCharacters = 0;
 
 protected:
 	// Cached style set for error validation
@@ -82,6 +87,7 @@ protected:
 	}
 
 	virtual void NativeSetValidationError(FText ErrorText) override;
+	void ClampMaxCharacters(const FText& InText);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Data Validation")
 	bool bValidateInput = false;

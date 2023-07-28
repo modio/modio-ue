@@ -24,6 +24,7 @@
 #include "UI/Views/ModDetails/ModioModDetailsOpProgress.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "TimerManager.h"
+#include "Framework/Application/SlateApplication.h"
 
 void UModioModDetailsView::NativeConstruct()
 {
@@ -184,8 +185,6 @@ void UModioModDetailsView::NativeRequestOperationRetry()
 
 FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	FillScrollableWidgetsArray();
-
 	if (ProcessCommandForEvent(InKeyEvent))
 	{
 		return FReply::Handled();
@@ -196,23 +195,14 @@ FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 	{
 		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
 		{
-			if (ScrollableWidgets.IsValidIndex(CurrentIndex + 1))
-			{
-				CurrentIndex += 1;
-				ScrollBox->ScrollWidgetIntoView(ScrollableWidgets[CurrentIndex], true,
-												EDescendantScrollDestination::Center);
-			}
+			CurrentIndex = FMath::Clamp(CurrentIndex+=ControllerScrollingMultiplier, 0, FMath::CeilToInt(ScrollBox->GetScrollOffsetOfEnd()));
+			bIsScrolling = true;
 			return FReply::Handled();
 		}
-
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+		else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
 		{
-			if (ScrollableWidgets.IsValidIndex(CurrentIndex - 1))
-			{
-				CurrentIndex -= 1;
-				ScrollBox->ScrollWidgetIntoView(ScrollableWidgets[CurrentIndex], true,
-												EDescendantScrollDestination::Center);
-			}
+			CurrentIndex = FMath::Clamp(CurrentIndex -= ControllerScrollingMultiplier, 0, FMath::CeilToInt(ScrollBox->GetScrollOffsetOfEnd()));
+			bIsScrolling = true;
 			return FReply::Handled();
 		}
 	}
@@ -235,12 +225,39 @@ FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		return FReply::Handled();
 	}
 
+	// if user changes from mouse to keyboard, this is to make sure these buttons actually do something:
+	if (HasAnyUserFocus() && (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up ||
+		GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down ||
+		GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left ||
+		GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right))
+	{
+		SubscribeButton->SetKeyboardFocus();
+		return FReply::Handled();
+	}
 	return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 }
 
 void UModioModDetailsView::NativeOnAuthenticationChanged(TOptional<FModioUser> User)
 {
 	bIsUserAuthenticated = User.IsSet();
+}
+
+void UModioModDetailsView::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) 
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (!bIsScrolling)
+	{
+		return;
+	}
+
+	float scrollValue = (CurrentIndex - ScrollBox->GetScrollOffset()) * ScrollingSpeed * InDeltaTime;
+	ScrollBox->SetScrollOffset(ScrollBox->GetScrollOffset() + scrollValue);
+
+	if (FMath::Floor(CurrentIndex) == FMath::Floor(ScrollBox->GetScrollOffset()))
+	{
+		bIsScrolling = false;
+	}
 }
 
 // These methods potentially need us to know about the user's ratings
@@ -310,7 +327,8 @@ void UModioModDetailsView::ReportClicked()
 
 void UModioModDetailsView::OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating SubmittedRating)
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(Subsystem))
 	{
 		Subsystem->DisplayErrorNotification(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
 	}
@@ -346,6 +364,11 @@ void UModioModDetailsView::OnRatingSubmissionComplete(FModioErrorCode ec, EModio
 				break;
 			default:
 				break;
+		}
+		if (Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse)
+		{
+			// no need to auto focus on any buttons when using mouse, without this the focus stays on the rate buttons
+			SetFocus();
 		}
 	}
 	else
@@ -453,7 +476,8 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 			{
 				NewDataSource->Underlying = Info.GetValue();
 				SetDataSource(NewDataSource);
-
+				bIsScrolling = true;
+				CurrentIndex = 0;
 				GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::SetInitialFocus, 0.6, false);
 			}
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
@@ -467,24 +491,19 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 	}
 }
 
-void UModioModDetailsView::FillScrollableWidgetsArray()
-{
-	// The contents here can be easily adjusted for smoother scrolling - these seemed work fine for now
-	ScrollableWidgets.Empty();
-	ScrollableWidgets.Add(ImageGallery);
-	ScrollableWidgets.Add(ModFullDescriptionTextBlock);
-	ScrollableWidgets.Add(ModChangelog);
-}
-
 void UModioModDetailsView::SetInitialFocus()
 {
-	if (SubscribeButton->GetIsEnabled())
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
-		FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
-	}
-	else
-	{
-		ImageGallery->SetKeyboardFocus();
+		if (SubscribeButton->GetIsEnabled())
+		{
+			FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+		}
+		else
+		{
+			ImageGallery->SetKeyboardFocus();
+		}
 	}
 }
 
@@ -499,7 +518,7 @@ void UModioModDetailsView::OnDialogClosed()
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	if (IsValid(Subsystem))
 	{
-		if (Subsystem->GetCurrentFocusTarget() != SubscribeButton)
+		if (Subsystem->GetCurrentFocusTarget() != SubscribeButton && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 		{
 			FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
 		}
@@ -508,13 +527,35 @@ void UModioModDetailsView::OnDialogClosed()
 
 void UModioModDetailsView::OnDownloadQueueClosed()
 {
-	FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+	{
+		FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+	}
 }
 
 void UModioModDetailsView::EnableSubscribeButton()
 {
 	SubscribeButton->SetIsEnabled(true);
-	SubscribeButton->SetKeyboardFocus();
+
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+	{
+		SubscribeButton->SetKeyboardFocus();
+	}
+
+	if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		if (!ModioSubsystem->QueryUserProfile().IsSet())
+		{
+			if (SubscribeButton->GetLabel() != SubscribeLabel.ToString())
+			{
+				SubscribeButton->SetLabel(SubscribeLabel);
+			}
+
+			return;
+		}
+	}
 
 	(SubscribeButton->GetLabel() == SubscribeLabel.ToString()) ? SubscribeButton->SetLabel(UnsubscribeLabel)
 																   : SubscribeButton->SetLabel(SubscribeLabel);
@@ -551,7 +592,11 @@ void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
 
 FReply UModioModDetailsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	SubscribeButton->SetKeyboardFocus();
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+	{
+		SubscribeButton->SetKeyboardFocus();
+	}
 	if (ModioErrorWithRetryWidget->IsVisible())
 	{
 		ModioErrorWithRetryWidget->SetKeyboardFocus();

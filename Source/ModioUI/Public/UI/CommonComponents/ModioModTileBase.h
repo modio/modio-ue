@@ -57,7 +57,8 @@ protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnEntryReleased() override;
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
-												  TOptional<FModioImageWrapper> Image) override;
+												  TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize) override;
+	TOptional<EModioLogoSize> CurrentLogoSize;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 	virtual void SynchronizeProperties() override;
@@ -121,6 +122,7 @@ protected:
 	FModioModID CurrentModId;
 	FTimerHandle SetFocusTimerHandle;
 	bool bIsUserAuthenticated;
+	bool bShouldPlayAnimation = false;
 	bool GetSubscriptionState();
 	UFUNCTION()
 	void EnableSubscribeButton();

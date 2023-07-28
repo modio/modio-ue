@@ -24,8 +24,19 @@ FText UModioModDetailsPropertyInspector::GetPropertyText(EModioModInfoPropertyTy
 				return FText::FromString(ModInfo->Underlying.ProfileSubmittedBy.Username);
 			case EModioModInfoPropertyType::LastUpdated:
 			{
+				int32 days = (FDateTime::UtcNow() - ModInfo->Underlying.ProfileDateUpdated).GetDays();
+
+				if (days <= 0)
+				{
+					return FText::FromString("Today");
+				}
+				else if (days == 1)
+				{
+					return FText::FromString("1 day ago");
+				}
+
 				FFormatNamedArguments Args;
-				Args.Add("Days", (FDateTime::UtcNow() - ModInfo->Underlying.ProfileDateUpdated).GetDays());
+				Args.Add("Days", days);
 				return FText::Format(LastUpdatedFormat, Args);
 			}
 			case EModioModInfoPropertyType::Name:

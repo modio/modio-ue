@@ -12,6 +12,7 @@
 #include "Engine/Texture2DDynamic.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Misc/EnumRange.h"
 
 UModioImage::UModioImage(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {}
@@ -37,7 +38,7 @@ void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture)
 void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture, UMaterialInterface* Material, FName ImageParameterName)
 {
 	if (Texture && !Material)
-    {
+	{
 		CachedMaterial = GetDynamicMaterial();
 		CachedMaterial->SetTextureParameterValue(ImageParameterName, Texture);
 		CachedMaterial->SetScalarParameterValue("UseRenderTarget", 1);
@@ -45,17 +46,21 @@ void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture, UMaterialInterfac
 		InvalidateLayoutAndVolatility();
 	}
 	else if (Texture && Material)
-    {
-        SetBrushFromMaterial(UMaterialInstanceDynamic::Create(Material->GetMaterial(), this));
-        CachedMaterial = GetDynamicMaterial();
-        if (Cast<UMaterialInstance>(Material))
-        {
-            CachedMaterial->CopyInterpParameters(Cast<UMaterialInstance>(Material));
-        }
-        CachedMaterial->SetTextureParameterValue(ImageParameterName, Texture);
-        CachedMaterial->SetScalarParameterValue("UseRenderTarget", 1);
-        InvalidateLayoutAndVolatility();
-    }
+	{
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+		SetBrushFromMaterial(UMaterialInstanceDynamic::Create(Material, this));
+#else
+		SetBrushFromMaterial(UMaterialInstanceDynamic::Create(Material->GetMaterial(), this));
+#endif
+		CachedMaterial = GetDynamicMaterial();
+		if (Cast<UMaterialInstance>(Material))
+		{
+			CachedMaterial->CopyInterpParameters(Cast<UMaterialInstance>(Material));
+		}
+		CachedMaterial->SetTextureParameterValue(ImageParameterName, Texture);
+		CachedMaterial->SetScalarParameterValue("UseRenderTarget", 1);
+		InvalidateLayoutAndVolatility();
+	}
 }
 
 void UModioImage::LoadImageFromFileWithMaterialAsync(FModioImageWrapper ImageLoader, UMaterialInterface* Material,

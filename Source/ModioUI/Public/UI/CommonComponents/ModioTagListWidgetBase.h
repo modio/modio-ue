@@ -33,11 +33,15 @@ protected:
 	int32 TagCategoryCount = 0;
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	UModioListView* TagSelectorList;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* CategoryTextBlock;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* SelectorListScrollBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UModioTagSelectorWidgetBase> TagSelectorListTemplate;
 	/**
 	* Retrieve the list of tags in this list
 	* @return 

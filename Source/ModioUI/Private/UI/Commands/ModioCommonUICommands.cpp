@@ -48,6 +48,11 @@ FModioUIMenuEntry UModioUICommandInfoLibrary::DownloadQueueCommand()
 	return FModioUIMenuEntry {FModioCommonUICommands::Get().DownloadQueue->GetLabel()};
 }
 
+FModioUIMenuEntry UModioUICommandInfoLibrary::CollapseCommand()
+{
+	return FModioUIMenuEntry {FModioCommonUICommands::Get().Collapse->GetLabel()};
+}
+
 FUIAction FModioCommonUICommands::GetNullAction()
 {
 	return FUIAction(FExecuteAction::CreateLambda([]() {}), FCanExecuteAction::CreateLambda([]() { return false; }));
@@ -95,6 +100,17 @@ void FModioCommonUICommands::RegisterCommands()
 		this->AsShared(), DownloadQueue, "DownloadQueue", LOCTEXT("DownloadQueue.Label", "Download Queue"),
 		LOCTEXT("DownloadQueue.Desc", "Displays the user profile and download queue"), FSlateIcon(),
 		EUserInterfaceActionType::Button, FInputChord(FModioInputKeys::DownloadQueue, EModifierKey::None));
+
+	FUICommandInfo::MakeCommandInfo(
+		this->AsShared(), EnableDisableMod, "EnableDisableMod", LOCTEXT("EnableDisableMod.Label", "Enable Or Disable Mod"),
+		LOCTEXT("EnableDisable.Desc", "Enable or disable selected mod"), FSlateIcon(),
+		EUserInterfaceActionType::Button, FInputChord(FModioInputKeys::EnableDisableMod, EModifierKey::None));
+
+	FUICommandInfo::MakeCommandInfo(
+		this->AsShared(), Collapse, "Collapse", LOCTEXT("Collapse.Label", "Collapse"),
+		LOCTEXT("Collapse.Desc", "Toggle collapse tag category"), FSlateIcon(),
+									EUserInterfaceActionType::Button,
+									FInputChord(FModioInputKeys::Collapse, EModifierKey::None));
 }
 
 #include "Loc/EndModioLocNamespace.h"

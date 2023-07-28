@@ -95,6 +95,7 @@ class MODIOUI_API UModioNotificationErrorWidgetBase : public UModioNotificationW
 	GENERATED_BODY()
 protected:
 	virtual void NativeConfigure(const FModioNotificationParams& Params);
+	virtual void NativeConfigureManual(const FText& title, const FText& message, bool bIsError);
 	virtual void NativeOnDisplay();
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 

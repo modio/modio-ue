@@ -74,6 +74,8 @@ public:
 	void ShowModReportDialog(UObject* DialogDataSource);
 	void ShowReportEmailDialog(UObject* DialogDataSource);
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
+	void SetShowCursor(bool bShow);
+	void CreateHideMouseCursorWidget(TSubclassOf<UUserWidget> widgetClass);
 	int32 GetPageIndex();
 	void RefreshDownloadQueue();
 
@@ -84,6 +86,8 @@ private:
 	bool bRoutedOnViewChanged = false;
 
 	bool bMenuFocused = false;
+
+	EMouseCursor::Type CachedBacgroundCursorType;
 
 protected:
 	// Action Delegates
@@ -151,9 +155,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioDrawerController* DrawerController;
-
+	
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	UModioDialogController* DialogController;
+
+	UPROPERTY(BlueprintReadOnly, Category="Widgets")
+	UUserWidget* HideCursorWidget;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets",
 			  meta = (BindWidget, MustImplement = "ModioUINotificationController"))

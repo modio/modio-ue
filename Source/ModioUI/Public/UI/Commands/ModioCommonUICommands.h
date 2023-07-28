@@ -34,6 +34,8 @@ public:
 	TSharedPtr<FUICommandInfo> DownloadQueue; // View button
 	TSharedPtr<FUICommandInfo> Back; // B-button
 	TSharedPtr<FUICommandInfo> Subscribe; // X-button
+	TSharedPtr<FUICommandInfo> EnableDisableMod; // Left trigger
+	TSharedPtr<FUICommandInfo> Collapse; // L-Trigger
 	FModioCommonUICommands()
 		: TCommands<FModioCommonUICommands>("ModioUI", FText::FromString("Modio UI"), NAME_None,
 											FName("ModioUIStyleSet")) {};
@@ -63,4 +65,6 @@ public:
 	static FModioUIMenuEntry BackCommand();
 	UFUNCTION(BlueprintCallable, Category = "ModioCommonUICommands")
 	static FModioUIMenuEntry DownloadQueueCommand();
+	UFUNCTION(BlueprintCallable, Category = "ModioCommonUICommands")
+	static FModioUIMenuEntry CollapseCommand();
 };

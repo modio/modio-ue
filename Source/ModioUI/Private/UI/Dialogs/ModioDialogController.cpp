@@ -9,18 +9,21 @@
  */
 
 #include "UI/Dialogs/ModioDialogController.h"
-#include "UI/CommonComponents/ModioMenu.h"
 #include "Core/ModioAuthenticationContextUI.h"
+#include "Internationalization/Culture.h"
+#include "Internationalization/Internationalization.h"
 #include "Libraries/ModioErrorConditionLibrary.h"
 #include "ModioUISubsystem.h"
 #include "UI/BaseWidgets/Slate/SModioButtonBase.h"
+#include "UI/CommonComponents/ModioMenu.h"
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
-#include "UI/Interfaces/IModioUITextValidator.h"
 #include "UI/Interfaces/IModioUIDialogButtonWidget.h"
+#include "UI/Interfaces/IModioUITextValidator.h"
 #include "UI/Styles/ModioButtonStyle.h"
 #include "UI/Styles/ModioUIStyleRef.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBackgroundBlur.h"
+#include "Core/Input/ModioInputKeys.h"
 
 void UModioDialogController::SynchronizeProperties()
 {
@@ -65,6 +68,10 @@ UModioDialogBaseInternal* UModioDialogController::GetActualDialog()
 
 bool UModioDialogController::TrySetFocusToActiveDialog()
 {
+	if (GEngine->GetEngineSubsystem<UModioUISubsystem>()->GetLastInputDevice() == EModioUIInputMode::Mouse)
+	{
+		return false;
+	}
 	if (DialogStack.Num() && ActualDialog && !ActualDialog->HasFocusedDescendants())
 	{
 		ActualDialog->SetDialogFocus();
@@ -270,17 +277,17 @@ void UModioDialogController::PopDialog()
 	}
 
 	SetVisibility(bCurrentlyDisplayingDialog ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
-	if (bCurrentlyDisplayingDialog) 
+	if (bCurrentlyDisplayingDialog)
 	{
 		return;
 	}
-	
+
 	UModioUISubsystem* UISubsystem = Cast<UModioUISubsystem>(GEngine->GetEngineSubsystem<UModioUISubsystem>());
-	if (UISubsystem && UISubsystem->GetCurrentFocusTarget() && UISubsystem->GetCurrentFocusTarget()->IsVisible()) 
+	if (UISubsystem && UISubsystem->GetCurrentFocusTarget() && UISubsystem->GetCurrentFocusTarget()->IsVisible())
 	{
 		UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
 	}
-	else if (UISubsystem && UISubsystem->ModBrowserInstance) 
+	else if (UISubsystem && UISubsystem->ModBrowserInstance)
 	{
 		UISubsystem->ModBrowserInstance->SetFocus();
 	}
@@ -299,16 +306,6 @@ void UModioDialogController::FinalizeDialog(EModioDialogReply Reply)
 			break;
 		case EModioDialogReply::Cancel:
 			break;
-	}
-
-	UModioUISubsystem* UISubsystem = Cast<UModioUISubsystem>(GEngine->GetEngineSubsystem<UModioUISubsystem>());
-	if (UISubsystem && UISubsystem->GetCurrentFocusTarget() && UISubsystem->GetCurrentFocusTarget()->IsVisible())
-	{
-		UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
-	}
-	else if (UISubsystem && UISubsystem->ModBrowserInstance)
-	{
-		UISubsystem->ModBrowserInstance->SetFocus();
 	}
 
 	OnDialogClosed.Broadcast();
@@ -405,11 +402,11 @@ void UModioDialogController::ShowErrorDialog(FModioErrorCode ec, bool bCloseDial
 {
 	if (ErrorDisplayDialog.IsNull())
 	{
-		return;	
+		return;
 	}
 
 	PushDialog(ErrorDisplayDialog.LoadSynchronous());
-	
+
 	ActualDialog->SetHeaderText(FText::FromString("Error " + FString::FromInt(ec.GetValue())));
 	ActualDialog->SetContentText(FText::FromString(ec.GetErrorMessage()));
 	// create a copy of the error widget
@@ -466,6 +463,12 @@ void UModioDialogController::HandleReportContent(FModioErrorCode ec, UModioDialo
 
 void UModioDialogController::HandleUnsubscribe(FModioModID ec, bool IsSubscribe)
 {
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (Subsystem && !IsSubscribe)
+	{
+		Subsystem->DisplayErrorNotification(
+			UModioNotificationParamsLibrary::CreateUninstallNotification(FModioErrorCode()));
+	}
 	PopDialog();
 }
 
@@ -529,7 +532,21 @@ void UModioDialogController::ShowTermsOfUseDialog(TSharedPtr<FModioUIAuthenticat
 {
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		Subsystem->GetTermsOfUseAsync(ProviderInfo->ProviderID, EModioLanguage::English,
+		// English by default
+		EModioLanguage CurrentLanguage = EModioLanguage::English;
+
+		// Use GetCurrentLanguage delegate if available
+		if (Subsystem->GetCurrentLanguage.IsBound())
+		{
+			CurrentLanguage = Subsystem->GetCurrentLanguage.Execute();
+		}
+		// Fallback on game settings if available
+		else if (FInternationalization::IsAvailable())
+		{
+			CurrentLanguage = Subsystem->ConvertLanguageCodeToModio(
+				FInternationalization::Get().GetCurrentLanguage()->GetTwoLetterISOLanguageName());
+		}
+		Subsystem->GetTermsOfUseAsync(ProviderInfo->ProviderID, CurrentLanguage,
 									  FOnGetTermsOfUseDelegateFast::CreateUObject(
 										  this, &UModioDialogController::HandleTermsOfUseReceived, ProviderInfo));
 	}

@@ -93,6 +93,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams CreateSubscriptionNotification(FModioErrorCode StatusCode);
 
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
+	static FModioNotificationParams CreateUninstallNotification(FModioErrorCode StatusCode);
+
+	/**
+	 * Create a notification parameters instance using an error code
+	 * @param StatusCode The modio error code to store
+	 * @return FModioNotificationParams instance
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
+	static FModioNotificationParams CreateInstallationNotification(FModioErrorCode StatusCode);
+
+
 	/**
 	* Add format text to the notification parameter
 	* @param NotificationParams Base class to add the format
@@ -191,6 +203,7 @@ protected:
 
 	virtual void NativeOnDisplay() {};
 	virtual void NativeConfigure(const FModioNotificationParams& Params) {};
+	virtual void NativeConfigureManual(const FText& title, const FText& message, bool bIsError) {};
 	virtual void NativeSetNotificationExpireHandler(const FOnNotificationExpired& InDelegate) {};
 	virtual UWidget* NativeGetAsWidget()
 	{
@@ -221,6 +234,14 @@ public:
 	void Configure_Implementation(const FModioNotificationParams& Params)
 	{
 		NativeConfigure(Params);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioUINotification")
+	void ConfigureManual(const FText& title, const FText& message, bool bIsError);
+
+	void ConfigureManual_Implementation(const FText& title, const FText& message, bool bIsError)
+	{
+		NativeConfigureManual(title, message, bIsError);
 	}
 
 	/**

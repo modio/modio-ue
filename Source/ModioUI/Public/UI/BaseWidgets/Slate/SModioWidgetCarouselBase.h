@@ -646,11 +646,17 @@ public:
 	}
 	virtual void ScrollLeft()
 	{
-		MoveInDirection(EModioUIDirection::MoveLeft);
+		if (!IsInTransition())
+		{
+			MoveInDirection(EModioUIDirection::MoveLeft);
+		}
 	};
 	virtual void ScrollRight()
 	{
-		MoveInDirection(EModioUIDirection::MoveRight);
+		if (!IsInTransition())
+		{
+			MoveInDirection(EModioUIDirection::MoveRight);
+		}
 	};
 
 	virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent) override 

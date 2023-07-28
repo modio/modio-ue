@@ -652,6 +652,10 @@ class FModioUserWidgetDetailsCustomization : public FInstancedModioUIColorCustom
 			if (FirstObject)
 			{
 				DetailBuilder.RegisterInstancedCustomPropertyTypeLayout(
+					FSlateBrush::StaticStruct()->GetFName(),
+					FOnGetPropertyTypeCustomizationInstance::CreateStatic(
+						&FModioEditorHelpers::MakePropertyCustomizationInstance<FModioSlateBrushStructCustomization>));
+				DetailBuilder.RegisterInstancedCustomPropertyTypeLayout(
 					FKey::StaticStruct()->GetFName(),
 					FOnGetPropertyTypeCustomizationInstance::CreateStatic(
 						&FModioEditorHelpers::MakePropertyCustomizationInstance<FModioKeyEditDetailsCustomization>));

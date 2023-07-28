@@ -47,4 +47,20 @@ FModioNotificationParams UModioNotificationParamsLibrary::CreateSubscriptionNoti
 	return NewParams;
 }
 
+FModioNotificationParams UModioNotificationParamsLibrary::CreateUninstallNotification(FModioErrorCode StatusCode)
+{
+	FModioNotificationParams NewParams =
+		CreateErrorNotificationParams(StatusCode, LOCTEXT("UninstallSuccess", "Mod Uninstalled!"),
+									  LOCTEXT("SubscriptionFailed", "Subscription Failed"));
+	return NewParams;
+}
+
+FModioNotificationParams UModioNotificationParamsLibrary::CreateInstallationNotification(FModioErrorCode StatusCode)
+{
+	FModioNotificationParams NewParams =
+		CreateErrorNotificationParams(StatusCode, LOCTEXT("InstallationSuccess", "Mod installed"),
+									  LOCTEXT("InstallationFailed", "Installation failed"));
+	return NewParams;
+}
+
 #include "Loc/EndModioLocNamespace.h"

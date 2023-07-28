@@ -85,15 +85,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioImage* TileActiveFrame;
 
-	float truncateDivider = 1.0f;
-
-
 public:
 	UPROPERTY(BlueprintAssignable)
 	FOnModTileDetailsClicked OnDetailsClicked;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnModTileReportClicked OnReportClicked;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	float TruncateDivider = 1.0f;
 
 	/**
 	* Update the widget size

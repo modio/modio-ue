@@ -23,30 +23,40 @@ FString UModioSelectableTag::GetTagString()
 	return TagSelectedCheckbox->GetLabelText().ToString();
 }
 
-void UModioSelectableTag::NativeOnInitialized()
+void UModioSelectableTag::SetTagLabel(FString InLabel)
 {
-	Super::NativeOnInitialized();
+	SearchString = InLabel;
 	if (TagSelectedCheckbox)
 	{
-		TagSelectedCheckbox->OnCheckStateChanged.AddDynamic(this, &UModioSelectableTag::OnCheckboxStateChanged);
+		UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		if (!subsystem)
+		{
+			TagSelectedCheckbox->SetLabelText(FText::FromString(SearchString));
+		}
+		else
+		{
+			TagSelectedCheckbox->SetLabelText(subsystem->GetLocalizedTag(SearchString));
+		}
 	}
 }
 
-void UModioSelectableTag::OnCheckboxStateChanged(bool bIsChecked)
+void UModioSelectableTag::OnCheckboxCheckStateChanged(bool bIsChecked)
 {
-	if (UListViewBase* BaseListView = GetOwningListView())
-	{
-		if (UListView* MyListView = Cast<UListView>(BaseListView))
-		{
-			MyListView->SetItemSelection(*MyListView->ItemFromEntryWidget(*this), bIsChecked,
-										 ESelectInfo::OnMouseClick);
-		}
-		else if (UModioListViewString* MyListViewString = Cast<UModioListViewString>(BaseListView))
-		{
-			MyListViewString->SetItemSelection(*MyListViewString->ItemFromEntryWidget(*this), bIsChecked,
-											   ESelectInfo::OnMouseClick);
-		}
-	}
+	OnTagStateChanged.Broadcast(this, bIsChecked);
+}
+
+
+void UModioSelectableTag::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+}
+
+void UModioSelectableTag::NativeConstruct() 
+{
+	Super::NativeConstruct();
+	FScriptDelegate onCheckboxStateChanged;
+	onCheckboxStateChanged.BindUFunction(this, "OnCheckboxCheckStateChanged");
+	TagSelectedCheckbox->OnCheckStateChanged.AddUnique(onCheckboxStateChanged);
 }
 
 void UModioSelectableTag::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) 

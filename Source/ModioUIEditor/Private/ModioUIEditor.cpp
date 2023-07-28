@@ -108,10 +108,7 @@ void FModioUIEditor::RegisterDetailsCustomizations()
 		FOnGetDetailCustomizationInstance::CreateStatic(
 			&FModioEditorHelpers::MakeDetailCustomizationInstance<FModioUIStyleSetDetailsCustomization>));
 
-	PropertyModule.RegisterCustomPropertyTypeLayout(
-		CustomClassLayoutNames.Add_GetRef(FSlateBrush::StaticStruct()->GetFName()),
-		FOnGetPropertyTypeCustomizationInstance::CreateStatic(
-			&FModioEditorHelpers::MakePropertyCustomizationInstance<FModioSlateBrushStructCustomization>));
+	
 
 	PropertyModule.RegisterCustomPropertyTypeLayout(
 		CustomClassLayoutNames.Add_GetRef(FModioTextBlockStyleOverride::StaticStruct()->GetFName()),
@@ -124,10 +121,13 @@ void FModioUIEditor::RegisterDetailsCustomizations()
 	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
 
 	TSet<FName> ExcludedNames;
-	AssetRegistry.GetDerivedClassNames(TArray<FName>({FName("ModioUserWidgetBase"), FName("Widget")}), ExcludedNames,
+	AssetRegistry.GetDerivedClassNames(TArray<FName>({FName("ModioUserWidgetBase"), FName("Widget"), FName("DataAsset")}),
+									   ExcludedNames,
 									   DerivedClassNames);
 	DerivedClassNames.Remove(FName("Widget"));
 	DerivedClassNames.Remove(FName("UserWidget"));
+	DerivedClassNames.Remove(FName("DataAsset"));
+	DerivedClassNames.Remove(FName("ModioInputGlyphSet"));
 
 	UPackage* ModioUIPackage = FindPackage(nullptr, TEXT("/Script/ModioUI"));
 	for (auto& Name : DerivedClassNames)
@@ -146,10 +146,10 @@ void FModioUIEditor::RegisterDetailsCustomizations()
 		CustomClassLayoutNames.Add_GetRef(UModioUserWidgetBase::StaticClass()->GetFName()),
 		FOnGetDetailCustomizationInstance::CreateStatic(
 			&FModioEditorHelpers::MakeDetailCustomizationInstance<FModioUserWidgetDetailsCustomization>));
-	PropertyModule.RegisterCustomClassLayout(
-		CustomClassLayoutNames.Add_GetRef(UWidget::StaticClass()->GetFName()),
-		FOnGetDetailCustomizationInstance::CreateStatic(
-			&FModioEditorHelpers::MakeDetailCustomizationInstance<FModioUserWidgetDetailsCustomization>));
+	//PropertyModule.RegisterCustomClassLayout(
+	//	CustomClassLayoutNames.Add_GetRef(UWidget::StaticClass()->GetFName()),
+	//	FOnGetDetailCustomizationInstance::CreateStatic(
+	//		&FModioEditorHelpers::MakeDetailCustomizationInstance<FModioUserWidgetDetailsCustomization>));
 
 	PropertyModule.NotifyCustomizationModuleChanged();
 }
