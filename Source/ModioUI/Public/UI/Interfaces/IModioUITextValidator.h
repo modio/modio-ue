@@ -99,7 +99,7 @@ public:
 	{
 		// Regex for validating email adress found here: https://mylittledevblog.com/2018/02/15/ue4-email-validation/
 		// I would prefer to use https://stackoverflow.com/a/201378/12018052, but that doesn't work
-		const FRegexPattern Pattern(TEXT("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+"));
+		const FRegexPattern Pattern(TEXT("^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"));
 		FRegexMatcher Matcher(Pattern, TextToValidate.ToString());
 
 		return Matcher.FindNext();

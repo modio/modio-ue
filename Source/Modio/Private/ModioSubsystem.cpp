@@ -443,11 +443,6 @@ void UModioSubsystem::K2_GetModMediaLogoAsync(FModioModID ModId, EModioLogoSize 
 
 void UModioSubsystem::GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Callback)
 {
-	if (CachedModTags)
-	{
-		Callback.ExecuteIfBound({}, CachedModTags);
-		return;
-	}
 	// TODO: @modio-UE4 capturing `this` is bad and we shouldn't do it. Better to store the cached tags as a TSharedPtr
 	// and capture that by value, so we are guaranteed lifetime
 	Modio::GetModTagOptionsAsync(

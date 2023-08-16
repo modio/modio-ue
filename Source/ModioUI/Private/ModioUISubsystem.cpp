@@ -844,17 +844,16 @@ void UModioUISubsystem::ShowUninstallConfirmationDialog(UObject* DialogDataSourc
 
 TOptional<FModioModTagOptions> UModioUISubsystem::GetTagOptionsList()
 {
-	if (CachedModTags.IsSet())
-	{
-		return CachedModTags;
-	}
+	return CachedModTags;
+}
+
+void UModioUISubsystem::GetTagOptionsListAsync()
+{
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
 		Subsystem->GetModTagOptionsAsync(
 			FOnGetModTagOptionsDelegateFast::CreateUObject(this, &UModioUISubsystem::OnGetModTagOptionsComplete));
 	}
-
-	return TOptional<FModioModTagOptions>();
 }
 
 void UModioUISubsystem::OnGetModTagOptionsComplete(FModioErrorCode ec, TOptional<FModioModTagOptions> ModTags)

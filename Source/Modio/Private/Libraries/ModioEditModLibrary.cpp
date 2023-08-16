@@ -59,3 +59,8 @@ void UModioEditModLibrary::SetLogoPath(FModioEditModParams& In, FString LogoPath
 {
 	In.LogoPath = LogoPath;
 }
+
+void UModioEditModLibrary::SetTags(FModioEditModParams& In, TArray<FString>& Tags)
+{
+	In.Tags = Tags;
+}

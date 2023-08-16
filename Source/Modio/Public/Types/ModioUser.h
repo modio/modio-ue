@@ -54,6 +54,12 @@ struct MODIO_API FModioUser
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "User")
 	FString ProfileUrl;
+
+	/**
+	 * Display name of this User for the given Portal, if their account is linked
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "User")
+	FString DisplayNamePortal;
 };
 
 /**

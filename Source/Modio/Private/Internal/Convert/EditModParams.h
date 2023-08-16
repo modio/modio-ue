@@ -35,6 +35,6 @@ FORCEINLINE Modio::EditModParams ToModio(const FModioEditModParams& In)
 												  : Modio::Optional<Modio::MaturityOption> {};
 	Out.MetadataBlob = ToModioOptional<std::string>(In.MetadataBlob);
 	Out.LogoPath = ToModioOptional<std::string>(In.LogoPath);
-
+	Out.Tags = ToModioOptional<std::vector<std::string>>(In.Tags);
 	return Out;
 }

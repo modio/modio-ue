@@ -254,6 +254,8 @@ public:
 
 	TOptional<FModioModTagOptions> GetTagOptionsList();
 
+	void GetTagOptionsListAsync();
+
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	float GetCurrentDPIScaleValue();
 

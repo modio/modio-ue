@@ -21,6 +21,12 @@ FText UModioModDetailsPropertyInspector::GetPropertyText(EModioModInfoPropertyTy
 		switch (PropertyType)
 		{
 			case EModioModInfoPropertyType::CreatorName:
+				if (ModInfo->Underlying.ProfileSubmittedBy.DisplayNamePortal.Len() > 0)
+				{
+					return FText::Format(FText::FromString("{0} ({1})"), FText::FromString(ModInfo->Underlying.ProfileSubmittedBy.Username),
+										 FText::FromString(ModInfo->Underlying.ProfileSubmittedBy.DisplayNamePortal));
+				}
+
 				return FText::FromString(ModInfo->Underlying.ProfileSubmittedBy.Username);
 			case EModioModInfoPropertyType::LastUpdated:
 			{

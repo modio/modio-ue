@@ -45,6 +45,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextButton* ClearButton;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioRichTextButton* CancelButton;
+
 	UPROPERTY(BlueprintAssignable)
 	FOnSearchSettingsChanged OnSettingsChanged;
 
@@ -75,6 +78,8 @@ protected:
 	void OnClearClicked();
 	UFUNCTION()
 	void OnApplyClicked();
+	UFUNCTION()
+	void OnCancelClicked();
 	UFUNCTION()
 	void ConstructNavigationPath();
 	UFUNCTION()

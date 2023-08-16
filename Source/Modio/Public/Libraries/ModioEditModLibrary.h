@@ -57,4 +57,7 @@ class MODIO_API UModioEditModLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Edit Mod Params")
 	static void SetLogoPath(UPARAM(ref) FModioEditModParams& In, FString LogoPath);
+
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Edit Mod Params")
+	static void SetTags(UPARAM(ref) FModioEditModParams& In, UPARAM(ref) TArray<FString>& Tags);
 };

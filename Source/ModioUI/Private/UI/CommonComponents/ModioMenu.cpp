@@ -338,7 +338,7 @@ void UModioMenu::NativeOnInitialized()
 	{
 		Subsystem->EnableModManagement();
 		// Cache tags for this game
-		Subsystem->GetTagOptionsList();
+		Subsystem->GetTagOptionsListAsync();
 	}
 	// Find the refine search drawer, bind to its confirmed event so we know to display the search results
 	if (DrawerController)

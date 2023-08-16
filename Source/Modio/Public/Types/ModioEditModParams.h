@@ -75,4 +75,9 @@ public:
 	 * Optional path to a new logo image for this mod
 	 **/
 	TOptional<FString> LogoPath;
+
+    /**
+	 * List of metadata tags that reference the mod to create. They help to search and filter content
+	 **/
+	TOptional<TArray<FString>> Tags;
 };

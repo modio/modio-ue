@@ -21,5 +21,6 @@ FORCEINLINE FModioUser ToUnreal(const Modio::User& In) {
 	Out.Username = ToUnreal(In.Username);
 	Out.DateOnline = ToUnreal(In.DateOnline);
 	Out.ProfileUrl = ToUnreal(In.ProfileUrl);
+	Out.DisplayNamePortal = ToUnreal(In.DisplayNamePortal);
 	return Out;
 }

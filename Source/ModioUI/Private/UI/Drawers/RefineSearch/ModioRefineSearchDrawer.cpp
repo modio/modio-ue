@@ -35,6 +35,10 @@ void UModioRefineSearchDrawer::NativeOnInitialized()
 	{
 		SearchInput->MaxCharacters = MaxCharacterAmount;
 	}
+	if (CancelButton)
+	{
+		CancelButton->OnClicked.AddDynamic(this, &UModioRefineSearchDrawer::OnCancelClicked);
+	}
 
 	UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	UISubsystem->OnInputDeviceChanged.AddUObject(this, &UModioRefineSearchDrawer::OnInputDeviceChanged);
@@ -94,6 +98,7 @@ void UModioRefineSearchDrawer::ConstructNavigationPath()
 
 	NavigationPath.Add(ApplyButton);
 	NavigationPath.Add(ClearButton);
+	NavigationPath.Add(CancelButton);
 }
 
 void UModioRefineSearchDrawer::BindCollapseButtons()
@@ -118,6 +123,8 @@ void UModioRefineSearchDrawer::BindCollapseButtons()
 
 void UModioRefineSearchDrawer::ValidateAndSetFocus() 
 {
+	CurrentNavIndex = FMath::Clamp(CurrentNavIndex, 0, NavigationPath.Num() - 1);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), CurrentNavIndex);
 	if (NavigationPath.IsValidIndex(CurrentNavIndex))
 	{
 		if (!NavigationPath[CurrentNavIndex]->TakeWidget()->SupportsKeyboardFocus())
@@ -192,6 +199,11 @@ void UModioRefineSearchDrawer::OnClearClicked()
 	}
 }
 
+void UModioRefineSearchDrawer::OnCancelClicked()
+{
+	GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseSearchDrawer();
+}
+
 void UModioRefineSearchDrawer::OnApplyClicked()
 {
 	Execute_NotifySettingsChanged(
@@ -234,45 +246,39 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 
 	if (InKeyEvent.GetKey() == EKeys::Tab && CurrentNavIndex == 0)
 	{
-		if (NavigationPath.IsValidIndex(CurrentNavIndex + 1))
-		{
-			CurrentNavIndex += 1;
-		}
+		CurrentNavIndex += 1;
 		ValidateAndSetFocus();
 		return FReply::Handled();	
 	}
 
 	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
 	{
-		if (NavigationPath.IsValidIndex(CurrentNavIndex + 1)) {
-			CurrentNavIndex += 1;
-		}
+		CurrentNavIndex += 1;
 		ValidateAndSetFocus();
 		return FReply::Handled();
 	}
 	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up) 
 	{
-		if (NavigationPath.IsValidIndex(CurrentNavIndex - 1))
-		{
-			CurrentNavIndex -= 1;
-		}
+		CurrentNavIndex -= 1;
 		ValidateAndSetFocus();
 		return FReply::Handled();
 	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left) 
+
+	if (CurrentNavIndex >= NavigationPath.Num() - 3)
 	{
-		if (CurrentNavIndex == NavigationPath.Num() - 1) 
+		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left)
 		{
-			CurrentNavIndex -= 1;
+			CurrentNavIndex--;
+			CurrentNavIndex = FMath::Clamp(CurrentNavIndex, NavigationPath.Num() - 3, NavigationPath.Num() - 1);
 			ValidateAndSetFocus();
+			return FReply::Handled();
 		}
-	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right) 
-	{
-		if (CurrentNavIndex == NavigationPath.Num() - 2)
+		else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right)
 		{
-			CurrentNavIndex += 1;
+			CurrentNavIndex++;
+			CurrentNavIndex = FMath::Clamp(CurrentNavIndex, NavigationPath.Num() - 3, NavigationPath.Num() - 1);
 			ValidateAndSetFocus();
+			return FReply::Handled();
 		}
 	}
 
