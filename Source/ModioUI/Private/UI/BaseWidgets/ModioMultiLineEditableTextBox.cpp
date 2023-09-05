@@ -36,12 +36,16 @@ TSharedRef<SWidget> UModioMultiLineEditableTextBox::RebuildWidget()
 {
 	MyEditableTextBlock = SNew(SMultiLineEditableTextBox)
 							  .Style(&WidgetStyle)
-#if !UE_VERSION_OLDER_THAN(5,1,0)
+#if !UE_VERSION_OLDER_THAN(5, 1, 0)
 							  .TextStyle(&WidgetStyle.TextStyle)
 #else
 							  .TextStyle(&TextStyle)
 #endif
 							  .AllowContextMenu(AllowContextMenu)
+							  .WrappingPolicy(ETextWrappingPolicy::AllowPerCharacterWrapping)
+							  .WrapTextAt(0.0f)
+							  .AutoWrapText(true)
+							  .AllowMultiLine(true)
 							  .IsReadOnly(bIsReadOnly)
 							  .VirtualKeyboardOptions(VirtualKeyboardOptions)
 							  .VirtualKeyboardDismissAction(VirtualKeyboardDismissAction)

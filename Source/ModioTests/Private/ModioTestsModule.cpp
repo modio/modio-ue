@@ -12,7 +12,6 @@
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
 #include "ModioTestSettings.h"
-#include "PropertyEditorModule.h"
 
 #if WITH_EDITOR
 	#include "ISettingsModule.h"

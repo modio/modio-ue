@@ -9,6 +9,8 @@
  */
 
 #include "UI/BaseWidgets/ModioEditableTextBox.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Core/Input/ModioInputKeys.h"
@@ -186,7 +188,6 @@ void UModioEditableTextBox::NativeSetValidationError(FText ErrorText)
 			.Padding(0, 8, 0, 0)[SAssignNew(MyErrorTextBlock, SModioRichTextBlock)
 									 .Text(ErrorText)
 									 .WrapTextAt(700)
-									 //.StyleReference(&TextStyle)
 									 .TextStyle(ErrorTextBlockStyle)];
 	}
 	else
@@ -207,7 +208,7 @@ FReply UModioEditableTextBox::OnKeyDownHandler(const FGeometry& MyGeometry, cons
 		OnNavigateDown.Broadcast();
 	}
 
-	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
 	if ((GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Next || GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Previous) && subsystem->GetLastInputDevice() != EModioUIInputMode::Keyboard)
 	{

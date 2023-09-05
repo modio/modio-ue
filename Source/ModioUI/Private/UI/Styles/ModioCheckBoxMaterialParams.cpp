@@ -9,6 +9,8 @@
  */
 
 #include "UI/Styles/ModioCheckBoxMaterialParams.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 #include "ModioUISubsystem.h"
@@ -16,7 +18,7 @@
 
 UMaterialInterface* UModioCheckBoxMaterialParams::GetMaterialInstance()
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
 

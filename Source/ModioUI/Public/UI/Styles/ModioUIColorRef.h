@@ -54,7 +54,7 @@ public:
 	/// when setting a new UModioUIStyleSet.
 	/// @return FSlateColor object with shared reference to the named color, or a default white color if the name was
 	/// invalid
-	FSlateColor ResolveReference(UModioUIStyleSet* OverrideStyleSet = nullptr) const;
+	FSlateColor ResolveReference(class UModioUIStyleSet* OverrideStyleSet = nullptr) const;
 	/// @brief Returns a shared slate brush instance which uses the underlying named color as it's tint value
 	/// @return shared brush containing the color
 	const FSlateBrush* GetBrush() const;

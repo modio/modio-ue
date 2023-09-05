@@ -13,6 +13,10 @@
 #include "Engine/Engine.h"
 #include "ModioSubsystem.h"
 
+#if WITH_EDITOR
+#include "UnrealEdMisc.h"
+#endif
+
 UModioSettings::UModioSettings() : LogLevel(EModioLogLevel::Info) {}
 
 #if WITH_EDITOR
@@ -25,6 +29,11 @@ void UModioSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 		{
 			Subsystem->SetLogLevel(LogLevel);
 		}
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(UModioSettings, bUseBackgroundThread))
+	{
+		const bool bWarn = true;
+		FUnrealEdMisc::Get().RestartEditor(bWarn);
 	}
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);

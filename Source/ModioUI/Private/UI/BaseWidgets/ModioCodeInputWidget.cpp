@@ -63,14 +63,15 @@ void UModioCodeInputWidget::NativeSetValidationError(FText ErrorText)
 
 	if (ErrorText.IsEmpty())
 	{
-		if (MyErrorTextBlock.IsValid())
-		{
-			MyErrorTextBlock->SetText(ErrorText);
-		}
 		return;
 	}
 
-	if (!MyErrorTextBlock.IsValid())
+	if (MyErrorTextBlock.IsValid())
+	{
+		MyErrorTextBlock->ReapplyStyle("Error");
+		MyErrorTextBlock->SetText(ErrorText);
+	}
+	else
 	{
 		MyVerticalBox->AddSlot()
 			.AutoHeight()
@@ -81,9 +82,8 @@ void UModioCodeInputWidget::NativeSetValidationError(FText ErrorText)
 									 .WrapTextAt(700)
 									 .StyleReference(&TextStyle)
 									 .TextStyle(ErrorTextBlockStyle)];
-	}
-	else
-	{
+
+		MyErrorTextBlock->ReapplyStyle("Error");
 		MyErrorTextBlock->SetText(ErrorText);
 	}
 }

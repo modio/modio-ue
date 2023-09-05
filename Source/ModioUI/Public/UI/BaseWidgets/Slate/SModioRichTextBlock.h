@@ -118,6 +118,7 @@ public:
 	TAttribute<const FModioUIStyleRef*> StyleReference;
 
 	void ReapplyStyle();
+	void ReapplyStyle(FName StyleName);
 	void SetDecoratorStyleSet(TSharedPtr<FSlateStyleSet> NewStyleSet)
 	{
 		StyleSetOverride = NewStyleSet;

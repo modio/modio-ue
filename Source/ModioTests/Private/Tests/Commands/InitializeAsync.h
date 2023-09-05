@@ -10,6 +10,7 @@
 
 #pragma once
 #include "ModioSubsystem.h"
+#include "ModioTestsFunctionLibrary.h"
 #include "Tests/Commands/ModioTestCommandBase.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
@@ -20,7 +21,7 @@ public:
 	using FModioTestLatentCommandBase::Update;
 	virtual void Start() override
 	{
-		Modio->InitializeAsync(UModioSDKLibrary::GetAutomationTestOptions(),
+		Modio->InitializeAsync(UModioTestsFunctionLibrary::GetAutomationTestOptions(),
 							   FOnErrorOnlyDelegateFast::CreateSP(this, &FModioInitializeAsyncCommand::Callback));
 	}
 	void Callback(FModioErrorCode ec)

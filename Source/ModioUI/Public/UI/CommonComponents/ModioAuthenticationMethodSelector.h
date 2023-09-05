@@ -33,7 +33,7 @@
  * on the current session
  **/
 UCLASS()
-class UModioAuthenticationMethodSelector : public UModioWidgetBase, public IModioUIDialogButtonWidget
+class UModioAuthenticationMethodSelector : public UWidget, public IModioUIDialogButtonWidget
 {
 	GENERATED_BODY()
 

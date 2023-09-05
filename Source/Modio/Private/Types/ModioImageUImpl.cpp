@@ -22,6 +22,7 @@
 #include "ModioSubsystem.h"
 #include "Modules/ModuleManager.h"
 #include "RenderingThread.h"
+#include "TextureResource.h"
 
 #if UE_VERSION_NEWER_THAN(5,2,0)
 	#include "TextureResource.h"

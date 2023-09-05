@@ -12,9 +12,13 @@
 
 #include "CoreMinimal.h"
 #include "Materials/MaterialExpression.h"
+#include "Misc/EngineVersionComparison.h"
 
 #include "RenderMSDF.generated.h"
 
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+	enum EMaterialSamplerType : int;
+#endif
 /**
  *
  */

@@ -42,6 +42,7 @@ protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent) override;
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec, TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize) override;
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
@@ -51,6 +52,8 @@ protected:
 
 	UFUNCTION()
 	FEventReply OnEntryPressed(FGeometry MyGeometry, const FPointerEvent& MouseEvent);
+
+	FReply CommonHandleInput(FKey key); 
 
 	const FModioRichTextStyle& GetRichTextStyle();
 

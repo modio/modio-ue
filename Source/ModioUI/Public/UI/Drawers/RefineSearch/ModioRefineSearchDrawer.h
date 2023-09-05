@@ -22,9 +22,9 @@
 #include "ModioRefineSearchDrawer.generated.h"
 
 /**
-* Class definition for the Modio refine search drawer which has search input
-* and operation buttons
-**/
+ * Class definition for the Modio refine search drawer which has search input
+ * and operation buttons
+ **/
 UCLASS()
 class MODIOUI_API UModioRefineSearchDrawer : public UModioUserWidgetBase,
 											 public IModioUIRefineSearchWidget // IModioUIUserChangeReceiver
@@ -58,7 +58,7 @@ protected:
 	TArray<UWidget*> NavigationPath;
 
 	UPROPERTY()
-	UModioUISubsystem* UISubsystem;
+	UModioUI4Subsystem* UISubsystem;
 
 	UPROPERTY()
 	class UModioTagSelectorWidgetBase* CurrentActiveTagSelector;
@@ -67,8 +67,8 @@ protected:
 
 	virtual void NativeOnInitialized() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
-	virtual FReply NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
 
 	virtual void BuildCommandList(TSharedRef<FUICommandList> InCommandList) override;
 
@@ -84,9 +84,6 @@ protected:
 	void ConstructNavigationPath();
 	UFUNCTION()
 	void OnCollapse();
-	UFUNCTION()
-	void OnInputDeviceChanged(EModioUIInputMode NewDevice);
-
 
 	void NextTagCategory();
 	void PrevTagCategory();

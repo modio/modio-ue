@@ -23,7 +23,6 @@
 #include "UI/EventHandlers/IModioUIModManagementEventReceiver.h"
 #include "UI/EventHandlers/IModioUISubscriptionsChangedReceiver.h"
 #include "UI/Views/ModioMenuView.h"
-
 #include "ModioCollectionView.generated.h"
 
 // TODO: listen for subscription changes etc
@@ -67,6 +66,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* CollectionCount;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UModioRichTextBlock* InfoRichTextBlock;
+
 	/// @brief Ensures that the underlying data set doesn't get GC'd
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
 	TArray<UModioModCollectionEntryUI*> CachedCollection;
@@ -90,6 +92,7 @@ protected:
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	bool ValidateSearchInput(const FKeyEvent& InKeyEvent);
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 	UFUNCTION()
@@ -112,9 +115,6 @@ protected:
 	void OnFetchUpdatesClicked();
 
 	UFUNCTION()
-	void OnSearchTextUpdated(const FText& NewText);
-
-	UFUNCTION()
 	void OnModGroupChanged(FText SelectedItem, ESelectInfo::Type SelectionType);
 
 	void UpdateModCount();
@@ -131,6 +131,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText SearchingButtonLabel;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText NoSubscribedModsText = NSLOCTEXT("ModioUI","YourCollectionIsEmpty", "Your collection is empty");
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText NoModsFoundText = NSLOCTEXT("ModioUI","NoModsInYourCollectionMatchYourFilter","No mods in your collection match your filter");
 
 public:
 	FOnProfileOpened OnProfileOpened;

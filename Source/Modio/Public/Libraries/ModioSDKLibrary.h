@@ -75,10 +75,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static MODIO_API FModioInitializeOptions GetProjectInitializeOptionsForSessionId(const FString SessionId);
 
-#if WITH_DEV_AUTOMATION_TESTS
-	/// @brief Gets the automation test options. not exposed to BP to prevent accidental use by developers in BP
-	static MODIO_API FModioInitializeOptions GetAutomationTestOptions();
-#endif
 
 	/**
 	 * Does a basic validation if the email address supplied has a valid form
@@ -95,6 +91,13 @@ public:
 	static MODIO_API bool IsValidSecurityCodeFormat(const FString& String);
 
 	/**
+	 * Get desired file size unit based on the size of the file
+	 * @return the desired file size unit
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
+	static MODIO_API EFileSizeUnit GetDesiredFileSizeUnit(int64 FileSize);
+
+	/**
 	 * Converts a filesize to a human readable string with the appropriate unit
 	 *
 	 * @param FileSize - Filesize in bytes
@@ -105,8 +108,8 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|String",
 			  meta = (DisplayName = "ToString (Filesize)", CompactNodeTitle = "Filesize"))
-	static MODIO_API FText Filesize_ToString(int64 FileSize, int32 MaxDecimals = 2,
-											 EFileSizeUnit Unit = EFileSizeUnit::Largest);
+	static MODIO_API FText Filesize_ToString(int64 FileSize, int32 MinDecimals = 0, int32 MaxDecimals = 2,
+											 EFileSizeUnit Unit = EFileSizeUnit::Largest, bool bIncludeUnitName = true);
 
 	/** Converts an integer64 value to a string */
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToString (integer64)", CompactNodeTitle = "->", BlueprintAutocast),

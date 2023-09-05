@@ -1,5 +1,6 @@
 #include "ModioEditor.h"
 #include "ModioEditorSettings.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #if WITH_EDITOR
 	#include "ISettingsModule.h"

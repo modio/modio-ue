@@ -237,7 +237,7 @@ void UModioFeaturedCategory::HandleSeeAllClicked()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->DisplaySearchResults(Filter);
+			Subsystem->ShowSearchResults(Filter);
 		}
 	}
 }

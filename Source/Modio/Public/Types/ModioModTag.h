@@ -25,6 +25,6 @@ struct MODIO_API FModioModTag
 	/**
 	* A string that represents a mod tag
 	**/
-	UPROPERTY(BlueprintReadOnly, Category = "ModTag")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModTag")
 	FString Tag;
 };

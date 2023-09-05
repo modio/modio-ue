@@ -44,6 +44,7 @@ protected:
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	FReply NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	UFUNCTION()
 	void OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating);

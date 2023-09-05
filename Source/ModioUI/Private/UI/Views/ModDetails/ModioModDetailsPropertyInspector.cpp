@@ -52,10 +52,10 @@ FText UModioModDetailsPropertyInspector::GetPropertyText(EModioModInfoPropertyTy
 			case EModioModInfoPropertyType::Size:
 				if (ModInfo->Underlying.FileInfo.Filesize < GB)
 				{
-					return UModioSDKLibrary::Filesize_ToString(ModInfo->Underlying.FileInfo.Filesize, 0);
+					return UModioSDKLibrary::Filesize_ToString(ModInfo->Underlying.FileInfo.Filesize, 0, 0);
 				}
 
-				return UModioSDKLibrary::Filesize_ToString(ModInfo->Underlying.FileInfo.Filesize, 1);
+				return UModioSDKLibrary::Filesize_ToString(ModInfo->Underlying.FileInfo.Filesize, 0, 1);
 			case EModioModInfoPropertyType::Subscribers:
 				return FText::AsNumber(ModInfo->Underlying.Stats.SubscribersTotal);
 		}

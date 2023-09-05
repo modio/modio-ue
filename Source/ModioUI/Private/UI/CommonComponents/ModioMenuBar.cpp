@@ -13,6 +13,7 @@
 #include "GameFramework/InputSettings.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "ModioUISubsystem.h"
+#include "ModioUI4Subsystem.h"
 #include "Settings/ModioUISettings.h"
 
 void UModioMenuBar::NativeConstruct()
@@ -36,7 +37,8 @@ void UModioMenuBar::NativeOnInitialized()
 	{
 		if (UserProfileButton)
 		{
-			UserProfileButton->NativeUserChanged(Subsystem->QueryUserProfile());
+			Subsystem->OnUserProfileUpdatedDelegate.BindUObject(UserProfileButton,
+																&UModioUserProfileButton::NativeUserChanged);
 		}
 	}
 }
@@ -48,7 +50,7 @@ void UModioMenuBar::SynchronizeProperties()
 
 void UModioMenuBar::OnBackClicked()
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		Subsystem->SendCommandToBrowserUI(FModioInputKeys::Back, 0);
 	}
@@ -56,7 +58,7 @@ void UModioMenuBar::OnBackClicked()
 
 void UModioMenuBar::OnSearchClicked()
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		Subsystem->SendCommandToBrowserUI(FModioInputKeys::RefineSearch, 0);
 	}

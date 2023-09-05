@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ModioUI4Subsystem.h"
 #include "Algo/Transform.h"
 #include "Core/ModioModInfoUI.h"
 #include "Core/Input/ModioInputKeys.h"
@@ -97,6 +98,13 @@ protected:
 
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override
 	{
+		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+		if (Subsystem && (Subsystem->IsAnyDialogOpen() || !Subsystem->IsDownloadDrawerOpen()))
+		{
+			return FReply::Unhandled();
+		}
+
 		ConstructNavigationPath();
 		if (CurrentNavIndex >= NavigationPath.Num())
 		{
@@ -171,11 +179,19 @@ protected:
 	void HandleOperationCompleted()
 	{
 		RefreshOperationQueue();
+		Execute_RefreshDownloadQueue(this);
 	}
 
 	UFUNCTION()
 	void OnSubsricptionChanged(FModioModID ID, bool Subscribed)
 	{
+		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+		if (Subsystem && (Subsystem->IsAnyDialogOpen() || !Subsystem->IsDownloadDrawerOpen()))
+		{
+			return;
+		}
+
 		if (LogOutButton)
 		{
 			LogOutButton->SetKeyboardFocus();
@@ -243,7 +259,7 @@ protected:
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override 
 	{
-		UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
 		RefreshOperationQueue();
 		ConstructNavigationPath();
@@ -260,13 +276,14 @@ protected:
 public:
 	virtual void NativeRefreshDownloadQueue() override
 	{
-
+		UModioUI4Subsystem* UI4Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+		
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
 			TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
 
 			// Early out if we do not find any subscriptions
-			if (UserSubscriptions.Num() == 0) {
+			if (UserSubscriptions.Num() <= 0) {
 				return;
 			}
 

@@ -9,11 +9,13 @@
  */
 
 #include "UI/Styles/ModioUIColorRef.h"
+
+#include "ModioUI4Subsystem.h"
 #include "UI/Styles/ModioUIStyleSet.h"
 
 FModioUIColorRef::operator FSlateColor() const
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (Subsystem)
 	{
 		UModioUIStyleSet* DefaultStyle = Subsystem->GetDefaultStyleSet();
@@ -44,7 +46,7 @@ FSlateColor FModioUIColorRef::ResolveReference(UModioUIStyleSet* OverrideStyleSe
 
 const FSlateBrush* FModioUIColorRef::GetBrush() const
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (Subsystem)
 	{
 		UModioUIStyleSet* DefaultStyle = Subsystem->GetDefaultStyleSet();

@@ -96,13 +96,16 @@ void UModioSearchResultsView::NativeOnInitialized()
 
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->ModBrowserInstance->GetDrawerController()->OnDrawerClosed.AddDynamic(this, &UModioSearchResultsView::OnDrawerClosed);
+		if (UModioMenu* MenuInstance = Cast<UModioMenu>(Subsystem->ModBrowserInstance))
+		{
+			MenuInstance->GetDrawerController()->OnDrawerClosed.AddDynamic(this, &UModioSearchResultsView::OnDrawerClosed);
+		}
 	}
 }
 
 FReply UModioSearchResultsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		FSlateApplication::Get().SetUserFocus(0, RefineSearchButton->TakeWidget(), EFocusCause::Navigation);
@@ -216,7 +219,7 @@ void UModioSearchResultsView::SortByLastUpdated()
 void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,
 																  TOptional<FModioModInfoList> List)
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
 	if (UModioFilterParamsUI* Params = Cast<UModioFilterParamsUI>(DataSource))
 	{
@@ -379,6 +382,16 @@ void UModioSearchResultsView::NativeRequestOperationRetry()
 	}
 }
 
+FReply UModioSearchResultsView::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent)
+{
+	if (ProcessCommandForEvent(InPointerEvent))
+	{
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnMouseButtonDown(InGeometry, InPointerEvent);
+}
+
 FReply UModioSearchResultsView::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
 	if (ProcessCommandForEvent(InKeyEvent))
@@ -396,6 +409,27 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 		return FReply::Unhandled();
 	}
 
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+
+	if (!IsValid(Subsystem))
+	{
+		return FReply::Handled();
+	}
+
+	UModioMenu* Menu = Cast<UModioMenu>(Subsystem->ModBrowserInstance);
+
+	if (IsValid(Menu) && Menu->IsAnyDrawerExpanded())
+	{
+		return FReply::Handled();
+	}
+
+	UModioUI4Subsystem* UI4Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (IsValid(UI4Subsystem) && UI4Subsystem->IsAnyDialogOpen())
+	{
+		return FReply::Handled();
+	}
+
 	// Had to do grid navigation manually since UE nav is seemingly random at times
 
 	float entryWidth = ResultsTileView->GetEntryWidth();
@@ -403,6 +437,7 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 	int itemsPerRow = FMath::FloorToInt(viewWidth / entryWidth);
 
 	int currentIndex = ResultsTileView->GetIndexForItem(ResultsTileView->GetSelectedItem());
+
 	if (CurrentRow + CurrentListIndex != currentIndex) 
 	{
 		if (currentIndex != -1)
@@ -413,6 +448,11 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 				CurrentRow += itemsPerRow;
 			}
 			CurrentListIndex = currentIndex-CurrentRow;
+		}
+		else
+		{
+			CurrentRow = 0;
+			CurrentListIndex = 0;
 		}
 	}
 
@@ -434,7 +474,12 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 
 		if (!SortBy->HasFocusedDescendants() && !RefineSearchButton->HasAnyUserFocus())
 		{
+			SetFocus();
 			CurrentRow = (CurrentRow - itemsPerRow >= 0 ? CurrentRow - itemsPerRow : CurrentRow);
+			return TryNavigateGrid();
+		}
+		else
+		{
 			return TryNavigateGrid();
 		}
 	}
@@ -448,7 +493,7 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 				ModioErrorWithRetryWidget->SetKeyboardFocus();
 				return FReply::Handled();
 			}
-			CurrentRow = 0;
+
 			return TryNavigateGrid();
 		}
 		else if (SortBy->HasFocusedDescendants() && SortBy->IsComboBoxOpen())
@@ -463,7 +508,6 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 	}
 	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left)
 	{
-		
 		if (SortBy->HasFocusedDescendants()) 
 		{
 			SortBy->SetComboBoxOpen(false);
@@ -509,7 +553,7 @@ FReply UModioSearchResultsView::TryNavigateGrid()
 
 void UModioSearchResultsView::OnRefineSearchButtonClicked()
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		Subsystem->SendCommandToBrowserUI(FModioInputKeys::RefineSearch, 0);
 	}

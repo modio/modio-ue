@@ -12,6 +12,7 @@
 #include "Components/ListViewBase.h"
 #include "Engine/Engine.h"
 #include "ModioSubsystem.h"
+#include "ModioUI4Subsystem.h"
 #include "ModioUISubsystem.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/Interfaces/IModioUINotification.h"
@@ -136,7 +137,7 @@ void UModioModTile::OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating 
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->DisplayErrorNotification(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
+		Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
 	}
 }
 
@@ -147,7 +148,7 @@ void UModioModTile::SubmitNegativeRating()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->ShowUserAuthenticationDialog();
+			Subsystem->ShowUserAuth();
 		}
 	}
 
@@ -173,7 +174,7 @@ void UModioModTile::SubmitPositiveRating()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->ShowUserAuthenticationDialog();
+			Subsystem->ShowUserAuth();
 		}
 	}
 
@@ -245,22 +246,25 @@ FEventReply UModioModTile::OnThumbnailMouseDown(FGeometry MyGeometry, const FPoi
 	}
 	if (MouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
-		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		if (UModioUI4Subsystem* Subsystem4 = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 		{
 			if (!AllowMouseHoverFocus() || MoreOptionsMenu->GetIsMenuOpen()) 
 			{
-				Subsystem->SetCurrentFocusTarget(nullptr);
+				Subsystem4->SetCurrentFocusTarget(nullptr);
 				MoreOptionsMenu->Close();
 				return FEventReply(true);
 			}
 
-			if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
+			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 			{
-				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+				if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
+				{
+					Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
 
-				FSlateApplication::Get().PlaySound(PressedSound);
+					FSlateApplication::Get().PlaySound(PressedSound);
 
-				return FEventReply(true);
+					return FEventReply(true);
+				}
 			}
 		}
 	}

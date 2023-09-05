@@ -45,6 +45,10 @@ struct MODIO_API FModioInitializeOptions
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	TMap<FString, FString> ExtendedInitializationParameters;
 
+	/** @brief Set Mod.io to run with background thread*/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
+	bool bUseBackgroundThread = false;
+
 	/// @brief String representing the local session. We recommend setting this to a unique per-user string.
 	/// On Windows, defaults to the string SID of the current logged-in Windows account.
 	/// On non-desktop platforms, this needs to be set by gameplay code before passing `FModioInitializeOptions` to

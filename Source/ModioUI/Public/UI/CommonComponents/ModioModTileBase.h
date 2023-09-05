@@ -66,7 +66,6 @@ protected:
 	UFUNCTION()
 	virtual void HandleModLogoOperationStateChanged(EModioUIAsyncOperationWidgetState NewState);
 
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeTileClicked();
 
 	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry,
@@ -104,14 +103,17 @@ protected:
 	FModioUIStyleRef Style = FModioUIStyleRef {"DefaultModTileStyle"};
 
 	UPROPERTY()
-	class UModioUISubsystem* UISubsystem;
+	class UModioUI4Subsystem* UISubsystem;
 
 	FSlateSound HoveredSound;
 	FSlateSound PressedSound;
 
+	bool bCurrentHoverAnimationState = false;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnSetExpandedState(bool bExpanded);
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
@@ -119,10 +121,13 @@ protected:
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent);
 	virtual void NativeOnAuthenticationChanged(TOptional<FModioUser> User);
 
+	void PlayHoverAnimation(bool bHovered);
+	EModioLogoSize ModLogoSize = EModioLogoSize::Thumb320;
+
 	FModioModID CurrentModId;
-	FTimerHandle SetFocusTimerHandle;
 	bool bIsUserAuthenticated;
 	bool bShouldPlayAnimation = false;
+	bool bImageLoaded = false;
 	bool GetSubscriptionState();
 	UFUNCTION()
 	void EnableSubscribeButton();

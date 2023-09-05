@@ -73,7 +73,7 @@ TSharedRef<SWidget> UModioModUninstallHeaderWidget::RebuildWidget()
 					const uint64 NumBytes = CurrentModEntry.GetSizeOnDisk().Underlying;
 
 					FFormatNamedArguments Args;
-					Args.Add("Size", UModioSDKLibrary::Filesize_ToString(NumBytes, NumBytes < GB ? 0 : 1));
+					Args.Add("Size", UModioSDKLibrary::Filesize_ToString(NumBytes, 0, NumBytes < GB ? 0 : 1));
 					ModDesc = FText::Format(ModDesc, Args);
 				}
 			}

@@ -9,6 +9,8 @@
  */
 
 #include "UI/Views/ModDetails/ModioModDetailsImageGallery.h"
+
+#include "ModioUI4Subsystem.h"
 #include "UI/Views/ModDetails/ModioModDetailsImage.h"
 #include "Brushes/SlateImageBrush.h"
 #include "Core/ModioModInfoUI.h"
@@ -272,7 +274,7 @@ void UModioModDetailsImageGallery::ApplyImageToWidget(UWidget* Widget, int32 Ima
 			// so we want loading brush instead of error, where it would otherwise go
 			if (ImageInfo[ImageIndex].DownloadedImageReference.IsSet() && ImageInfo[ImageIndex].DownloadedImageReference.GetValue().GetState() == EModioImageState::LoadingIntoMemory)
 			{
-				UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+				UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 				if (Subsystem)
 				{
 					UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
@@ -286,7 +288,7 @@ void UModioModDetailsImageGallery::ApplyImageToWidget(UWidget* Widget, int32 Ima
 			}
 			else if (ImageInfo[ImageIndex].Status)
 			{
-				UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+				UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 				if (Subsystem)
 				{
 					UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
@@ -300,7 +302,7 @@ void UModioModDetailsImageGallery::ApplyImageToWidget(UWidget* Widget, int32 Ima
 			}
 			else
 			{
-				UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+				UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 				if (Subsystem)
 				{
 					UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();

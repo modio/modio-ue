@@ -46,7 +46,7 @@ UMaterialInterface* UModioDefaultInputGlyphProvider::NativeGetInputGlyphMaterial
 		case EModioUIInputMode::Unknown:
 			return nullptr;
 		case EModioUIInputMode::Mouse:
-			return nullptr;
+			return KeyboardGlyphSet != nullptr ? KeyboardGlyphSet->GetGlyphForKey(VirtualInput) : nullptr;
 		case EModioUIInputMode::Keyboard:
 			return KeyboardGlyphSet != nullptr ? KeyboardGlyphSet->GetGlyphForKey(VirtualInput) : nullptr;
 		case EModioUIInputMode::XBox:

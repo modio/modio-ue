@@ -44,6 +44,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, config, Category = "Project")
 	EModioPortal DefaultPortal = EModioPortal::None;
 
+	/** Run the mod.io plugin on a managed background thread. Enabling this will spin up a new thread which
+	 * automatically calls RunPendingHandlers for you. Refer to the documentation for more information about this
+	 * option. */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Project")
+	bool bUseBackgroundThread = false;
+
 private:
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

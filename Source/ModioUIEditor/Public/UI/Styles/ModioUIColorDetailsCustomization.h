@@ -184,7 +184,7 @@ class FModioUIColorRefDetailsCustomization : public IPropertyTypeCustomization
 public:
 	FModioUIColorRefDetailsCustomization()
 	{
-		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		{
 			if (Subsystem)
 			{

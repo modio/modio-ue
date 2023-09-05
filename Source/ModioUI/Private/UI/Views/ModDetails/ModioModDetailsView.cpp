@@ -75,9 +75,12 @@ void UModioModDetailsView::NativeOnInitialized()
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	if (Subsystem)
 	{
-		Subsystem->OnSubscriptionStatusChanged.AddUObject(this, &UModioModDetailsView::OnModSubscriptionStatusChanged);
-		Subsystem->ModBrowserInstance->OnDownloadQueueClosed.AddDynamic(this, &UModioModDetailsView::OnDownloadQueueClosed);
-		Subsystem->ModBrowserInstance->GetDialogController()->OnDialogClosed.AddDynamic(this, &UModioModDetailsView::OnDialogClosed);
+		if (UModioMenu* MenuInstance = Cast<UModioMenu>(Subsystem->ModBrowserInstance))
+		{
+			Subsystem->OnSubscriptionStatusChanged.AddUObject(this, &UModioModDetailsView::OnModSubscriptionStatusChanged);
+			MenuInstance->OnDownloadQueueClosed.AddDynamic(this, &UModioModDetailsView::OnDownloadQueueClosed);
+			MenuInstance->GetDialogController()->OnDialogClosed.AddDynamic(this, &UModioModDetailsView::OnDialogClosed);
+		}
 	}
 }
 
@@ -92,7 +95,7 @@ void UModioModDetailsView::OnModSubscriptionStatusChanged(FModioModID ID, bool S
 			{
 				if (SubscribeButton)
 				{
-					GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::EnableSubscribeButton, 0.6, false);
+					SubscribeButton->SetIsEnabled(true);
 				}
 
 				if (SubscriptionBadge)
@@ -109,7 +112,9 @@ void UModioModDetailsView::OnModSubscriptionStatusChanged(FModioModID ID, bool S
 void UModioModDetailsView::NativeSubscribeClicked()
 {
 	SubscribeButton->SetIsEnabled(false);
-	GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::EnableSubscribeButton, 0.6, false);
+	FTimerHandle timerHandle;
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UModioModDetailsView::EnableSubscribeButton, 0.6,
+										   false);
 
 	if (!bCachedSubscriptionState)
 	{
@@ -183,6 +188,16 @@ void UModioModDetailsView::NativeRequestOperationRetry()
 	ShowDetailsForMod(CurrentModID);
 }
 
+FReply UModioModDetailsView::NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent)
+{
+	if (ProcessCommandForEvent(InPointerEvent))
+	{
+		return FReply::Handled();
+	}
+	
+	return Super::NativeOnPreviewMouseButtonDown(InGeometry, InPointerEvent);
+}
+
 FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
 	if (ProcessCommandForEvent(InKeyEvent))
@@ -190,7 +205,13 @@ FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		return FReply::Handled();
 	}
 
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (IsValid(Subsystem) && Subsystem->IsAnyDialogOpen())
+	{
+		return FReply::Handled();
+	}
+
 	if (ImageGallery->bIsFocused)
 	{
 		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
@@ -330,7 +351,7 @@ void UModioModDetailsView::OnRatingSubmissionComplete(FModioErrorCode ec, EModio
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	if (IsValid(Subsystem))
 	{
-		Subsystem->DisplayErrorNotification(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
+		Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
 	}
 
 	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
@@ -365,7 +386,9 @@ void UModioModDetailsView::OnRatingSubmissionComplete(FModioErrorCode ec, EModio
 			default:
 				break;
 		}
-		if (Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse)
+
+		UModioUI4Subsystem* Subsystem4 = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+		if (Subsystem4->GetLastInputDevice() == EModioUIInputMode::Mouse)
 		{
 			// no need to auto focus on any buttons when using mouse, without this the focus stays on the rate buttons
 			SetFocus();
@@ -478,7 +501,7 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 				SetDataSource(NewDataSource);
 				bIsScrolling = true;
 				CurrentIndex = 0;
-				GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModDetailsView::SetInitialFocus, 0.6, false);
+				SetInitialFocus();
 			}
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																	   EModioUIAsyncOperationWidgetState::Success);
@@ -493,12 +516,12 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 
 void UModioModDetailsView::SetInitialFocus()
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		if (SubscribeButton->GetIsEnabled())
 		{
-			FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+			SubscribeButton->SetKeyboardFocus();
 		}
 		else
 		{
@@ -515,19 +538,19 @@ void UModioModDetailsView::OnDialogClosed()
 		return;
 	}
 
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(Subsystem))
 	{
 		if (Subsystem->GetCurrentFocusTarget() != SubscribeButton && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 		{
-			FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
+			SubscribeButton->SetKeyboardFocus();
 		}
 	}
 }
 
 void UModioModDetailsView::OnDownloadQueueClosed()
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		FSlateApplication::Get().SetUserFocus(0, SubscribeButton->TakeWidget(), EFocusCause::SetDirectly);
@@ -538,13 +561,15 @@ void UModioModDetailsView::EnableSubscribeButton()
 {
 	SubscribeButton->SetIsEnabled(true);
 
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		SubscribeButton->SetKeyboardFocus();
 	}
 
-	if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+
+	if (IsValid(ModioSubsystem))
 	{
 		if (!ModioSubsystem->QueryUserProfile().IsSet())
 		{
@@ -557,8 +582,20 @@ void UModioModDetailsView::EnableSubscribeButton()
 		}
 	}
 
-	(SubscribeButton->GetLabel() == SubscribeLabel.ToString()) ? SubscribeButton->SetLabel(UnsubscribeLabel)
-																   : SubscribeButton->SetLabel(SubscribeLabel);
+	UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
+	if (ModInfo)
+	{
+		if (IsValid(ModioSubsystem))
+		{
+			if (ModioSubsystem->QueryUserSubscriptions().Contains(ModInfo->Underlying.ModId))
+			{
+				SubscribeButton->SetLabel(UnsubscribeLabel);
+				return;
+			}
+		}
+	}
+
+	SubscribeButton->SetLabel(SubscribeLabel);
 }
 
 void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
@@ -592,7 +629,7 @@ void UModioModDetailsView::ShowDetailsForMod(FModioModID ID)
 
 FReply UModioModDetailsView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		SubscribeButton->SetKeyboardFocus();

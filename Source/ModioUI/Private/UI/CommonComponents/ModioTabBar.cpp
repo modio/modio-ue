@@ -25,9 +25,9 @@
 TSharedRef<SWidget> UModioTabBar::RebuildWidget()
 {
 	UpdateBoundValues();
-	if (GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
-		GEngine->GetEngineSubsystem<UModioUISubsystem>()->OnMenuTabIndexChanged.AddUniqueDynamic(
+		GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->OnMenuTabIndexChanged.AddUniqueDynamic(
 			this, &UModioTabBar::OnTabIndexChanged);
 	}
 	GeneratedButtons.Empty();
@@ -79,9 +79,9 @@ TSharedRef<ITableRow> UModioTabBar::OnGenerateTabButton(TSharedPtr<FText> TabNam
 		];
 	// clang-format on
 
-	if (GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
-		int ActiveTabIndex = GEngine->GetEngineSubsystem<UModioUISubsystem>()->GetActiveTabIndex();
+		int32 ActiveTabIndex = GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->GetActiveTabIndex();
 
 		for (int i = 0; i < TabNames.Num(); i++)
 		{
@@ -112,9 +112,9 @@ FReply UModioTabBar::OnTabClicked(TSharedPtr<FText> TabName)
 	{
 		if (TabNames[i].EqualTo(Tab))
 		{
-			if (GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			if (GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 			{
-				GEngine->GetEngineSubsystem<UModioUISubsystem>()->SetActiveTabIndex(i);
+				GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->SetActiveTabIndex(i);
 
 				return FReply::Handled();
 			}

@@ -105,6 +105,13 @@ void UModioDrawerController::SetDrawerExpanded(int32 SlotIndex, bool bExpandedSt
 				if (CurrentSlotIndex == SlotIndex)
 				{
 					TargetSlot->SetExpanded(bExpandedState);
+
+					if (!bExpandedState)
+					{
+						CurrentAnimatingOutDrawer = SlotIndex;
+						TargetSlot->OnDrawerAnimatedOut.AddUniqueDynamic(this,
+																		 &UModioDrawerController::DrawerAnimatedOut);
+					}
 				}
 				else
 				{
@@ -159,9 +166,15 @@ bool UModioDrawerController::SetFocusToActiveDrawer()
 			}
 			if (TargetSlot->GetExpandedState() && TargetSlot->Content && !TargetSlot->Content->HasFocusedDescendants())
 			{
+				TargetSlot->Content->SetFocus();
 				return true;
 			}
 		}
 	}
 	return false;
+}
+
+void UModioDrawerController::DrawerAnimatedOut()
+{
+	OnDrawerAnimatedOut.Broadcast(CurrentAnimatingOutDrawer);
 }

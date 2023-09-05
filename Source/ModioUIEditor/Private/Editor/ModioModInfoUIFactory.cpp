@@ -73,7 +73,7 @@ bool UModioModInfoUIFactory::ConfigureProperties()
 									   }
 								   }));
 
-		while (bOperationInProgress)
+		while (bOperationInProgress && !UModioSDKLibrary::GetProjectInitializeOptions().bUseBackgroundThread)
 		{
 			Subsystem->RunPendingHandlers();
 		}
@@ -81,7 +81,7 @@ bool UModioModInfoUIFactory::ConfigureProperties()
 		bOperationInProgress = true;
 		Subsystem->ListAllModsAsync(FModioFilterParams(), FOnListAllModsDelegateFast::CreateUObject(
 															  this, &UModioModInfoUIFactory::OnModListRetrieved));
-		while (bOperationInProgress)
+		while (bOperationInProgress && !UModioSDKLibrary::GetProjectInitializeOptions().bUseBackgroundThread)
 		{
 			Subsystem->RunPendingHandlers();
 		}
@@ -90,7 +90,7 @@ bool UModioModInfoUIFactory::ConfigureProperties()
 			bOperationInProgress = true;
 			Subsystem->ShutdownAsync(
 				FOnErrorOnlyDelegateFast::CreateLambda([this](FModioErrorCode) { bOperationInProgress = false; }));
-			while (bOperationInProgress)
+			while (bOperationInProgress && !UModioSDKLibrary::GetProjectInitializeOptions().bUseBackgroundThread)
 			{
 				Subsystem->RunPendingHandlers();
 			}

@@ -45,8 +45,8 @@ void UModioModManagementWidgetBase::SynchronizeProperties()
 #if WITH_EDITOR
 	if (IsDesignTime())
 	{
-		
-		PreviewProgressInfo = FModioModProgressInfo::ConstructPreviewProgressInfo(PreviewProgressState, PreviewCurrent, PreviewTotal);
+		PreviewProgressInfo =
+			FModioModProgressInfo::ConstructPreviewProgressInfo(PreviewProgressState, PreviewCurrent, PreviewTotal);
 		PreviewProgressInfo.ID = PreviewModID;
 		UpdateProgress(PreviewProgressInfo);
 		return;

@@ -13,14 +13,11 @@
 #include "Tests/Commands/ModioTestCommandBase.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
-class FModioFetchExternalUpdatesAsyncCommand : public FModioTestLatentCommandBase
+class FModioFetchExternalUpdatesAsyncCommand : public FModioTestLatentCommandBaseExpectedResult
 {
-	bool bDesiredResult;
 public:
-	FModioFetchExternalUpdatesAsyncCommand(FAutomationTestBase* AssociatedTest, const FModioModID ModID, bool DesiredResult)
-		: FModioTestLatentCommandBase(AssociatedTest),
-		  ModID(ModID),
-		  bDesiredResult(DesiredResult)
+	FModioFetchExternalUpdatesAsyncCommand(FAutomationTestBase* AssociatedTest, EModioErrorCondition DesiredResult)
+		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, DesiredResult)
 	{}
 
 	using FModioTestLatentCommandBase::Update;
@@ -30,7 +27,7 @@ public:
 	}
 	void Callback(FModioErrorCode ec)
 	{
-		CurrentTest->TestEqual("External updates fetched with expected result", ec, bDesiredResult);
+		CurrentTest->TestEqual("External updates fetched with expected result", CheckExpected(ec), true);
 		Done();
 	}
 };

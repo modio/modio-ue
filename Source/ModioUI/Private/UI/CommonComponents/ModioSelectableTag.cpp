@@ -28,7 +28,7 @@ void UModioSelectableTag::SetTagLabel(FString InLabel)
 	SearchString = InLabel;
 	if (TagSelectedCheckbox)
 	{
-		UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		if (!subsystem)
 		{
 			TagSelectedCheckbox->SetLabelText(FText::FromString(SearchString));
@@ -63,8 +63,10 @@ void UModioSelectableTag::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEve
 {
 	if (const FModioCheckBoxStyle* ResolvedStyle = FocusedStyle.FindStyle<FModioCheckBoxStyle>())
 	{
-		TagSelectedCheckbox->SetStyle(ResolvedStyle);
-		FSlateApplication::Get().PlaySound(ResolvedStyle->HoveredSlateSound);
+		const FModioCheckBoxStyle* style =
+			bAllowMultipleSelection ? ResolvedStyle : RadioCheckboxFocusedStyle.FindStyle<FModioCheckBoxStyle>();
+		TagSelectedCheckbox->SetStyle(style);
+		FSlateApplication::Get().PlaySound(style->HoveredSlateSound);
 	}
 	Super::NativeOnAddedToFocusPath(InFocusEvent);
 }
@@ -73,7 +75,18 @@ void UModioSelectableTag::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocu
 {
 	if (const FModioCheckBoxStyle* ResolvedStyle = NormalStyle.FindStyle<FModioCheckBoxStyle>())
 	{
-		TagSelectedCheckbox->SetStyle(ResolvedStyle);
+		TagSelectedCheckbox->SetStyle(bAllowMultipleSelection ? ResolvedStyle
+															  : RadioCheckboxStyle.FindStyle<FModioCheckBoxStyle>());
 	}
 	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
+}
+
+void UModioSelectableTag::SetAllowMultipleSelection(bool bAllowMultiple)
+{
+	bAllowMultipleSelection = bAllowMultiple;
+	if (const FModioCheckBoxStyle* ResolvedStyle = NormalStyle.FindStyle<FModioCheckBoxStyle>())
+	{
+		TagSelectedCheckbox->SetStyle(bAllowMultipleSelection ? ResolvedStyle
+															  : RadioCheckboxStyle.FindStyle<FModioCheckBoxStyle>());
+	}
 }

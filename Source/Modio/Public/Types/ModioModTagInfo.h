@@ -24,14 +24,14 @@ struct MODIO_API FModioModTagInfo
 	GENERATED_BODY()
 
 	/** @brief The display name for the tag */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModTagInfo")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ModTagInfo")
 	FString TagGroupName;
 
 	/** @brief The valid tags the group can have */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModTagInfo")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ModTagInfo")
 	TArray<FString> TagGroupValues;
 
 	/** @brief True if multiple tags from the group can be used simultaneously */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModTagInfo")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ModTagInfo")
 	bool bAllowMultipleSelection {};
 };

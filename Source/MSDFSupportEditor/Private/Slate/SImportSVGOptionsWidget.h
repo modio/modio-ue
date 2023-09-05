@@ -44,9 +44,8 @@
 #include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Text/STextBlock.h"
-
 #if UE_VERSION_NEWER_THAN(5, 2, 0)
-	#include "MaterialDomain.h"
+#include "MaterialDomain.h"
 #endif
 
 UENUM()
@@ -115,6 +114,7 @@ public:
 		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), FieldDistance);
 		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), OutputImageSize);
 		MaterialExpressionHelpers::AddMaterialExpression(RenderedMaterialInstance.Get(), ComponentMask);
+		
 		RenderedMaterialInstance->MaterialDomain = EMaterialDomain::MD_UI;
 		RenderedMaterialInstance->BlendMode = BLEND_Translucent;
 		// Use a flat white color for the rendered preview

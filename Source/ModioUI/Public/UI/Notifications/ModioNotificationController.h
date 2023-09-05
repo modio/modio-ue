@@ -36,8 +36,8 @@ protected:
 	virtual void OnNotificationExpired(UWidget* Notification);
 
 	virtual void NativeDisplayNotification(const TScriptInterface<class IModioUINotification>& Notification) override;
-	virtual void NativeDisplayErrorNotification(const FModioNotificationParams& Params) override;
-	virtual void NativeDisplayErrorNotificationManual(const FText& title, const FText& message, bool bIsError) override;
+	virtual void NativeDisplayNotificationParams(const FModioNotificationParams& Params) override;
+	virtual void NativeDisplayNotificationManual(const FText& Title, const FText& Message, bool bIsError) override;
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUINotification"), Category = "Widgets")
 	TSubclassOf<UUserWidget> ErrorNotificationClass;
 

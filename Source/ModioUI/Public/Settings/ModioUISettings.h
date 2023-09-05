@@ -127,6 +127,24 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	bool bOverridePlatformMaterials = false;
 
+	/**
+	* Enable for a centered mod browser in case you want the aspect ratio to be the same for all screen types
+	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
+	bool bEnableCenteredUI = false;
+
+	/**
+	* Sets the max menu width for UI, behaves more like aspect ratio so 1080 for example will display normally on 16:9 4K displays
+	**/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings", meta = (EditCondition = "bEnableCenteredUI", EditConditionHides))
+	float MaxMenuWidth = 1920.0f;
+
+	/**
+	* Removes input glyphs from every input device
+	**/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Config, Category = "ModioUISettings")
+	bool bDisableInputGlyphsCompletely = false;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Config, Category = "ModioLocalization")
 	TMap<FString, FText> LocalizedTags;
 

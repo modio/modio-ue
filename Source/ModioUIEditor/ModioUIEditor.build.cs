@@ -19,7 +19,7 @@ public class ModioUIEditor : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         bEnforceIWYU = true;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UnrealEd", "Modio", "ModioUI", "DetailCustomizations", "PropertyEditor", "PropertyPath" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UnrealEd", "Modio", "ModioUI","ModioUICore", "DetailCustomizations", "PropertyEditor", "PropertyPath" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "UMG", "Slate", "SlateCore", "UnrealEd", "AssetTools", "AssetRegistry", "AppFramework", "InputCore" });
 

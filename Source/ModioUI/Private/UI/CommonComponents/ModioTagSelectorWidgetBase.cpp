@@ -37,7 +37,7 @@ void UModioTagSelectorWidgetBase::Refresh()
 	{
 		if (TagCategoryLabel)
 		{
-			UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+			UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 			if (!subsystem)
 			{
 				TagCategoryLabel->SetText(FText::FromString(CachedTagInfo->Underlying.TagGroupName));
@@ -59,6 +59,7 @@ void UModioTagSelectorWidgetBase::Refresh()
 			CategoryVerticalBox->AddChild(tagWidget);
 			tagWidget->SetTagLabel(item);
 			tagWidget->OnTagStateChanged.AddUniqueDynamic(this, &UModioTagSelectorWidgetBase::OnCheckboxChecked);
+			tagWidget->SetAllowMultipleSelection(CachedTagInfo->Underlying.bAllowMultipleSelection);
 		}
 	}
 }

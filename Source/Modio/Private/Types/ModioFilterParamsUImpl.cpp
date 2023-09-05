@@ -99,7 +99,14 @@ FModioFilterParams& FModioFilterParams::PagedResults(uint64 PageNumber, uint64 P
 
 FString FModioFilterParams::ToString() const
 {
-	return FString(UTF8_TO_TCHAR(ToModio(*this).ToString().c_str()));
+	FString FilterParamString;
+
+	for (auto& FilterParam : ToModio(*this).ToQueryParamaters())
+	{
+		FilterParamString += FString::Printf(TEXT("%s=%s&"), UTF8_TO_TCHAR(FilterParam.first.c_str()), UTF8_TO_TCHAR(FilterParam.second.c_str()));
+
+	}
+	return FilterParamString;
 }
 
 FModioFilterParams& FModioFilterParams::MetadataLike(FString SearchString)

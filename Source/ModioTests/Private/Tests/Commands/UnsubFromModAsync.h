@@ -13,15 +13,13 @@
 #include "Tests/Commands/ModioTestCommandBase.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
-class FModioUnsubFromModAsyncCommand : public FModioTestLatentCommandBase
+class FModioUnsubFromModAsyncCommand : public FModioTestLatentCommandBaseExpectedResult
 {
 FModioModID ModID;
-bool bDesiredResult;
 public:
-	FModioUnsubFromModAsyncCommand(FAutomationTestBase* AssociatedTest, const FModioModID ModID, bool DesiredResult)
-		: FModioTestLatentCommandBase(AssociatedTest),
-		  ModID(ModID),
-		  bDesiredResult(DesiredResult)
+	FModioUnsubFromModAsyncCommand(FAutomationTestBase* AssociatedTest, const FModioModID ModID, EModioErrorCondition DesiredResult)
+		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, DesiredResult),
+		  ModID(ModID)
 	{}
 
 	using FModioTestLatentCommandBase::Update;
@@ -32,7 +30,7 @@ public:
 	}
 	void Callback(FModioErrorCode ec)
 	{
-		CurrentTest->TestEqual("Unsubscription completed with expected result", ec, bDesiredResult);
+		CurrentTest->TestEqual("Unsubscription completed with expected result", CheckExpected(ec), true);
 		Done();
 	}
 };

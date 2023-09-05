@@ -9,7 +9,10 @@
  */
 
 #include "UI/BaseWidgets/ModioInputBindingImage.h"
+
+#include "ModioUI4Subsystem.h"
 #include "UI/Styles/ModioUIStyleSet.h"
+#include "Settings/ModioUISettings.h"
 
 void UModioInputBindingImage::OnWidgetRebuilt()
 {
@@ -43,7 +46,16 @@ void UModioInputBindingImage::NativeOnInputDeviceChanged(EModioUIInputMode Input
 
 void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
+	// Disable input images when bDisableInputGlyphsCompletly is set true
+	if (Settings->bDisableInputGlyphsCompletely)
+	{
+		SetVisibility(ESlateVisibility::Collapsed);
+		InvalidateLayoutAndVolatility();
+		return;
+  }
+  
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		UMaterialInterface* InputGlyphMaterial = Subsystem->GetInputGlyphMaterialForInputType(KeyToShow, InputDevice);
 		if (IsValid(InputGlyphMaterial))
@@ -63,8 +75,8 @@ void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
 	}
 	else
 	{
-		// Disable input images when using Mouse/Keyboard as we do not have appropriate glyphs
-		if (InputDevice == EModioUIInputMode::Mouse || InputDevice == EModioUIInputMode::Unknown)
+		// Disable input images when input device is unknown
+		if (InputDevice == EModioUIInputMode::Unknown)
 		{
 			SetVisibility(ESlateVisibility::Collapsed);
 			InvalidateLayoutAndVolatility();

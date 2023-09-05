@@ -10,6 +10,7 @@
 
 #include "UI/BaseWidgets/ModioLogoWidget.h"
 
+#include "ModioUI4Subsystem.h"
 #include "ModioUISubsystem.h"
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
@@ -23,7 +24,7 @@ void UModioLogoWidget::SynchronizeProperties()
 
 TSharedRef<SWidget> UModioLogoWidget::RebuildWidget()
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (Subsystem)
 	{
 		UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();

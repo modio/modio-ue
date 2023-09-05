@@ -35,6 +35,13 @@ class MODIOUI_API UModioSelectableTag : public UModioUserWidgetBase,
 {
 	GENERATED_BODY()
 public:
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCheckBoxStyle"), Category = "Widgets")
+	FModioUIStyleRef RadioCheckboxStyle;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioCheckBoxStyle"), Category = "Widgets")
+	FModioUIStyleRef RadioCheckboxFocusedStyle;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioCheckBox* TagSelectedCheckbox;
 
@@ -53,12 +60,16 @@ public:
 	FString GetTagString();
 
 	void SetTagLabel(FString InLabel);
+	void SetAllowMultipleSelection(bool bAllowMultiple);
 
 	UFUNCTION()
 	void OnCheckboxCheckStateChanged(bool bIsChecked);
 
 
 protected:
+
+	bool bAllowMultipleSelection = false;
+
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
 	virtual void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) override;

@@ -23,7 +23,7 @@ public class ModioUI : ModuleRules
         //bUseUnity = false;
         
         PublicDependencyModuleNames.AddRange(new string[] {
-            "Core", "Engine", "UMG", "Slate", "SlateCore", "InputCore", "Modio", "PropertyPath", "RHI", "MSDFSupport"
+            "Core", "Engine", "UMG", "Slate", "SlateCore", "InputCore", "Modio", "ModioUICore", "PropertyPath", "RHI", "MSDFSupport"
 			// ... add other public dependencies that you statically link with here ...
 		});
 

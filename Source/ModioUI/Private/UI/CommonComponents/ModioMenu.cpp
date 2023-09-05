@@ -13,11 +13,15 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Input/Reply.h"
 #include "Settings/ModioUISettings.h"
+#include "Components/SizeBox.h"
+#include "Components/HorizontalBoxSlot.h"
+#include "Components/Border.h"
 #include "UI/BaseWidgets/ModioScrollBox.h"
 #include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
 #include "UI/Commands/ModioCommonUICommands.h"
 #include "UI/Commands/ModioUIMenuCommandList.h"
 #include "UI/Dialogs/ModioDialogBaseInternal.h"
+#include "UI/Drawers/RefineSearch/ModioRefineSearchDrawer.h"
 #include "UI/Interfaces/IModioUIDialogButtonWidget.h"
 #include "UI/Interfaces/IModioMenuBackgroundProvider.h"
 #include "UI/Interfaces/IModioUIDownloadQueueWidget.h"
@@ -31,6 +35,11 @@
 
 bool UModioMenu::CanExecutePageChange()
 {
+	if (IsValid(DialogController) && DialogController->DialogStack.Num() > 0)
+	{
+		return false;
+	}
+
 	// Only allow the user to change the page if we're currently displaying Collection or Browse
 	if (ViewController)
 	{
@@ -43,6 +52,10 @@ bool UModioMenu::CanExecutePageChange()
 
 bool UModioMenu::CanShowRefineSearch()
 {
+	if (IsValid(DialogController) && DialogController->DialogStack.Num() > 0)
+	{
+		return false;
+	}
 	// Only show the refine search results if we're currently displaying Browse or SearchResults
 	if (ViewController)
 	{
@@ -55,6 +68,11 @@ bool UModioMenu::CanShowRefineSearch()
 
 bool UModioMenu::CanShowDownloadQueue()
 {
+	if (IsValid(DialogController) && DialogController->DialogStack.Num() > 0)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -62,21 +80,21 @@ void UModioMenu::ChangePagePrevious()
 {
 	// Takes advantage of the two pages we want to swap between being index 0 and 1. If we add additional pages this
 	// will have to change
-	GEngine->GetEngineSubsystem<UModioUISubsystem>()->SetActiveTabIndex(!ViewController->ActiveWidgetIndex);
+	GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->SetActiveTabIndex(!ViewController->ActiveWidgetIndex);
 }
 
 void UModioMenu::ChangePageNext()
 {
 	// Takes advantage of the two pages we want to swap between being index 0 and 1. If we add additional pages this
 	// will have to change
-	GEngine->GetEngineSubsystem<UModioUISubsystem>()->SetActiveTabIndex(!ViewController->ActiveWidgetIndex);
+	GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->SetActiveTabIndex(!ViewController->ActiveWidgetIndex);
 }
 
-void UModioMenu::SetPageIndex(int Index)
+void UModioMenu::SetPageIndex(int Index, bool bForce)
 {
 	if (ViewController)
 	{
-		if (ViewController->GetActiveWidgetIndex() != Index)
+		if (ViewController->GetActiveWidgetIndex() != Index || bForce)
 		{
 			ViewController->SetActiveWidgetIndex(Index);
 		}
@@ -91,6 +109,16 @@ int32 UModioMenu::GetPageIndex()
 	}
 
 	return INDEX_NONE;
+}
+
+void UModioMenu::CacheCurrentPage()
+{
+	CachedPageIndex = GetPageIndex();
+}
+
+void UModioMenu::RestoreCachedPage()
+{
+	SetPageIndex(CachedPageIndex, true);
 }
 
 void UModioMenu::ToggleRefineSearchDrawer()
@@ -114,25 +142,33 @@ void UModioMenu::ToggleRefineSearchDrawer()
 				}
 			}
 		}
-		else 
+		else
 		{
 			SetFocus();
 		}
 	}
 }
 
-void UModioMenu::RefreshDownloadQueue()
+
+bool UModioMenu::IsAnyDrawerExpanded()
 {
 	if (DrawerController)
 	{
-		if (DrawerController)
+		return DrawerController->IsAnyDrawerExpanded();
+	}
+
+	return false;
+}
+
+void UModioMenu::RefreshDownloadQueue()
+{
+	if(DrawerController)
+	{
+		for (UWidget* Child : DrawerController->GetAllChildren())
 		{
-			for (UWidget* Child : DrawerController->GetAllChildren())
+			if (Child->Implements<UModioUIDownloadQueueWidget>())
 			{
-				if (Child->Implements<UModioUIDownloadQueueWidget>())
-				{
-					IModioUIDownloadQueueWidget::Execute_RefreshDownloadQueue(Child);
-				}
+				IModioUIDownloadQueueWidget::Execute_RefreshDownloadQueue(Child);
 			}
 		}
 	}
@@ -140,6 +176,7 @@ void UModioMenu::RefreshDownloadQueue()
 
 void UModioMenu::ToggleDownloadQueueDrawer()
 {
+	bDownloadDrawerOpen = false;
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
 		if (TOptional<FModioUser> User = Subsystem->QueryUserProfile())
@@ -157,6 +194,7 @@ void UModioMenu::ToggleDownloadQueueDrawer()
 							FModioOptionalUser UserWrapper {User};
 							IModioUIDownloadQueueWidget::Execute_DisplayUserInfo(Child, UserWrapper);
 							FSlateApplication::Get().SetUserFocus(0, Child->TakeWidget(), EFocusCause::SetDirectly);
+							bDownloadDrawerOpen = true;
 						}
 					}
 				}
@@ -180,6 +218,12 @@ void UModioMenu::ToggleDownloadQueueDrawer()
 		}
 	}
 }
+
+bool UModioMenu::IsDownloadDrawerOpen_Implementation()
+{
+	return bDownloadDrawerOpen;
+}
+
 bool UModioMenu::CanGoToPreviousSubmenu()
 {
 	return true;
@@ -237,7 +281,23 @@ void UModioMenu::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 void UModioMenu::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-	
+
+	if (const UModioUISettings* CurrentUISettings =
+			UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
+	{
+		UHorizontalBoxSlot* slot = Cast<UHorizontalBoxSlot>(MenuSizeBox->Slot);
+		if (slot)
+		{
+			slot->SetHorizontalAlignment(CurrentUISettings->bEnableCenteredUI ? EHorizontalAlignment::HAlign_Center
+																			  : EHorizontalAlignment::HAlign_Fill);
+			slot->SetSize(CurrentUISettings->bEnableCenteredUI ? ESlateSizeRule::Automatic : ESlateSizeRule::Fill);
+			ESlateVisibility blurBorderVisibility =
+				CurrentUISettings->bEnableCenteredUI ? ESlateVisibility::Visible : ESlateVisibility::Collapsed;
+			LeftBlurBorder->SetVisibility(blurBorderVisibility);
+			RightBlurBorder->SetVisibility(blurBorderVisibility);
+			MenuSizeBox->SetWidthOverride(CurrentUISettings->MaxMenuWidth);
+		}
+	}
 }
 
 void UModioMenu::NativeConstruct()
@@ -250,6 +310,8 @@ void UModioMenu::NativeConstruct()
 		{
 			DrawerController->SetDrawerExpanded(ChildIndex, false);
 		}
+
+		DrawerController->OnDrawerAnimatedOut.AddUniqueDynamic(this, &UModioMenu::OnDrawerAnimatedOut);
 	}
 
 	if (MenuBar)
@@ -339,7 +401,24 @@ void UModioMenu::NativeOnInitialized()
 		Subsystem->EnableModManagement();
 		// Cache tags for this game
 		Subsystem->GetTagOptionsListAsync();
+
+		Subsystem->OnUserChanged.AddWeakLambda(this, [this](TOptional<FModioUser> User) {
+			ForceCloseDownloadDrawer();
+			RestoreCachedPage();
+		});
+
+		Subsystem->OnAuthenticationChangeStarted.AddWeakLambda(this, [this]()
+		{
+			CacheCurrentPage();
+		});
+
+		Subsystem->OnModManagementEvent.AddWeakLambda(
+			this, [this](FModioModManagementEvent Event)
+			{
+				RefreshDownloadQueue();
+			});
 	}
+
 	// Find the refine search drawer, bind to its confirmed event so we know to display the search results
 	if (DrawerController)
 	{
@@ -358,13 +437,14 @@ void UModioMenu::NativeOnInitialized()
 		ViewController->SetClipping(EWidgetClipping::ClipToBoundsAlways);
 	}
 
-	if (Subsystem && Subsystem->GetDefaultStyleSet())
+	UModioUI4Subsystem* Subsystem4 = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+	if (Subsystem4 && Subsystem4->GetDefaultStyleSet())
 	{
-		Background->SetBrushFromMaterial(Subsystem->GetDefaultStyleSet()->NativeGetBackgroundMaterial());
+		Background->SetBrushFromMaterial(Subsystem4->GetDefaultStyleSet()->NativeGetBackgroundMaterial());
 
-		if (IsValid(Subsystem->GetDefaultStyleSet()->GetHideCursorWidgetClass()))
+		if (IsValid(Subsystem4->GetDefaultStyleSet()->GetHideCursorWidgetClass()))
 		{
-			CreateHideMouseCursorWidget(Subsystem->GetDefaultStyleSet()->GetHideCursorWidgetClass());
+			CreateHideMouseCursorWidget(Subsystem4->GetDefaultStyleSet()->GetHideCursorWidgetClass());
 		}
 	}
 }
@@ -417,7 +497,7 @@ void UModioMenu::OnSearchSettingsChanged(FModioFilterParams Settings)
 	}
 }
 
-void UModioMenu::ShowDetailsForMod(FModioModID ID)
+void UModioMenu::ShowDetailsForMod_Implementation(FModioModID ID)
 {
 	int32 UnderlyingWidgetIndex = (int32) EModioMenuScreen::EMMS_ModDetails;
 
@@ -425,6 +505,72 @@ void UModioMenu::ShowDetailsForMod(FModioModID ID)
 	if (UModioModDetailsView* View = Cast<UModioModDetailsView>(ViewController->GetActiveWidget()))
 	{
 		View->ShowDetailsForMod(ID);
+	}
+}
+
+void UModioMenu::RequestExternalAuthentication_Implementation(EModioAuthenticationProvider Provider)
+{
+	IModioModBrowserInterface::RequestExternalAuthentication_Implementation(Provider);
+	// Query the settings, get the authentication data provider, invoke the provider to fill in the rest of the params
+	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
+	{
+		if (UClass* AuthProviderClass = Settings->AuthenticationDataProvider.Get())
+		{
+			UObject* TmpProvider = NewObject<UObject>(this, AuthProviderClass);
+			FModioAuthenticationParams NewParams =
+				IModioUIAuthenticationDataProvider::Execute_GetAuthenticationParams(TmpProvider, Provider);
+			if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+			{
+				if (UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+				{
+					Subsystem->AuthenticateUserExternalAsync(
+						NewParams, Provider,
+						FOnErrorOnlyDelegateFast::CreateUObject(UISubsystem, &UModioUISubsystem::OnAuthenticationComplete));
+				}
+			}
+		}
+	}
+}
+
+void UModioMenu::RequestExternalAuthenticationNative(EModioAuthenticationProvider Provider, FOnErrorOnlyDelegateFast DedicatedCallback)
+{
+	IModioModBrowserInterface::RequestExternalAuthenticationNative(Provider, DedicatedCallback);
+	// Query the settings, get the authentication data provider, invoke the provider to fill in the rest of the params
+	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>())
+	{
+		if (UClass* AuthProviderClass = Settings->AuthenticationDataProvider.Get())
+		{
+			UObject* TmpProvider = NewObject<UObject>(this, AuthProviderClass);
+			FModioAuthenticationParams NewParams =
+				IModioUIAuthenticationDataProvider::Execute_GetAuthenticationParams(TmpProvider, Provider);
+			if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+			{
+				if (UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+				{
+					Subsystem->AuthenticateUserExternalAsync(
+						NewParams, Provider,
+						FOnErrorOnlyDelegateFast::CreateLambda([HookedHandler = FOnErrorOnlyDelegateFast::CreateUObject(
+																	UISubsystem, &UModioUISubsystem::OnAuthenticationComplete),
+																DedicatedCallback](FModioErrorCode ec) {
+							DedicatedCallback.ExecuteIfBound(ec);
+							HookedHandler.ExecuteIfBound(ec);
+						}));
+				}
+			}
+		}
+	}
+}
+
+void UModioMenu::ShowReportMod_Implementation(UObject* DialogDataSource)
+{
+	IModioModBrowserInterface::ShowReportMod_Implementation(DialogDataSource);
+	if (DialogController)
+	{
+		DialogController->ShowModReportDialog(DialogDataSource);
+	}
+	if (DialogAnim)
+	{
+		PlayAnimation(DialogAnim);
 	}
 }
 
@@ -457,13 +603,18 @@ void UModioMenu::HandleViewChanged(int32 ViewIndex)
 									  "Super::NativeOnViewChanged to ensure events are routed to blueprint"));
 }
 
+void UModioMenu::RefreshView(int32 ViewIndex)
+{
+	NativeOnViewChanged(ViewIndex);
+}
+
 void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 {
 	bRoutedOnViewChanged = true;
 	OnViewChanged(ViewIndex);
 	if (ViewController)
 	{
-		UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		if (subsystem)
 		{
 			subsystem->SetCurrentFocusTarget(nullptr);
@@ -511,32 +662,26 @@ void UModioMenu::NativeOnViewChanged(int64 ViewIndex)
 
 void UModioMenu::NativeTick(const FGeometry& InGeometry, float DeltaTime) 
 {
-	if (DialogController->TrySetFocusToActiveDialog())
+	UpdateMenuFocus();
+}
+
+FReply UModioMenu::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent)
+{
+	if (ProcessCommandForEvent(InPointerEvent))
 	{
-		ViewController->SetVisibility(ESlateVisibility::HitTestInvisible);
-		bMenuFocused = false;
-		return;
+		return FReply::Handled();
 	}
 
-	if (DrawerController->SetFocusToActiveDrawer())
-	{
-		bMenuFocused = false;
-		return;
-	}
-
-	ViewController->SetVisibility(ESlateVisibility::Visible);
-	if (!bMenuFocused) 
-	{	
-		bMenuFocused = true;
-		if (ActiveViewWidget)
-		{
-			ActiveViewWidget->SetKeyboardFocus();
-		}
-	}
+	return Super::NativeOnMouseButtonDown(InGeometry, InPointerEvent);
 }
 
 FReply UModioMenu::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
+	if (IsValid(DialogController) && DialogController->DialogStack.Num() > 0)
+	{
+		return FReply::Handled();
+	}
+
 	if (ProcessCommandForEvent(InKeyEvent))
 	{
 		return FReply::Handled();
@@ -562,7 +707,7 @@ FReply UModioMenu::NativeOnFocusReceived(const FGeometry& InGeometry, const FFoc
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
-void UModioMenu::ShowAuthenticationChoiceDialog()
+void UModioMenu::ShowUserAuth_Implementation()
 {
 	if (DialogController)
 	{
@@ -575,7 +720,7 @@ void UModioMenu::ShowAuthenticationChoiceDialog()
 	}
 }
 
-void UModioMenu::ShowLogoutDialog()
+void UModioMenu::LogOut_Implementation()
 {
 	if (DialogController)
 	{
@@ -588,23 +733,11 @@ void UModioMenu::ShowLogoutDialog()
 	}
 }
 
-void UModioMenu::ShowModUnsubscribeDialog(UObject* DialogDataSource)
+void UModioMenu::ShowModUnsubscribeDialog_Implementation(UObject* DialogDataSource)
 {
 	if (DialogController)
 	{
 		DialogController->ShowModUnsubscribeDialog(DialogDataSource);
-	}
-}
-
-void UModioMenu::ShowModReportDialog(UObject* DialogDataSource)
-{
-	if (DialogController)
-	{
-		DialogController->ShowModReportDialog(DialogDataSource);
-	}
-	if (DialogAnim)
-	{
-		PlayAnimation(DialogAnim);
 	}
 }
 
@@ -635,7 +768,7 @@ void UModioMenu::ShowUninstallConfirmationDialog(UObject* DialogDataSource)
 void UModioMenu::NativeUserChanged(TOptional<FModioUser> NewUser)
 {
 	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
-	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (subsystem)
 	{
 		subsystem->SetCurrentFocusTarget(nullptr);
@@ -649,10 +782,6 @@ void UModioMenu::NativeUserChanged(TOptional<FModioUser> NewUser)
 			{
 				DrawerController->CollapseAllDrawers();
 			}
-		}
-		if (ViewController)
-		{
-			ViewController->SetActiveWidgetIndex(0);
 		}
 	}
 	return;
@@ -682,3 +811,54 @@ void UModioMenu::CreateHideMouseCursorWidget(TSubclassOf<UUserWidget> widgetClas
 	HideCursorWidget->AddToViewport(1000);
 	HideCursorWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
+
+void UModioMenu::UpdateMenuFocus()
+{
+	UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+	if (subsystem && subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse)
+	{
+		return;
+	}
+
+	if (IsValid(DialogController))
+	{
+		if (DialogController->TrySetFocusToActiveDialog())
+		{
+			DialogController->SetVisibility(ESlateVisibility::Visible);
+			DialogController->SetRenderOpacity(1.f);
+			bMenuFocused = false;
+			return;
+		}
+
+		if (DialogController->DialogStack.Num() > 0)
+		{
+			bMenuFocused = false;
+			return;
+		}
+	}
+
+	if (DrawerController->SetFocusToActiveDrawer())
+	{
+		bMenuFocused = false;
+		return;
+	}
+
+	ViewController->SetVisibility(ESlateVisibility::Visible);
+	if (!bMenuFocused)
+	{
+		bMenuFocused = true;
+		if (ActiveViewWidget)
+		{
+			ActiveViewWidget->SetKeyboardFocus();
+		}
+	}
+}
+
+void UModioMenu::OnDrawerAnimatedOut(int32 SlotIndex)
+{
+	if (SlotIndex == (int32)EModioMenuDrawer::EMMD_RefineSearch)
+	{
+		SetFocus();
+	}
+}
+

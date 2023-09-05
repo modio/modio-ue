@@ -18,12 +18,17 @@
 #include "ModioFeaturedMod.generated.h"
 
 /**
- * Class that bridges mod features with actions, like submit ratings and reports
- **/
+* Class that bridges mod features with actions, like submit ratings and reports
+**/
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnModTilePressed, UWidget*, WidgetReference);
+
 UCLASS()
 class MODIOUI_API UModioFeaturedMod : public UModioModTileBase
 {
 	GENERATED_BODY()
+public:
+	FOnModTilePressed OnModTilePressed;
+
 protected:
 	float truncateDivider = 1.0f;
 	bool bCurrentSelectionState = false;
@@ -36,8 +41,8 @@ protected:
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
-
 	virtual void NativeOnModLogoDownloadCompleted(FModioModID ModID, FModioErrorCode ec,
 												  TOptional<FModioImageWrapper> Image, EModioLogoSize LogoSize);
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Types/ModioCommonTypes.h"
+#include "Misc/DateTime.h"
 
 #include "ModioFileMetadata.generated.h"
 
@@ -49,37 +50,37 @@ struct MODIO_API FModioFileMetadata
 	FModioModID ModId;
 
 	/** @brief Unix timestamp of date file was added. */
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata")
 	FDateTime DateAdded;
 
 	/**
 	 * @brief Current virus scan status of the file. For newly added files that have yet to be scanned this field
 	 * will change frequently until a scan is complete
 	 **/
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|Virus")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Virus")
 	EModioVirusScanStatus CurrentVirusScanStatus {};
 
 	/** @brief Was a virus detected? */
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|Virus")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Virus")
 	EModioVirusStatus CurrentVirusStatus {};
 
 	/** @brief Size of the file in bytes. */
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|File")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
 	int64 Filesize {};
 
 	/** @brief Filename including extension. */
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|File")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
 	FString Filename;
 
 	/** @brief Release version this file represents. */
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|Version")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Version")
 	FString Version;
 
 	/** @brief Changelog for the file. */
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|Version")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Version")
 	FString Changelog;
 
 	/** @brief Metadata stored by the game developer for this file. */
-	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata|Metadata")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Metadata")
 	FString MetadataBlob;
 };

@@ -9,6 +9,7 @@
  */
 
 #include "UI/Views/CategoryBrowser/ModioFeaturedView.h"
+#include "UI/Views/CategoryBrowser/ModioFeaturedModCarousel.h"
 #include "Algo/Transform.h"
 #include "Core/ModioModInfoUI.h"
 #include "GameFramework/InputSettings.h"
@@ -52,6 +53,14 @@ void UModioFeaturedView::NativeConstruct()
 	FCustomWidgetNavigationDelegate additionaNavDelegate;
 	additionaNavDelegate.BindUFunction(this, "SetFocusToPrimaryCategory");
 	AdditionalCategories->SetNavigationRuleCustom(EUINavigation::Up, additionaNavDelegate);
+	if (FeaturedModCarousel)
+	{
+		FCustomWidgetNavigationDelegate primaryNavDelegate;
+		primaryNavDelegate.BindUFunction(this, "SetFocusToAdditionalCategory");
+		FeaturedModCarousel->SetNavigationRuleCustom(EUINavigation::Down, primaryNavDelegate);
+	}
+
+	// In case we get an error message we better keep this here to keep navigation functionality
 	if (PrimaryCategoryGridPanel)
 	{
 		FCustomWidgetNavigationDelegate primaryNavDelegate;
@@ -123,7 +132,13 @@ FNavigationReply UModioFeaturedView::NativeOnNavigation(const FGeometry& InGeome
 
 FReply UModioFeaturedView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (IsValid(UISubsystem) && UISubsystem->IsAnyDialogOpen())
+	{
+		return FReply::Handled();
+	}
+
 	if (IsValid(UISubsystem) && !(UISubsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		if (UISubsystem->GetCurrentFocusTarget())
@@ -137,23 +152,34 @@ FReply UModioFeaturedView::NativeOnFocusReceived(const FGeometry& InGeometry, co
 	}
 	else
 	{
-		PrimaryFeaturedCategory->SetFocus();
+		SetFocusToPrimaryCategory();
 	}
 
 	return FReply::Handled();
 }
 
+FReply UModioFeaturedView::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent)
+{
+	return FReply::Unhandled();
+}
+
 FReply UModioFeaturedView::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	
 	return FReply::Unhandled();
 }
 
 void UModioFeaturedView::SetFocusToPrimaryCategory() 
 {
-	if (PrimaryFeaturedCategory && bModsFound)
+	UModioUI4Subsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (IsValid(UISubsystem) && UISubsystem->IsAnyDialogOpen())
 	{
-		PrimaryFeaturedCategory->SetFocusToCurrentElement();
+		return;
+	}
+
+	if (FeaturedModCarousel && bModsFound)
+	{
+		FeaturedModCarousel->SetFocusToCenterWidget();
 	}
 	else
 	{
@@ -164,6 +190,13 @@ void UModioFeaturedView::SetFocusToPrimaryCategory()
 
 void UModioFeaturedView::SetFocusToAdditionalCategory() 
 {
+	UModioUI4Subsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (IsValid(UISubsystem) && UISubsystem->IsAnyDialogOpen())
+	{
+		return;
+	}
+
 	AdditionalCategories->NavigateToIndex(0);
 	AdditionalCategories->SetSelectedIndex(0);
 }
@@ -194,8 +227,9 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 				WrappedMod->Underlying = In;
 				return WrappedMod;
 			});
-			PrimaryFeaturedCategory->SetItems(CachedFeaturedItems);
-			PrimaryFeaturedCategory->SetFocusToCurrentElement();
+			FeaturedModCarousel->GenerateWidgets(CachedFeaturedItems);
+			FeaturedModCarousel->RePositionWidgets();
+			FeaturedModCarousel->SetFocusToCenterWidget();
 			IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 			                                                           EModioUIAsyncOperationWidgetState::Success);
 		}
@@ -206,7 +240,7 @@ void UModioFeaturedView::NativeOnListAllModsRequestCompleted(FString RequestIden
 			if (ModioErrorWithRetryWidget)
 			{
 				bModsFound = false;
-				UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+				UModioUI4Subsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 				if (IsValid(UISubsystem) && !(UISubsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 				{
 					ModioErrorWithRetryWidget->RetryButton->SetKeyboardFocus();
@@ -243,6 +277,6 @@ void UModioFeaturedView::NativeUserChanged(TOptional<FModioUser> NewUser)
 	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
 	FetchPrimaryCategoryMods();
 	SynchronizeProperties();
-	PrimaryFeaturedCategory->SetFocusToCurrentElement();
+	FeaturedModCarousel->SetFocusToCenterWidget();
 	AdditionalCategories->RegenerateAllEntries();
 }

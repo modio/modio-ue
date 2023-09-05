@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ModioUI4Subsystem.h"
 #include "Engine/Engine.h"
 #include "ModioUISubsystem.h"
 #include "Styling/ISlateStyle.h"
@@ -53,7 +54,7 @@ public:
 	template<typename StyleType>
 	const StyleType* const FindStyle() const
 	{
-		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		if (Subsystem)
 		{
 			UModioUIStyleSet* DefaultStyle = Subsystem->GetDefaultStyleSet();

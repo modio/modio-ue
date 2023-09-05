@@ -10,6 +10,7 @@
 
 #include "UI/Views/Collection/ModioCollectionView.h"
 #include "UI/Views/Collection/ModioModCollectionTile.h"
+#include "UI/CommonComponents/ModioMenu.h"
 #include "Algo/Transform.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Core/ModioModCollectionEntryUI.h"
@@ -27,13 +28,8 @@ void UModioCollectionView::NativeOnInitialized()
 {
 	if (CollectionList)
 	{
-		UpdateCachedCollection();
+		OnFetchUpdatesClicked();
 		ApplyFiltersToCollection();
-	}
-
-	if (SearchInput)
-	{
-		SearchInput->OnTextChanged.AddDynamic(this, &UModioCollectionView::OnSearchTextUpdated);
 	}
 
 	if (ModGroupSelection)
@@ -42,6 +38,7 @@ void UModioCollectionView::NativeOnInitialized()
 	}
 	if (FetchButton)
 	{
+		FetchButton->IsFocusable = true;
 		FetchButton->SetLabel(DefaultButtonLabel);
 		FetchButton->OnClicked.AddDynamic(this, &UModioCollectionView::OnFetchUpdatesClicked);
 	}
@@ -84,8 +81,8 @@ void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->DisplayErrorNotification(UModioNotificationParamsLibrary::CreateErrorNotificationParams(
-			ec, LOCTEXT("FetchUpdatesSucceeded", "Updates fetched!"),
+		Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateNotificationParams(
+			ec, LOCTEXT("FetchUpdatesSucceeded", "Updates fetched!"), LOCTEXT("FetchUpdatesSucceeded", "Updates fetched!"),
 			LOCTEXT("FetchUpdatesFailed", "Could not fetch updates.")));
 	}
 	if (!ec)
@@ -267,11 +264,6 @@ void UModioCollectionView::SortZToA()
 	CollectionList->RegenerateAllEntries();
 }
 
-void UModioCollectionView::OnSearchTextUpdated(const FText& NewText)
-{
-	ApplyFiltersToCollection();
-}
-
 void UModioCollectionView::OnModGroupChanged(FText SelectedItem, ESelectInfo::Type SelectionType)
 {
 	ApplyFiltersToCollection();
@@ -293,6 +285,15 @@ void UModioCollectionView::UpdateModCount()
 		}
 		FString Count = FString::Printf(TEXT("(%d)"), numberOfVisibleMods);
 		CollectionCount->SetText(FText::FromString(Count));
+		if (numberOfVisibleMods <= 0)
+		{
+			InfoRichTextBlock->SetVisibility(ESlateVisibility::Visible);
+			InfoRichTextBlock->SetText(CachedCollection.Num() > 0 ? NoModsFoundText : NoSubscribedModsText);
+		}
+		else
+		{
+			InfoRichTextBlock->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 }
 
@@ -306,16 +307,14 @@ void UModioCollectionView::ValidateAndSetFocus()
 	}
 	else
 	{
-		FTimerHandle TimerHandle;
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUFunction(SearchInput, "StartInput");
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
+		CurrentNavIndex = -1;
+		GetWorld()->GetTimerManager().SetTimerForNextTick(SearchInput, &UModioEditableTextBox::StartInput);
 	}
 }
 
 FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
 	if (CollectionList->GetNumItems() > 0 && IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
@@ -324,17 +323,49 @@ FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, 
 
 	else
 	{
-		FTimerHandle TimerHandle;
-		FTimerDelegate TimerDelegate;
-		TimerDelegate.BindUFunction(SearchInput, "StartInput");
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
+		CurrentNavIndex = -1;
+		GetWorld()->GetTimerManager().SetTimerForNextTick(SearchInput, &UModioEditableTextBox::StartInput);
 	}
 
 	return FReply::Handled();
 }
+bool UModioCollectionView::ValidateSearchInput(const FKeyEvent& InKeyEvent)
+{
+	return InKeyEvent.GetKey() != EKeys::Up && InKeyEvent.GetKey() != EKeys::Down &&
+		   InKeyEvent.GetKey() != EKeys::Left && InKeyEvent.GetKey() != EKeys::Right &&
+		   InKeyEvent.GetKey() != EKeys::Escape;
+}
 
 FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
+	if (SearchInput->HasFocusedDescendants() && ValidateSearchInput(InKeyEvent))
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UModioCollectionView::ApplyFiltersToCollection);
+
+		return FReply::Unhandled();
+	}
+	
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+
+	if (!IsValid(Subsystem))
+	{
+		return FReply::Handled();
+	}
+
+	UModioMenu* Menu = Cast <UModioMenu>(Subsystem->ModBrowserInstance);
+
+	if (IsValid(Menu) && Menu->IsAnyDrawerExpanded())
+	{
+		return FReply::Handled();
+	}
+
+	UModioUI4Subsystem* UI4Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (IsValid(UI4Subsystem) && UI4Subsystem->IsAnyDialogOpen())
+	{
+		return FReply::Handled();
+	}
+
 	if (ProcessCommandForEvent(InKeyEvent))
 	{
 		return FReply::Handled();
@@ -343,6 +374,12 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::DownloadQueue && CurrentNavIndex != 0)
 	{
 		OnProfileOpened.Broadcast();
+		return FReply::Handled();
+	}
+
+	if (Subsystem->IsDownloadDrawerOpen())
+	{
+		return FReply::Handled();
 	}
 
 	if (InKeyEvent.GetKey() == EKeys::Enter && SearchInput->HasFocusedDescendants())
@@ -363,8 +400,9 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		return FReply::Handled();
 	}
 
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (IsValid(Subsystem))
 	{
+		
 		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::RefineSearch && (!SearchInput->HasFocusedDescendants() || InKeyEvent.GetKey().IsGamepadKey()))
 		{
 			OnFetchUpdatesClicked();

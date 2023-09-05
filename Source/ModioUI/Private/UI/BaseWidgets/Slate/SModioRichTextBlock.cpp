@@ -69,6 +69,11 @@ void SModioRichTextBlock::Construct(const FArguments& InArgs)
 
 void SModioRichTextBlock::ReapplyStyle()
 {
+	ReapplyStyle(FName("Default"));
+}
+
+void SModioRichTextBlock::ReapplyStyle(FName StyleName)
+{
 	if (const FModioUIStyleRef* Style = StyleReference.Get())
 	{
 		const FModioRichTextStyle* ResolvedStyle = Style->FindStyle<FModioRichTextStyle>();
@@ -79,9 +84,10 @@ void SModioRichTextBlock::ReapplyStyle()
 			{
 				SRichTextBlock::SetDecoratorStyleSet(StyleSetOverride.Get());
 
-				if (StyleSetOverride->HasWidgetStyle<FTextBlockStyle>(FName("Default")))
+				if (StyleSetOverride->HasWidgetStyle<FTextBlockStyle>(StyleName))
 				{
-					SetTextStyle(StyleSetOverride->GetWidgetStyle<FTextBlockStyle>(FName("Default")));
+					UE_LOG(LogTemp, Warning, TEXT("reapply style set"));
+					SetTextStyle(StyleSetOverride->GetWidgetStyle<FTextBlockStyle>(StyleName));
 				}
 			}
 		}

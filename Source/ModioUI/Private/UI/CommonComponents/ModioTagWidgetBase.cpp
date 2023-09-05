@@ -9,6 +9,8 @@
  */
 
 #include "UI/CommonComponents/ModioTagWidgetBase.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Settings/ModioUISettings.h"
 #include "UI/Styles/ModioRichTextStyle.h"
 #include "UI/Styles/ModioTagWidgetStyle.h"
@@ -32,7 +34,7 @@ void UModioTagWidgetBase::SynchronizeProperties()
 		// NOTE: @modio-core this requires server-side localization of tag categories and values
 		// 
 		// String tables cannot have spaces in keys so removing spaces from lookup
-		UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		if (!subsystem)
 		{
 			Args.Add("Value", FFormatArgumentValue(FText::FromString(TagValue)));

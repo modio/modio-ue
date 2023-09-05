@@ -9,6 +9,8 @@
  */
 
 #include "UI/BaseWidgets/ModioRichTextBlockDecorator.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Components/RichTextBlock.h"
 #include "Engine/Engine.h"
 #include "Fonts/FontMeasure.h"
@@ -153,7 +155,7 @@ TSharedPtr<SWidget> FModioRichTextDecorator::CreateDecoratorWidget(const FTextRu
 		const FString* Name = RunInfo.MetaData.Find("name");
 		if (Name)
 		{
-			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+			UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 			if (Subsystem)
 			{
 				UModioUIStyleSet* DefaultStyle = Subsystem->GetDefaultStyleSet();
@@ -212,7 +214,7 @@ TSharedPtr<SWidget> FModioRichTextDecorator::CreateDecoratorWidget(const FTextRu
 	if (Path)
 	{
 		// if that's the case we can then load the global style and ask it for the resource with that name
-		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		if (Subsystem)
 		{
 			UModioUIStyleSet* DefaultStyle = Subsystem->GetDefaultStyleSet();

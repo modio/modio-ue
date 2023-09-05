@@ -13,6 +13,7 @@
 #include "ModioUIModule.h"
 #include "Core/Input/ModioInputKeys.h"
 #include "CoreMinimal.h"
+#include "ModioUI4Subsystem.h"
 #include "Engine/Engine.h"
 #include "HAL/IConsoleManager.h"
 #include "Logging/LogVerbosity.h"
@@ -70,27 +71,27 @@ void FModioUIModule::StartupModule()
 
 	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("InputGlyphPS4"), TEXT("Preview Input Glyphs for PS4"), FConsoleCommandDelegate::CreateLambda([]() {
-			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>()) {
+			if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>()) {
 				Subsystem->SetControllerOverrideType(EModioUIInputMode::Playstation);
 			}
 		})));
 	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("InputGlyphXBox"), TEXT("Preview Input Glyphs for XBox"), FConsoleCommandDelegate::CreateLambda([]() {
-			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 			{
 				Subsystem->SetControllerOverrideType(EModioUIInputMode::XBox);
 			}
 		})));
 	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("InputGlyphSwitch"), TEXT("Preview Input Glyphs for Switch"), FConsoleCommandDelegate::CreateLambda([]() {
-			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 			{
 				Subsystem->SetControllerOverrideType(EModioUIInputMode::NintendoSwitch);
 			}
 		})));
 	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("InputGlyphClear"), TEXT("Clear Preview Input Glyph Override"), FConsoleCommandDelegate::CreateLambda([]() {
-			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 			{
 				Subsystem->ClearControllerOverride();
 			}

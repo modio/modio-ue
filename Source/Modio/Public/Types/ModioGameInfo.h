@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "Misc/DateTime.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioGameStats.h"
 #include "Types/ModioHeaderImage.h"

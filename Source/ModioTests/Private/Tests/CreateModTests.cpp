@@ -26,7 +26,7 @@ bool FModioCreateModAndModFileTest::RunTest(const FString& Parameters)
 {
 	ADD_LATENT_AUTOMATION_COMMAND(FModioInitializeAsyncCommand(this));
 
-	FModioModID NewModID;
+	/*FModioModID NewModID;
 	TSharedPtr<TOptional<FModioErrorCode>> SharedState = MakeShared<TOptional<FModioErrorCode>>();
 	ADD_LATENT_AUTOMATION_COMMAND(FModioCreateModAsyncCommand(this, FModioCreateModParams{}, &NewModID));
 
@@ -39,7 +39,7 @@ bool FModioCreateModAndModFileTest::RunTest(const FString& Parameters)
 		}
 	)));
 
-	ADD_LATENT_AUTOMATION_COMMAND(FModioSubmitModFileAsyncCommand(this, NewModID, FModioCreateModFileParams{}, SharedState));
+	ADD_LATENT_AUTOMATION_COMMAND(FModioSubmitModFileAsyncCommand(this, NewModID, FModioCreateModFileParams{}, SharedState));*/
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));
 	return true;

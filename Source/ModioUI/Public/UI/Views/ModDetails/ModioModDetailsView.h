@@ -51,6 +51,7 @@ protected:
 	virtual void NativeDisplayModDetailsForId(const FModioModID& ModID) override;
 	virtual void NativeRequestOperationRetry() override;
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent) override;
 	virtual void NativeOnAuthenticationChanged(TOptional<FModioUser> User);
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	UFUNCTION()
@@ -152,9 +153,6 @@ protected:
 
 	FModioModID CurrentModID;
 	void NativeOnModInfoRequestCompleted(FModioModID ModID, FModioErrorCode ec, TOptional<FModioModInfo> Info);
-
-	
-	FTimerHandle SetFocusTimerHandle;
 
 	int CurrentIndex = 0;
 

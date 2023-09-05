@@ -94,10 +94,10 @@ class MODIOUI_API UModioNotificationErrorWidgetBase : public UModioNotificationW
 {
 	GENERATED_BODY()
 protected:
-	virtual void NativeConfigure(const FModioNotificationParams& Params);
-	virtual void NativeConfigureManual(const FText& title, const FText& message, bool bIsError);
-	virtual void NativeOnDisplay();
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeConfigure(const FModioNotificationParams& Params) override;
+	virtual void NativeConfigureManual(const FText& Title, const FText& Message, bool bIsError) override;
+	virtual void NativeOnDisplay() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioImage* StatusColorBackground;
@@ -105,7 +105,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioImage* StatusIndicator;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))
 	UModioRichTextBlock* NotificationTitle;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidgetOptional))

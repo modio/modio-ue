@@ -9,6 +9,8 @@
  */
 
 #include "UI/Styles/ModioNamedGlyphMaterialParams.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Algo/Transform.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
@@ -18,7 +20,7 @@
 TArray<FString> UModioNamedGlyphMaterialParams::GetValidGlyphNames()
 {
 	TArray<FString> OutNames;
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
 		if (DefaultStyleSet)
@@ -33,7 +35,7 @@ TArray<FString> UModioNamedGlyphMaterialParams::GetValidGlyphNames()
 
 UMaterialInterface* UModioNamedGlyphMaterialParams::GetMaterialInstance()
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
 		if (DefaultStyleSet)

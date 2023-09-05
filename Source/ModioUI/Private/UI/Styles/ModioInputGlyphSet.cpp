@@ -10,6 +10,8 @@
 
 
 #include "ModioInputGlyphSet.h"
+
+#include "ModioUI4Subsystem.h"
 #include "UI/Styles/ModioUIStyleSet.h"
 #include "ModioUISubsystem.h"
 #include "GameFramework/InputSettings.h"
@@ -24,7 +26,7 @@ UMaterialInterface* UModioInputGlyphSet::GetGlyphForKey(const FKey& Key)
 
 	FKey RawKey;
 	UTexture2D* GlyphTexture = nullptr;
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (!Subsystem)
 	{
 		return nullptr;

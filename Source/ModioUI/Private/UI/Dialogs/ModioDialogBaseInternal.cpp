@@ -362,8 +362,7 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 						{
 							if (DataSource->Implements<UModioModInfoUIDetails>())
 							{
-								FModioModInfo ModInfo = IModioModInfoUIDetails::Execute_GetFullModInfo(DataSource);
-
+								const FModioModInfo ModInfo = IModioModInfoUIDetails::Execute_GetFullModInfo(DataSource);
 								Controller->RequestUnsubscribe(ModInfo.ModId, Button->Destination);
 							}
 						}
@@ -374,8 +373,7 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 						{
 							if (DataSource->Implements<UModioModInfoUIDetails>())
 							{
-								FModioModInfo ModInfo = IModioModInfoUIDetails::Execute_GetFullModInfo(DataSource);
-
+								const FModioModInfo ModInfo = IModioModInfoUIDetails::Execute_GetFullModInfo(DataSource);
 								Controller->RequestUninstall(ModInfo.ModId, Button->Destination);
 							}
 						}
@@ -700,6 +698,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 					{
 						MySizeBox->SetHeightOverride(DialogDescriptor->InputWidgetHeightOverride);
 					}
+					MySizeBox->SetMaxDesiredWidth(MySizeBox->GetCachedGeometry().GetAbsoluteSize().X);
 #if UE_VERSION_OLDER_THAN(5, 0, 0)
 
 					InputWidgetSlot->NotifySlotChanged(false);

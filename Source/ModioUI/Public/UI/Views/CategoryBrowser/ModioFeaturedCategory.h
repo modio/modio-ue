@@ -13,7 +13,7 @@
 #include "Blueprint/IUserObjectListEntry.h"
 #include "CoreMinimal.h"
 #include "Delegates/DelegateCombinations.h"
-#include "ModioFeaturedCategoryParams.h"
+#include "UI/Views/CategoryBrowser/ModioFeaturedCategoryParams.h"
 #include "TimerManager.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioErrorCode.h"

@@ -9,6 +9,8 @@
  */
 
 #include "UI/Styles/ModioUIBrushRef.h"
+
+#include "ModioUI4Subsystem.h"
 #include "UI/Styles/ModioUIStyleSet.h"
 
 FName FModioUIMaterialRef::GetMaterialName()
@@ -25,7 +27,7 @@ UMaterialInterface* FModioUIMaterialRef::ResolveReference(UModioUIStyleSet* Over
 			MaterialName, AdditionalSpecifier != NAME_None ? AdditionalSpecifier.ToString() : TOptional<FString> {});
 	}
 
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
 		if (DefaultStyleSet)

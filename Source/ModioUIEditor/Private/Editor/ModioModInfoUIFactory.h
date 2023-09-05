@@ -19,6 +19,13 @@
 	#include "Types/ModioModInfoList.h"
 	#include "Containers/Array.h"
 	#include "Types/SlateEnums.h"
+	
+	#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+	#include "Widgets/Views/SListView.h"
+	#include "Widgets/Views/ITableRow.h"
+#endif
+	
 	#include "ModioModInfoUIFactory.generated.h"
 
 class FModioModInfoUIAssetActions : public FAssetTypeActions_Base

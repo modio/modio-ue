@@ -15,7 +15,7 @@
 
 void UModioTileView::OnItemHoveredChanged(UObject* Item, bool bNewSelectionState)
 {
-	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(subsystem) && subsystem->GetCurrentFocusTarget()) 
 	{
 		UModioModTile* modTile = Cast<UModioModTile>(subsystem->GetCurrentFocusTarget());

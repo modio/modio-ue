@@ -25,7 +25,7 @@ public:
 	void UpdateMaterialNameList()
 	{
 		MaterialNames.Empty();
-		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		if (Subsystem)
 		{
 			UModioUIStyleSet* DefaultStyle = Subsystem->GetDefaultStyleSet();

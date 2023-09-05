@@ -9,6 +9,8 @@
  */
 
 #include "UI/CommonComponents/ModioModTileBase.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Core/ModioModInfoUI.h"
 #include "Engine/Engine.h"
 #include "Fonts/FontMeasure.h"
@@ -21,7 +23,7 @@
 void UModioModTileBase::NativeConstruct()
 {
 	Super::NativeConstruct();
-	UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	bIsFocusable = true;
 	IModioUIMediaDownloadCompletedReceiver::Register<UModioModTileBase>(EModioUIMediaDownloadEventType::ModLogo);
 	IModioUIAuthenticationChangedReceiver::Register<UModioModTileBase>();
@@ -156,8 +158,15 @@ void UModioModTileBase::NativeOnModLogoDownloadCompleted(FModioModID ModID, FMod
 																		   EModioUIAsyncOperationWidgetState::Error);
 				UE_LOG(LogTemp, Error, TEXT("%s - %d"), *ec.GetErrorMessage(), ec.GetValue());
 			}
+			else if (LogoSize != ModLogoSize && bImageLoaded)
+			{
+				// Correct image should already be loaded for this tile
+				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
+																		   EModioUIAsyncOperationWidgetState::Success);
+			}
 			else
 			{
+				bImageLoaded = true;
 				CurrentLogoSize = LogoSize;
 				Thumbnail->LoadImageFromFileAsync(Image.GetValue());
 				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
@@ -249,7 +258,7 @@ void UModioModTileBase::NativeOnMouseEnter(const FGeometry& InGeometry, const FP
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
 	}
-	PlayAnimation(FocusTransition);
+	PlayHoverAnimation(true);
 }
 
 FReply UModioModTileBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -284,14 +293,8 @@ void UModioModTileBase::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 0);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 0);
 	}
-	if (bShouldPlayAnimation)
-	{
-		if (IsAnimationPlayingForward(FocusTransition))
-		{
-			StopAnimation(FocusTransition);
-		}
-		PlayAnimationReverse(FocusTransition);
-	}
+
+	PlayHoverAnimation(false);
 }
 
 void UModioModTileBase::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent)
@@ -303,18 +306,18 @@ void UModioModTileBase::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent
 		{
 			UISubsystem->SetCurrentFocusTarget(this);
 		}
-		if (TileBorder)
-		{
-			TileBorder->SetHoveredState();
-			TileBorder->EnableBorder();
-		}
-		if (TileFrame)
-		{
-			TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
-			TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
-		}
-		PlayAnimation(FocusTransition);
 	}
+	if (TileBorder)
+	{
+		TileBorder->SetHoveredState();
+		TileBorder->EnableBorder();
+	}
+	if (TileFrame)
+	{
+		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
+		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
+	}
+	PlayHoverAnimation(true);
 }
 
 void UModioModTileBase::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
@@ -331,15 +334,25 @@ void UModioModTileBase::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusE
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 0);
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 0);
 	}
+	PlayHoverAnimation(false);
+}
 
-	if (bShouldPlayAnimation)
+void UModioModTileBase::PlayHoverAnimation(bool bHovered)
+{
+	if (!FocusTransition)
 	{
-		if (IsAnimationPlayingForward(FocusTransition))
-		{
-			StopAnimation(FocusTransition);
-		}
+		return;
+	}
+
+	if (!bCurrentHoverAnimationState && bHovered)
+	{
+		PlayAnimationForward(FocusTransition);
+	}
+	else if (bCurrentHoverAnimationState && !bHovered)
+	{
 		PlayAnimationReverse(FocusTransition);
 	}
+	bCurrentHoverAnimationState = bHovered;
 }
 
 FReply UModioModTileBase::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
@@ -358,9 +371,8 @@ FReply UModioModTileBase::NativeOnFocusReceived(const FGeometry& InGeometry, con
 		}
 
 		FSlateApplication::Get().PlaySound(HoveredSound);
-		PlayAnimation(FocusTransition);
+		PlayHoverAnimation(true);
 	}
-	UISubsystem->SetCurrentFocusTarget(this);
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
@@ -390,14 +402,12 @@ void UModioModTileBase::OnModSubscriptionStatusChanged(FModioModID ID, bool Subs
 				if (SubscribeButton && !Subscribed)
 				{
 					SubscribeButton->SetLabel(SubscribeLabel);
-					GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this,
-													   &UModioModTileBase::EnableSubscribeButton, 0.6, false);
+					SubscribeButton->SetIsEnabled(true);
 				}
 				else if (SubscribeButton && Subscribed)
 				{
 					SubscribeButton->SetLabel(UnsubscribeLabel);
-					GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this,
-													   &UModioModTileBase::EnableSubscribeButton, 0.6, false);
+					SubscribeButton->SetIsEnabled(true);
 				}
 				if (SubscriptionIndicator)
 				{
@@ -418,7 +428,8 @@ void UModioModTileBase::NativeSubscribeClicked()
 		SubscribeButton->SetIsEnabled(false);
 	}
 
-	GWorld->GetTimerManager().SetTimer(SetFocusTimerHandle, this, &UModioModTileBase::EnableSubscribeButton, 0.6,
+	FTimerHandle handle;
+	GetWorld()->GetTimerManager().SetTimer(handle, this, &UModioModTileBase::EnableSubscribeButton, 5.0f,
 									   false);
 
 	if (!bIsUserAuthenticated)
@@ -426,7 +437,7 @@ void UModioModTileBase::NativeSubscribeClicked()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->ShowUserAuthenticationDialog();
+			Subsystem->ShowUserAuth();
 		}
 	}
 

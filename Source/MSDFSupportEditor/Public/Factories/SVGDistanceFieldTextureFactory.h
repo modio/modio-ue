@@ -15,6 +15,14 @@
 #include "Engine/Texture2DDynamic.h"
 #include "Factories/Factory.h"
 
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+	#include "TextureResource.h"
+	#include "Engine/Texture2D.h"
+	#include "Rendering/Texture2DResource.h"
+	#include "Widgets/SWindow.h"
+#endif
+
 #include "SVGDistanceFieldTextureFactory.generated.h"
 
 enum class EImportSVGDialogReturnType : uint8;

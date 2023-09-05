@@ -16,55 +16,32 @@
 		{
 			"Name": "Modio",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux",
-				"PS4"
-			]
+			"LoadingPhase": "Default"
 		},
 		{
 			"Name": "ModioEx",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux",
-				"PS4"
-			]
+			"LoadingPhase": "Default"
 		},
 		{
 			"Name": "ModioUI",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux",
-				"PS4"
-			]
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ModioUICore",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
 		},
 		{
 			"Name": "ModioTests",
 			"Type": "Editor",
-			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux"
-			]
+			"LoadingPhase": "Default"
 		},
 		{
 			"Name": "ModioUIEditor",
 			"Type": "Editor",
-			"LoadingPhase": "PostEngineInit",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux"
-			]
+			"LoadingPhase": "PostEngineInit"
 		},
 		{
 			"Name": "MSDFSupportEditor",

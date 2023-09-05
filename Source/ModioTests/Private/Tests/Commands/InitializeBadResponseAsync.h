@@ -25,6 +25,8 @@ public:
 		Opts.ApiKey = FModioApiKey("8d561adc585f3292356a20ef6502ae64");
 		Opts.GameEnvironment = EModioEnvironment::Test;
 		Opts.GameId = FModioGameID(788);
+		Opts.LocalSessionIdentifier = "test";
+		Opts.bUseBackgroundThread = UModioSDKLibrary::GetProjectInitializeOptions().bUseBackgroundThread;
 
 		Modio->InitializeAsync(Opts, FOnErrorOnlyDelegateFast::CreateSP(this, &FModioInitializeBadResponseAsyncCommand::Callback));
 	}

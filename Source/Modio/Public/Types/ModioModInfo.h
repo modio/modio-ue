@@ -79,43 +79,43 @@ struct MODIO_API FModioModInfo
 	GENERATED_BODY()
 
 	/** @brief Unique Mod ID */
-	UPROPERTY(BlueprintReadOnly, Category = "ModInfo")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModInfo")
 	FModioModID ModId;
 
 	/** @brief Name of the mod */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FString ProfileName;
 
 	/** @brief Summary of the mod */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FString ProfileSummary;
 
 	/** @brief Detailed description in HTML format */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FString ProfileDescription;
 
 	/** @brief Detailed description in plaintext */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FString ProfileDescriptionPlaintext;
 
 	/** @brief URL to the mod profile */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FString ProfileURL;
 
 	/** @brief Information on the user who submitted the mod */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FModioUser ProfileSubmittedBy;
 
 	/** @brief Unix timestamp of the date the mod was registered */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FDateTime ProfileDateAdded;
 
 	/** @brief Unix timestamp of the date the mod was updated */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FDateTime ProfileDateUpdated;
 
 	/** @brief Unix timestamp of the date the mod was marked live */
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	FDateTime ProfileDateLive;
 
 	/**
@@ -123,7 +123,7 @@ struct MODIO_API FModioModInfo
 	 * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to
 	 * be labeled as mature.
 	 **/
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	EModioMaturityFlags ProfileMaturityOption {};
 
 	/** @brief Is the mod marked as visible? 
@@ -136,45 +136,45 @@ struct MODIO_API FModioModInfo
 	* @brief Enum parameter to signal the backend if the mod to upload would be publicly visible.  
     * Default value is Public
 	**/
-	UPROPERTY(BlueprintReadOnly, Category = "Profile")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	EModioObjectVisibilityFlags Visibility {};
 
 	/**
 	* Stored property to the metadata string
 	**/
-	UPROPERTY(BlueprintReadOnly, Category = "Metadata")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Metadata")
 	FString MetadataBlob;
 
 	/** @brief Information about the mod's most recent public release */
-	UPROPERTY(BlueprintReadOnly, Category = "File")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "File")
 	FModioFileMetadata FileInfo;
 
 	/** @brief Arbitrary key-value metadata set for this mod */
-	UPROPERTY(BlueprintReadOnly, Category = "Metadata")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Metadata")
 	TArray<FModioMetadata> MetadataKvp;
 
 	/** @brief Tags this mod has set */
-	UPROPERTY(BlueprintReadOnly, Category = "Metadata")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Metadata")
 	TArray<FModioModTag> Tags;
 
 	/** @brief Number of images in the mod's media gallery */
-	UPROPERTY(BlueprintReadOnly, Category = "Media")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Media")
 	int32 NumGalleryImages {};
 
 	/** @brief List of youtube links provided by the creator of the mod */
-	UPROPERTY(BlueprintReadOnly, Category = "Media")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Media")
 	FModioYoutubeURLList YoutubeURLs;
 
 	/** @brief List of sketchfab links provided by the creator of the mod */
-	UPROPERTY(BlueprintReadOnly, Category = "Media")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Media")
 	FModioSketchfabURLList SketchfabURLs;
 
 	/** @brief Stats and rating information for the mod */
-	UPROPERTY(BlueprintReadOnly, Category = "Stats")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Stats")
 	FModioModStats Stats;
 
 	/** @brief Status of the mod */
-	UPROPERTY(BlueprintReadOnly, Category = "Status")
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Status")
 	EModioModServerSideStatus ModStatus {};
 
 	friend struct FModioModInfo ToUnreal(const struct Modio::ModInfo& In);

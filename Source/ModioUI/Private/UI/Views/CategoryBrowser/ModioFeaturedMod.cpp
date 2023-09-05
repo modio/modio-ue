@@ -9,6 +9,8 @@
  */
 
 #include "UI/Views/CategoryBrowser/ModioFeaturedMod.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Core/ModioModInfoUI.h"
 #include "Engine/Engine.h"
 #include "ModioUISubsystem.h"
@@ -19,13 +21,15 @@
 void UModioFeaturedMod::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
+
+	ModLogoSize = EModioLogoSize::Thumb1280;
 	if (DataSource)
 	{
 		UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource);
 		if (ModInfo)
 		{
 			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-			Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId, EModioLogoSize::Thumb1280);
+			Subsystem->RequestLogoDownloadForModID(ModInfo->Underlying.ModId, ModLogoSize);
 
 			// Some of this logic perhaps would be better on the Subscribe button itself, treat that button as a special
 			// case
@@ -60,7 +64,7 @@ void UModioFeaturedMod::SubmitNegativeRating()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->ShowUserAuthenticationDialog();
+			Subsystem->ShowUserAuth();
 		}
 	}
 
@@ -86,7 +90,7 @@ void UModioFeaturedMod::SubmitPositiveRating()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->ShowUserAuthenticationDialog();
+			Subsystem->ShowUserAuth();
 		}
 	}
 
@@ -109,7 +113,7 @@ void UModioFeaturedMod::OnRatingSubmissionComplete(FModioErrorCode ec, EModioRat
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->DisplayErrorNotification(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
+		Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
 	}
 }
 
@@ -168,11 +172,7 @@ void UModioFeaturedMod::BuildCommandList(TSharedRef<FUICommandList> CommandList)
 // This should be 'while in the focus path'
 FReply UModioFeaturedMod::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
-	if (FocusTransition)
-	{
-		PlayAnimation(FocusTransition);
-	}
-	// hide/show the subscriptionbutton moreoptions and modname
+	
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
@@ -191,7 +191,14 @@ void UModioFeaturedMod::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
 void UModioFeaturedMod::NativeOnItemSelectionChanged(bool bIsSelected)
 {
 	Super::NativeOnItemSelectionChanged(bIsSelected);
+	
 	bCurrentSelectionState = bIsSelected;
+
+	if (bCurrentSelectionState)
+	{
+		PlayHoverAnimation(true);
+	}
+
 	if (SubscribeButton)
 	{
 		SubscribeButton->SetVisibility(bIsSelected ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
@@ -224,10 +231,13 @@ void UModioFeaturedMod::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	}
 }
 
-void UModioFeaturedMod::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+void UModioFeaturedMod::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) 
 {
-	TileActiveFrame->GetRenderOpacity() > 0.0f ? bShouldPlayAnimation = true : bShouldPlayAnimation = false;
+	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+}
 
+void UModioFeaturedMod::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) 
+{
 	Super::NativeOnMouseLeave(InMouseEvent);
 }
 
@@ -259,6 +269,8 @@ FReply UModioFeaturedMod::NativeOnMouseButtonDown(const FGeometry& InGeometry, c
 	{
 		return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 	}
+
+	OnModTilePressed.Broadcast(this);
 	return FReply::Unhandled();
 }
 

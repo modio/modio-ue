@@ -9,6 +9,8 @@
  */
 
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
+
+#include "ModioUI4Subsystem.h"
 #include "ModioUISubsystem.h"
 #include "Fonts/FontMeasure.h"
 #include "UI/Styles/ModioUIStyleSet.h"
@@ -134,6 +136,15 @@ void UModioUserWidgetBase::NativeFinishLoadExternalData(FModioErrorCode ec)
 	OnFinishLoadExternalData(ec);
 }
 
+FReply UModioUserWidgetBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent)
+{
+	if (ProcessCommandForEvent(InPointerEvent))
+	{
+		return FReply::Handled();
+	}
+	return Super::NativeOnMouseButtonDown(InGeometry, InPointerEvent);
+}
+
 FReply UModioUserWidgetBase::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
 	if (ProcessCommandForEvent(InKeyEvent))
@@ -146,8 +157,9 @@ FReply UModioUserWidgetBase::NativeOnKeyDown(const FGeometry& InGeometry, const 
 FString UModioUserWidgetBase::TruncateLongModName(FString inputStr, UModioRichTextBlock* ModName, float divider)
 {
 	TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+	UModioUI4Subsystem* Subsystem4 = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-	UModioUIStyleSet* DefaultStyleSet = Subsystem->GetDefaultStyleSet();
+	UModioUIStyleSet* DefaultStyleSet = Subsystem4->GetDefaultStyleSet();
 	float DPIScale = Subsystem->GetCurrentDPIScaleValue();
 	FString originalInputStr = inputStr;
 

@@ -17,7 +17,7 @@
 
 /**
  * Strong UI type struct to store the authentication provider information
- **/
+ */
 USTRUCT(BlueprintType)
 struct MODIOUI_API FModioUIAuthenticationProviderInfo
 {

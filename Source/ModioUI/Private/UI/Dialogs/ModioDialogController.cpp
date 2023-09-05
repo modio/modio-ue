@@ -68,7 +68,7 @@ UModioDialogBaseInternal* UModioDialogController::GetActualDialog()
 
 bool UModioDialogController::TrySetFocusToActiveDialog()
 {
-	if (GEngine->GetEngineSubsystem<UModioUISubsystem>()->GetLastInputDevice() == EModioUIInputMode::Mouse)
+	if (GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->GetLastInputDevice() == EModioUIInputMode::Mouse)
 	{
 		return false;
 	}
@@ -283,9 +283,10 @@ void UModioDialogController::PopDialog()
 	}
 
 	UModioUISubsystem* UISubsystem = Cast<UModioUISubsystem>(GEngine->GetEngineSubsystem<UModioUISubsystem>());
-	if (UISubsystem && UISubsystem->GetCurrentFocusTarget() && UISubsystem->GetCurrentFocusTarget()->IsVisible())
+	UModioUI4Subsystem* UISubsystem4 = Cast<UModioUI4Subsystem>(GEngine->GetEngineSubsystem<UModioUI4Subsystem>());
+	if (UISubsystem4 && UISubsystem4->GetCurrentFocusTarget() && UISubsystem4->GetCurrentFocusTarget()->IsVisible())
 	{
-		UISubsystem->GetCurrentFocusTarget()->SetKeyboardFocus();
+		UISubsystem4->GetCurrentFocusTarget()->SetKeyboardFocus();
 	}
 	else if (UISubsystem && UISubsystem->ModBrowserInstance)
 	{
@@ -326,8 +327,11 @@ void UModioDialogController::PushDialog(UModioDialogInfo* InitialDialog, UObject
 		ActualDialog->InitializeFromDialogInfo(InitialDialog, false, DialogDataSource);
 		ActualDialog->SetDialogFocus();
 
-		MyBackgroundBlur->Invalidate(EInvalidateWidgetReason::PaintAndVolatility | EInvalidateWidgetReason::Visibility |
-									 EInvalidateWidgetReason::Layout);
+		if (MyBackgroundBlur)
+		{
+			MyBackgroundBlur->Invalidate(EInvalidateWidgetReason::PaintAndVolatility |
+										 EInvalidateWidgetReason::Visibility | EInvalidateWidgetReason::Layout);
+		}
 	}
 	SetVisibility(bCurrentlyDisplayingDialog ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 }
@@ -463,12 +467,6 @@ void UModioDialogController::HandleReportContent(FModioErrorCode ec, UModioDialo
 
 void UModioDialogController::HandleUnsubscribe(FModioModID ec, bool IsSubscribe)
 {
-	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-	if (Subsystem && !IsSubscribe)
-	{
-		Subsystem->DisplayErrorNotification(
-			UModioNotificationParamsLibrary::CreateUninstallNotification(FModioErrorCode()));
-	}
 	PopDialog();
 }
 

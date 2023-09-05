@@ -42,7 +42,11 @@ bool FModioTestLatentCommandBase::Update()
 			}
 			else
 			{
-				Modio->RunPendingHandlers();
+				if (!Modio->IsUsingBackgroundThread())
+				{
+					Modio->RunPendingHandlers();
+				}
+
 				return false;
 			}
 			break;

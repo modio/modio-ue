@@ -36,8 +36,6 @@ class MODIOUI_API UModioFeaturedView : public UModioMenuView,
 protected:
 	bool bModsFound = false;
 	int32 CurrentlySelectedCategoryColumn = INDEX_NONE;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
-	UModioWidgetCarousel* PrimaryFeaturedCategory;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	class UModioErrorRetryWidget* ModioErrorWithRetryWidget;
@@ -57,6 +55,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UModioGridPanel* PrimaryCategoryGridPanel;
 
+	UPROPERTY(meta = (BindWidget))
+	class UModioFeaturedModCarousel* FeaturedModCarousel;
 	// Holds the featured items so that they don't go out of scope
 	UPROPERTY()
 	TArray<UObject*> CachedFeaturedItems;
@@ -76,6 +76,7 @@ protected:
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets")
 	void SetFocusToPrimaryCategory();

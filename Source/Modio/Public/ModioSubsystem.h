@@ -10,6 +10,10 @@
 
 #pragma once
 
+#include "Containers/Queue.h"
+#include "Core/Public/HAL/Runnable.h"
+#include "HAL/Runnable.h"
+#include "HAL/RunnableThread.h"
 #include "ModioImageCache.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "Types/ModioAuthenticationParams.h"
@@ -42,6 +46,7 @@
 // Native versions of the delegates
 DECLARE_DELEGATE_OneParam(FOnErrorOnlyDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_OneParam(FOnModManagementDelegateFast, FModioModManagementEvent);
+DECLARE_DELEGATE_OneParam(FOnUserProfileUpdatedDelegate, TOptional<FModioUser> UserProfile);
 DECLARE_DELEGATE_TwoParams(FOnListAllModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnGetModInfoDelegateFast, FModioErrorCode, TOptional<FModioModInfo>);
 DECLARE_DELEGATE_TwoParams(FOnGetGameInfoDelegateFast, FModioErrorCode, TOptional<FModioGameInfo>);
@@ -56,6 +61,7 @@ DECLARE_DELEGATE_TwoParams(FOnListUserCreatedModsDelegateFast, FModioErrorCode, 
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 
 // Blueprint version of delegates
+
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnErrorOnlyDelegate, FModioErrorCode, ErrorCode);
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnModManagementDelegate, FModioModManagementEvent, Event);
@@ -85,6 +91,27 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnMuteUsersDelegate, FModioErrorCode, ErrorC
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCode, ErrorCode,
 								   FModioOptionalModInfoList, Result);
 
+class ARunnableThread;
+
+class FModioBackgroundThread : public FRunnable
+{
+public:
+	bool bStopThread = false;
+
+	FModioBackgroundThread(class UModioSubsystem* modio);
+	~FModioBackgroundThread();
+
+	virtual bool Init() override;
+	virtual uint32 Run() override;
+	virtual void Stop() override;
+	virtual void Exit() override;
+
+	void EndThread();
+
+	class UModioSubsystem* CurrentModio;
+	FRunnableThread* CurrentRunningThread = nullptr;
+};
+
 /**
  * @brief Thin wrapper around the mod.io SDK. This mostly wraps all the functions available in modio/ModioSDK.h that's
  * the public header of the mod.io SDK. It converts mod.io SDK types to a more unreal friendly types and caches some
@@ -95,13 +122,22 @@ class UModioSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 
+protected:
+	class FModioBackgroundThread* BackgroundThread = nullptr;
+
 #if WITH_EDITOR
 	/// @brief Internal method used for emitting a warning during PIE if the Plugin was initialized during that PIE
 	/// session
 	void CheckShutdownBeforePIEClose(UWorld*);
 	bool bInitializedDuringPIE = false;
 #endif
+
+private:
+	bool bUseBackgroundThread = false;
+
 public:
+	FOnUserProfileUpdatedDelegate OnUserProfileUpdatedDelegate;
+
 	/** Begin USubsystem interface */
 	virtual void Initialize(FSubsystemCollectionBase& Collection);
 	virtual void Deinitialize();
@@ -112,12 +148,17 @@ public:
 	/// displayed in this language during authentication.
 	FGetCurrentLanguageDelegate GetCurrentLanguage;
 
+	UFUNCTION(BlueprintCallable, Category = "mod.io")
+	MODIO_API bool IsUsingBackgroundThread();
+
+	UFUNCTION(BlueprintCallable, Category = "mod.io")
+	MODIO_API void KillBackgroundThread();
+
 	/**
 	 * @brief Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the
 	 * set of mods the specified user has installed on this device
 	 * @param InitializeOptions Parameters to the function packed as a struct where all members needs to be initialized
 	 * for the call to succeed
-	 * @param OnInitComplete Callback containing a status code indicating success or failure of initialization
 	 * @errorcategory NetworkError|Couldn't connect to the mod.io servers
 	 * @errorcategory FilesystemError|Couldn't create the user data or common data folders
 	 * @errorcategory ConfigurationError|InitOptions contains an invalid value - inspect ec.value() to determine what
@@ -147,7 +188,7 @@ public:
 
 	/**
 	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
-	 * Modio::GenericError::OperationCanceled. This function will NOT block while the deinitialization occurs.
+	 * Modio::GenericError::OperationCanceled . This function will NOT block while the deinitialization occurs.
 	 * @param OnShutdownComplete Callback invoked when the plugin is shut down and calling <<RunPendingHandlers>> is no
 	 * longer required
 	 * @requires initialized-sdk
@@ -328,7 +369,7 @@ public:
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @error GenericError::SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 *  @error GenericError::BadParameter|The supplied mod ID is invalid
 	 **/
 	MODIO_API void GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegateFast Callback);
 
@@ -601,7 +642,6 @@ public:
 
 	/** Get our image cache */
 	struct FModioImageCache& GetImageCache() const;
-	void ShowUserAuthenticationDialog();
 
 	/*
 	@brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
@@ -696,6 +736,7 @@ private:
 	void InvalidateUserInstallationCache();
 
 private:
+
 	/** Maps two letter ISO 639-1 language codes to EModioLanguage values */
 	TMap<FString, EModioLanguage> LanguageMap;
 
@@ -704,6 +745,18 @@ private:
 
 	/** Cached list of user subscriptions */
 	TOptional<TMap<FModioModID, FModioModCollectionEntry>> CachedUserSubscriptions;
+
+	UPROPERTY()
+	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptionsDefaultValue;
+
+	UPROPERTY()
+	TMap<FModioModID, FModioModCollectionEntry> QueryUserInstallationsDefaultValue;
+
+	/** Cached list of mod update */
+	TOptional<FModioModProgressInfo> CachedCurrentModUpdate;
+
+	/** Cached user profile */
+	TOptional<FModioUser> CachedUserProfile;
 
 	/** Cached list of user installation */
 	TOptional<TMap<FModioModID, FModioModCollectionEntry>> CachedUserInstallationWithOutdatedMods;

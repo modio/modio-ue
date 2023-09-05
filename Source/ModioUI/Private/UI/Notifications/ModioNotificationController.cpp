@@ -9,6 +9,7 @@
  */
 
 #include "UI/Notifications/ModioNotificationController.h"
+#include "InputCoreTypes.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Input/Reply.h"
@@ -17,6 +18,11 @@
 #include "UI/Interfaces/IModioUIDataSourceWidget.h"
 #include "UI/Interfaces/IModioUINotification.h"
 #include "UI/Notifications/ModioNotificationWidgetBase.h"
+
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+	#include "Engine/BlueprintGeneratedClass.h"
+#endif
 
 void UModioNotificationControllerBase::NativeOnInitialized()
 {
@@ -50,8 +56,14 @@ void UModioNotificationControllerBase::NativeDisplayNotification(
 	}
 }
 
-void UModioNotificationControllerBase::NativeDisplayErrorNotification(const FModioNotificationParams& Params)
+void UModioNotificationControllerBase::NativeDisplayNotificationParams(const FModioNotificationParams& Params)
 {
+	if (GetWorld()->bIsTearingDown)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Error during tearing down the world: %s"), *Params.ErrorCode.GetErrorMessage());
+		return;
+	}
+
 	if (*ErrorNotificationClass)
 	{
 		TSubclassOf<UWidget> ActualClass;
@@ -74,9 +86,14 @@ void UModioNotificationControllerBase::NativeDisplayErrorNotification(const FMod
 	}
 }
 
-void UModioNotificationControllerBase::NativeDisplayErrorNotificationManual(const FText& title, const FText& message,
+void UModioNotificationControllerBase::NativeDisplayNotificationManual(const FText& title, const FText& message,
 																			bool bIsError)
 {
+	if (GetWorld()->bIsTearingDown)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Notification during tearing down the world: %s"), *message.ToString());
+		return;
+	}
 
 	if (NotificationList)
 	{

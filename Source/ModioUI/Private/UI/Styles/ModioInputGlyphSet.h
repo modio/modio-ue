@@ -13,6 +13,8 @@
 
 #include "Engine/DataAsset.h"
 #include "Engine/Texture2D.h"
+#include "Containers/Map.h"
+#include "InputCoreTypes.h"
 
 #include "ModioInputGlyphSet.generated.h"
 

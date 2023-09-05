@@ -15,6 +15,7 @@
 #include "GameFramework/InputSettings.h"
 #include "Input/Events.h"
 #include "ModioUISubsystem.h"
+#include "ModioUI4Subsystem.h"
 #include "Settings/ModioUISettings.h"
 
 bool operator==(const FInputActionKeyMapping& Mapping, const FKeyEvent& Event)
@@ -93,6 +94,47 @@ TArray<FKey> IModioInputMappingAccessor::GetKeyForModioInputName(const FName Nam
 	return {};
 }
 PRAGMA_DISABLE_OPTIMIZATION
+TOptional<FKey> IModioInputMappingAccessor::GetCommandKeyForPointerEvent(const FPointerEvent& Event) const
+{
+	
+	if (UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
+	{
+		// Get the global input settings
+		if (UInputSettings* CurrentInputSettings = UInputSettings::GetInputSettings())
+		{
+			// Find the modio key which corresponds to the event
+			FModioInputMapping* ModioInputMapping = CurrentUISettings->ModioToProjectInputMappings.FindByPredicate(
+				[CurrentInputSettings, &Event](FModioInputMapping& Mapping) {
+					// For each project action which is bound to the current modio key
+					for (const auto& MappingName : Mapping.MappedProjectInputs)
+					{
+						TArray<FInputActionKeyMapping> Actions;
+						// check if any of the action's input chords are equivalent to the specific chord in the event
+						CurrentInputSettings->GetActionMappingByName(MappingName, Actions);
+						for (const FInputActionKeyMapping& CurrentAction : Actions)
+						{
+							// If the action contains an input chord matching the event, select it
+							if (CurrentAction.Key == Event.GetEffectingButton())
+							{
+								return true;
+							};
+						}
+					}
+					return false;
+				});
+			// If we found an action with a chord matching our event, and we know which modio key is associated with
+			// that action...
+			if (ModioInputMapping)
+			{
+				{
+					return ModioInputMapping->VirtualKey;
+				}
+			}
+		}
+	}
+	return {};
+}
+
 TOptional<FKey> IModioInputMappingAccessor::GetCommandKeyForEvent(const FKeyEvent& Event) const
 {
 	// If we're processing an event containing a modio command key, return the key directly and skip the lookup
@@ -155,13 +197,23 @@ PRAGMA_ENABLE_OPTIMIZATION
 
 TSharedRef<const FUICommandList> IModioUIInputHandler::GetCommandList()
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		TSharedRef<FUICommandList> NewCommandList = MakeShared<FUICommandList>(*Subsystem->GetCommandList().Get());
 		BuildCommandList(NewCommandList);
 		return NewCommandList;
 	}
 	return MakeShared<FUICommandList>();
+}
+
+bool IModioUIInputHandler::ProcessCommandForEvent(const FPointerEvent& Event)
+{
+	TOptional<FKey> CommandKey = IModioInputMappingAccessor::GetCommandKeyForPointerEvent(Event);
+	if (CommandKey.IsSet())
+	{
+		return GetCommandList()->ProcessCommandBindings(CommandKey.GetValue(), FModifierKeysState {}, false);
+	}
+	return false;
 }
 
 bool IModioUIInputHandler::ProcessCommandForEvent(const FKeyEvent& Event)

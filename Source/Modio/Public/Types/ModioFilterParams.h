@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Types/ModioCommonTypes.h"
+#include "Misc/DateTime.h"
 
 #include "ModioFilterParams.generated.h"
 
@@ -164,6 +165,9 @@ private:
 	
 	friend class Modio::FilterParams ToModio(const FModioFilterParams& In );
 	friend class UModioSearchResultsView;
+	friend class UModioCommonSearchResultsViewBase;
+	friend class UModioCommonSearchResultsView;
+	friend class UModioCommonFilteredModListView;
 
 	EModioSortDirection Direction = EModioSortDirection::Ascending;
 	EModioSortFieldType SortField = EModioSortFieldType::ID;

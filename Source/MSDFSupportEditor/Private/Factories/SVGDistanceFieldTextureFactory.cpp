@@ -9,7 +9,7 @@
  */
 
 #include "Factories/SVGDistanceFieldTextureFactory.h"
-#include "AssetRegistryModule.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetTypeCategories.h"
 #include "EditorFramework/AssetImportData.h"
 #include "HAL/ThreadManager.h"

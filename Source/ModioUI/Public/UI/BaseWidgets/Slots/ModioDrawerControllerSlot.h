@@ -14,6 +14,8 @@
 #include "CoreMinimal.h"
 #include "ModioDrawerControllerSlot.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDrawerAnimatedOut);
+
 /**
 * Enum listing the possible alignment locations of a drawer slot
 **/
@@ -34,6 +36,9 @@ class MODIOUI_API UModioDrawerControllerSlot : public UOverlaySlot
 {
 	GENERATED_BODY()
 protected:
+
+	bool bIsAnimatingOut = false;
+
 	TSharedPtr<FActiveTimerHandle> CurrentAnimationTimer;
 
 	virtual void SynchronizeProperties() override;
@@ -78,6 +83,9 @@ protected:
 	virtual void AnimateOut();
 
 public:
+
+	FOnDrawerAnimatedOut OnDrawerAnimatedOut;
+
 	/**
 	* Change the drawer condition between expanded or not 
 	* @param bNewState True for an expanded condition, false to collapse it

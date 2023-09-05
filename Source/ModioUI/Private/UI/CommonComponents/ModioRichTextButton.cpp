@@ -13,6 +13,7 @@
 #include "Engine/Engine.h"
 #include "Misc/EngineVersionComparison.h"
 #include "ModioUISubsystem.h"
+#include "Settings/ModioUISettings.h"
 #include "UI/BaseWidgets/ModioRichTextBlockDecorator.h"
 #include "UI/Styles/ModioButtonStyle.h"
 #include "UI/Styles/ModioRichTextStyle.h"
@@ -119,7 +120,7 @@ void UModioRichTextButton::NativeDisplayHintForInput(FKey VirtualKey)
 {
 	IModioUIInputHintDisplayWidget::NativeDisplayHintForInput(VirtualKey);
 	KeyForInputHint = VirtualKey;
-	UModioUISubsystem* subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (InputHintImage && subsystem && KeyForInputHint.IsValid())
 	{
 		InputHintImage->LastDeviceType = subsystem->GetLastInputDevice();
@@ -129,7 +130,14 @@ void UModioRichTextButton::NativeDisplayHintForInput(FKey VirtualKey)
 
 ESlateVisibility UModioRichTextButton::GetInputHintVisibility(EModioUIInputMode InputMode)
 {
-	if (InputMode == EModioUIInputMode::Mouse || InputMode == EModioUIInputMode::Unknown)
+	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
+
+	if (Settings->bDisableInputGlyphsCompletely)
+	{
+		return ESlateVisibility::Collapsed;
+	}
+
+	if (InputMode == EModioUIInputMode::Unknown)
 	{
 		return ESlateVisibility::Collapsed;
 	}

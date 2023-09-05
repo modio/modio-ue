@@ -26,6 +26,7 @@ The settings have the following parameters:
 |[.paramname]#API Key#|Your mod.io-provided Game Id for the target environment (Live, or Test)
 |[.paramname]#Environment#|Your current environment, Live or Test (check difference below)
 |[.paramname]#Log Level#|The default logging level to use. Messages with a lower log level will be silently discarded.
+|[.paramname]#Use Background Thread#|Run the mod.io plugin on a managed background thread.
 
 |===
 
@@ -42,6 +43,12 @@ In summary, here are the three steps:
 * Test Environment: Used for integration between your game and mod.io
 * Live Environment, Hidden: Used for quality assurance and pre-release mods
 * Live Environment, Public: It is open for everyone to see.
+
+==== Using background thread
+
+The mod.io plugin can be run on a background thread. Rather than calling <<RunPendingHandlers>> yourself, the mod.io plugin will spin up a background thread and continually call RunPendingHandlers for you. This option can be enabled in the mod.io project settings. This allows you to decouple the frequency with which you perform the plugin's "work" from your games main thread, which improves performance of the plugin.
+
+Calling methods from the ModioSubsystem will marshall all callbacks back to the game thread, and all other plugin call guarantees remain the same.
 
 '''
 
@@ -1061,4 +1068,3 @@ void UModioManager::OnListMutedUsersCallback(FModioErrorCode ErrorCode, FModioOp
 ----
 
 ====
-

@@ -16,7 +16,7 @@
 #include "ModioDrawerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDrawerClosed);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDrawerAnimatedOut_WithIndex, int32, SlotIndex);
 
 struct EVisibility;
 /**
@@ -28,6 +28,9 @@ class MODIOUI_API UModioDrawerController : public UModioOverlay
 	GENERATED_BODY()
 
 protected:
+
+	int CurrentAnimatingOutDrawer = -1;
+
 	virtual UClass* GetSlotClass() const override;
 	virtual void OnSlotAdded(UPanelSlot* InSlot) override;
 	virtual void OnSlotRemoved(UPanelSlot* InSlot) override;
@@ -35,8 +38,12 @@ protected:
 	virtual FReply OnMouseUp(const FGeometry&, const FPointerEvent&);
 	virtual void UpdateVisibility();
 
+	UFUNCTION()
+	void DrawerAnimatedOut();
+
 public:
 	FOnDrawerClosed OnDrawerClosed;
+	FOnDrawerAnimatedOut_WithIndex OnDrawerAnimatedOut;
 
 	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	bool ToggleDrawerExpanded(int32 SlotIndex, bool bCloseOtherDrawers = true);

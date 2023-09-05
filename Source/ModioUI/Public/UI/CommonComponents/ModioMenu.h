@@ -21,6 +21,7 @@
 #include "UI/Dialogs/ModioDialogController.h"
 #include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
 #include "UI/Interfaces/IModioInputMappingAccessor.h"
+#include "UI/Interfaces/IModioModBrowser.h"
 #include "UI/Views/CategoryBrowser/ModioFeaturedView.h"
 #include "UI/Views/Collection/ModioCollectionView.h"
 
@@ -64,20 +65,24 @@ enum class EModioMenuDrawer : uint8
 * other visual instances like a controller
 **/
 UCLASS()
-class MODIOUI_API UModioMenu : public UModioUserWidgetBase, public IModioUIUserChangedReceiver
+class MODIOUI_API UModioMenu : public UModioUserWidgetBase, public IModioUIUserChangedReceiver, public IModioModBrowserInterface
 {
 public:
-	void ShowAuthenticationChoiceDialog();
-	void SetPageIndex(int Index);
-	void ShowModUnsubscribeDialog(UObject* DialogDataSource);
-	void ShowLogoutDialog();
-	void ShowModReportDialog(UObject* DialogDataSource);
+	virtual void ShowUserAuth_Implementation() override;
+	void SetPageIndex(int Index, bool bForce = false);
+	virtual void ShowModUnsubscribeDialog_Implementation(UObject* DialogDataSource) override;
+	virtual void LogOut_Implementation() override;
+	virtual bool IsDownloadDrawerOpen_Implementation() override;
 	void ShowReportEmailDialog(UObject* DialogDataSource);
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
 	void SetShowCursor(bool bShow);
 	void CreateHideMouseCursorWidget(TSubclassOf<UUserWidget> widgetClass);
 	int32 GetPageIndex();
 	void RefreshDownloadQueue();
+	bool IsAnyDrawerExpanded();
+	void RefreshView(int32 ViewIndex);
+	void CacheCurrentPage();
+	void RestoreCachedPage();
 
 	FDownloadQueueClosed OnDownloadQueueClosed;
 
@@ -86,6 +91,7 @@ private:
 	bool bRoutedOnViewChanged = false;
 
 	bool bMenuFocused = false;
+	bool bDownloadDrawerOpen = false;
 
 	EMouseCursor::Type CachedBacgroundCursorType;
 
@@ -113,6 +119,9 @@ protected:
 	void GoToPreviousSubmenu();
 	// End Action Delegates
 
+	//Updates foucus on menu if possible
+	void UpdateMenuFocus();
+
 	virtual void BuildCommandList(TSharedRef<FUICommandList> CommandList) override;
 
 	virtual void NativePreConstruct() override;
@@ -128,11 +137,15 @@ protected:
 	UFUNCTION()
 	void HandleViewChanged(int32 ViewIndex);
 
+	UFUNCTION()
+	void OnDrawerAnimatedOut(int32 SlotIndex);
+
 	virtual void NativeOnViewChanged(int64 ViewIndex);
 	virtual void NativeTick(const FGeometry& InGeometry, float DeltaTime) override;
 
 	// Using switched from NativeOnKeyDown to NativeOnPreviewKeyDown to capture input event when the menu is hidden 
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -169,6 +182,15 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets", meta = (BindWidget))
 	class UUserWidget* ModioMenuBarWidget;
 
+	UPROPERTY(meta = (BindWidget))
+	class USizeBox* MenuSizeBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* LeftBlurBorder;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* RightBlurBorder;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioMenuView> FeaturedView;
 
@@ -187,12 +209,18 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	TSubclassOf<UModioDrawer> RefineSearchDrawer;
 
+	int CachedPageIndex = 0;
+
 	UUserWidget* ActiveViewWidget;
 
 	virtual void NativeUserChanged(TOptional<FModioUser> NewUser) override;
 
 public:
-	void ShowDetailsForMod(FModioModID ID);
+
+	virtual void ShowDetailsForMod_Implementation(FModioModID ID) override;
+	virtual void RequestExternalAuthentication_Implementation(EModioAuthenticationProvider Provider) override;
+	virtual void RequestExternalAuthenticationNative(EModioAuthenticationProvider Provider, FOnErrorOnlyDelegateFast DedicatedCallback) override;
+	virtual void ShowReportMod_Implementation(UObject* DialogDataSource) override;
 	bool RequestShowSearchResults(FModioFilterParams Params);
 	void ForceCloseDownloadDrawer()
 	{

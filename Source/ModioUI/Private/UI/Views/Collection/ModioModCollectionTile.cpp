@@ -9,6 +9,8 @@
  */
 
 #include "UI/Views/Collection/ModioModCollectionTile.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Core/ModioModCollectionEntryUI.h"
 #include "Core/ModioModInfoUI.h"
 #include "Engine/Engine.h"
@@ -63,14 +65,14 @@ void UModioModCollectionTile::NativeOnSetDataSource()
 			{
 				SizeOnDiskLabel->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
-				SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 0));
+				SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 0, 0));
 			}
         }
         else
         {
 			SizeOnDiskLabel->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
-            SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 1));
+            SizeOnDiskLabel->SetText(UModioSDKLibrary::Filesize_ToString(NumBytes, 0, 1));
         }
     }
     // Perform the initial hide of the remove mod button if we are not subscribed (because we want users to use
@@ -185,11 +187,31 @@ void UModioModCollectionTile::NativeTick(const FGeometry& MyGeometry, float InDe
 	}
 }
 
+void UModioModCollectionTile::NativeOnListItemObjectSet(UObject* ListItemObject) 
+{
+	Super::NativeOnListItemObjectSet(ListItemObject);
+
+	if (HasKeyboardFocus())
+	{
+		if (TileBorder)
+		{
+			TileBorder->SetHoveredState();
+			TileBorder->EnableBorder();
+		}
+		if (TileFrame)
+		{
+			TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 1);
+			TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("EnableBorder"), 1);
+		}
+		PlayHoverAnimation(true);
+	}
+}
+
 void UModioModCollectionTile::OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating)
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->DisplayErrorNotification(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
+		Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateRatingNotification(ec, DataSource));
 	}
 }
 void UModioModCollectionTile::SubmitNegativeRating()
@@ -199,7 +221,7 @@ void UModioModCollectionTile::SubmitNegativeRating()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->ShowUserAuthenticationDialog();
+			Subsystem->ShowUserAuth();
 		}
 	}
 
@@ -225,7 +247,7 @@ void UModioModCollectionTile::SubmitPositiveRating()
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			Subsystem->ShowUserAuthenticationDialog();
+			Subsystem->ShowUserAuth();
 		}
 	}
 
@@ -262,7 +284,7 @@ void UModioModCollectionTile::ForceUninstall()
 	UModioModCollectionEntryUI* ModInfo = Cast<UModioModCollectionEntryUI>(DataSource);
 	if (ModInfo)
 	{
-		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 		{
 			if (Subsystem)
 			{
@@ -438,21 +460,24 @@ void UModioModCollectionTile::NativeCollectionTileClicked()
 
 void UModioModCollectionTile::ShowModDetails() 
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem4 = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		if (MoreOptionsMenu->GetIsMenuOpen())
 		{
-			Subsystem->SetCurrentFocusTarget(nullptr);
+			Subsystem4->SetCurrentFocusTarget(nullptr);
 			MoreOptionsMenu->Close();
 			return;
 		}
 
-		if (UModioModInfoUI* ModInfo = GetAsModInfoUIObject())
+		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
-			Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
+			if (UModioModInfoUI* ModInfo = GetAsModInfoUIObject())
+			{
+				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
 
-			FSlateApplication::Get().PlaySound(PressedSound);
-			return;
+				FSlateApplication::Get().PlaySound(PressedSound);
+				return;
+			}
 		}
 	}
 }

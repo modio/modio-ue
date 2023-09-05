@@ -12,6 +12,7 @@
 
 #include "Components/Widget.h"
 #include "CoreMinimal.h"
+#include "ModioUI4Subsystem.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
 #include "UI/BaseWidgets/Slate/SModioWidgetCarouselBase.h"
 #include "TimerManager.h"
@@ -174,7 +175,7 @@ public:
 
 			// Easiest way to ensure the focus is set to some target when this function is called
 			// Prevents focus lost on Login/Logout
-			UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+			UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 			if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 			{
 				GetWorld()->GetTimerManager().SetTimer(timer, this, &UModioWidgetCarousel::SetFocusToCurrentElement,

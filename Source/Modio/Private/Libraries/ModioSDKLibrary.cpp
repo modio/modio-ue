@@ -12,7 +12,7 @@
 #include "Internationalization/Regex.h"
 #include "Modio.h"
 #include "ModioSettings.h"
-#include "ModioTestSettings.h"
+
 
 FModioGameID UModioSDKLibrary::GetProjectGameId()
 {
@@ -37,6 +37,7 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptions()
 	Options.ApiKey = FModioApiKey(Settings->ApiKey);
 	Options.GameEnvironment = Settings->Environment;
 	Options.GameId = FModioGameID(Settings->GameId);
+	Options.bUseBackgroundThread = Settings->bUseBackgroundThread;
 
 	return Options;
 }
@@ -50,6 +51,8 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptionsForSessionI
 	Options.GameEnvironment = Settings->Environment;
 	Options.GameId = FModioGameID(Settings->GameId);
 	Options.LocalSessionIdentifier = SessionId;
+	Options.bUseBackgroundThread = Settings->bUseBackgroundThread;
+
 	if (SessionId.IsEmpty())
 	{
 		UE_LOG(LogModio, Error, TEXT("SessionID cannot be empty for GetProjectInitializeOptions"));
@@ -57,22 +60,6 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptionsForSessionI
 	return Options;
 }
 
-#if WITH_DEV_AUTOMATION_TESTS
-FModioInitializeOptions UModioSDKLibrary::GetAutomationTestOptions()
-{
-	#if WITH_EDITORONLY_DATA
-	const UModioTestSettings* Settings = GetDefault<UModioTestSettings>();
-	FModioInitializeOptions Options = Settings->AutomationTestOptions;
-	if (!Settings->AutomationSessionID.IsEmpty())
-	{
-		Options.LocalSessionIdentifier = Settings->AutomationSessionID;
-	}
-	return Options;
-	#else
-	return FModioInitializeOptions {};
-	#endif
-}
-#endif
 
 static FString ToString(EFileSizeUnit Unit)
 {
@@ -93,8 +80,25 @@ static FString ToString(EFileSizeUnit Unit)
 	return TEXT("Unknown unit");
 }
 
-FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MaxDecimals /** = 2*/,
-										  EFileSizeUnit Unit /**= EFileSizeUnit::Largest*/)
+EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit(int64 FileSize)
+{
+	if (FileSize > GB)
+	{
+		return EFileSizeUnit::GB;
+	}
+	if (FileSize > MB)
+	{
+		return EFileSizeUnit::MB;
+	}
+	if (FileSize > KB)
+	{
+		return EFileSizeUnit::KB;
+	}
+	return EFileSizeUnit::B;
+}
+
+FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals/* = 0*/, int32 MaxDecimals /** = 2*/,
+										  EFileSizeUnit Unit /**= EFileSizeUnit::Largest*/, bool bIncludeUnitName /**= true*/)
 {
 	static const int32 KB = 1024;
 	static const int32 MB = 1024 * 1024;
@@ -102,22 +106,7 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MaxDecimals /** 
 
 	if (Unit == EFileSizeUnit::Largest)
 	{
-		if (FileSize > GB)
-		{
-			Unit = EFileSizeUnit::GB;
-		}
-		else if (FileSize > MB)
-		{
-			Unit = EFileSizeUnit::MB;
-		}
-		else if (FileSize > KB)
-		{
-			Unit = EFileSizeUnit::KB;
-		}
-		else
-		{
-			Unit = EFileSizeUnit::B;
-		}
+		Unit = GetDesiredFileSizeUnit(FileSize);
 	}
 
 	const double InNewUnit = FileSize / static_cast<double>(Unit);
@@ -125,21 +114,24 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MaxDecimals /** 
 	FFormatNamedArguments Args;
 
 	FNumberFormattingOptions FormatRules;
-	FormatRules.MinimumFractionalDigits = 0;
+	FormatRules.MinimumFractionalDigits = MinDecimals;
 	FormatRules.MaximumFractionalDigits = MaxDecimals;
 	FormatRules.MinimumIntegralDigits = 1;
 
 	Args.Add(TEXT("FileSize"), FText::AsNumber(InNewUnit, &FormatRules));
-	Args.Add(TEXT("UnitName"), FText::FromString(ToString(Unit)));
+	Args.Add(TEXT("UnitName"), bIncludeUnitName ? FText::FromString(ToString(Unit)) : FText::GetEmpty());
 
 	return FText::Format(FTextFormat::FromString(TEXT("{FileSize}{UnitName}")), Args);
 }
 
 bool UModioSDKLibrary::IsValidEmailAddressFormat(const FString& String)
 {
-	// Regex for validating email adress found here: https://mylittledevblog.com/2018/02/15/ue4-email-validation/
-	// I would prefer to use https://stackoverflow.com/a/201378/12018052, but that doesn't work
-	const FRegexPattern Pattern(TEXT("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+"));
+	if (String.IsEmpty())
+	{
+		return false;
+	}
+
+	const FRegexPattern Pattern(TEXT("^([a-z0-9]+)((\\.|-|_)([a-z0-9])+)*@([a-z0-9]+)(\\.([a-z0-9]{2,8}+))+$"));
 	FRegexMatcher Matcher(Pattern, String);
 
 	return Matcher.FindNext();

@@ -14,7 +14,7 @@
 
 void UModioUserProfileButton::OnButtonClicked()
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		Subsystem->SendCommandToBrowserUI(FModioInputKeys::DownloadQueue, 0);
 	}

@@ -16,6 +16,11 @@
 #include "Styling/SlateStyle.h"
 #include "UI/Styles/ModioUIStyleSet.h"
 
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_NEWER_THAN(5, 2, 0)
+	#include "RenderDeferredCleanup.h"
+#endif
+
 template<class ObjectType>
 struct FDeferredDeletor : public FDeferredCleanupInterface
 {

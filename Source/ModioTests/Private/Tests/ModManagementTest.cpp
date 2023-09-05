@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #include "Engine/Engine.h"
@@ -13,6 +13,7 @@
 #include "Misc/AutomationTest.h"
 #include "Tests/Commands/DisableModManagement.h"
 #include "Tests/Commands/EnableModManagement.h"
+#include "Tests/Commands/FetchExternalUpdatesAsync.h"
 #include "Tests/Commands/InitializeAsync.h"
 #include "Tests/Commands/IsModManagementBusy.h"
 #include "Tests/Commands/QueryCurrentModUpdate.h"
@@ -79,7 +80,8 @@ bool FModioModManagementBusyManagementDisabledTest::RunTest(const FString& Param
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioModManagementQueryCurrentUpdateManagementDisabled, "Modio.ModManagement.QueryCurrentUpdate.ManagementDisabled",
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioModManagementQueryCurrentUpdateManagementDisabled,
+								 "Modio.ModManagement.QueryCurrentUpdate.ManagementDisabled",
 								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
 									 EAutomationTestFlags::ProductFilter)
 bool FModioModManagementQueryCurrentUpdateManagementDisabled::RunTest(const FString& Parameters)
@@ -95,8 +97,6 @@ bool FModioModManagementQueryCurrentUpdateManagementDisabled::RunTest(const FStr
 
 	return true;
 }
-
-
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioModManagementQueryCurrentUpdateNoWork,
 								 "Modio.ModManagement.QueryCurrentUpdate.NoUpdate",
@@ -122,4 +122,39 @@ bool FModioModManagementQueryCurrentUpdateNoWork::RunTest(const FString& Paramet
 
 	return true;
 }
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioFetchExternalUpdatesTest, "Modio.FetchExternal.ManagementEnabled",
+								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+									 EAutomationTestFlags::ProductFilter)
+bool FModioFetchExternalUpdatesTest::RunTest(const FString& Parameters)
+{
+	ADD_LATENT_AUTOMATION_COMMAND(FModioInitializeAsyncCommand(this));
+
+	ADD_LATENT_AUTOMATION_COMMAND(FModioEnableModManagementCommand(
+		this, FOnModManagementDelegateFast::CreateLambda([](FModioModManagementEvent Event) {
+
+		})));
+
+	ADD_LATENT_AUTOMATION_COMMAND(FModioFetchExternalUpdatesAsyncCommand(this, EModioErrorCondition::NoError));
+	ADD_LATENT_AUTOMATION_COMMAND(FModioDisableModManagementCommand(this));
+
+	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioFetchExternalUpdatesTestManagementDisabled, "Modio.FetchExternal.ManagementDisabled",
+								 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+									 EAutomationTestFlags::ProductFilter)
+bool FModioFetchExternalUpdatesTestManagementDisabled::RunTest(const FString& Parameters)
+{
+	ADD_LATENT_AUTOMATION_COMMAND(FModioInitializeAsyncCommand(this));
+	
+	ADD_LATENT_AUTOMATION_COMMAND(FModioFetchExternalUpdatesAsyncCommand(this, EModioErrorCondition::ModManagementDisabled));
+
+	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));
+
+	return true;
+}
+
 #endif

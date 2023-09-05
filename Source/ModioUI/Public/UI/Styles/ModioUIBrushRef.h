@@ -68,7 +68,7 @@ public:
 	* @param AdditionalSpecifier Extra parameter use to find the material in the engine subsystem 
 	* @return Material interface when the reference is found, otherwise a nullptr
 	**/
-	UMaterialInterface* ResolveReference(UModioUIStyleSet* OverrideStyleSet = nullptr,
+	UMaterialInterface* ResolveReference(class UModioUIStyleSet* OverrideStyleSet = nullptr,
 										 FName AdditionalSpecifier = NAME_None) const;
 };
 

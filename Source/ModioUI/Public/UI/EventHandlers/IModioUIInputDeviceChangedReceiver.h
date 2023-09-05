@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ModioUI4Subsystem.h"
 #include "Core/Input/InputDeviceTypes.h"
 #include "ModioUISubsystem.h"
 #include "UObject/Interface.h"
@@ -33,7 +34,7 @@ protected:
 	template<typename ImplementingClass>
 	void Register()
 	{
-		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 		if (Subsystem)
 		{
 			Subsystem->OnInputDeviceChanged.AddUObject(Cast<ImplementingClass>(this),

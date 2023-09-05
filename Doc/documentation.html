@@ -768,6 +768,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_configuration">Configuration</a>
 <ul class="sectlevel3">
 <li><a href="#_endpoint_environment">Endpoint Environment</a></li>
+<li><a href="#_using_background_thread">Using background thread</a></li>
 </ul>
 </li>
 <li><a href="#_plugin_structure_and_concepts">Plugin structure and concepts</a>
@@ -825,29 +826,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <ul class="sectlevel2">
 <li><a href="#_ui_specific_plugin_modules">UI-Specific Plugin Modules</a></li>
 <li><a href="#_displaying_the_mod_browser">Displaying the Mod Browser</a></li>
-<li><a href="#_configuration_2">Configuration</a>
-<ul class="sectlevel3">
-<li><a href="#_input_mappings">Input Mappings</a></li>
-<li><a href="#_ui_style_set">UI Style Set</a></li>
-<li><a href="#_navigationconfig_factory">NavigationConfig Factory</a></li>
-<li><a href="#_authentication_data_provider">Authentication Data Provider</a></li>
-<li><a href="#_input_hint_glyph_provider">Input Hint Glyph Provider</a></li>
-<li><a href="#_featured_rows_categories">Featured Rows &amp; Categories</a></li>
-</ul>
-</li>
-<li><a href="#_styling_and_customization">Styling and Customization</a>
-<ul class="sectlevel3">
-<li><a href="#_color_material_and_style_references">Color, Material, and Style References</a></li>
-<li><a href="#_default_background_material">Default Background Material</a></li>
-<li><a href="#_color_presets_data">Color Presets Data</a></li>
-<li><a href="#_widget_style_assets">Widget Style Assets</a></li>
-<li><a href="#_customizing_audio">Customizing Audio</a></li>
-<li><a href="#_named_glyphs_asset">Named Glyphs Asset</a></li>
-<li><a href="#_material_data">Material Data</a></li>
-<li><a href="#_localization">Localization</a></li>
-</ul>
-</li>
-<li><a href="#_known_issues">Known Issues</a></li>
 </ul>
 </li>
 <li><a href="#_classes">Classes</a>
@@ -892,6 +870,17 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#CollapseAllDrawers">Collapse All Drawers</a></li>
 </ul>
 </li>
+<li><a href="#_modioextendedmodinfouidetails">ModioExtendedModInfoUIDetails</a>
+<ul class="sectlevel3">
+<li><a href="#IsModSubscribed">Is Mod Subscribed</a></li>
+<li><a href="#IsModInstalled">Is Mod Installed</a></li>
+<li><a href="#IsModInQueue">Is Mod in Queue</a></li>
+<li><a href="#IsModExtracting">Is Mod Extracting</a></li>
+<li><a href="#IsModEnabled">Is Mod Enabled</a></li>
+<li><a href="#IsModDownloading">Is Mod Downloading</a></li>
+<li><a href="#HasModErrors">Has Mod Errors</a></li>
+</ul>
+</li>
 <li><a href="#_modiofeaturedcategory">ModioFeaturedCategory</a>
 <ul class="sectlevel3">
 <li><a href="#SetSelectionIndexDelegate">Set Selection Index Delegate</a></li>
@@ -926,6 +915,19 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiomenubackgroundprovider">ModioMenuBackgroundProvider</a>
 <ul class="sectlevel3">
 <li><a href="#GetBackgroundMaterial">Get Background Material</a></li>
+</ul>
+</li>
+<li><a href="#_modiomodbrowserinterface">ModioModBrowserInterface</a>
+<ul class="sectlevel3">
+<li><a href="#ShowUserAuth">Show User Auth</a></li>
+<li><a href="#ShowSearchResults">Show Search Results</a></li>
+<li><a href="#ShowReportMod">Show Report Mod</a></li>
+<li><a href="#ShowModUnsubscribeDialog">Show Mod Unsubscribe Dialog</a></li>
+<li><a href="#ShowDialog">Show Dialog</a></li>
+<li><a href="#ShowDetailsForMod">Show Details for Mod</a></li>
+<li><a href="#RequestExternalAuthentication">Request External Authentication</a></li>
+<li><a href="#LogOut">Log Out</a></li>
+<li><a href="#IsDownloadDrawerOpen">Is Download Drawer Open</a></li>
 </ul>
 </li>
 <li><a href="#_modiomodinfouidetails">ModioModInfoUIDetails</a>
@@ -973,6 +975,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#QueryUserInstallations">Query User Installations</a></li>
 <li><a href="#QuerySystemInstallations">Query System Installations</a></li>
 <li><a href="#PrioritizeTransferForMod">Prioritize Transfer for Mod</a></li>
+<li><a href="#KillBackgroundThread">Kill Background Thread</a></li>
 <li><a href="#K2_VerifyUserAuthenticationAsync">VerifyUserAuthenticationAsync</a></li>
 <li><a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a></li>
 <li><a href="#K2_UnmuteUserAsync">UnmuteUserAsync</a></li>
@@ -1008,6 +1011,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a></li>
 <li><a href="#K2_AuthenticateUserEmailAsync">AuthenticateUserEmailAsync</a></li>
 <li><a href="#K2_ArchiveModAsync">ArchiveModAsync</a></li>
+<li><a href="#IsUsingBackgroundThread">Is Using Background Thread</a></li>
 <li><a href="#IsModManagementBusy">Is Mod Management Busy</a></li>
 <li><a href="#GetLastValidationError">Get Last Validation Error</a></li>
 <li><a href="#DisableModManagement">Disable Mod Management</a></li>
@@ -1041,6 +1045,16 @@ table.stripes-odd tr:nth-of-type(odd) {
 <ul class="sectlevel3">
 <li><a href="#SetCenterPanelItems">Set Center Panel Items</a></li>
 <li><a href="#SetAllowPartialItems">Set Allow Partial Items</a></li>
+</ul>
+</li>
+<li><a href="#_modioui4subsystem">ModioUI4Subsystem</a>
+<ul class="sectlevel3">
+<li><a href="#SetCurrentFocusTarget">Set Current Focus Target</a></li>
+<li><a href="#GetLocalizedTag">Get Localized Tag</a></li>
+<li><a href="#GetInputGlyphMaterialForInputType">Get Input Glyph Material for Input Type</a></li>
+<li><a href="#GetDefaultStyleSet">Get Default Style Set</a></li>
+<li><a href="#GetCurrentFocusTarget">Get Current Focus Target</a></li>
+<li><a href="#GetAllNamedStyleNames">Get All Named Style Names</a></li>
 </ul>
 </li>
 <li><a href="#_modiouiasynchandlerwidget">ModioUIAsyncHandlerWidget</a>
@@ -1133,9 +1147,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiouinotificationcontroller">ModioUINotificationController</a>
 <ul class="sectlevel3">
 <li><a href="#RegisterUserWidget">Register User Widget</a></li>
+<li><a href="#DisplayNotificationParams">Display Notification Params</a></li>
+<li><a href="#DisplayNotificationManual">Display Notification Manual</a></li>
 <li><a href="#DisplayNotification">Display Notification</a></li>
-<li><a href="#DisplayErrorNotificationManual">Display Error Notification Manual</a></li>
-<li><a href="#DisplayErrorNotification">Display Error Notification</a></li>
 </ul>
 </li>
 <li><a href="#_modiouipopupmenucontentwidget">ModioUIPopupMenuContentWidget</a>
@@ -1162,10 +1176,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 </li>
 <li><a href="#_modiouisubsystem">ModioUISubsystem</a>
 <ul class="sectlevel3">
+<li><a href="#ShowSearchResults">Show Search Results</a></li>
 <li><a href="#ShowModBrowserUIForPlayer">Show Mod Browser UIFor Player</a></li>
 <li><a href="#ShowDetailsForMod">Show Details for Mod</a></li>
-<li><a href="#SetCurrentFocusTarget">Set Current Focus Target</a></li>
-<li><a href="#SendCommandToBrowserUI">Send Command to Browser UI</a></li>
 <li><a href="#RequestUserAvatar">Request User Avatar</a></li>
 <li><a href="#RequestSubscriptionForModID">Request Subscription for Mod ID</a></li>
 <li><a href="#RequestRemoveSubscriptionForModID">Request Remove Subscription for Mod ID</a></li>
@@ -1177,17 +1190,11 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#RequestEmailAuthentication">Request Email Authentication</a></li>
 <li><a href="#HideModBrowserUI">Hide Mod Browser UI</a></li>
 <li><a href="#GetOnModEnabled">Get on Mod Enabled</a></li>
-<li><a href="#GetLocalizedTag">Get Localized Tag</a></li>
-<li><a href="#GetInputGlyphMaterialForInputType">Get Input Glyph Material for Input Type</a></li>
-<li><a href="#GetDefaultStyleSet">Get Default Style Set</a></li>
-<li><a href="#GetCurrentFocusTarget">Get Current Focus Target</a></li>
 <li><a href="#GetCurrentDPIScaleValue">Get Current DPIScale Value</a></li>
-<li><a href="#GetAllNamedStyleNames">Get All Named Style Names</a></li>
 <li><a href="#FormatText">Format Text</a></li>
-<li><a href="#DisplaySearchResults">Display Search Results</a></li>
+<li><a href="#DisplayNotificationParams">Display Notification Params</a></li>
+<li><a href="#DisplayNotificationManual">Display Notification Manual</a></li>
 <li><a href="#DisplayNotification">Display Notification</a></li>
-<li><a href="#DisplayErrorNotificationManual">Display Error Notification Manual</a></li>
-<li><a href="#DisplayErrorNotification">Display Error Notification</a></li>
 <li><a href="#DisplayErrorDialog">Display Error Dialog</a></li>
 <li><a href="#CloseModBrowserUI">Close Mod Browser UI</a></li>
 </ul>
@@ -1280,8 +1287,8 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiouserlist">ModioUserList</a></li>
 <li><a href="#_modiovalidationerror">ModioValidationError</a></li>
 <li><a href="#_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</a></li>
-<li><a href="#_modiouiauthenticationproviderinfo">ModioUIAuthenticationProviderInfo</a></li>
 <li><a href="#_modionotificationparams">ModioNotificationParams</a></li>
+<li><a href="#_modiouiauthenticationproviderinfo">ModioUIAuthenticationProviderInfo</a></li>
 <li><a href="#_modiotextvalidationrule">ModioTextValidationRule</a></li>
 <li><a href="#_modiobuttonstyle">ModioButtonStyle</a></li>
 <li><a href="#_modiouistyleref">ModioUIStyleRef</a></li>
@@ -1394,8 +1401,8 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#CreateUninstallNotification">Create Uninstall Notification</a></li>
 <li><a href="#CreateSubscriptionNotification">Create Subscription Notification</a></li>
 <li><a href="#CreateRatingNotification">Create Rating Notification</a></li>
+<li><a href="#CreateNotificationParams">Create Notification Params</a></li>
 <li><a href="#CreateInstallationNotification">Create Installation Notification</a></li>
-<li><a href="#CreateErrorNotificationParams">Create Error Notification Params</a></li>
 <li><a href="#AddFormatText">Add Format Text</a></li>
 <li><a href="#ValidateUsingRule">Validate Using Rule</a></li>
 <li><a href="#ValidateNoWhitespace">Validate No Whitespace</a></li>
@@ -1442,11 +1449,11 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_emodiorating"> EModioRating</a></li>
 <li><a href="#_emodioreporttype"> EModioReportType</a></li>
 <li><a href="#_efilesizeunit"> EFileSizeUnit</a></li>
+<li><a href="#_emodiouimediadownloadeventtype"> EModioUIMediaDownloadEventType</a></li>
+<li><a href="#_emodiouimodinfoeventtype"> EModioUIModInfoEventType</a></li>
 <li><a href="#_emodiouiinputmode"> EModioUIInputMode</a></li>
 <li><a href="#_emodiouiasyncoperationwidgetstate"> EModioUIAsyncOperationWidgetState</a></li>
 <li><a href="#_emodiouidirection"> EModioUIDirection</a></li>
-<li><a href="#_emodiouimediadownloadeventtype"> EModioUIMediaDownloadEventType</a></li>
-<li><a href="#_emodiouimodinfoeventtype"> EModioUIModInfoEventType</a></li>
 <li><a href="#_emodiotextvalidationrule"> EModioTextValidationRule</a></li>
 <li><a href="#_emodiodialogreply"> EModioDialogReply</a></li>
 <li><a href="#_emodiodialogoperationcall"> EModioDialogOperationCall</a></li>
@@ -1523,6 +1530,10 @@ table.stripes-odd tr:nth-of-type(odd) {
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Log Level</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default logging level to use. Messages with a lower log level will be silently discarded.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Use Background Thread</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Run the mod.io plugin on a managed background thread.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -1551,6 +1562,15 @@ table.stripes-odd tr:nth-of-type(odd) {
 <p>Live Environment, Public: It is open for everyone to see.</p>
 </li>
 </ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_background_thread">Using background thread</h4>
+<div class="paragraph">
+<p>The mod.io plugin can be run on a background thread. Rather than calling <a href="#RunPendingHandlers">Run Pending Handlers</a> yourself, the mod.io plugin will spin up a background thread and continually call RunPendingHandlers for you. This option can be enabled in the mod.io project settings. This allows you to decouple the frequency with which you perform the plugin&#8217;s "work" from your games main thread, which improves performance of the plugin.</p>
+</div>
+<div class="paragraph">
+<p>Calling methods from the ModioSubsystem will marshall all callbacks back to the game thread, and all other plugin call guarantees remain the same.</p>
 </div>
 <hr>
 </div>
@@ -2939,22 +2959,30 @@ To perform any of these actions, the muting user must be authenticated.
 <col>
 <col style="width: 1%;">
 </colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Module Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-<th class="tableblock halign-left valign-top">Module Type</th>
-</tr>
-</thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Module Name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Module Type</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ModioUI</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Core UI module containing all Slate and UMG widgets for the UI</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UI module containing all Slate and UMG widgets for the UE4 UI</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModioUI5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UI module containing all Slate and UMG widgets for the UE5 Common UI</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModioUICore</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Core UI module containing all shared entities between UE4 and UE5 UIs</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Runtime</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ModioUIEditor</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Editor details customization and asset factories for UI classes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Editor details customization and asset factories for UE4 UI classes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Editor</p></td>
 </tr>
 <tr>
@@ -3036,383 +3064,11 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="paragraph">
 <p>You can close the Mod Browser by calling <code>CloseModBrowserUI()</code> on the ModioUISubsystem.</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_configuration_2">Configuration</h3>
 <div class="paragraph">
-<p>The mod.io Mod Browser will utilise the configuration that you provided on the mod.io Plugin Settings page referenced above; however, there are a number of additional UI-specific settings you will need to update to match your project&#8217;s requirements. These are all accessible on the <code>mod.io UI</code> settings page in your project settings.</p>
-</div>
-<div class="sect3">
-<h4 id="_input_mappings">Input Mappings</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_inputmapping.png" alt="plugin ui inputmapping">
-</div>
+<p><a href="ui4-documentation.adoc">UE4 UI Documentation</a></p>
 </div>
 <div class="paragraph">
-<p>The mod.io Mod Browser requires you to map your project&#8217;s input actions and axes to the virtual keys we use internally, so that the UI automatically respects your bindings, as well as any rebinding functionality you support.</p>
-</div>
-<div class="paragraph">
-<p>To configure these mappings, expand the <code>Modio to Project Input Mappings</code> section. For each of our virtual keys, map at least one, but optionally more, Input Actions or Axes from your project. The UI will resolve any keypresses it receives, against the actions and axes you specify, to respond to user input.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_ui_style_set">UI Style Set</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_styleset.png" alt="plugin ui styleset">
-</div>
-</div>
-<div class="paragraph">
-<p>The Style Set defines UI properties such as colors, materials, widget styles, and more that can be altered to suit the aesthetic of your game. Each of these style types are split into separate assets to be managed individually, described further in <a href="#_styling_and_customization">Styling and Customization</a></p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_navigationconfig_factory">NavigationConfig Factory</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_navconfig.png" alt="plugin ui navconfig">
-</div>
-</div>
-<div class="paragraph">
-<p>Unreal uses a NavigationConfig object to specify configuration information regarding tab navigation, digital versus analog directional navigation, and translation between keypresses and navigation actions or directions.</p>
-</div>
-<div class="paragraph">
-<p>The mod.io Mod Browser allows you to specify a UModioNavigationConfigFactoryBase-derived class here, which will return an instance of a native FNavigationConfig object (or subclass) which can override the default behaviour for performing these tasks.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-The FNavigationConfig class is a native-only class, so you will need to implement your overriding class in C++ if you wish to provide an alternative factory class, as we cannot return instances of FNavigationConfig directly from Blueprint functions.
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_authentication_data_provider">Authentication Data Provider</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_authprovider.png" alt="plugin ui authprovider">
-</div>
-</div>
-<div class="paragraph">
-<p>A number of authentication providers are supported by mod.io, including email authentication, Steam, Xbox Live, and so on.</p>
-</div>
-<div class="paragraph">
-<p>To tell the UI which authentication methods you wish to support, create a new class that implements <code>IModioUIAuthenticationDataProvider</code> and overrides the following functions:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>GetAuthenticationTypes(Blueprint)/NativeGetAuthenticationTypes(C++)</p>
-<div class="paragraph">
-<p>This function provides an array of FModioUIAuthenticationProviderInfo objects. Each object contains a field for you to specify an authentication method you want to support, and localized text to display for that authentication method in the UI.</p>
-</div>
-</li>
-<li>
-<p>ShouldOfferEmailAuthentication(Blueprint)/NativeShouldOfferEmailAuthentication(C++)</p>
-<div class="paragraph">
-<p>This function returns a boolean indicating if the UI should offer email authentication as an option in the authentication dialog.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-If you either don&#8217;t specify an authentication data provider, or your data provider returns an empty list of authentication methods, then email authentication will be offered as a fallback.
-</td>
-</tr>
-</table>
-</div>
-</li>
-<li>
-<p>GetAuthenticationParams(Blueprint)/NativeGetAuthenticationParams(C++)</p>
-<div class="paragraph">
-<p>This function is invoked by the mod.io UI with an <code>EModioAuthenticationProvider</code> enum value (based on the set that you returned in <code>GetAuthenticationTypes</code>) in order for you to populate it with the appropriate data. Perform whatever platform specific calls you need to make in order to retrieve the relevant authentication token, populate a <code>FModioAuthenticationParams</code> object, and return it.</p>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_input_hint_glyph_provider">Input Hint Glyph Provider</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_glyphprovider.png" alt="plugin ui glyphprovider">
-</div>
-</div>
-<div class="paragraph">
-<p>The mod.io Mod Browser supports remapping inputs within your project, as mentioned above. Classes implementing <code>IModioUIInputHintGlyphProvider</code> allow the UI to query your project for a specific material displaying an input hint.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>GetInputGlyphMaterialForInputType(Blueprint)/NativeGetInputGlyphMaterialForInputType(C++)</p>
-<div class="paragraph">
-<p>This function will be invoked by the UI to offer your project a chance to return a specific material for a particular combination of virtual input and input device. Return <code>nullptr</code> from this function to fallback to the default implementation, which uses glyphs specified in the default style sheet.</p>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_featured_rows_categories">Featured Rows &amp; Categories</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_categories.png" alt="plugin ui categories">
-</div>
-</div>
-<div class="paragraph">
-<p>The mod.io Mod Browser allows you to customize the Featured row and secondary category rows with custom search criteria suitable for your game. By default, the browser uses the <code>Modio/UI/Browser/DefaultModBrowserParams</code> object, which you are free to modify to suit your needs. However, you can also create your own by creating a Data Asset inheriting from ModioModBrowserParams, and specifying that object as the <code>BrowserCategoryConfiguration</code> in the mod.io UI Settings.</p>
-</div>
-<div class="paragraph">
-<p>By default, the browser contains a single Featured Mods row (based off daily downloads), and additional rows of Highest Rated, Most Popular, Most Subscribers, Recently Added and Recently Updated.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_styling_and_customization">Styling and Customization</h3>
-<div class="paragraph">
-<p>For easier management of styling customization, <code>ModioUIDefaultStyle</code> contains multiple assets such that you can independently customize different aspects of the mod.io UI.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_defaultstyle.png" alt="plugin ui defaultstyle">
-</div>
-</div>
-<div class="paragraph">
-<p>When styling your UI, we recommend duplicating the existing <code>ModioUIDefaultStyle</code> asset and any child assets you wish to alter, rather than overriding the properties in the existing style assets. This will ensure that future UI updates will not cause conflicts with your changes.</p>
-</div>
-<div class="sect3">
-<h4 id="_color_material_and_style_references">Color, Material, and Style References</h4>
-<div class="paragraph">
-<p>Palettized Colors, Materials and Widget Styles use special FName-based references so that visual elements of the UI can 'pull' information from the central Style Sheet asset at runtime.  These references are visible in the Editor and use Details Customizations so that you can select from a dropdown list of valid elements to reference.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>FModioUIStyleRef</p>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_styleref.png" alt="plugin ui styleref">
-</div>
-</div>
-<div class="paragraph">
-<p>This struct creates a reference to a specific named widget style defined in the <code>Widget Styles</code> property on the Style Sheet. Metadata on the UPROPERTY declaration in C++ is used to specify which specific type of Widget Style can be referenced.</p>
-</div>
-</li>
-<li>
-<p>FModioUIMaterialRef</p>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_materialref.png" alt="plugin ui materialref">
-</div>
-</div>
-<div class="paragraph">
-<p>This struct creates a reference to a specific named material from the <code>Named Brush Materials</code> property on the style sheet, and is primarily intended to allow for procedural material instances to be shared between multiple Brushes.</p>
-</div>
-</li>
-<li>
-<p>FModioUIColorRef</p>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_colorref.png" alt="plugin ui colorref">
-</div>
-</div>
-<div class="paragraph">
-<p>This struct references a specific named color from the <code>Color Presets</code> table in the style sheet.</p>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_default_background_material">Default Background Material</h4>
-<div class="paragraph">
-<p>The mod.io Mod Browser supports a custom background, or removal of a background altogether. <code>ModioUIDefaultStyle</code> implements a <code>UMaterialInterface* DefaultBackgroundMaterial</code> which can be set to your chosen Material or Material Instance.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_backgroundmaterial.png" alt="plugin ui backgroundmaterial">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_color_presets_data">Color Presets Data</h4>
-<div class="paragraph">
-<p>Widgets in the Mod Browser reference a centrally defined color palette, <code>ModioUIColorPresets</code>. You can alter these colors by changing entries in the 'Color Presets' list.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-Changing the names of the existing colors will break references in widgets. You can, however, add additional colors to the palette and reference them in widgets or styles.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>Referencing a palette entry in a widget style is simple - just click the 'Color Presets' dropdown and select the new palette entry you wish to reference.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_colorpresets.png" alt="plugin ui colorpresets">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_widget_style_assets">Widget Style Assets</h4>
-<div class="paragraph">
-<p>Multiple Widget Style Assets have been created for different widget types.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_widgetstyleassets.png" alt="plugin ui widgetstyleassets">
-</div>
-</div>
-<div class="paragraph">
-<p>Each Widget Style Asset groups together a set of styles for a given asset type:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Borders</p>
-</li>
-<li>
-<p>Buttons</p>
-</li>
-<li>
-<p>Input (editable text boxes, checkboxes)</p>
-</li>
-<li>
-<p>Panels (notifications, pop-ups, tiles, tables)</p>
-</li>
-<li>
-<p>Status (progress bars, subscription indicators)</p>
-</li>
-<li>
-<p>Text</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>For example, <code>ButtonStyles</code> (below) contains a map of styles that could be applied to a button depending on that button&#8217;s function.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_editstyle.png" alt="plugin ui editstyle">
-</div>
-</div>
-<div class="paragraph">
-<p>To customize a widget style, expand its entry in the relevant Widget Style Asset map and make changes as you see fit.</p>
-</div>
-<div class="paragraph">
-<p>Similarly, to create a new widget style for a particular asset type, add a new entry to its widget style map and populate the values as required.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_customizing_audio">Customizing Audio</h4>
-<div class="paragraph">
-<p>The plugin ships with two default pieces of audio for rollover/focus and selection.</p>
-</div>
-<div class="paragraph">
-<p>Where relevant, these are configurable per-control for a given widget in its Widget Style Asset.  For example, each style in the previous <code>ButtonStyles</code> example above has entries <code>Pressed Sound</code> and <code>Hovered Sound</code> assigned to <code>UI_Click_Cue</code> and <code>UI_Rollover_Cue</code> respectively.</p>
-</div>
-<div class="paragraph">
-<p><code>S_Modio_UI</code> sound class can be used to control the volume of these default audio cues.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_named_glyphs_asset">Named Glyphs Asset</h4>
-<div class="paragraph">
-<p>This asset contains maps of <code>Named Glyphs</code> and <code>PNGGlyphs</code> that can be used to create a material instance of the specified SDF glyph or icon, which can then be referenced in other assets by name.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_material_data">Material Data</h4>
-<div class="paragraph">
-<p>The Mod Browser style sheet maintains a list of named materials and named material instance parameters that can be referenced by name by a style.  This allows materials and material instances to be easily shared between multiple widgets. The parameters for a named material are exposed in the <code>Named Brush Materials</code> property. There are currently 3 different types of parameters that can be specified:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Specified Material Params</p>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_specifiedmaterial.png" alt="plugin ui specifiedmaterial">
-</div>
-</div>
-<div class="paragraph">
-<p>This parameter simply references a material from the project - essentially a wrapper allowing us to easily refer to the material by a centralised FName key.</p>
-</div>
-</li>
-<li>
-<p>Rounded Rectangle Material Params</p>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_roundedrectmaterial.png" alt="plugin ui roundedrectmaterial">
-</div>
-</div>
-<div class="paragraph">
-<p>This parameter set specifies a dynamic material instance of the 'RoundedRectangle' named material. It sets the included parameters on the new material instance.</p>
-</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_localization">Localization</h4>
-<div class="paragraph">
-<p>ModioUISettings has a Modio Localization category with an empty map. When the user has a working project setup and enters PIE, every tag and category that exist in the game project is gathered to this map as a key-value pair. Every time a localized tag is requested from ModioUISubsystem and a tag is not found from this list, a new pair will be added. Values can be edited and formatted freely as well as removed from localization as there might be some tags such as numbers that do not need to be localized.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_empty_taglist.png" alt="plugin ui empty taglist">
-</div>
-</div>
-<div class="paragraph">
-<p>An empty map can be found from project settings before entering PIE for the first time with a proper API key.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_localized_tags.png" alt="plugin ui localized tags">
-</div>
-</div>
-<div class="paragraph">
-<p>This is how the localized tags list should look like after entering PIE. The map should contain all categories and tags. Map values are saved as FText and can be edited normally. Keys should be left untouched.</p>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_known_issues">Known Issues</h3>
-<div class="paragraph">
-<p>This release of the UI contains some known issues that are currently being improved.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Unreal Engine 5 is not officially supported, therefore there may be some display or functionality issues related to the mod browser.</p>
-</li>
-<li>
-<p>Offline mode is not supported. If there are connectivity issues to the mod.io API then the UI behavior is currently undefined.</p>
-</li>
-<li>
-<p>Changing users by logging out and logging back in as a new user may result in some inconsistent UI state related to mod collections. This does not occur after restarting.</p>
-</li>
-<li>
-<p>Transparent PNGs retrieved for mod galleries, logos etc may not display correctly</p>
-</li>
-</ul>
+<p><a href="ui5-documentation.adoc">UE5 Common UI Documentation</a></p>
 </div>
 </div>
 </div>
@@ -3612,6 +3268,108 @@ Changing the names of the existing colors will break references in widgets. You 
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">CollapseAllDrawers</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modioextendedmodinfouidetails">ModioExtendedModInfoUIDetails</h3>
+<hr>
+<div class="sect3">
+<h4 id="IsModSubscribed">Is Mod Subscribed</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsModSubscribed.png" alt="nd img IsModSubscribed">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsModSubscribed</span><span class="p">()</span> <span class="k">const</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="IsModInstalled">Is Mod Installed</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsModInstalled.png" alt="nd img IsModInstalled">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsModInstalled</span><span class="p">()</span> <span class="k">const</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="IsModInQueue">Is Mod in Queue</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsModInQueue.png" alt="nd img IsModInQueue">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsModInQueue</span><span class="p">()</span> <span class="k">const</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="IsModExtracting">Is Mod Extracting</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsModExtracting.png" alt="nd img IsModExtracting">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsModExtracting</span><span class="p">()</span> <span class="k">const</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="IsModEnabled">Is Mod Enabled</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsModEnabled.png" alt="nd img IsModEnabled">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsModEnabled</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="IsModDownloading">Is Mod Downloading</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsModDownloading.png" alt="nd img IsModDownloading">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsModDownloading</span><span class="p">()</span> <span class="k">const</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="HasModErrors">Has Mod Errors</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_HasModErrors.png" alt="nd img HasModErrors">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">HasModErrors</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
 <hr>
@@ -3842,6 +3600,136 @@ Changing the names of the existing colors will break references in widgets. You 
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UMaterialInterface</span><span class="o">*</span> <span class="n">GetBackgroundMaterial</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modiomodbrowserinterface">ModioModBrowserInterface</h3>
+<hr>
+<div class="sect3">
+<h4 id="ShowUserAuth">Show User Auth</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowUserAuth.png" alt="nd img ShowUserAuth">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowUserAuth</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ShowSearchResults">Show Search Results</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowSearchResults.png" alt="nd img ShowSearchResults">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowSearchResults</span><span class="p">(</span><span class="n">FModioFilterParams</span> <span class="n">FilterParams</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ShowReportMod">Show Report Mod</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowReportMod.png" alt="nd img ShowReportMod">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowReportMod</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span> <span class="n">DialogDataSource</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ShowModUnsubscribeDialog">Show Mod Unsubscribe Dialog</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowModUnsubscribeDialog.png" alt="nd img ShowModUnsubscribeDialog">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowModUnsubscribeDialog</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span> <span class="n">DialogDataSource</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ShowDialog">Show Dialog</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowDialog.png" alt="nd img ShowDialog">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowDialog</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ShowDetailsForMod">Show Details for Mod</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowDetailsForMod.png" alt="nd img ShowDetailsForMod">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowDetailsForMod</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ID</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="RequestExternalAuthentication">Request External Authentication</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_RequestExternalAuthentication.png" alt="nd img RequestExternalAuthentication">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">RequestExternalAuthentication</span><span class="p">(</span><span class="n">EModioAuthenticationProvider</span> <span class="n">Provider</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="LogOut">Log Out</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_LogOut.png" alt="nd img LogOut">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">LogOut</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="IsDownloadDrawerOpen">Is Download Drawer Open</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsDownloadDrawerOpen.png" alt="nd img IsDownloadDrawerOpen">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsDownloadDrawerOpen</span><span class="p">()</span></code></pre>
 </div>
 </div>
 <hr>
@@ -4370,6 +4258,20 @@ Changing the names of the existing colors will break references in widgets. You 
 </tr>
 </tbody>
 </table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="KillBackgroundThread">Kill Background Thread</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_KillBackgroundThread.png" alt="nd img KillBackgroundThread">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">KillBackgroundThread</span><span class="p">()</span></code></pre>
+</div>
+</div>
 <hr>
 </div>
 <div class="sect3">
@@ -6761,6 +6663,20 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="IsUsingBackgroundThread">Is Using Background Thread</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_IsUsingBackgroundThread.png" alt="nd img IsUsingBackgroundThread">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsUsingBackgroundThread</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="IsModManagementBusy">Is Mod Management Busy</h4>
 <div class="imageblock">
 <div class="content">
@@ -7072,6 +6988,94 @@ This function is part of an experimental feature and is subject to change.
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetAllowPartialItems</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bAllowPartialItems</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modioui4subsystem">ModioUI4Subsystem</h3>
+<hr>
+<div class="sect3">
+<h4 id="SetCurrentFocusTarget">Set Current Focus Target</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetCurrentFocusTarget.png" alt="nd img SetCurrentFocusTarget">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetCurrentFocusTarget</span><span class="p">(</span><span class="n">UWidget</span><span class="o">*</span> <span class="n">currentTarget</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="GetLocalizedTag">Get Localized Tag</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_GetLocalizedTag.png" alt="nd img GetLocalizedTag">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">GetLocalizedTag</span><span class="p">(</span><span class="n">FString</span> <span class="n">InTag</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="GetInputGlyphMaterialForInputType">Get Input Glyph Material for Input Type</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_GetInputGlyphMaterialForInputType.png" alt="nd img GetInputGlyphMaterialForInputType">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UMaterialInterface</span><span class="o">*</span> <span class="n">GetInputGlyphMaterialForInputType</span><span class="p">(</span><span class="n">FKey</span> <span class="n">VirtualInput</span><span class="p">,</span> <span class="n">EModioUIInputMode</span> <span class="n">InputType</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="GetDefaultStyleSet">Get Default Style Set</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_GetDefaultStyleSet.png" alt="nd img GetDefaultStyleSet">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioUIStyleSet</span><span class="o">*</span> <span class="n">GetDefaultStyleSet</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="GetCurrentFocusTarget">Get Current Focus Target</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_GetCurrentFocusTarget.png" alt="nd img GetCurrentFocusTarget">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">GetCurrentFocusTarget</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="GetAllNamedStyleNames">Get All Named Style Names</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_GetAllNamedStyleNames.png" alt="nd img GetAllNamedStyleNames">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FName</span><span class="o">&gt;</span> <span class="n">GetAllNamedStyleNames</span><span class="p">()</span></code></pre>
 </div>
 </div>
 <hr>
@@ -7743,6 +7747,54 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="DisplayNotificationParams">Display Notification Params</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_DisplayNotificationParams.png" alt="nd img DisplayNotificationParams">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayNotificationParams</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Function to display an error code notification widget</p>
+</div>
+<h5 id="_parameters_60" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio UINotification Controller Interface</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Params</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="DisplayNotificationManual">Display Notification Manual</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_DisplayNotificationManual.png" alt="nd img DisplayNotificationManual">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayNotificationManual</span><span class="p">(</span><span class="n">FText</span> <span class="n">Title</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Message</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIsError</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="DisplayNotification">Display Notification</h4>
 <div class="imageblock">
 <div class="content">
@@ -7757,54 +7809,6 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Function to display an arbitrary notification widget that the caller has already configured</p>
 </div>
-<h5 id="_parameters_60" class="discrete">Parameters</h5>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modio UINotification Controller Interface</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="DisplayErrorNotificationManual">Display Error Notification Manual</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_DisplayErrorNotificationManual.png" alt="nd img DisplayErrorNotificationManual">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayErrorNotificationManual</span><span class="p">(</span><span class="n">FText</span> <span class="n">title</span><span class="p">,</span> <span class="n">FText</span> <span class="n">message</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIsError</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="DisplayErrorNotification">Display Error Notification</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_DisplayErrorNotification.png" alt="nd img DisplayErrorNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayErrorNotification</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Function to display an error code notification widget</p>
-</div>
 <h5 id="_parameters_61" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
@@ -7817,7 +7821,7 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modio UINotification Controller Interface</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
@@ -7981,6 +7985,20 @@ This function is part of an experimental feature and is subject to change.
 <h3 id="_modiouisubsystem">ModioUISubsystem</h3>
 <hr>
 <div class="sect3">
+<h4 id="ShowSearchResults">Show Search Results</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ShowSearchResults.png" alt="nd img ShowSearchResults">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ShowSearchResults</span><span class="p">(</span><span class="n">FModioFilterParams</span> <span class="n">SearchParameters</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="ShowModBrowserUIForPlayer">Show Mod Browser UIFor Player</h4>
 <div class="imageblock">
 <div class="content">
@@ -7989,7 +8007,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioMenu</span><span class="o">*</span> <span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioMenu</span><span class="o">&gt;</span>  <span class="n">MenuClass</span><span class="p">,</span> <span class="n">APlayerController</span><span class="o">*</span> <span class="n">Controller</span><span class="p">,</span> <span class="n">FOnModBrowserClosed</span> <span class="n">BrowserClosedDelegate</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UUserWidget</span><span class="o">*</span> <span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UUserWidget</span><span class="o">&gt;</span>  <span class="n">MenuClass</span><span class="p">,</span> <span class="n">APlayerController</span><span class="o">*</span> <span class="n">Controller</span><span class="p">,</span> <span class="n">FOnModBrowserClosed</span> <span class="n">BrowserClosedDelegate</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -8006,58 +8024,6 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ShowDetailsForMod</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ID</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="SetCurrentFocusTarget">Set Current Focus Target</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_SetCurrentFocusTarget.png" alt="nd img SetCurrentFocusTarget">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetCurrentFocusTarget</span><span class="p">(</span><span class="n">UWidget</span><span class="o">*</span> <span class="n">currentTarget</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="SendCommandToBrowserUI">Send Command to Browser UI</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_SendCommandToBrowserUI.png" alt="nd img SendCommandToBrowserUI">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SendCommandToBrowserUI</span><span class="p">(</span><span class="n">FKey</span> <span class="n">CommandKey</span><span class="p">,</span> <span class="n">int32</span> <span class="n">UserIndex</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Sends a command to the browser UI in the form of a virtual keypress</p>
-</div>
-<h5 id="_parameters_62" class="discrete">Parameters</h5>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Modio UISubsystem Object Reference</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Command Key</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">User Index</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 <div class="sect3">
@@ -8215,62 +8181,6 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
-<h4 id="GetLocalizedTag">Get Localized Tag</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_GetLocalizedTag.png" alt="nd img GetLocalizedTag">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">GetLocalizedTag</span><span class="p">(</span><span class="n">FString</span> <span class="n">InTag</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="GetInputGlyphMaterialForInputType">Get Input Glyph Material for Input Type</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_GetInputGlyphMaterialForInputType.png" alt="nd img GetInputGlyphMaterialForInputType">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UMaterialInterface</span><span class="o">*</span> <span class="n">GetInputGlyphMaterialForInputType</span><span class="p">(</span><span class="n">FKey</span> <span class="n">VirtualInput</span><span class="p">,</span> <span class="n">EModioUIInputMode</span> <span class="n">InputType</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="GetDefaultStyleSet">Get Default Style Set</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_GetDefaultStyleSet.png" alt="nd img GetDefaultStyleSet">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioUIStyleSet</span><span class="o">*</span> <span class="n">GetDefaultStyleSet</span><span class="p">()</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="GetCurrentFocusTarget">Get Current Focus Target</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_GetCurrentFocusTarget.png" alt="nd img GetCurrentFocusTarget">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">GetCurrentFocusTarget</span><span class="p">()</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
 <h4 id="GetCurrentDPIScaleValue">Get Current DPIScale Value</h4>
 <div class="imageblock">
 <div class="content">
@@ -8280,20 +8190,6 @@ This function is part of an experimental feature and is subject to change.
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">float</span> <span class="n">GetCurrentDPIScaleValue</span><span class="p">()</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="GetAllNamedStyleNames">Get All Named Style Names</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_GetAllNamedStyleNames.png" alt="nd img GetAllNamedStyleNames">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FName</span><span class="o">&gt;</span> <span class="n">GetAllNamedStyleNames</span><span class="p">()</span></code></pre>
 </div>
 </div>
 <hr>
@@ -8313,15 +8209,29 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
-<h4 id="DisplaySearchResults">Display Search Results</h4>
+<h4 id="DisplayNotificationParams">Display Notification Params</h4>
 <div class="imageblock">
 <div class="content">
-<img src="img/nd_img_DisplaySearchResults.png" alt="nd img DisplaySearchResults">
+<img src="img/nd_img_DisplayNotificationParams.png" alt="nd img DisplayNotificationParams">
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">DisplaySearchResults</span><span class="p">(</span><span class="n">FModioFilterParams</span> <span class="n">SearchParameters</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayNotificationParams</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="DisplayNotificationManual">Display Notification Manual</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_DisplayNotificationManual.png" alt="nd img DisplayNotificationManual">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayNotificationManual</span><span class="p">(</span><span class="n">FText</span> <span class="n">Title</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Message</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIsError</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -8341,34 +8251,6 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
-<h4 id="DisplayErrorNotificationManual">Display Error Notification Manual</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_DisplayErrorNotificationManual.png" alt="nd img DisplayErrorNotificationManual">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayErrorNotificationManual</span><span class="p">(</span><span class="n">FText</span> <span class="n">title</span><span class="p">,</span> <span class="n">FText</span> <span class="n">message</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIsError</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
-<h4 id="DisplayErrorNotification">Display Error Notification</h4>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_DisplayErrorNotification.png" alt="nd img DisplayErrorNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayErrorNotification</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<hr>
-</div>
-<div class="sect3">
 <h4 id="DisplayErrorDialog">Display Error Dialog</h4>
 <div class="imageblock">
 <div class="content">
@@ -8377,7 +8259,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayErrorDialog</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ec</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">DisplayErrorDialog</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ErrorCode</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -8415,7 +8297,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>performs validation on the text passed in, storing the validation message of the first rule that failed /// validation in ValidationMessageText if validation failed //</p>
 </div>
-<h5 id="_parameters_63" class="discrete">Parameters</h5>
+<h5 id="_parameters_62" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8454,7 +8336,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetValidationError</span><span class="p">(</span><span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_64" class="discrete">Parameters</h5>
+<h5 id="_parameters_63" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8485,7 +8367,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">GetTextValidationRules</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioTextValidationRule</span><span class="o">&gt;</span> <span class="n">Rules</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_65" class="discrete">Parameters</h5>
+<h5 id="_parameters_64" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8555,7 +8437,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Requests the widget make any network or asynchronous calls required to load external data to display</p>
 </div>
-<h5 id="_parameters_66" class="discrete">Parameters</h5>
+<h5 id="_parameters_65" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8586,7 +8468,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetItems</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">UObject</span><span class="o">*&gt;</span> <span class="n">Items</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_67" class="discrete">Parameters</h5>
+<h5 id="_parameters_66" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9651,6 +9533,11 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExtendedInitializationParameters</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Extended platform-specific initialization parameters. Refer to the platform documentation for valid keys and their values. Unrecognized values will be ignored</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#bool">bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bUseBackgroundThread</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Set Mod.io to run with background thread</p></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -9917,10 +9804,6 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_modiouiauthenticationproviderinfo">ModioUIAuthenticationProviderInfo</h3>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_modionotificationparams">ModioNotificationParams</h3>
 <h4 id="_variables_30" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
@@ -9947,6 +9830,10 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiouiauthenticationproviderinfo">ModioUIAuthenticationProviderInfo</h3>
 <hr>
 </div>
 <div class="sect2">
@@ -11275,7 +11162,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the session identifier for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_68" class="discrete">Parameters</h4>
+<h4 id="_parameters_67" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11317,7 +11204,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the portal for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_69" class="discrete">Parameters</h4>
+<h4 id="_parameters_68" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11359,7 +11246,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if not equal</p>
 </div>
-<h4 id="_parameters_70" class="discrete">Parameters</h4>
+<h4 id="_parameters_69" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11397,7 +11284,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Make initialization options, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_71" class="discrete">Parameters</h4>
+<h4 id="_parameters_70" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11443,7 +11330,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a game id from a integer, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_72" class="discrete">Parameters</h4>
+<h4 id="_parameters_71" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11477,7 +11364,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Creates an AuthenticationParams object</p>
 </div>
-<h4 id="_parameters_73" class="discrete">Parameters</h4>
+<h4 id="_parameters_72" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11523,7 +11410,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a ApiKey id from a string, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_74" class="discrete">Parameters</h4>
+<h4 id="_parameters_73" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11557,7 +11444,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use with care.</p>
 </div>
-<h4 id="_parameters_75" class="discrete">Parameters</h4>
+<h4 id="_parameters_74" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11595,7 +11482,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if equal</p>
 </div>
-<h4 id="_parameters_76" class="discrete">Parameters</h4>
+<h4 id="_parameters_75" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11784,7 +11671,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetValue</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_77" class="discrete">Parameters</h4>
+<h4 id="_parameters_76" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11819,7 +11706,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetMessage</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_78" class="discrete">Parameters</h4>
+<h4 id="_parameters_77" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11854,7 +11741,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the passed-in ErrorCode matches the specified error condition</p>
 </div>
-<h4 id="_parameters_79" class="discrete">Parameters</h4>
+<h4 id="_parameters_78" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11896,7 +11783,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Runs a filter over the user&#8217;s subscription list</p>
 </div>
-<h4 id="_parameters_80" class="discrete">Parameters</h4>
+<h4 id="_parameters_79" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12011,7 +11898,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetLogoSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Logo</span><span class="p">,</span> <span class="n">EModioLogoSize</span> <span class="n">LogoSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_81" class="discrete">Parameters</h4>
+<h4 id="_parameters_80" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12050,7 +11937,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetGallerySize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">GalleryImage</span><span class="p">,</span> <span class="n">EModioGallerySize</span> <span class="n">GallerySize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_82" class="discrete">Parameters</h4>
+<h4 id="_parameters_81" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12089,7 +11976,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetAvatarSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Avatar</span><span class="p">,</span> <span class="n">EModioAvatarSize</span> <span class="n">AvatarSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_83" class="discrete">Parameters</h4>
+<h4 id="_parameters_82" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12128,7 +12015,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetPath</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_84" class="discrete">Parameters</h4>
+<h4 id="_parameters_83" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12163,7 +12050,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioModState</span> <span class="n">GetModState</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_85" class="discrete">Parameters</h4>
+<h4 id="_parameters_84" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12198,7 +12085,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModInfo</span> <span class="n">GetModProfile</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_86" class="discrete">Parameters</h4>
+<h4 id="_parameters_85" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12233,7 +12120,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModID</span> <span class="n">GetID</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_87" class="discrete">Parameters</h4>
+<h4 id="_parameters_86" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12271,7 +12158,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the total amount of progress required for the specified state.</p>
 </div>
-<h4 id="_parameters_88" class="discrete">Parameters</h4>
+<h4 id="_parameters_87" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12313,7 +12200,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Returns a EModioModProgressState indicating which state the mod operation is in</p>
 </div>
-<h4 id="_parameters_89" class="discrete">Parameters</h4>
+<h4 id="_parameters_88" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12347,7 +12234,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the progress value for the specified state. <code>CurrentProgress == TotalProgress</code> for states which have completed, for example if a mod is currently Extracting, then passing in Downloading would give you a value equal to the total download size because the download has completed</p>
 </div>
-<h4 id="_parameters_90" class="discrete">Parameters</h4>
+<h4 id="_parameters_89" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12389,7 +12276,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Sets the correct decimals depending on the file size or speed</p>
 </div>
-<h4 id="_parameters_91" class="discrete">Parameters</h4>
+<h4 id="_parameters_90" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12423,7 +12310,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Dividend/Divisor and return the floating point result with no checks *</p>
 </div>
-<h4 id="_parameters_92" class="discrete">Parameters</h4>
+<h4 id="_parameters_91" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12458,7 +12345,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidSecurityCodeFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_93" class="discrete">Parameters</h4>
+<h4 id="_parameters_92" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12493,7 +12380,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidEmailAddressFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_94" class="discrete">Parameters</h4>
+<h4 id="_parameters_93" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12528,7 +12415,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioInitializeOptions</span> <span class="n">GetProjectInitializeOptionsForSessionId</span><span class="p">(</span><span class="n">FString</span> <span class="n">SessionId</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_95" class="discrete">Parameters</h4>
+<h4 id="_parameters_94" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12601,7 +12488,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">Filesize_ToString</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MaxDecimals</span><span class="p">,</span> <span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">Unit</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_96" class="discrete">Parameters</h4>
+<h4 id="_parameters_95" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12815,7 +12702,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Submit a new mod, with its logo data coming from an in-memory buffer rather than a file.</p>
 </div>
-<h4 id="_parameters_97" class="discrete">Parameters</h4>
+<h4 id="_parameters_96" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12868,7 +12755,7 @@ This class is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h4 id="_parameters_98" class="discrete">Parameters</h4>
+<h4 id="_parameters_97" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12917,7 +12804,7 @@ This class is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h4 id="_parameters_99" class="discrete">Parameters</h4>
+<h4 id="_parameters_98" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12956,7 +12843,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetTextArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_100" class="discrete">Parameters</h4>
+<h4 id="_parameters_99" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12999,7 +12886,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetStringArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_101" class="discrete">Parameters</h4>
+<h4 id="_parameters_100" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13042,7 +12929,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetIntegerArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">int32</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_102" class="discrete">Parameters</h4>
+<h4 id="_parameters_101" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13085,7 +12972,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetFloatArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_103" class="discrete">Parameters</h4>
+<h4 id="_parameters_102" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13125,7 +13012,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUninstallNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUninstallNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -13139,10 +13026,10 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateSubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateSubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_104" class="discrete">Parameters</h4>
+<h4 id="_parameters_103" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13152,6 +13039,10 @@ This class is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
@@ -13177,7 +13068,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateRatingNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_105" class="discrete">Parameters</h4>
+<h4 id="_parameters_104" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13205,18 +13096,18 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="CreateInstallationNotification">Create Installation Notification</h3>
+<h3 id="CreateNotificationParams">Create Notification Params</h3>
 <div class="imageblock">
 <div class="content">
-<img src="img/nd_img_CreateInstallationNotification.png" alt="nd img CreateInstallationNotification">
+<img src="img/nd_img_CreateNotificationParams.png" alt="nd img CreateNotificationParams">
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateInstallationNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateNotificationParams</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">SuccessText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_106" class="discrete">Parameters</h4>
+<h4 id="_parameters_105" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13226,6 +13117,18 @@ This class is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Title Text</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Success Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when a successful result happen</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Error Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when an error occur</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
@@ -13240,18 +13143,18 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="CreateErrorNotificationParams">Create Error Notification Params</h3>
+<h3 id="CreateInstallationNotification">Create Installation Notification</h3>
 <div class="imageblock">
 <div class="content">
-<img src="img/nd_img_CreateErrorNotificationParams.png" alt="nd img CreateErrorNotificationParams">
+<img src="img/nd_img_CreateInstallationNotification.png" alt="nd img CreateInstallationNotification">
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateErrorNotificationParams</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">SuccessText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateInstallationNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_107" class="discrete">Parameters</h4>
+<h4 id="_parameters_106" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13263,12 +13166,8 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Success Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when a successful result happen</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Error Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when an error occur</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
@@ -13294,7 +13193,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">AddFormatText</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FName</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_108" class="discrete">Parameters</h4>
+<h4 id="_parameters_107" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13337,7 +13236,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateUsingRule</span><span class="p">(</span><span class="n">FModioTextValidationRule</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">,</span> <span class="n">FText</span> <span class="n">ValidationMessageText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_109" class="discrete">Parameters</h4>
+<h4 id="_parameters_108" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13380,7 +13279,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateNoWhitespace</span><span class="p">(</span><span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_110" class="discrete">Parameters</h4>
+<h4 id="_parameters_109" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13415,7 +13314,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateNotEmpty</span><span class="p">(</span><span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_111" class="discrete">Parameters</h4>
+<h4 id="_parameters_110" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13450,7 +13349,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateLength</span><span class="p">(</span><span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">,</span> <span class="n">int32</span> <span class="n">DesiredMaximumLength</span><span class="p">,</span> <span class="n">int32</span> <span class="n">DesiredMinimumLength</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_112" class="discrete">Parameters</h4>
+<h4 id="_parameters_111" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13493,7 +13392,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateEmailAddress</span><span class="p">(</span><span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_113" class="discrete">Parameters</h4>
+<h4 id="_parameters_112" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13528,7 +13427,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateAlphanumeric</span><span class="p">(</span><span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_114" class="discrete">Parameters</h4>
+<h4 id="_parameters_113" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13563,7 +13462,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateAllNumeric</span><span class="p">(</span><span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_115" class="discrete">Parameters</h4>
+<h4 id="_parameters_114" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13598,7 +13497,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">ValidateAllLetters</span><span class="p">(</span><span class="n">FText</span> <span class="n">TextToValidate</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_116" class="discrete">Parameters</h4>
+<h4 id="_parameters_115" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13745,7 +13644,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">CreateFromParams</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UWidget</span><span class="o">&gt;</span>  <span class="n">NotificationClass</span><span class="p">,</span> <span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">,</span> <span class="n">UWidget</span><span class="o">*</span> <span class="n">Outer</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_117" class="discrete">Parameters</h4>
+<h4 id="_parameters_116" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -14687,8 +14586,54 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_emodiouiinputmode"><a id="EModioUIInputMode"></a> EModioUIInputMode</h3>
+<h3 id="_emodiouimediadownloadeventtype"><a id="EModioUIMediaDownloadEventType"></a> EModioUIMediaDownloadEventType</h3>
 <h4 id="_values_25" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModGalleryImages</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading gallery images *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModCreatorAvatarImage</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading an avatar *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModLogo</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading a logo *</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodiouimodinfoeventtype"><a id="EModioUIModInfoEventType"></a> EModioUIModInfoEventType</h3>
+<h4 id="_values_26" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ListAllMods</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Event to list all mods *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GetModInfo</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Event to retrieve the mod information *</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodiouiinputmode"><a id="EModioUIInputMode"></a> EModioUIInputMode</h3>
+<h4 id="_values_27" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14729,7 +14674,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiouiasyncoperationwidgetstate"><a id="EModioUIAsyncOperationWidgetState"></a> EModioUIAsyncOperationWidgetState</h3>
-<h4 id="_values_26" class="discrete">Values</h4>
+<h4 id="_values_28" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14754,7 +14699,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_emodiouidirection"><a id="EModioUIDirection"></a> EModioUIDirection</h3>
-<h4 id="_values_27" class="discrete">Values</h4>
+<h4 id="_values_29" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14776,52 +14721,6 @@ This class is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MoveDown</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Perform a move down action *</p></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodiouimediadownloadeventtype"><a id="EModioUIMediaDownloadEventType"></a> EModioUIMediaDownloadEventType</h3>
-<h4 id="_values_28" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModGalleryImages</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading gallery images *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModCreatorAvatarImage</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading an avatar *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModLogo</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading a logo *</p></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodiouimodinfoeventtype"><a id="EModioUIModInfoEventType"></a> EModioUIModInfoEventType</h3>
-<h4 id="_values_29" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ListAllMods</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Event to list all mods *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GetModInfo</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Event to retrieve the mod information *</p></td>
 </tr>
 </tbody>
 </table>
@@ -15249,7 +15148,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-08-16 16:50:01 +1000
+Last updated 2023-09-05 10:07:56 +1000
 </div>
 </div>
 </body>

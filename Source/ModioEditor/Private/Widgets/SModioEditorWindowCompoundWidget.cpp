@@ -82,7 +82,7 @@ void SModioEditorWindowCompoundWidget::Construct(const FArguments& InArgs)
 
 void SModioEditorWindowCompoundWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
 {
-	if (ModioSubsystem)
+	if (ModioSubsystem && !ModioSubsystem->IsUsingBackgroundThread())
 	{
 		ModioSubsystem->RunPendingHandlers();
 	}

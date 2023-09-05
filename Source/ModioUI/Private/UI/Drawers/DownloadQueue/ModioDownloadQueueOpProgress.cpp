@@ -108,11 +108,11 @@ void UModioDownloadQueueOpProgress::UpdateProgress(const struct FModioModProgres
 
 			FFormatNamedArguments Args;
 			Args.Add("Progress",
-					 UModioSDKLibrary::Filesize_ToString(Current.Underlying, decimals));
-			Args.Add("Total", UModioSDKLibrary::Filesize_ToString(Total.Underlying, 1));
+					 UModioSDKLibrary::Filesize_ToString(Current.Underlying, 0, decimals));
+			Args.Add("Total", UModioSDKLibrary::Filesize_ToString(Total.Underlying, 0, 1));
 
-			FText currenttext = UModioSDKLibrary::Filesize_ToString(Current.Underlying, 1);
-			FText totaltext = UModioSDKLibrary::Filesize_ToString(Total.Underlying, 1);
+			FText currenttext = UModioSDKLibrary::Filesize_ToString(Current.Underlying, 0, 1);
+			FText totaltext = UModioSDKLibrary::Filesize_ToString(Total.Underlying, 0, 1);
 
 			OperationProgressText->SetText(FText::Format(FTextFormat(ProgressFormatText), Args));
 			OperationProgressText->SetVisibility(ESlateVisibility::SelfHitTestInvisible);

@@ -9,6 +9,8 @@
  */
 
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueEntry.h"
+
+#include "ModioUI4Subsystem.h"
 #include "Core/ModioModInfoUI.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "GameFramework/InputSettings.h"
@@ -189,7 +191,7 @@ void UModioDownloadQueueEntry::NativeOnMouseLeave(const FPointerEvent& InMouseEv
 	}
 }
 
-FReply UModioDownloadQueueEntry::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+FReply UModioDownloadQueueEntry::CommonHandleInput(FKey KeyPressed)
 {
 	if (UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
 	{
@@ -213,14 +215,14 @@ FReply UModioDownloadQueueEntry::NativeOnKeyDown(const FGeometry& InGeometry, co
 
 				for (auto& ActionMapping : ActionMappings)
 				{
-					if (ActionMapping.Key == InKeyEvent.GetKey()) {
-
+					if (ActionMapping.Key == KeyPressed)
+					{
 						if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 						{
 							if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
 							{
 								Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
-								GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseDownloadDrawer();
+								GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->CloseDownloadDrawer();
 
 								if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
 										EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())
@@ -229,7 +231,6 @@ FReply UModioDownloadQueueEntry::NativeOnKeyDown(const FGeometry& InGeometry, co
 									FSlateApplication::Get().PlaySound(PressedSound);
 								}
 
-								
 								return FReply::Handled();
 							}
 						}
@@ -239,6 +240,16 @@ FReply UModioDownloadQueueEntry::NativeOnKeyDown(const FGeometry& InGeometry, co
 		}
 	}
 	return FReply::Unhandled();
+}
+
+FReply UModioDownloadQueueEntry::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent)
+{
+	return CommonHandleInput(InPointerEvent.GetEffectingButton());
+}
+
+FReply UModioDownloadQueueEntry::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	return CommonHandleInput(InKeyEvent.GetKey());
 }
 
 void UModioDownloadQueueEntry::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -261,7 +272,7 @@ FEventReply UModioDownloadQueueEntry::OnEntryPressed(FGeometry MyGeometry, const
 			if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(DataSource))
 			{
 				Subsystem->ShowDetailsForMod(ModInfo->Underlying.ModId);
-				GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseDownloadDrawer();
+				GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->CloseDownloadDrawer();
 
 				if (const FModioDownloadQueueEntryStyle* ResolvedStyle =
 						EntryStyle.FindStyle<FModioDownloadQueueEntryStyle>())

@@ -81,6 +81,7 @@ public class Modio : ModuleRules
     }
 #endif
 
+    
     private ModioPlatformConfigFile TryLoadPlatformConfig(string PlatformConfigPath)
     {
 #if UE_5_0_OR_LATER
@@ -199,6 +200,76 @@ public class Modio : ModuleRules
                 MergedConfig.IncludeDirectories.Select((string IncludeDir) => Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/platform", IncludeDir)).ToList();
         }
         return MergedConfig;
+    }
+
+    public class ModioTestConfigFile
+    {
+        public class FileToCopy
+        {
+            public string SourcePath;
+            public string DestPath;
+        }
+        public List<string> TestDefines = new List<string>();
+        public List<FileToCopy> TestFiles = new List<FileToCopy>();
+    }
+
+    private ModioTestConfigFile LoadTestConfig()
+    {
+        string TestConfigPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/tests", "UnrealTestConfig.json");
+        if (File.Exists(TestConfigPath))
+        {
+#if UE_5_0_OR_LATER
+            ModioTestConfigFile ParsedConfig = new ModioTestConfigFile();
+
+            JsonObject TestConfigObject = JsonObject.Read(new FileReference(TestConfigPath));
+            string[] ParsedTestDefines;
+            if (TestConfigObject.TryGetStringArrayField("TestDefines", out ParsedTestDefines))
+            {
+                ParsedConfig.TestDefines = new List<string>(ParsedTestDefines);
+            }
+            JsonObject[] TestFiles;
+            if (TestConfigObject.TryGetObjectArrayField("TestFiles", out TestFiles))
+            {
+                foreach (JsonObject TestFile in TestFiles)
+                {
+                    ModioTestConfigFile.FileToCopy CurrentFileToCopy = new ModioTestConfigFile.FileToCopy();
+                    CurrentFileToCopy.SourcePath = TestFile.GetStringField("SourcePath");
+                    CurrentFileToCopy.DestPath = TestFile.GetStringField("DestPath");
+                    ParsedConfig.TestFiles.Add(CurrentFileToCopy);
+                }
+            }
+            return ParsedConfig;
+#else
+            return Json.Load<ModioTestConfigFile>(new FileReference(TestConfigPath));
+#endif
+        }
+        else
+        {
+#if ENABLE_TRACE_LOG
+        Log.TraceInformation("TestConfig.json not found. Skipping unit tests");
+#endif
+            return null;
+        }
+    }
+
+    private void ApplyTestConfig(string GeneratedHeaderPath, string GeneratedSourcePath)
+    {
+        ModioTestConfigFile TestConfig = LoadTestConfig();
+        if (TestConfig != null)
+        {
+            foreach (string CompilerDefine in TestConfig.TestDefines)
+            {
+#if ENABLE_TRACE_LOG
+                Log.TraceInformation("Testing Define: " + CompilerDefine);
+#endif
+                PrivateDefinitions.Add(CompilerDefine);
+            }
+            foreach(ModioTestConfigFile.FileToCopy TestFile in TestConfig.TestFiles)
+            {
+                Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, Path.GetDirectoryName(TestFile.DestPath)));
+                File.Copy(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK", TestFile.SourcePath), Path.Combine(GeneratedHeaderPath, TestFile.DestPath));
+            }
+        }
     }
 
     private void CopyCommonGeneratedHeaders(string GeneratedHeaderPath)
@@ -331,6 +402,11 @@ public class Modio : ModuleRules
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Projects", "CoreUObject", "RHI", "RenderCore", "HTTP"
         });
+
+        if (Target.bBuildEditor)
+        {
+            PrivateDependencyModuleNames.Add("UnrealEd");
+        }
     }
 
     private void ApplyNativePlatformConfig(ModioPlatformConfigFile.PlatformConfig Config, string GeneratedHeaderPath, string GeneratedSourcePath)
@@ -469,6 +545,9 @@ public class Modio : ModuleRules
 
         // Apply all platform-specific includes, source, modules, defines, etc
         ApplyNativePlatformConfig(PlatformConfig, GeneratedHeaderPath, GeneratedSourcePath);
+
+        // Apply internal testing config
+        ApplyTestConfig(GeneratedHeaderPath, GeneratedSourcePath);
 
     }
 }

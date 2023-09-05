@@ -92,6 +92,12 @@ EActiveTimerReturnType UModioDrawerControllerSlot::TickAnimate(double InCurrentT
 	}
 	else
 	{
+		if (bIsAnimatingOut && CurrentAnimationProgress >= 1.0f)
+		{
+			bIsAnimatingOut = false;
+			OnDrawerAnimatedOut.Broadcast();
+		}
+
 		return FMath::IsNearlyEqual(CurrentAnimationProgress, 0) ? EActiveTimerReturnType::Stop
 																 : EActiveTimerReturnType::Continue;
 	}
@@ -146,6 +152,8 @@ void UModioDrawerControllerSlot::AnimateOut()
 {
 	if (Slot)
 	{
+		bIsAnimatingOut = true;
+
 		if (CurrentAnimationTimer)
 		{
 			Slot->GetWidget()->UnRegisterActiveTimer(CurrentAnimationTimer.ToSharedRef());

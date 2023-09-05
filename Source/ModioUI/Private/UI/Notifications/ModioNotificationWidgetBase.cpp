@@ -27,42 +27,42 @@ void UModioNotificationErrorWidgetBase::NativeConfigure(const FModioNotification
 	}
 #endif
 
-	if (NotificationTitle)
+	if (NotificationMessage)
 	{
 		if (bIsError)
 		{
 			if (Params.NamedTextFormats.Contains(FName("ErrorText")))
 			{
-				NotificationTitle->SetText(FText::Format(Params.NamedTextFormats["ErrorText"], Params.FormatArgs));
+				NotificationMessage->SetText(FText::Format(Params.NamedTextFormats["ErrorText"], Params.FormatArgs));
 			}
 			else
 			{
-				NotificationTitle->SetText(LOCTEXT("GenericErrorText", "Error"));
+				NotificationMessage->SetText(LOCTEXT("GenericErrorText", "Error"));
 			}
 		}
 		else
 		{
 			if (Params.NamedTextFormats.Contains(FName("SuccessText")))
 			{
-				NotificationTitle->SetText(FText::Format(Params.NamedTextFormats["SuccessText"], Params.FormatArgs));
+				NotificationMessage->SetText(FText::Format(Params.NamedTextFormats["SuccessText"], Params.FormatArgs));
 			}
 			else
 			{
-				NotificationTitle->SetText(LOCTEXT("GenericSuccessText", "Success!"));
+				NotificationMessage->SetText(LOCTEXT("GenericSuccessText", "Success!"));
 			}
 		}
 	}
 
-	if (NotificationMessage)
+	if (NotificationTitle)
 	{
-		if (Params.NamedTextFormats.Contains(FName("MessageText")))
+		if (Params.NamedTextFormats.Contains(FName("TitleText")))
 		{
-			NotificationMessage->SetText(FText::Format(Params.NamedTextFormats["MessageText"], Params.FormatArgs));
-			NotificationMessage->SetVisibility(ESlateVisibility::HitTestInvisible);
+			NotificationTitle->SetText(FText::Format(Params.NamedTextFormats["TitleText"], Params.FormatArgs));
+			NotificationTitle->SetVisibility(ESlateVisibility::HitTestInvisible);
 		}
 		else
 		{
-			NotificationMessage->SetVisibility(ESlateVisibility::Collapsed);
+			NotificationTitle->SetVisibility(ESlateVisibility::Collapsed);
 		}
 	}
 
@@ -109,7 +109,7 @@ void UModioNotificationErrorWidgetBase::NativeConfigure(const FModioNotification
 	}
 }
 
-void UModioNotificationErrorWidgetBase::NativeConfigureManual(const FText& title, const FText& message, bool bIsError)
+void UModioNotificationErrorWidgetBase::NativeConfigureManual(const FText& Title, const FText& Message, bool bIsError)
 {
 #if WITH_EDITORONLY_DATA
 	if (IsDesignTime())
@@ -118,10 +118,14 @@ void UModioNotificationErrorWidgetBase::NativeConfigureManual(const FText& title
 	}
 #endif
 
-	NotificationTitle->SetText(title);
+	if (NotificationTitle)
+	{
+		NotificationTitle->SetText(Title);	
+	}
+	
 	if (NotificationMessage)
 	{
-		NotificationMessage->SetText(message);
+		NotificationMessage->SetText(Message);
 		NotificationMessage->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
 	

@@ -80,6 +80,7 @@ protected:
 #endif
 
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent) override;
 
 public:
 	FString TruncateLongModName(FString inputStr, UModioRichTextBlock* ModName, float divider = 1.0f);

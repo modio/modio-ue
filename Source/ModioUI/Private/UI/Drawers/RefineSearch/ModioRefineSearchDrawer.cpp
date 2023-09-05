@@ -9,6 +9,8 @@
  */
 
 #include "UI/Drawers/RefineSearch/ModioRefineSearchDrawer.h"
+
+#include "ModioUI4Subsystem.h"
 #include "UI/CommonComponents/ModioTagSelectorWidgetBase.h"
 #include "UI/CommonComponents/ModioSelectableTag.h"
 #include "UI/BaseWidgets/ModioGridPanel.h"
@@ -19,6 +21,11 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Types/ModioFilterParams.h"
+#include "UI/BaseWidgets/ModioGridPanel.h"
+#include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
+#include "UI/CommonComponents/ModioSelectableTag.h"
+#include "UI/CommonComponents/ModioTagSelectorWidgetBase.h"
+#include "Widgets/Input/SEditableTextBox.h"
 
 void UModioRefineSearchDrawer::NativeOnInitialized()
 {
@@ -40,31 +47,25 @@ void UModioRefineSearchDrawer::NativeOnInitialized()
 		CancelButton->OnClicked.AddDynamic(this, &UModioRefineSearchDrawer::OnCancelClicked);
 	}
 
-	UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-	UISubsystem->OnInputDeviceChanged.AddUObject(this, &UModioRefineSearchDrawer::OnInputDeviceChanged);
+	UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 }
 
 FReply UModioRefineSearchDrawer::NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent)
 {
 	ConstructNavigationPath();
 	BindCollapseButtons();
-
-	FTimerHandle TimerHandle;
-	FTimerDelegate TimerDelegate;
-
-	TimerDelegate.BindUFunction(SearchInput, "StartInput");
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
-
-	return FReply::Handled();
+	CurrentNavIndex = 0;
+	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UModioRefineSearchDrawer::ValidateAndSetFocus);
+	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
-void UModioRefineSearchDrawer::ConstructNavigationPath() 
+void UModioRefineSearchDrawer::ConstructNavigationPath()
 {
 	NavigationPath.Empty();
 	NavigationPath.Add(SearchInput);
-	
+
 	// Can't use GetDisplayedEntryWidgets here as it appears to be cursed
-	// Suppose we should not use it anywhere since the results are rather random 
+	// Suppose we should not use it anywhere since the results are rather random
 
 	TArray<UUserWidget*> widgets;
 	for (auto& item : TagSelector->SelectorListScrollBox->GetAllChildren())
@@ -72,10 +73,10 @@ void UModioRefineSearchDrawer::ConstructNavigationPath()
 		widgets.Add(Cast<UUserWidget>(item));
 	}
 
-	for (auto& item : widgets) 
+	for (auto& item : widgets)
 	{
 		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
-		if (!tagSelector) 
+		if (!tagSelector)
 		{
 			continue;
 		}
@@ -117,14 +118,15 @@ void UModioRefineSearchDrawer::BindCollapseButtons()
 			continue;
 		}
 
-		tagSelector->TagCategoryCollapseButton->OnClicked.AddUniqueDynamic(this, &UModioRefineSearchDrawer::ConstructNavigationPath);
+		tagSelector->TagCategoryCollapseButton->OnClicked.AddUniqueDynamic(
+			this, &UModioRefineSearchDrawer::ConstructNavigationPath);
 	}
 }
 
-void UModioRefineSearchDrawer::ValidateAndSetFocus() 
+void UModioRefineSearchDrawer::ValidateAndSetFocus()
 {
 	CurrentNavIndex = FMath::Clamp(CurrentNavIndex, 0, NavigationPath.Num() - 1);
-	UE_LOG(LogTemp, Warning, TEXT("%d"), CurrentNavIndex);
+
 	if (NavigationPath.IsValidIndex(CurrentNavIndex))
 	{
 		if (!NavigationPath[CurrentNavIndex]->TakeWidget()->SupportsKeyboardFocus())
@@ -134,7 +136,7 @@ void UModioRefineSearchDrawer::ValidateAndSetFocus()
 		}
 
 		NavigationPath[CurrentNavIndex]->SetFocus();
-		
+
 		TArray<UUserWidget*> widgets;
 		for (auto& item : TagSelector->SelectorListScrollBox->GetAllChildren())
 		{
@@ -148,7 +150,8 @@ void UModioRefineSearchDrawer::ValidateAndSetFocus()
 			}
 		}
 
-		// NavPath widgets are not indexes of TagSelector list. TagSelector contains multiple lists so scrollindex is calculated with these in mind
+		// NavPath widgets are not indexes of TagSelector list. TagSelector contains multiple lists so scrollindex is
+		// calculated with these in mind
 
 		int itemIndex = 0;
 		for (auto& item : widgets)
@@ -162,7 +165,7 @@ void UModioRefineSearchDrawer::ValidateAndSetFocus()
 			if (tagSelector->HasFocusedDescendants())
 			{
 				TagSelector->CategoryTextBlock->SetText(tagSelector->TagCategoryLabel->GetText());
-				//TagSelector->TagSelectorList->SetScrollOffset(itemIndex);
+				// TagSelector->TagSelectorList->SetScrollOffset(itemIndex);
 				TagSelector->SelectorListScrollBox->ScrollWidgetIntoView(item, true,
 																		 EDescendantScrollDestination::IntoView);
 				tagSelector->ToggleKeybindVisibility(true);
@@ -184,7 +187,7 @@ void UModioRefineSearchDrawer::OnCollapse()
 
 void UModioRefineSearchDrawer::OnClearClicked()
 {
-	if (GEngine->GetEngineSubsystem<UModioUISubsystem>()->GetLastInputDevice() == EModioUIInputMode::Mouse)
+	if (GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->GetLastInputDevice() == EModioUIInputMode::Mouse)
 	{
 		SetFocus();
 	}
@@ -201,7 +204,7 @@ void UModioRefineSearchDrawer::OnClearClicked()
 
 void UModioRefineSearchDrawer::OnCancelClicked()
 {
-	GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseSearchDrawer();
+	GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->CloseSearchDrawer();
 }
 
 void UModioRefineSearchDrawer::OnApplyClicked()
@@ -210,14 +213,12 @@ void UModioRefineSearchDrawer::OnApplyClicked()
 		this,
 		FModioFilterParams().NameContains(Execute_GetSearchString(this)).WithTags(Execute_GetSelectedTagValues(this)));
 
-	GEngine->GetEngineSubsystem<UModioUISubsystem>()->CloseSearchDrawer();
+	GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->CloseSearchDrawer();
 }
 
 FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 {
-	ConstructNavigationPath();
-	
-	if (UModioDrawerControllerSlot* controllerSlot = Cast<UModioDrawerControllerSlot>(Slot)) 
+	if (UModioDrawerControllerSlot* controllerSlot = Cast<UModioDrawerControllerSlot>(Slot))
 	{
 		if (!controllerSlot->GetExpandedState())
 		{
@@ -225,17 +226,22 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 		}
 	}
 
-	if (!IsVisible()) 
+	ConstructNavigationPath();
+
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (IsValid(Subsystem) && Subsystem->IsAnyDialogOpen())
 	{
-		return FReply::Unhandled();
+		return FReply::Handled();
 	}
 
 	if ((GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Back ||
 		 GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::RefineSearch) &&
 		InKeyEvent.GetKey().IsGamepadKey() && SearchInput->HasFocusedDescendants())
 	{
-		ApplyButton->SetFocus();
-		return FReply::Unhandled();
+		CurrentNavIndex = NavigationPath.Num() - 3;
+		ValidateAndSetFocus();
+		return FReply::Handled();
 	}
 
 	if (InKeyEvent.GetKey() == EKeys::Enter && CurrentNavIndex == 0)
@@ -248,7 +254,7 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 	{
 		CurrentNavIndex += 1;
 		ValidateAndSetFocus();
-		return FReply::Handled();	
+		return FReply::Handled();
 	}
 
 	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
@@ -257,15 +263,14 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 		ValidateAndSetFocus();
 		return FReply::Handled();
 	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up) 
+	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
 	{
 		CurrentNavIndex -= 1;
 		ValidateAndSetFocus();
 		return FReply::Handled();
 	}
-
 	if (CurrentNavIndex >= NavigationPath.Num() - 3)
-	{
+{
 		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left)
 		{
 			CurrentNavIndex--;
@@ -281,17 +286,21 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 			return FReply::Handled();
 		}
 	}
-
 	return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
 }
 
 FReply UModioRefineSearchDrawer::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	if (GetCommandKeyForPointerEvent(InMouseEvent) == FModioInputKeys::Back)
+	{
+		return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	}
+
 	return FReply::Handled();
 }
 
 void UModioRefineSearchDrawer::NextTagCategory()
-{ 
+{
 	CategoryNav(true);
 }
 
@@ -307,7 +316,7 @@ void UModioRefineSearchDrawer::CategoryNav(bool bMoveForward)
 	for (auto& item : TagSelector->SelectorListScrollBox->GetAllChildren())
 	{
 		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(item);
-		if (!tagSelector)
+		if (!IsValid(tagSelector))
 		{
 			continue;
 		}
@@ -332,8 +341,7 @@ void UModioRefineSearchDrawer::CategoryNav(bool bMoveForward)
 			TagSelector->SelectorListScrollBox->GetAllChildren()[bCategoryHasSelection ? currentCategoryIndex : 0]);
 		if (tagSelector->CategoryVerticalBox->GetAllChildren().IsValidIndex(0) && !tagSelector->IsCollapsed())
 		{
-			UModioSelectableTag* tag =
-				Cast<UModioSelectableTag>(tagSelector->CategoryVerticalBox->GetAllChildren()[0]);
+			UModioSelectableTag* tag = Cast<UModioSelectableTag>(tagSelector->CategoryVerticalBox->GetAllChildren()[0]);
 			if (!tag)
 			{
 				return;
@@ -357,14 +365,12 @@ void UModioRefineSearchDrawer::BuildCommandList(TSharedRef<FUICommandList> InCom
 	InCommandList->MapAction(
 		FModioCommonUICommands::Get().PreviousPage,
 		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::PrevTagCategory)));
-	InCommandList->MapAction(
-		FModioCommonUICommands::Get().Subscribe,
-		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnApplyClicked)));
-	InCommandList->MapAction(
-		FModioCommonUICommands::Get().MoreOptions,
-		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnClearClicked)));
+	InCommandList->MapAction(FModioCommonUICommands::Get().Subscribe,
+							 FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnApplyClicked)));
+	InCommandList->MapAction(FModioCommonUICommands::Get().MoreOptions,
+							 FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnClearClicked)));
 	InCommandList->MapAction(FModioCommonUICommands::Get().Collapse,
-		FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnCollapse)));
+							 FUIAction(FExecuteAction::CreateUObject(this, &UModioRefineSearchDrawer::OnCollapse)));
 }
 
 FString UModioRefineSearchDrawer::NativeGetSearchString()
@@ -381,7 +387,8 @@ FString UModioRefineSearchDrawer::NativeGetSearchString()
 
 		// remove spaces at the beginning
 		FString parsedString = SearchInput->GetText().ToString();
-		while (parsedString.RemoveFromStart(" "));
+		while (parsedString.RemoveFromStart(" "))
+			;
 		return parsedString;
 	}
 	return FString();
@@ -429,12 +436,4 @@ void UModioRefineSearchDrawer::NativeRefreshTags()
 FOnSearchSettingsChanged& UModioRefineSearchDrawer::NativeGetOnSettingsChangedDelegate()
 {
 	return OnSettingsChanged;
-}
-
-void UModioRefineSearchDrawer::OnInputDeviceChanged(EModioUIInputMode NewDevice)
-{
-	if (NewDevice == EModioUIInputMode::Mouse)
-	{
-		SetFocus();
-	}
 }

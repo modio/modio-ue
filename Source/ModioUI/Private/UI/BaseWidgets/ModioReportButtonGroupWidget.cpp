@@ -14,6 +14,7 @@
 #include "Core/ModioReportInfoUI.h"
 #include "IPlatformFilePak.h"
 #include "ModioUISubsystem.h"
+#include "ModioUI4Subsystem.h"
 #include "UI/BaseWidgets/ModioWidgetBase.h"
 #include "UI/BaseWidgets/Slate/SModioRichTextBlock.h"
 #include "UI/BaseWidgets/Slate/SModioButtonBase.h"
@@ -92,7 +93,7 @@ TSharedRef<SWidget> UModioReportButtonGroupWidget::RebuildWidget()
 
 FReply UModioReportButtonGroupWidget::OnReportButtonClicked(EModioReportType ModioReport)
 {
-	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
 		UModioReportInfoUI* ReportDataSource = NewObject<UModioReportInfoUI>();
 

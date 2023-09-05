@@ -174,7 +174,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioUIInputValidationLibrary")
 	static bool ValidateNotEmpty(const FText& TextToValidate)
 	{
-		return !TextToValidate.IsEmpty();
+		FString testString = TextToValidate.ToString();
+		testString.ReplaceInline(TEXT("\r\n"), TEXT(" "));
+		testString.RemoveSpacesInline();
+		return !testString.IsEmpty();
 	};
 
 	/**

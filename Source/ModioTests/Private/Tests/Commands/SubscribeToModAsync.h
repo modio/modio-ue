@@ -18,7 +18,7 @@ class FModioSubscribeToModAsyncCommand : public FModioTestLatentCommandBaseExpec
 	FModioModID ModID;
 
 public:
-	FModioSubscribeToModAsyncCommand(FAutomationTestBase* AssociatedTest, const FModioModID ModID,
+	FModioSubscribeToModAsyncCommand(FAutomationTestBase* AssociatedTest, FModioModID ModID,
 									 EModioErrorCondition ExpectedResult)
 		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, ExpectedResult),
 		  ModID(ModID)
