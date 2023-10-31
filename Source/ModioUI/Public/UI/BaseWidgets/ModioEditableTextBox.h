@@ -79,6 +79,7 @@ protected:
 	bool SupportsKeyboardFocus() const{return true;};
 	bool HasValidationError() const;
 	const FSlateBrush* GetBorderImage() const;
+	const FSlateBrush* GetBackgroundImage() const;
 	EVisibility GetHintGlyphVisibility() const;
 	virtual void HandleOnTextChanged(const FText& InText) override;
 	virtual void NativeGetTextValidationRules(TArray<FModioTextValidationRule>& Rules)

@@ -22,6 +22,8 @@
 #include "UI/Default/Report/ModioCommonReportMessageView.h"
 #include "UI/Default/Report/ModioCommonReportSummaryView.h"
 #include "UI/Foundation/Base/Report/ModioCommonReportSummaryViewBase.h"
+#include "UI/Default/Dialog/ModioCommonDialogInfo.h"
+#include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
 
 void UModioCommonReportView::NativeOnActivated()
 {
@@ -258,10 +260,37 @@ void UModioCommonReportView::HandleReportSubmit(FModioErrorCode ErrorCode)
 		{
 			UE_LOG(ModioUI5, Log, TEXT("Report successfully submitted for mod %s"), *ModInfoUI->Underlying.ProfileName);
 			DeactivateWidget();
+
+			if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			{
+				UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
+				DialogInfo->TitleText = FText::FromString(ModInfoUI->Underlying.ProfileName);
+				DialogInfo->DialogText = NSLOCTEXT("Modio", "ReportSubmissionPopupText", "Your report has been submitted successfully.");
+				if (DialogInfo->IsValid())
+				{
+					Cast<UModioCommonModBrowser>(ModioUISubsystem->ModBrowserInstance)->ShowDialog(DialogInfo);
+				}
+			}
 		}
 		else
 		{
 			UE_LOG(ModioUI5, Error, TEXT("Report successfully submitted, but no mod info was found"));
+		}
+	}
+	else
+	{
+		if (UModioModInfoUI* ModInfoUI = Cast<UModioModInfoUI>(DataSource))
+		{
+			if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			{
+				UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
+				DialogInfo->TitleText = FText::FromString(ModInfoUI->Underlying.ProfileName);
+				DialogInfo->DialogText = NSLOCTEXT("Modio", "ReportSubmissionPopupText", "Failed to report due to unknown circumstances. Make sure to write your message containing correct information.");
+				if (DialogInfo->IsValid())
+				{
+					Cast<UModioCommonModBrowser>(ModioUISubsystem->ModBrowserInstance)->ShowDialog(DialogInfo);
+				}
+			}
 		}
 	}
 }

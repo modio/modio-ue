@@ -11,21 +11,56 @@
 #include "UI/Foundation/Components/List/ModioCommonModListView.h"
 #include "Containers/Array.h"
 #include "Core/ModioModInfoUI.h"
+#include "TimerManager.h"
+#include "Engine/World.h"
+#include "Core/ModioModCollectionEntryUI.h"
 
-void UModioCommonModListView::SetModSelectionByID_Implementation(FModioModID ModID)
+void UModioCommonModListView::NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting)
 {
-	IModioCommonModListViewInterface::SetModSelectionByID_Implementation(ModID);
-	const TArray<UObject*> ModListItems = GetListItems();
-	for (UObject* CurrentItem : ModListItems)
+	IModioCommonModListViewInterface::NativeSetListItems(InListItems, bAddToExisting);
+	if (bAddToExisting)
 	{
-		if (UModioModInfoUI* ModInfo = Cast<UModioModInfoUI>(CurrentItem))
+		for (UObject* Item : InListItems)
 		{
-			if (IModioModInfoUIDetails::Execute_GetModID(ModInfo) == ModID)
+			if (Item->Implements<UModioModInfoUIDetails>()) 
 			{
-				SetSelectedItem(CurrentItem);
-				RequestRefresh();
-				return;
+				if(ListItems.ContainsByPredicate([Item](UObject* Obj) 
+					{
+						if (Obj->Implements<UModioModInfoUIDetails>())
+						{
+							return UModioModCollectionEntryUI::Execute_GetModID(Item) == UModioModCollectionEntryUI::Execute_GetModID(Obj);
+						}
+						return false;
+					}))
+				{
+					continue;
+				};
 			}
+			AddItem(Item);
+		}
+	}
+	else
+	{
+		UObject* ModItem;
+		TOptional<FModioModID> SelectedModID;
+		if (Execute_GetSelectedModItem(Cast<UObject>(this), true, ModItem))
+		{
+			if (ModItem->Implements<UModioModInfoUIDetails>())
+			{
+				SelectedModID = IModioModInfoUIDetails::Execute_GetModID(ModItem);
+			}
+		}
+		
+		SetListItems(InListItems);
+		if (UWorld* World = Cast<UObject>(this)->GetWorld())
+		{
+			World->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(Cast<UObject>(this), [this, SelectedModID]() mutable {
+				if (SelectedModID.IsSet() && GetOwningPlayer() && (bFocusOnceListIsPopulatedRequested || HasAnyUserFocus() || HasFocusedDescendants()))
+				{
+					Execute_SetModSelectionByID(this, SelectedModID.GetValue());
+					bFocusOnceListIsPopulatedRequested = false;
+				}
+			}));
 		}
 	}
 }
@@ -36,38 +71,11 @@ void UModioCommonModListView::SetFocusOnceListIsPopulated_Implementation(bool bF
 	bFocusOnceListIsPopulatedRequested = bFocus;
 }
 
-void UModioCommonModListView::RequestFullClearSelection_Implementation()
+void UModioCommonModListView::OnSelectionChangedInternal(NullableItemType FirstSelectedItem)
 {
-	IModioCommonModListViewInterface::RequestFullClearSelection_Implementation();
-	ClearSelection();
-	for (UUserWidget* CurrentWidget : GetDisplayedEntryWidgets())
+	if (FirstSelectedItem && FirstSelectedItem->Implements<UModioModInfoUIDetails>())
 	{
-		IUserListEntry::UpdateItemSelection(*CurrentWidget, false);
+		PreviouslySelectedModID = IModioModInfoUIDetails::Execute_GetModID(FirstSelectedItem);
 	}
-	RequestRefresh();
-}
-
-void UModioCommonModListView::NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting)
-{
-	IModioCommonModListViewInterface::NativeSetListItems(InListItems, bAddToExisting);
-	if (bAddToExisting)
-	{
-		for (UObject* Item : InListItems)
-		{
-			AddItem(Item);
-		}
-	}
-	else
-	{
-		UObject* SelectedItem = GetSelectedItem<UObject>();
-		const int32 SelectedIndex = SelectedItem ? GetIndexForItem(SelectedItem) : 0;
-		SetListItems(InListItems);
-		if (GetOwningPlayer() && (bFocusOnceListIsPopulatedRequested || HasAnyUserFocus() || HasFocusedDescendants() || SelectedItem))
-		{
-			SetSelectedIndex(SelectedIndex);
-			SetFocus();
-			bFocusOnceListIsPopulatedRequested = false;
-		}
-		RequestRefresh();
-	}
+	Super::OnSelectionChangedInternal(FirstSelectedItem);
 }

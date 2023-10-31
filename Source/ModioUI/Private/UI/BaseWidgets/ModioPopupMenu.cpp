@@ -88,7 +88,7 @@ TSharedRef<SWidget> UModioPopupMenu::RebuildWidget()
 									 .Method(EPopupMethod::UseCurrentWindow)
 									 .OnGetMenuContent(BIND_UOBJECT_DELEGATE(FOnGetContent, HandleGetMenuContent))
 									 .OnMenuOpenChanged(BIND_UOBJECT_DELEGATE(FOnIsOpenChanged, HandleMenuOpenChanged))
-									 .ShouldDeferPaintingAfterWindowContent(ShouldDeferPaintingAfterWindowContent)
+									 .ShouldDeferPaintingAfterWindowContent(bPaintOverCurrentUI)
 									 .UseApplicationMenuStack(UseApplicationMenuStack)[MenuButton->TakeWidget()];
 	return Widget;
 }

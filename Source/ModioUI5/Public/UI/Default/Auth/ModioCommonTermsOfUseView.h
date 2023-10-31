@@ -31,6 +31,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonTextBlock> ContentTextBlock;
+	
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
+	TObjectPtr<UModioCommonButtonBase> TermsButton;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
+	TObjectPtr<UModioCommonButtonBase> PrivacyButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonButtonBase> CancelButton;

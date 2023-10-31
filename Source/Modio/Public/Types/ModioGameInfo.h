@@ -18,6 +18,7 @@
 #include "Types/ModioLogo.h"
 #include "Types/ModioOtherUrl.h"
 #include "Types/ModioTheme.h"
+#include "Types/ModioGamePlatform.h"
 
 #include "ModioGameInfo.generated.h"
 
@@ -25,6 +26,22 @@ namespace Modio
 {
 	struct GameInfo;
 }
+
+/**
+* @brief Monetization properties of a game
+* 0 = None set (default)
+* 1 = Monetization is enabled
+* 2 = Marketplace is enabled
+* 4 = Partner Program is enabled
+**/
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EGameMonetizationFlags : uint8
+{
+	None = 0,
+	Monetization = 1,
+	Marketplace = 2,
+	PartnerProgram = 4,
+};
 
 /**
  * Full game profile with extended information
@@ -100,9 +117,21 @@ struct MODIO_API FModioGameInfo
 	TArray<FModioOtherUrl> OtherUrls = {};
 
 	/** @brief Platforms that are supported by this title */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.9 release. Please use the <<GamePlatforms>> instead."), BlueprintReadOnly, Category = "mod.io|GameInfo")
 	TArray<EModioModfilePlatform> Platforms = {};
 
+	/** @brief Monetization options for the game */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	EGameMonetizationFlags GameMonetizationOptions;
+
+	/** @brief Name of the Virtual Tokens for this game */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	FString VirtualTokenName = TEXT("");
+
+	/** @brief Platforms that are supported by this title */
+	UPROPERTY(BlueprintReadOnly, Category="mod.io|GameInfo")
+	TArray<FModioGamePlatform> PlatformSupport = {};
+	
 	friend struct FModioGameInfo ToUnreal(const struct Modio::GameInfo& In);
 };
 

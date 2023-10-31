@@ -21,6 +21,11 @@
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "TimerManager.h"
 #include "ModioUI5.h"
+#include "UI/Foundation/Components/Tab/ModioCommonTabListWidgetBase.h"
+
+// These are only for the internal identification of the tabs
+const FName AllInstalledTabId = FName(TEXT("AllInstalled"));
+const FName SystemModsTabId = FName(TEXT("SystemMods"));
 
 void UModioCommonCollectionView::SetStyle(TSubclassOf<UModioCommonCollectionViewStyle> InStyle)
 {
@@ -36,7 +41,10 @@ void UModioCommonCollectionView::UpdateDownloadingMods_Implementation()
 		return;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions =
+		ViewTabType == EModioCommonCollectionViewTabType::SystemMods
+			? Subsystem->QuerySystemInstallations()
+			: Subsystem->QueryUserSubscriptions();
 	
 	// Rebuild the Pending Downloads list
 	TArray<FModioModCollectionEntry> Entries;
@@ -84,10 +92,13 @@ void UModioCommonCollectionView::UpdateInstalledMods_Implementation()
 		return;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> SystemInstallations = Subsystem->QuerySystemInstallations();
+	TMap<FModioModID, FModioModCollectionEntry> Installations =
+		ViewTabType == EModioCommonCollectionViewTabType::SystemMods
+			? Subsystem->QuerySystemInstallations()
+			: Subsystem->QueryUserInstallations(true);
 
 	TArray<FModioModCollectionEntry> Entries;
-	SystemInstallations.GenerateValueArray(Entries);
+	Installations.GenerateValueArray(Entries);
 	Entries.RemoveAll([](const FModioModCollectionEntry& Entry) {
 		return Entry.GetModState() != EModioModState::Installed;
 	});
@@ -100,6 +111,11 @@ void UModioCommonCollectionView::UpdateInstalledMods_Implementation()
 	if (NumOfErrorsTextBlock)
 	{
 		NumOfErrorsTextBlock->SetText(FText::AsNumber(ModIDsWithErrors.Num()));
+	}
+
+	if (AreInstalledSameMods(Entries))
+	{
+		return;
 	}
 
 	if (InstalledModList && InstalledModList->Implements<UModioCommonModListViewInterface>() && !IsDesignTime())
@@ -129,6 +145,37 @@ bool UModioCommonCollectionView::AreDownloadingSameMods_Implementation(const TAr
 			return ModCollectionEntryUI
 			       && IModioModInfoUIDetails::Execute_GetModID(ModCollectionEntryUI) == NewDownloadingMod.GetID()
 			       && ModCollectionEntryUI->Underlying.GetModState() == NewDownloadingMod.GetModState();
+		});
+		if (!bContains)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool UModioCommonCollectionView::AreInstalledSameMods_Implementation(const TArray<FModioModCollectionEntry>& NewInstalledMods) const
+{
+	if (!InstalledModList || IsDesignTime())
+	{
+		return false;
+	}
+
+	const TArray<UObject*>& OldInstalledMods = InstalledModList->GetListItems();
+
+	if (OldInstalledMods.Num() != NewInstalledMods.Num())
+	{
+		return false;
+	}
+
+	for (FModioModCollectionEntry NewDownloadingMod : NewInstalledMods)
+	{
+		const bool bContains = OldInstalledMods.ContainsByPredicate([&NewDownloadingMod](UObject* ListItem) {
+			UModioModCollectionEntryUI* ModCollectionEntryUI = Cast<UModioModCollectionEntryUI>(ListItem);
+			return ModCollectionEntryUI
+				   && IModioModInfoUIDetails::Execute_GetModID(ModCollectionEntryUI) == NewDownloadingMod.GetID()
+				   && ModCollectionEntryUI->Underlying.GetModState() == NewDownloadingMod.GetModState();
 		});
 		if (!bContains)
 		{
@@ -193,6 +240,38 @@ void UModioCommonCollectionView::SynchronizeProperties()
 		{
 			ModTileView->SetStyle(StyleCDO->ModListStyle);
 		}
+
+		if (const UModioCommonModCollectionParamsSettings* Settings = GetDefault<UModioCommonModCollectionParamsSettings>())
+		{
+			if (TabList)
+			{
+				TabList->RemoveAllDynamicTabs();
+
+				TabList->SetPreviousTabInputActionData(Settings->PreviousTabInputAction);
+				TabList->SetNextTabInputActionData(Settings->NextTabInputAction);
+
+				TabList->SetListeningForInput(false);
+				TabList->SetListeningForInput(true);
+
+				FModioCommonTabDescriptor AllInstalledTabInfo;
+				{
+					AllInstalledTabInfo.TabId = AllInstalledTabId;
+					AllInstalledTabInfo.TabText = Settings->AllInstalledCategoryName;
+					AllInstalledTabInfo.TabButtonType = StyleCDO->CategoryTabButtonClass;
+					AllInstalledTabInfo.TabButtonStyle = StyleCDO->CategoryTabButtonStyle;
+				}
+				TabList->RegisterDynamicTab(AllInstalledTabInfo);
+
+				FModioCommonTabDescriptor SystemModsTabInfo;
+				{
+					SystemModsTabInfo.TabId = SystemModsTabId;
+					SystemModsTabInfo.TabText = Settings->SystemModsCategoryName;
+					SystemModsTabInfo.TabButtonType = StyleCDO->CategoryTabButtonClass;
+					SystemModsTabInfo.TabButtonStyle = StyleCDO->CategoryTabButtonStyle;
+				}
+				TabList->RegisterDynamicTab(SystemModsTabInfo);
+			}
+		}
 		
 		if (DownloadingModsLabelTextBlock)
 		{
@@ -250,7 +329,21 @@ UWidget* UModioCommonCollectionView::NativeGetDesiredFocusTarget() const
 
 	if (!DownloadingModList || DownloadingModList->GetNumItems() <= 0)
 	{
+		if (InstalledModList && InstalledModList->Implements<UModioCommonModListViewInterface>())
+		{
+			if (InstalledModList->Implements<UModioCommonModListViewInterface>())
+			{
+				return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(InstalledModList);
+			}
+		}
 		return InstalledModList;
+	}
+	if (DownloadingModList && DownloadingModList->Implements<UModioCommonModListViewInterface>())
+	{
+		if (DownloadingModList->Implements<UModioCommonModListViewInterface>())
+		{
+			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(DownloadingModList);
+		}
 	}
 	return DownloadingModList;
 }
@@ -262,6 +355,17 @@ void UModioCommonCollectionView::NativeOnInitialized()
 	IModioUIModManagementEventReceiver::Register<UModioCommonCollectionView>();
 	IModioUISubscriptionsChangedReceiver::Register<UModioCommonCollectionView>();
 	IModioUIUserChangedReceiver::Register<UModioCommonCollectionView>();
+
+	if (TabList)
+	{
+		TabList->OnTabSelectedFast.AddWeakLambda(this, [this](FName TabId) {
+			if (!IsActivated())
+			{
+				return;
+			}
+			RefreshListByTabId(TabId);
+		});
+	}
 
 	if (DownloadingModList)
 	{
@@ -385,6 +489,31 @@ void UModioCommonCollectionView::OnFetchExternalCompleted_Implementation(FModioE
 			}
 			FetchUpdateButton->SetLabel(Settings->DefaultFetchUpdateButtonLabel);
 		}
+	}
+}
+
+void UModioCommonCollectionView::RefreshListByTabId_Implementation(FName TabId)
+{
+#if WITH_EDITOR
+	if (!IsDesignTime())
+#endif
+	{
+		if (TabId.IsEqual(AllInstalledTabId))
+		{
+			ViewTabType = EModioCommonCollectionViewTabType::AllInstalled;
+		}
+		else if (TabId.IsEqual(SystemModsTabId))
+		{
+			ViewTabType = EModioCommonCollectionViewTabType::SystemMods;
+		}
+		else
+		{
+			UE_LOG(ModioUI5, Error, TEXT("Unable to refresh mod list in '%s' for tab '%s': Tab ID '%s' is not supported"), *GetName(), *TabId.ToString(), *TabId.ToString());
+			return;
+		}
+
+		UpdateDownloadingMods();
+		UpdateInstalledMods();
 	}
 }
 

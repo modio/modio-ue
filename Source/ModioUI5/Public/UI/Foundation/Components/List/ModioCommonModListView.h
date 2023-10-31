@@ -25,12 +25,12 @@ class MODIOUI5_API UModioCommonModListView : public UModioCommonListView, public
 	GENERATED_BODY()
 
 public:
-	virtual void SetModSelectionByID_Implementation(FModioModID ModID) override;
-	virtual void SetFocusOnceListIsPopulated_Implementation(bool bFocus) override;
-	virtual void RequestFullClearSelection_Implementation() override;
+	virtual UListView* GetListView() const override { return const_cast<UModioCommonModListView*>(this); }
 	virtual void NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting = false) override;
-	
+	virtual void SetFocusOnceListIsPopulated_Implementation(bool bFocus) override;
+    virtual void OnSelectionChangedInternal(NullableItemType FirstSelectedItem) override;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mod.io Common UI")
-	bool bFocusOnceListIsPopulatedRequested = false;
+	bool bFocusOnceListIsPopulatedRequested;
 };

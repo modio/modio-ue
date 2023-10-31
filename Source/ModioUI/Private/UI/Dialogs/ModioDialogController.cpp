@@ -28,6 +28,8 @@
 void UModioDialogController::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
+	IModioUIActionHandler::Register<UModioDialogController>();
+
 	if (MyBackgroundBlur)
 	{
 		MyBackgroundBlur->Invalidate(EInvalidateWidgetReason::PaintAndVolatility | EInvalidateWidgetReason::Visibility |
@@ -133,7 +135,7 @@ TSharedRef<SWidget> UModioDialogController::RebuildWidget()
 					]
 				]
 			];
-
+	ActualDialog->SetAllNavigationRules(EUINavigationRule::Stop, FName());
 	if (const FModioButtonStyle* ResolvedButtonStyle = InvisibleButtonStyleRef.FindStyle<FModioButtonStyle>())
 	{
 		MyBackgroundButton->SetButtonStyle(&ResolvedButtonStyle->ButtonStyle);
@@ -544,7 +546,7 @@ void UModioDialogController::ShowTermsOfUseDialog(TSharedPtr<FModioUIAuthenticat
 			CurrentLanguage = Subsystem->ConvertLanguageCodeToModio(
 				FInternationalization::Get().GetCurrentLanguage()->GetTwoLetterISOLanguageName());
 		}
-		Subsystem->GetTermsOfUseAsync(ProviderInfo->ProviderID, CurrentLanguage,
+		Subsystem->GetTermsOfUseAsync(CurrentLanguage,
 									  FOnGetTermsOfUseDelegateFast::CreateUObject(
 										  this, &UModioDialogController::HandleTermsOfUseReceived, ProviderInfo));
 	}
@@ -570,4 +572,34 @@ void UModioDialogController::HandleTermsOfUseReceived(FModioErrorCode ec, TOptio
 	{
 		PushDialog(TermsOfUseFailDialog.LoadSynchronous(), AuthContext);
 	}
+}
+
+void UModioDialogController::NativeOnMenuAction(EMenuAction Action, UObject* OptionalData)
+{
+	switch (Action)
+	{
+		case EMenuAction::ShowModReportDialog:
+			ShowModReportDialog(OptionalData);
+			break;
+		case EMenuAction::ShowReportEmailDialog:
+			ShowReportEmailDialog(OptionalData);
+			break;
+		case EMenuAction::ShowUninstallConfirmDialog:
+			ShowUninstallConfirmationDialog(OptionalData);
+			break;
+		case EMenuAction::ShowUnsubscribeDialog:
+			ShowModUnsubscribeDialog(OptionalData);
+			break;
+		case EMenuAction::ShowLogoutDialog:
+			ShowLogoutDialog();
+			break;
+		case EMenuAction::ShowUserAuthenticationDialog:
+			ShowAuthenticationChoiceDialog();
+			break;
+	}
+}
+
+void UModioDialogController::NativeOnErrorCodeReceived(FModioErrorCode ec)
+{
+	ShowErrorDialog(ec);
 }

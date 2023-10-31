@@ -14,6 +14,7 @@
 #include "Engine/DataTable.h"
 #include "Engine/DeveloperSettings.h"
 #include "UI/Settings/ModioCommonDefines.h"
+#include "Engine/DataTable.h"
 #include "ModioCommonModCollectionParams.generated.h"
 
 /**
@@ -27,9 +28,21 @@ class MODIOUI5_API UModioCommonModCollectionParamsSettings : public UDeveloperSe
 public:
 	UModioCommonModCollectionParamsSettings()
 	{
-		CheckForUpdatesInputAction.RowName = "RightTabSecondary";
+		CheckForUpdatesInputAction.RowName = "Back";
 		CheckForUpdatesInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		PreviousTabInputAction.RowName = "LeftTabSecondary";
+		PreviousTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		NextTabInputAction.RowName = "RightTabSecondary";
+		NextTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText AllInstalledCategoryName = NSLOCTEXT("Modio", "AllInstalled", "All Installed");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText SystemModsCategoryName = NSLOCTEXT("Modio", "SystemMods", "System Mods");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText DownloadingModsLabel = NSLOCTEXT("Modio", "DownloadingModsLabel", "Downloading");
@@ -51,6 +64,12 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText SearchingFetchUpdateButtonLabel = NSLOCTEXT("Modio", "SearchingFetchUpdateButtonLabel", "Searching");
+
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	FDataTableRowHandle PreviousTabInputAction;
+
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	FDataTableRowHandle NextTabInputAction;
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle CheckForUpdatesInputAction;

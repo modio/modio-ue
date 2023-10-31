@@ -19,6 +19,8 @@
 
 #include "ModioImage.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnImageLoadFailed);
+
 /**
  *
  */
@@ -41,6 +43,9 @@ protected:
 	class UMaterialInstanceDynamic* CachedMaterial;
 
 public:
+
+	FOnImageLoadFailed OnImageLoadFailed;
+
 	UModioImage(const FObjectInitializer& ObjectInitializer);
 
 	virtual void SetBrushFromMaterial(UMaterialInterface* Material) override;

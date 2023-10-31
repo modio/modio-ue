@@ -135,57 +135,61 @@ TOptional<FKey> IModioInputMappingAccessor::GetCommandKeyForPointerEvent(const F
 	return {};
 }
 
-TOptional<FKey> IModioInputMappingAccessor::GetCommandKeyForEvent(const FKeyEvent& Event) const
+TArray<TOptional<FKey>> IModioInputMappingAccessor::GetCommandKeyForEvent(const FKeyEvent& Event) const
 {
+	TArray<TOptional<FKey>> commandsToReturn;
+
 	// If we're processing an event containing a modio command key, return the key directly and skip the lookup
+
 	if (FModioInputKeys::GetAll().Contains(Event.GetKey()))
 	{
-		return Event.GetKey();
+		commandsToReturn.Add(Event.GetKey());
+		return commandsToReturn;
 	}
+
 	// Get our overall settings
 	if (UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
 	{
 		// Get the global input settings
 		if (UInputSettings* CurrentInputSettings = UInputSettings::GetInputSettings())
 		{
-			// Find the modio key which corresponds to the event
-			FModioInputMapping* ModioInputMapping = CurrentUISettings->ModioToProjectInputMappings.FindByPredicate(
-				[CurrentInputSettings, &Event](FModioInputMapping& Mapping) {
-					// For each project action which is bound to the current modio key
-					for (const auto& MappingName : Mapping.MappedProjectInputs)
-					{
-						TArray<FInputActionKeyMapping> Actions;
-						// check if any of the action's input chords are equivalent to the specific chord in the event
-						CurrentInputSettings->GetActionMappingByName(MappingName, Actions);
-						for (const FInputActionKeyMapping& CurrentAction : Actions)
-						{
-							// If the action contains an input chord matching the event, select it
-							if (CurrentAction == Event)
-							{
-								return true;
-							};
-						}
-
-						TArray<FInputAxisKeyMapping> Axes;
-						CurrentInputSettings->GetAxisMappingByName(MappingName, Axes);
-						for (const FInputAxisKeyMapping& CurrentAxis : Axes)
-						{
-							return (CurrentAxis == Event);
-						}
-					}
-					return false;
-				});
-			// If we found an action with a chord matching our event, and we know which modio key is associated with
-			// that action...
-			if (ModioInputMapping)
+			for (auto& inputMapping : CurrentUISettings->ModioToProjectInputMappings)
 			{
+				for (const auto& MappingName : inputMapping.MappedProjectInputs)
 				{
-					return ModioInputMapping->VirtualKey;
+					bool bMappingFound = false;
+					TArray<FInputActionKeyMapping> Actions;
+					// check if any of the action's input chords are equivalent to the specific chord in the event
+					CurrentInputSettings->GetActionMappingByName(MappingName, Actions);
+					for (const FInputActionKeyMapping& CurrentAction : Actions)
+					{
+						// If the action contains an input chord matching the event, select it
+						if (CurrentAction == Event)
+						{
+							commandsToReturn.Add(inputMapping.VirtualKey);
+							bMappingFound = true;
+							break;
+						};
+					}
+
+					if (bMappingFound)
+					{
+						break;
+					}
+
+					TArray<FInputAxisKeyMapping> Axes;
+					CurrentInputSettings->GetAxisMappingByName(MappingName, Axes);
+					for (const FInputAxisKeyMapping& CurrentAxis : Axes)
+					{
+						commandsToReturn.Add(inputMapping.VirtualKey);
+						break;
+					}
 				}
 			}
 		}
 	}
-	return {};
+
+	return commandsToReturn;
 }
 
 TOptional<FKey> IModioInputMappingAccessor::GetCommandKeyForAnalogEvent(const FAnalogInputEvent& Event) const
@@ -218,10 +222,14 @@ bool IModioUIInputHandler::ProcessCommandForEvent(const FPointerEvent& Event)
 
 bool IModioUIInputHandler::ProcessCommandForEvent(const FKeyEvent& Event)
 {
-	TOptional<FKey> CommandKey = IModioInputMappingAccessor::GetCommandKeyForEvent(Event);
-	if (CommandKey.IsSet())
+	TArray<TOptional<FKey>> CommandKeys = IModioInputMappingAccessor::GetCommandKeyForEvent(Event);
+
+	for (auto& CommandKey : CommandKeys)
 	{
-		return GetCommandList()->ProcessCommandBindings(CommandKey.GetValue(), FModifierKeysState {}, false);
+		if (CommandKey.IsSet())
+		{
+			return GetCommandList()->ProcessCommandBindings(CommandKey.GetValue(), FModifierKeysState {}, false);
+		}
 	}
 
 	return false;

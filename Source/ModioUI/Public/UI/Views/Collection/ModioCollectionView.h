@@ -22,6 +22,7 @@
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/EventHandlers/IModioUIModManagementEventReceiver.h"
 #include "UI/EventHandlers/IModioUISubscriptionsChangedReceiver.h"
+#include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
 #include "UI/Views/ModioMenuView.h"
 #include "ModioCollectionView.generated.h"
 
@@ -35,6 +36,7 @@ DECLARE_MULTICAST_DELEGATE(FOnProfileOpened);
 
 UCLASS()
 class MODIOUI_API UModioCollectionView : public UModioMenuView,
+										 public IModioUIUserChangedReceiver,
 										 public IModioUISubscriptionsChangedReceiver,
 										 public IModioUIModManagementEventReceiver
 {
@@ -80,20 +82,31 @@ protected:
 	FModioUIAction CurrentSortAction;
 	bool HasSortActionApplied;
 	int CurrentNavIndex = 0;
+	int SearchCaretPosition = 0;
 
 	virtual void NativeOnInitialized() override;
 
 	void OnFetchExternalCompleted(FModioErrorCode ec);
 
+	void RefreshCachedCollection();
+
 	void UpdateCachedCollection();
+
+	TMap<FModioModID, FModioModCollectionEntry> ValidateSubscriptions(
+		TMap<FModioModID, FModioModCollectionEntry> Subscriptions);
 
 	virtual void ApplyFiltersToCollection();
 	virtual void NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState) override;
+	virtual void NativeUserChanged(TOptional<FModioUser> NewUser) override;
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 	virtual void NativeConstruct() override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	bool ValidateSearchInput(const FKeyEvent& InKeyEvent);
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+
+	bool HandleSearchInput(const FKeyEvent& InKeyEvent);
+
+	void OnCollectionEntryHovered(UObject* Item, bool bNewHoveredState);
 
 	UFUNCTION()
 	void SortAToZ();

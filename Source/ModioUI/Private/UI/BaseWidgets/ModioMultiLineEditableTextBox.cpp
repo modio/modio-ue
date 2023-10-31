@@ -34,7 +34,7 @@ void UModioMultiLineEditableTextBox::NativeSetHintText(FText InHintText)
 
 TSharedRef<SWidget> UModioMultiLineEditableTextBox::RebuildWidget()
 {
-	MyEditableTextBlock = SNew(SMultiLineEditableTextBox)
+	MyEditableTextBlock = SNew(SModioMultiLineEditableTextBox)
 							  .Style(&WidgetStyle)
 #if !UE_VERSION_OLDER_THAN(5, 1, 0)
 							  .TextStyle(&WidgetStyle.TextStyle)
@@ -50,7 +50,8 @@ TSharedRef<SWidget> UModioMultiLineEditableTextBox::RebuildWidget()
 							  .VirtualKeyboardOptions(VirtualKeyboardOptions)
 							  .VirtualKeyboardDismissAction(VirtualKeyboardDismissAction)
 							  .OnTextChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnTextChangedDelegate))
-							  .OnTextCommitted(BIND_UOBJECT_DELEGATE(FOnTextCommitted, HandleOnTextCommitted));
+							  .OnTextCommitted(BIND_UOBJECT_DELEGATE(FOnTextCommitted, HandleOnTextCommitted))
+							  .OnCursorMoved_UObject(this, &UModioMultiLineEditableTextBox::HandleOnTextCursorMoved);
 
 	// clang-format off
 	return SAssignNew(MyVerticalBox, SVerticalBox)
@@ -73,20 +74,21 @@ void UModioMultiLineEditableTextBox::NativeSetValidationError(FText ErrorText)
 	{
 		if (MyErrorTextBlock.IsValid())
 		{
-			MyErrorTextBlock->SetText(ErrorText);
+			MyErrorTextBlock->SetVisibility(EVisibility::Collapsed);
 		}
 		return;
 	}
 
 	const FModioRichTextStyle* ResolvedErrorTextStyle = ErrorTextStyle.FindStyle<FModioRichTextStyle>();
 	const FTextBlockStyle* ErrorTextBlockStyle = &FTextBlockStyle::GetDefault();
-
+	const FTextBlockStyle* CharacterOverLimitStyle = &FTextBlockStyle::GetDefault();
 	if (ResolvedErrorTextStyle)
 	{
 		ErrorStyleSet = ResolvedErrorTextStyle->CloneStyleSet();
 		if (ErrorStyleSet)
 		{
 			ErrorTextBlockStyle = &ErrorStyleSet->GetWidgetStyle<FTextBlockStyle>(FName("Error"));
+			CharacterOverLimitStyle = &ErrorStyleSet->GetWidgetStyle<FTextBlockStyle>(FName("Default"));
 		}
 	}
 
@@ -104,6 +106,7 @@ void UModioMultiLineEditableTextBox::NativeSetValidationError(FText ErrorText)
 	}
 	else
 	{
+		MyErrorTextBlock->SetVisibility(EVisibility::Visible);
 		MyErrorTextBlock->SetText(ErrorText);
 	}
 }
@@ -111,13 +114,16 @@ void UModioMultiLineEditableTextBox::NativeSetValidationError(FText ErrorText)
 void UModioMultiLineEditableTextBox::HandleOnTextChangedDelegate(const FText& InText)
 {
 	// Ensure we call base class method so Blueprint bindings are also dispatched
-	HandleOnTextChanged(InText);
-
+	FText ValidationError;
 	if (bValidateInput)
 	{
-		FText ValidationError;
-		NativeValidateText(MyEditableTextBlock->GetText(), ValidationError);
+		if (!NativeValidateText(MyEditableTextBlock->GetText(), ValidationError))
+		{
+			return;
+		}
 	}
+
+	HandleOnTextChanged(InText);
 }
 
 void UModioMultiLineEditableTextBox::SynchronizeProperties()
@@ -133,6 +139,78 @@ void UModioMultiLineEditableTextBox::SynchronizeProperties()
 		{
 			MyEditableTextBlock->SetTextStyle(ResolvedTextStyle);
 		}
+	}
+}
+
+FReply SModioMultiLineEditableTextBox::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	const FKey Key = InKeyEvent.GetKey();
+
+	bool bIsHandled = false;
+	FKey KeyToHandle = EKeys::Invalid;
+
+	if (Key == EKeys::Gamepad_RightStick_Up || Key == EKeys::Gamepad_LeftStick_Up || Key == EKeys::Gamepad_DPad_Up)
+	{
+		FString TextLine;
+		EditableText->GetCurrentTextLine(TextLine);
+		if (LastCursorPosition.GetLineIndex() == 0)
+		{
+			bIsHandled = false;
+		}
+		else
+		{
+			bIsHandled = true;
+			KeyToHandle = EKeys::Up;
+		}
+	}
+	else if (Key == EKeys::Gamepad_RightStick_Down || Key == EKeys::Gamepad_LeftStick_Down || Key == EKeys::Gamepad_DPad_Down)
+	{
+		FString LastLine = [this]() -> FString {
+			TArray<FString> Lines;
+			EditableText->GetText().ToString().ParseIntoArrayLines(Lines);
+			return Lines.Num() > 0 ? Lines.Last() : FString();
+		}();
+
+		FString TextLine;
+		EditableText->GetCurrentTextLine(TextLine);
+		if (TextLine.Find(LastLine) != INDEX_NONE)
+		{
+			bIsHandled = false;
+		}
+		else
+		{
+			bIsHandled = true;
+			KeyToHandle = EKeys::Down;
+		}
+	}
+	else if (Key == EKeys::Gamepad_RightStick_Left || Key == EKeys::Gamepad_LeftStick_Left || Key == EKeys::Gamepad_DPad_Left)
+	{
+		bIsHandled = true;
+		KeyToHandle = EKeys::Left;
+	}
+	else if (Key == EKeys::Gamepad_RightStick_Right || Key == EKeys::Gamepad_LeftStick_Right || Key == EKeys::Gamepad_DPad_Right)
+	{
+		bIsHandled = true;
+		KeyToHandle = EKeys::Right;
+	}
+
+	if (bIsHandled)
+	{
+		return StaticCastSharedPtr<SWidget>(EditableText)->OnKeyDown(MyGeometry, FKeyEvent(KeyToHandle, FModifierKeysState(), 0, false, 0, 0));
+	}
+	return FReply::Unhandled();
+}
+
+void SModioMultiLineEditableTextBox::HandleOnTextCursorMoved(const FTextLocation& NewCursorPosition)
+{
+	LastCursorPosition = NewCursorPosition;
+}
+
+void UModioMultiLineEditableTextBox::HandleOnTextCursorMoved(const FTextLocation& NewCursorPosition)
+{
+	if (TSharedPtr<SModioMultiLineEditableTextBox> EditableTextBlock = StaticCastSharedPtr<SModioMultiLineEditableTextBox>(MyEditableTextBlock))
+	{
+		EditableTextBlock->HandleOnTextCursorMoved(NewCursorPosition);
 	}
 }
 

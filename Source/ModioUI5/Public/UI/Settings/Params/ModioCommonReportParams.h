@@ -27,16 +27,16 @@ class MODIOUI5_API UModioCommonReportParamsSettings : public UDeveloperSettings
 public:
 	UModioCommonReportParamsSettings()
 	{
-		ProceedInputAction.RowName = "Primary";
+		ProceedInputAction.RowName = "Secondary";
 		ProceedInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
 		BackInputAction.RowName = "Back";
 		BackInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		SubmitInputAction.RowName = "Primary";
+		SubmitInputAction.RowName = "Secondary";
 		SubmitInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		CancelInputAction.RowName = "Secondary";
+		CancelInputAction.RowName = "Tertiary";
 		CancelInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
@@ -104,7 +104,7 @@ public:
 	FText BackButtonText = NSLOCTEXT("Modio", "BackButtonText", "Back");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText SubmitButtonText = NSLOCTEXT("Modio", "SubmitButtonText", "Submit");
+	FText SubmitButtonText = NSLOCTEXT("Modio", "SubmitButtonText", "Next");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
@@ -140,7 +140,7 @@ public:
 	FText BackButtonText = NSLOCTEXT("Modio", "BackButtonText", "Back");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText SubmitButtonText = NSLOCTEXT("Modio", "SubmitButtonText", "Submit");
+	FText SubmitButtonText = NSLOCTEXT("Modio", "SubmitButtonText", "Next");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");

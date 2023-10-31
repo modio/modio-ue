@@ -124,6 +124,7 @@ void UModioModTileBase::NativeOnListItemObjectSet(UObject* ListItemObject)
 	{
 		TileBorder->RenderOnPhase = true;
 	}
+
 	if (TileFrame)
 	{
 		TileFrame->GetDynamicMaterial()->SetScalarParameterValue(FName("Hovered"), 0);
@@ -169,6 +170,9 @@ void UModioModTileBase::NativeOnModLogoDownloadCompleted(FModioModID ModID, FMod
 				bImageLoaded = true;
 				CurrentLogoSize = LogoSize;
 				Thumbnail->LoadImageFromFileAsync(Image.GetValue());
+				Thumbnail->OnImageLoadFailed.AddWeakLambda(this, [this](){
+					HandleModLogoOperationStateChanged(EModioUIAsyncOperationWidgetState::Error);
+					});
 				IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this,
 																		   EModioUIAsyncOperationWidgetState::Success);
 			}
@@ -178,7 +182,7 @@ void UModioModTileBase::NativeOnModLogoDownloadCompleted(FModioModID ModID, FMod
 
 FReply UModioModTileBase::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Subscribe && !InKeyEvent.IsRepeat() && SubscribeButton &&
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Subscribe) && !InKeyEvent.IsRepeat() && SubscribeButton &&
 		SubscribeButton->GetIsEnabled())
 	{
 		NativeSubscribeClicked();

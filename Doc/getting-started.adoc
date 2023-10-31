@@ -82,11 +82,7 @@ The plugin uses UTF8 for all strings, as does the mod.io REST API.
 
 ==== Thread-safety guarantees
 
-[caption=CURRENT RELEASE] 
-NOTE: The mod.io plugin is currently NOT thread-safe. All calls to plugin functions should be made on the game thread.
-
-[caption=FUTURE RELEASE] 
-NOTE: The mod.io plugin will be thread-safe for all calls EXCEPT <<RunPendingHandlers>>. See <<Maintaining the plugin event loop>> below for further information. 
+The mod.io plugin is thread-safe with the exception of <<RunPendingHandlers>>. If you are calling RunPendingHandlers manually, you must always call it on the same thread.
 
 NOTE: The plugin event loop, any internal event handlers, and all callbacks you provide to the mod.io plugin, will be run on the thread invoking <<RunPendingHandlers>>.
 
@@ -106,7 +102,9 @@ NOTE: Even if the plugin is shut down while asynchronous operations are in-fligh
 
 ===== Maintaining the plugin event loop
 
-In order to provide a non-blocking implementation, the plugin operates an internal event loop. This event loop, will only ever run on the thread which calls <<RunPendingHandlers>>.
+In order to provide a non-blocking implementation, the plugin operates an internal event loop. This event loop, will only ever run on the thread which calls <<RunPendingHandlers>>, which is the function we provide to allow you to 'tick' the event loop and process any pending work the Plugin needs to perform.
+
+You should either enable the <<Configuration>> setting to allow the plugin to manage a background thread for you which will call <<RunPendingHandlers>>, or else invoke it on Tick on the game thread yourself. 
 
 NOTE: This means that if you stop calling <<RunPendingHandlers>>, any pending asynchronous API methods you have called will not complete and their associated callbacks will not be invoked, nor will the internal data allocated for those operations be freed.
 
@@ -272,6 +270,7 @@ void UModioManager::OnShutdownCallback(FModioErrorCode ErrorCode)
 
 .Notes
 * You will need to continue to call <<RunPendingHandlers>> while the async shutdown is in progress to allow for intermediate handlers to finish running, and for your in-flight calls to return with an error code indicating cancellation.
+* You MUST NOT call ShutdownAsync from within one of your completion handlers/callbacks, or the application will potentially deadlock. 
 
 
 '''

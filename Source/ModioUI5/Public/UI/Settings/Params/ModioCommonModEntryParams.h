@@ -79,6 +79,9 @@ public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText ErrorLabel = NSLOCTEXT("Modio", "Error", "Error:");
 
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Delays", meta = (UIMin = 0.0, UIMax = 2.0))
+	float DeselectionDelay = 0.5f;
+
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle SubscribeInputAction;
 

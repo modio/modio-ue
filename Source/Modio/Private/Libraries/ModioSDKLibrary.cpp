@@ -205,3 +205,60 @@ FText UModioSDKLibrary::RoundNumberString(FText inputText)
 
 	return FinalText;
 }
+
+FString UModioSDKLibrary::GetTimeSpanAsString(FString PastDateString)
+{
+	FDateTime Present = FDateTime::Now();
+	FDateTime Past;
+	if (!FDateTime::Parse(PastDateString, Past)) 
+	{
+		return PastDateString;
+	}
+	FTimespan TimeSpan = Present - Past;
+
+	int32 Days = TimeSpan.GetDays();
+	int32 Months = TimeSpan.GetDays() / 30;
+	int32 Years = TimeSpan.GetDays() / 365;
+
+	if (Years > 0)
+	{
+		return FString::Printf(TEXT("%d year%s ago"), Years, *(Years == 1 ? FString("") : FString("s")));
+	}
+	else if (Months > 0)
+	{
+		return FString::Printf(TEXT("%d month%s ago"), Months, *(Months == 1 ? FString("") : FString("s")));
+	}
+	else if (Days > 0)
+	{
+		return FString::Printf(TEXT("%d day%s ago"), Days, *(Days == 1 ? FString("") : FString("s")));
+	}
+
+	return FString("Today");
+}
+
+FString UModioSDKLibrary::GetShortenedNumberAsString(int64 Number)
+{
+	int64 Thousands = Number / 1000;
+	int64 Millions = Number / 1000000;
+	int64 Billions = Number / 1000000000;
+	int64 Trillions = Number / 1000000000000;
+
+	if (Trillions > 0)
+	{
+		return FString::Printf(TEXT("%lld%s"), Trillions, *FString("T"));
+	}
+	else if (Billions > 0)
+	{
+		return FString::Printf(TEXT("%lld%s"), Billions, *FString("B"));
+	}
+	else if (Millions > 0)
+	{
+		return FString::Printf(TEXT("%lld%s"), Millions, *FString("M"));
+	}
+	else if (Thousands > 0)
+	{
+		return FString::Printf(TEXT("%lld%s"), Thousands, *FString("K"));
+	}
+
+	return FString::FromInt(Number);
+}

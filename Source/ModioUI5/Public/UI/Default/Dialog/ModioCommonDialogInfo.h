@@ -32,4 +32,9 @@ public:
 	 **/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (MultiLine = true), Category = "Dialog")
 	FText DialogText;
+
+	bool IsValid() 
+	{
+		return (!TitleText.IsEmpty() && !DialogText.IsEmpty());
+	}
 };

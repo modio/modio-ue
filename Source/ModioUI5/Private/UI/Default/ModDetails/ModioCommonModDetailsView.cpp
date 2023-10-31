@@ -27,6 +27,9 @@
 #include "UI/Foundation/Components/Tag/ModioCommonModTagList.h"
 #include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerUserWidget.h"
+#include "UI/Default/Dialog/ModioCommonDialogInfo.h"
+#include <TimerManager.h>
+#include "Libraries/ModioErrorConditionLibrary.h"
 
 UModioCommonModDetailsView::UModioCommonModDetailsView()
 {
@@ -277,6 +280,26 @@ void UModioCommonModDetailsView::NativeOnInitialized()
 			ActivateBottomButtonsInputBindings();
 		});
 	}
+
+	if (Execute_IsModDownloading(this) || Execute_IsModExtracting(this))
+	{
+		ShowProgress();
+	}
+	else
+	{
+		HideProgress();
+	}
+
+	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>()) 
+	{
+		ModioUISubsystem->OnSubscriptionRequestCompleted.AddWeakLambda(this, [this, ModioUISubsystem](FModioErrorCode Error, FModioModID ModID)
+		{ 
+			if (IsRateLimited(Error)) 
+			{
+				AllowSubscription(true);
+			}
+		});
+	}
 }
 
 void UModioCommonModDetailsView::NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState)
@@ -301,6 +324,12 @@ void UModioCommonModDetailsView::NativeOnModManagementEvent(FModioModManagementE
 				HideProgress();
 				UpdateInputActions();
 				FocusOnDesiredWidget();
+				if (UWorld* World = GetWorld()) 
+				{
+					World->GetTimerManager().ClearTimer(SubscriptionDelayTimer);
+					FTimerDelegate TimerDelegate = FTimerDelegate::CreateUObject(this, &UModioCommonModDetailsView::AllowSubscription, true);
+					World->GetTimerManager().SetTimer(SubscriptionDelayTimer, TimerDelegate, 2, false);
+				}
 				break;
 			}
 			case EModioModManagementEventType::BeginInstall:
@@ -310,6 +339,7 @@ void UModioCommonModDetailsView::NativeOnModManagementEvent(FModioModManagementE
 				ShowProgress();
 				UpdateInputActions();
 				FocusOnDesiredWidget();
+				AllowSubscription(false);
 				break;
 			}
 		}
@@ -486,12 +516,14 @@ void UModioCommonModDetailsView::OnRatingSubmissionComplete_Implementation(FModi
 		if (ErrorCode)
 		{
 			Subsystem->DisplayErrorDialog(ErrorCode);
+			IsRateLimited(ErrorCode);
 		}
 		else
 		{
 			Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateRatingNotification(ErrorCode, DataSource.Get()));
 		}
 	}
+	AllowRating(true);
 }
 
 void UModioCommonModDetailsView::NativeOnSetDataSource()
@@ -508,6 +540,11 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 	if (ModNameTextBlock)
 	{
 		ModNameTextBlock->SetText(FText::FromString(ModInfo.ProfileName));
+	}
+
+	if (ModFullDescriptionLabelTextBlock)
+	{
+		ModFullDescriptionLabelTextBlock->SetVisibility(ModInfo.ProfileDescriptionPlaintext.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
 	}
 
 	if (ModFullDescriptionTextBlock)
@@ -527,17 +564,17 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 
 	if (LastUpdatedTextBlock)
 	{
-		LastUpdatedTextBlock->SetText(FText::FromString(ModInfo.ProfileDateUpdated.ToString()));
+		LastUpdatedTextBlock->SetText(FText::FromString(UModioSDKLibrary::GetTimeSpanAsString(ModInfo.ProfileDateUpdated.ToString())));
 	}
 
 	if (ReleaseDateTextBlock)
 	{
-		ReleaseDateTextBlock->SetText(FText::FromString(ModInfo.ProfileDateLive.ToString()));
+		ReleaseDateTextBlock->SetText(FText::FromString(UModioSDKLibrary::GetTimeSpanAsString(ModInfo.ProfileDateLive.ToString())));
 	}
 
 	if (SubscribersTextBlock)
 	{
-		SubscribersTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%lld"), ModInfo.Stats.SubscribersTotal)));
+		SubscribersTextBlock->SetText(FText::FromString(FString::FormatAsNumber(ModInfo.Stats.SubscribersTotal)));
 	}
 
 	if (CreatedByTextBlock)
@@ -547,17 +584,33 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 
 	if (RateUpButton)
 	{
-		RateUpButton->SetLabel(FText::FromString(FString::Printf(TEXT("%lld"), ModInfo.Stats.RatingPositive)));
+		RateUpButton->SetLabel(FText::FromString(FString::FormatAsNumber(ModInfo.Stats.RatingPositive)));
 	}
 
 	if (RateDownButton)
 	{
-		RateDownButton->SetLabel(FText::FromString(FString::Printf(TEXT("%lld"), ModInfo.Stats.RatingNegative)));
+		RateDownButton->SetLabel(FText::FromString(FString::FormatAsNumber(ModInfo.Stats.RatingNegative)));
 	}
 
 	if (TagsWidget)
 	{
 		TagsWidget->SetTags(ModInfo.Tags);
+	}
+
+	if (!LastModID.ToString().Equals(ModInfo.ModId.ToString())) 
+	{
+		if (Execute_IsModDownloading(this) || Execute_IsModExtracting(this))
+		{
+			ShowProgress();
+			AllowSubscription(false);
+		}
+		else
+		{
+			HideProgress();
+			AllowSubscription(true);
+		}
+		LastModID = ModInfo.ModId;
+		EndTrackingSubscription();
 	}
 
 	if (const UModioCommonModDetailsParamsSettings* Settings = GetDefault<UModioCommonModDetailsParamsSettings>())
@@ -566,15 +619,6 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 		{
 			SubscribeButton->SetLabel(Execute_IsModSubscribed(this) ? Settings->UnsubscribeLabel : Settings->SubscribeLabel);
 		}
-	}
-
-	if (Execute_IsModDownloading(this) || Execute_IsModExtracting(this))
-	{
-		ShowProgress();
-	}
-	else
-	{
-		HideProgress();
 	}
 }
 
@@ -670,8 +714,6 @@ void UModioCommonModDetailsView::HandleSubscribeClicked_Implementation()
 		return;
 	}
 
-	const FModioModID ModID = Execute_GetModID(this);
-
 	if (!IsUserAuthenticated())
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Unable to subscribe/unsubscribe for mod details '%s' since user is not authenticated. Showing user auth dialog"), *GetName());
@@ -682,6 +724,9 @@ void UModioCommonModDetailsView::HandleSubscribeClicked_Implementation()
 		return;
 	}
 
+	const FModioModID ModID = Execute_GetModID(this);
+	AllowSubscription(false);
+	StartTrackingSubscription();
 	if (!Execute_IsModSubscribed(this))
 	{
 		Subsystem->RequestSubscriptionForModID(ModID);
@@ -707,7 +752,6 @@ void UModioCommonModDetailsView::HandleCancelClicked_Implementation()
 		return;
 	}
 
-	const FModioModID ModID = Execute_GetModID(this);
 	if (!IsUserAuthenticated())
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Unable to cancel subscription for mod entry '%s' since user is not authenticated. Showing user auth dialog"), *GetName());
@@ -717,13 +761,17 @@ void UModioCommonModDetailsView::HandleCancelClicked_Implementation()
 		}
 		return;
 	}
+	const FModioModID ModID = Execute_GetModID(this);
 	if (Execute_IsModSubscribed(this))
 	{
+		AllowSubscription(false);
+		StartTrackingSubscription();
 		Subsystem->RequestRemoveSubscriptionForModID(ModID);
 	}
 	else
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Unable to cancel subscription for mod entry '%s' since mod is not subscribed"), *GetName());
+		AllowSubscription(true);
 	}
 }
 
@@ -736,6 +784,7 @@ void UModioCommonModDetailsView::HandleRateUpClicked_Implementation()
 		return;
 	}
 
+	AllowRating(false);
 	const FModioModID CurrentModID = Execute_GetModID(this);
 	Subsystem->RequestRateUpForModId(CurrentModID, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCommonModDetailsView::OnRatingSubmissionComplete, EModioRating::Positive));
 }
@@ -749,6 +798,7 @@ void UModioCommonModDetailsView::HandleRateDownClicked_Implementation()
 		return;
 	}
 
+	AllowRating(false);
 	const FModioModID CurrentModID = Execute_GetModID(this);
 	Subsystem->RequestRateDownForModId(CurrentModID, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCommonModDetailsView::OnRatingSubmissionComplete, EModioRating::Negative));
 }
@@ -766,4 +816,74 @@ void UModioCommonModDetailsView::HandleReportClicked_Implementation()
 	UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
 	ModInfoObj->Underlying = CurrentModInfo;
 	Subsystem->ShowModReportDialog(ModInfoObj);
+}
+
+void UModioCommonModDetailsView::AllowSubscription(bool allow)
+{
+	if (SubscribeButton) 
+	{
+		SubscribeButton->SetIsEnabled(allow);
+	}
+}
+
+void UModioCommonModDetailsView::AllowRating(bool allow) 
+{
+	if (RateUpButton) 
+	{
+		RateUpButton->SetIsEnabled(allow);
+	}
+	if (RateDownButton) 
+	{
+		RateDownButton->SetIsEnabled(allow);
+	}
+}
+
+bool UModioCommonModDetailsView::IsRateLimited(FModioErrorCode ErrorCode)
+{
+	if (UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::RateLimited) ||
+		UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::ModBeingProcessed))
+	{
+		if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		{
+			const FModioModInfo CurrentModInfo = Execute_GetFullModInfo(this);
+			UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
+			DialogInfo->TitleText = FText::FromString(CurrentModInfo.ProfileName);
+			DialogInfo->DialogText = FText::FromString(FString::Printf(TEXT("%s"), *ErrorCode.GetErrorMessage()));
+			if (!DialogInfo->IsValid()) 
+			{
+				return false;
+			}
+			Cast<UModioCommonModBrowser>(ModioUISubsystem->ModBrowserInstance)->ShowDialog(DialogInfo);
+			return true;
+		}
+	}
+	return false;
+}
+
+void UModioCommonModDetailsView::StartTrackingSubscription()
+{
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(SubscriptionTrackTimer);
+		World->GetTimerManager().SetTimer(SubscriptionTrackTimer, [this]()
+		{
+			if(UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+			{
+				const FModioModID ModID = Execute_GetModID(this);
+				if (Execute_IsModSubscribed(this) && Execute_IsModInQueue(this))
+				{
+					Subsystem->RequestRemoveSubscriptionForModID(ModID);
+					AllowSubscription(true);
+				}
+			}
+		}, 10, false);
+	}
+}
+
+void UModioCommonModDetailsView::EndTrackingSubscription() 
+{
+	if (UWorld* World = GetWorld()) 
+	{
+		World->GetTimerManager().ClearTimer(SubscriptionTrackTimer);
+	}
 }

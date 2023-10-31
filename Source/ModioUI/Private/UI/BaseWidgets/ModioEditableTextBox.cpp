@@ -77,22 +77,35 @@ TSharedRef<SWidget> UModioEditableTextBox::RebuildWidget()
 		SNew(SBorder)
 		.BorderImage_UObject(this, &UModioEditableTextBox::GetBorderImage)
 		[
-			SNew(SGridPanel).FillColumn(1, 1) 
-			+SGridPanel::Slot(0, 0)
+			SNew(SOverlay)+SOverlay::Slot()
+			.VAlign(EVerticalAlignment::VAlign_Fill)
+			.HAlign(EHorizontalAlignment::HAlign_Fill)
 			[
-				SNew(SScaleBox).Stretch(EStretch::ScaleToFit).StretchDirection(EStretchDirection::Both)
+				SNew(SImage)
+				.Image_UObject(this, &UModioEditableTextBox::GetBackgroundImage)
+
+			]+SOverlay::Slot()
+			.VAlign(EVerticalAlignment::VAlign_Fill)
+			.HAlign(EHorizontalAlignment::HAlign_Fill)
+			[
+				SNew(SGridPanel).FillColumn(1, 1) 
+				+SGridPanel::Slot(0, 0)
 				[
-					SNew(SImage)
-					.Image_UObject(this, &UModioEditableTextBox::GetHintGlyph)
-					.Visibility_UObject(this, &UModioEditableTextBox::GetHintGlyphVisibility)
+					SNew(SScaleBox).Stretch(EStretch::ScaleToFit).StretchDirection(EStretchDirection::Both)
+					[
+						SNew(SImage)
+						.Image_UObject(this, &UModioEditableTextBox::GetHintGlyph)
+						.Visibility_UObject(this, &UModioEditableTextBox::GetHintGlyphVisibility)
+					]
+				] 
+				+SGridPanel::Slot(1, 0)
+				[
+					SAssignNew(MyEditableTextBlock, SEditableTextBox)
+					.OnKeyDownHandler_UObject(this, &UModioEditableTextBox::OnKeyDownHandler)
+					.OnTextChanged_UObject(this, &UModioEditableTextBox::ClampMaxCharacters)
 				]
-			] 
-			+SGridPanel::Slot(1, 0)
-			[
-				SAssignNew(MyEditableTextBlock, SEditableTextBox)
-				.OnKeyDownHandler_UObject(this, &UModioEditableTextBox::OnKeyDownHandler)
-				.OnTextChanged_UObject(this, &UModioEditableTextBox::ClampMaxCharacters)
 			]
+			
 		]
 	];
 	// clang-format on
@@ -142,6 +155,20 @@ const FSlateBrush* UModioEditableTextBox::GetBorderImage() const
 			return &ResolvedStyle->HoveredBorderBrush;
 		}
 		return &ResolvedStyle->NormalBorderBrush;
+	}
+	return nullptr;
+}
+
+const FSlateBrush* UModioEditableTextBox::GetBackgroundImage() const
+{
+	const FModioEditableTextBoxStyle* ResolvedStyle = TextBoxStyle.FindStyle<FModioEditableTextBoxStyle>();
+	if (ResolvedStyle)
+	{
+		if (IsHovered() || HasAnyUserFocus() || HasFocusedDescendants())
+		{
+			return &ResolvedStyle->BackgroundImageHovered;
+		}
+		return &ResolvedStyle->BackgroundImageNormal;
 	}
 	return nullptr;
 }
@@ -201,18 +228,19 @@ FReply UModioEditableTextBox::OnKeyDownHandler(const FGeometry& MyGeometry, cons
 	if (InKeyEvent.GetKey() == EKeys::Enter)
 	{
 		OnSubmit.Broadcast();
+		return FReply::Handled();
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down))
 	{
 		OnNavigateDown.Broadcast();
 	}
 
 	UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
-	if ((GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Next || GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Previous) && subsystem->GetLastInputDevice() != EModioUIInputMode::Keyboard)
+	if ((GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Next) || GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Previous)) && subsystem->GetLastInputDevice() != EModioUIInputMode::Keyboard)
 	{
-		return FReply::Unhandled();
+		return FReply::Handled();
 	}
 	return FReply::Unhandled();
 }

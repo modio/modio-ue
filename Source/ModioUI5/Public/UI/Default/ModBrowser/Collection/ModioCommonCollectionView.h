@@ -23,6 +23,14 @@ class UModioCommonTextBlock;
 class UModioCommonModListView;
 class UListView;
 class UModioCommonButtonBase;
+class UModioCommonTabListWidgetBase;
+
+UENUM(BlueprintType)
+enum class EModioCommonCollectionViewTabType : uint8
+{
+	AllInstalled,
+	SystemMods
+};
 
 /**
  * @brief Collection View that displays a list of downloading, installed or subscribed mods
@@ -51,6 +59,9 @@ protected:
 	TSubclassOf<UModioCommonCollectionViewStyle> ModioStyle;
 
 protected:
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")
+	TObjectPtr<UModioCommonTabListWidgetBase> TabList;
+
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")
 	TObjectPtr<UModioCommonTextBlock> DownloadingModsLabelTextBlock;
 
@@ -86,6 +97,9 @@ protected:
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	void RefreshListByTabId(FName TabId);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
 	void UpdateDownloadingMods();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
@@ -93,6 +107,9 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
 	bool AreDownloadingSameMods(const TArray<FModioModCollectionEntry>& NewDownloadingMods) const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	bool AreInstalledSameMods(const TArray<FModioModCollectionEntry>& NewInstalledMods) const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
 	void OnFetchUpdatesClicked();
@@ -121,4 +138,7 @@ protected:
 protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Collection View")
 	TSet<FModioModID> ModIDsWithErrors;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Collection View")
+	EModioCommonCollectionViewTabType ViewTabType = EModioCommonCollectionViewTabType::AllInstalled;
 };

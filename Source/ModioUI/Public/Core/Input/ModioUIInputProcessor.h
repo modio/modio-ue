@@ -16,6 +16,8 @@
 #include "Input/Events.h"
 #include "Misc/Optional.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnInputProcessorGlobalMouseClick);
+
 /// @brief Class responsible for detecting input mode changes so that input hints, etc, know what type of device is
 /// currently being used. This base class treats all controllers as Xbox controllers unless
 /// UModioUISubsystem::SetControllerOverrideType is called by your application
@@ -56,10 +58,14 @@ class MODIOUI_API FModioUIInputProcessor : public IInputProcessor
 	}
 
 protected:
+
 	virtual EModioUIInputMode DetectDeviceType(const FKeyEvent& InEvent);
 	virtual bool ShouldEmitDeviceChangeEventsForKeyEvent(const FKeyEvent& InEvent);
 
 public:
+
+	FOnInputProcessorGlobalMouseClick OnInputProcessorGlobalMouseClick;
+
 	void SetControllerOverrideType(EModioUIInputMode Override);
 
 	bool HasControllerOverrideType() const
@@ -112,6 +118,7 @@ public:
 
 	bool HandleMouseButtonDownEvent(FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override
 	{
+		OnInputProcessorGlobalMouseClick.Broadcast();
 		HandleInputModeChange(CurrentControllerTypeOverride.Get(EModioUIInputMode::Mouse));
 		return false;
 	}

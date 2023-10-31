@@ -9,27 +9,27 @@
  */
 
 #include "UI/Views/Collection/ModioCollectionView.h"
-#include "UI/Views/Collection/ModioModCollectionTile.h"
-#include "UI/CommonComponents/ModioMenu.h"
 #include "Algo/Transform.h"
-#include "Widgets/Input/SEditableTextBox.h"
-#include "Core/ModioModCollectionEntryUI.h"
 #include "Core/Input/ModioInputKeys.h"
+#include "Core/ModioModCollectionEntryUI.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
 #include "Loc/BeginModioLocNamespace.h"
 #include "ModioSubsystem.h"
+#include "TimerManager.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioModCollectionEntry.h"
-#include "Engine/World.h"
-#include "TimerManager.h"
+#include "UI/CommonComponents/ModioMenu.h"
+#include "UI/Views/Collection/ModioModCollectionTile.h"
 #include "UI/Views/SearchResults/ModioSearchResultsView.h"
+#include "Widgets/Input/SEditableTextBox.h"
 
 void UModioCollectionView::NativeOnInitialized()
 {
 	if (CollectionList)
 	{
-		OnFetchUpdatesClicked();
 		ApplyFiltersToCollection();
+		CollectionList->OnItemIsHoveredChanged().AddUObject(this, &UModioCollectionView::OnCollectionEntryHovered);
 	}
 
 	if (ModGroupSelection)
@@ -75,6 +75,7 @@ void UModioCollectionView::NativeOnInitialized()
 
 	IModioUISubscriptionsChangedReceiver::Register<UModioCollectionView>();
 	IModioUIModManagementEventReceiver::Register<UModioCollectionView>();
+	IModioUIUserChangedReceiver::Register<UModioCollectionView>();
 }
 
 void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
@@ -82,7 +83,8 @@ void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateNotificationParams(
-			ec, LOCTEXT("FetchUpdatesSucceeded", "Updates fetched!"), LOCTEXT("FetchUpdatesSucceeded", "Updates fetched!"),
+			ec, LOCTEXT("FetchUpdatesSucceeded", "Updates fetched!"),
+			LOCTEXT("FetchUpdatesSucceeded", "Updates fetched!"),
 			LOCTEXT("FetchUpdatesFailed", "Could not fetch updates.")));
 	}
 	if (!ec)
@@ -90,15 +92,12 @@ void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
 		UpdateCachedCollection();
 		ApplyFiltersToCollection();
 
-		// focus is lost after search probably because collection list items are not quite there yet when getting here, so
-		// setting the focus to searchinput:
-		SearchInput->StartInput();
+		ValidateAndSetFocus();
 	}
 	else
 	{
 		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 		{
-			
 			// Subsystem->DisplayNotification(LOCTEXT("FetchUpdatesFailed", "Fetch updates failed. Please retry"));
 		}
 	}
@@ -106,14 +105,49 @@ void UModioCollectionView::OnFetchExternalCompleted(FModioErrorCode ec)
 	FetchButton->SetLabel(DefaultButtonLabel);
 }
 
+void UModioCollectionView::RefreshCachedCollection()
+{
+	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+
+	CachedCollection.Empty();
+
+	if (!IsValid(Subsystem))
+	{
+		return;
+	}
+
+	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions =
+		ValidateSubscriptions(Subsystem->QueryUserSubscriptions());
+	TMap<FModioModID, FModioModCollectionEntry> SystemInstallations =
+		ValidateSubscriptions(Subsystem->QuerySystemInstallations());
+
+	Algo::Transform(SystemInstallations, CachedCollection,
+					[&UserSubscriptions](const TPair<FModioModID, FModioModCollectionEntry>& In) {
+						UModioModCollectionEntryUI* WrappedModCollectionEntry = NewObject<UModioModCollectionEntryUI>();
+						WrappedModCollectionEntry->Underlying = In.Value;
+						WrappedModCollectionEntry->bCachedSubscriptionStatus = UserSubscriptions.Contains(In.Key);
+						return WrappedModCollectionEntry;
+					});
+	CollectionList->SetListItems(CachedCollection);
+	CollectionList->RegenerateAllEntries();
+}
+
 void UModioCollectionView::UpdateCachedCollection()
 {
-	CachedCollection.Empty();
 	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
-	if (Subsystem)
+
+	if (!IsValid(Subsystem))
 	{
-		TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
-		TMap<FModioModID, FModioModCollectionEntry> SystemInstallations = Subsystem->QuerySystemInstallations();
+		return;
+	}
+
+	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions =
+		ValidateSubscriptions(Subsystem->QueryUserSubscriptions());
+	TMap<FModioModID, FModioModCollectionEntry> SystemInstallations =
+		ValidateSubscriptions(Subsystem->QuerySystemInstallations());
+
+	if (CachedCollection.Num() <= 0)
+	{
 		Algo::Transform(SystemInstallations, CachedCollection,
 						[&UserSubscriptions](const TPair<FModioModID, FModioModCollectionEntry>& In) {
 							UModioModCollectionEntryUI* WrappedModCollectionEntry =
@@ -125,6 +159,60 @@ void UModioCollectionView::UpdateCachedCollection()
 		CollectionList->SetListItems(CachedCollection);
 		CollectionList->RegenerateAllEntries();
 	}
+	else
+	{
+		TMap<FModioModID, FModioModCollectionEntry> AllItems;
+		AllItems.Append(UserSubscriptions);
+		AllItems.Append(SystemInstallations);
+
+		for (int i = CachedCollection.Num() - 1; i > -1; i--)
+		{
+			if (!AllItems.Contains(CachedCollection[i]->GetModID_Implementation()))
+			{
+				CachedCollection.RemoveAt(i);
+			}
+		}
+
+		for (auto& item : AllItems)
+		{
+			bool bCollectionItemFound = false;
+			for (auto& collection : CachedCollection)
+			{
+				if (collection->GetModID_Implementation() == item.Key)
+				{
+					bCollectionItemFound = true;
+					break;
+				}
+			}
+
+			if (!bCollectionItemFound)
+			{
+				UModioModCollectionEntryUI* WrappedModCollectionEntry = NewObject<UModioModCollectionEntryUI>();
+				WrappedModCollectionEntry->Underlying = item.Value;
+				WrappedModCollectionEntry->bCachedSubscriptionStatus = UserSubscriptions.Contains(item.Key);
+				CachedCollection.Add(WrappedModCollectionEntry);
+			}
+		}
+
+		CollectionList->SetListItems(CachedCollection);
+		CollectionList->RegenerateAllEntries();
+	}
+}
+
+TMap<FModioModID, FModioModCollectionEntry> UModioCollectionView::ValidateSubscriptions(
+	TMap<FModioModID, FModioModCollectionEntry> Subscriptions)
+{
+	TMap<FModioModID, FModioModCollectionEntry> subscriptionsToReturn;
+
+	for (auto& sub : Subscriptions)
+	{
+		if (sub.Value.GetModState() != EModioModState::UninstallPending)
+		{
+			subscriptionsToReturn.Add(sub);
+		}
+	}
+
+	return subscriptionsToReturn;
 }
 
 void UModioCollectionView::OnFetchUpdatesClicked()
@@ -183,6 +271,15 @@ void UModioCollectionView::NativeOnSubscriptionsChanged(FModioModID ModID, bool 
 	UpdateCachedCollection();
 	ApplyFiltersToCollection();
 	// to prevent weird focus jumping:
+
+	ValidateAndSetFocus();
+}
+
+void UModioCollectionView::NativeUserChanged(TOptional<FModioUser> NewUser)
+{
+	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
+	RefreshCachedCollection();
+	ApplyFiltersToCollection();
 	ValidateAndSetFocus();
 }
 
@@ -191,8 +288,8 @@ void UModioCollectionView::NativeOnModManagementEvent(FModioModManagementEvent E
 	IModioUIModManagementEventReceiver::NativeOnModManagementEvent(Event);
 	UpdateCachedCollection();
 	ApplyFiltersToCollection();
-	// to prevent weird focus jumping:
-	ValidateAndSetFocus();
+	//// to prevent weird focus jumping:
+	// ValidateAndSetFocus();
 }
 
 void UModioCollectionView::NativeConstruct()
@@ -218,16 +315,36 @@ void UModioCollectionView::OnSelectionChanged(FModioUIAction ModioUIAction, ESel
 {
 	CurrentSortAction = ModioUIAction;
 	HasSortActionApplied = true;
-	
+
 	CurrentSortAction.ExecuteAction.ExecuteIfBound();
 }
 
 void UModioCollectionView::SortAToZ()
 {
-	Algo::Sort(FilteredCollection, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+	TArray<UModioModCollectionEntryUI*> NotInstalled;
+	TArray<UModioModCollectionEntryUI*> Installed;
+
+	for (auto& mod : FilteredCollection)
+	{
+		mod->Underlying.GetModState() == EModioModState::Installed ||
+				mod->Underlying.GetModState() == EModioModState::UninstallPending
+			? Installed.Add(mod)
+			: NotInstalled.Add(mod);
+	}
+
+	Algo::Sort(NotInstalled, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
 		return FName(A->Underlying.GetModProfile().ProfileName)
 			.LexicalLess(FName(B->Underlying.GetModProfile().ProfileName));
 	});
+
+	Algo::Sort(Installed, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+		return FName(A->Underlying.GetModProfile().ProfileName)
+			.LexicalLess(FName(B->Underlying.GetModProfile().ProfileName));
+	});
+
+	FilteredCollection.Empty();
+	FilteredCollection.Append(NotInstalled);
+	FilteredCollection.Append(Installed);
 
 	CollectionList->SetListItems(FilteredCollection);
 	CollectionList->RegenerateAllEntries();
@@ -235,9 +352,28 @@ void UModioCollectionView::SortAToZ()
 
 void UModioCollectionView::SortRecentlyUpdatedDelegate()
 {
-	Algo::Sort(FilteredCollection, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+	TArray<UModioModCollectionEntryUI*> NotInstalled;
+	TArray<UModioModCollectionEntryUI*> Installed;
+
+	for (auto& mod : FilteredCollection)
+	{
+		mod->Underlying.GetModState() == EModioModState::Installed ||
+				mod->Underlying.GetModState() == EModioModState::UninstallPending
+			? Installed.Add(mod)
+			: NotInstalled.Add(mod);
+	}
+
+	Algo::Sort(NotInstalled, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
 		return A->Underlying.GetModProfile().ProfileDateUpdated < B->Underlying.GetModProfile().ProfileDateUpdated;
 	});
+
+	Algo::Sort(Installed, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+		return A->Underlying.GetModProfile().ProfileDateUpdated < B->Underlying.GetModProfile().ProfileDateUpdated;
+	});
+
+	FilteredCollection.Empty();
+	FilteredCollection.Append(NotInstalled);
+	FilteredCollection.Append(Installed);
 
 	CollectionList->SetListItems(FilteredCollection);
 	CollectionList->RegenerateAllEntries();
@@ -245,9 +381,28 @@ void UModioCollectionView::SortRecentlyUpdatedDelegate()
 
 void UModioCollectionView::SortSizeOnDisk()
 {
-	Algo::Sort(FilteredCollection, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+	TArray<UModioModCollectionEntryUI*> NotInstalled;
+	TArray<UModioModCollectionEntryUI*> Installed;
+
+	for (auto& mod : FilteredCollection)
+	{
+		mod->Underlying.GetModState() == EModioModState::Installed ||
+				mod->Underlying.GetModState() == EModioModState::UninstallPending
+			? Installed.Add(mod)
+			: NotInstalled.Add(mod);
+	}
+
+	Algo::Sort(NotInstalled, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
 		return A->Underlying.GetSizeOnDisk() > B->Underlying.GetSizeOnDisk();
 	});
+
+	Algo::Sort(Installed, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+		return A->Underlying.GetSizeOnDisk() > B->Underlying.GetSizeOnDisk();
+	});
+
+	FilteredCollection.Empty();
+	FilteredCollection.Append(NotInstalled);
+	FilteredCollection.Append(Installed);
 
 	CollectionList->SetListItems(FilteredCollection);
 	CollectionList->RegenerateAllEntries();
@@ -255,10 +410,30 @@ void UModioCollectionView::SortSizeOnDisk()
 
 void UModioCollectionView::SortZToA()
 {
-	Algo::Sort(FilteredCollection, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+	TArray<UModioModCollectionEntryUI*> NotInstalled;
+	TArray<UModioModCollectionEntryUI*> Installed;
+
+	for (auto& mod : FilteredCollection)
+	{
+		mod->Underlying.GetModState() == EModioModState::Installed ||
+				mod->Underlying.GetModState() == EModioModState::UninstallPending
+			? Installed.Add(mod)
+			: NotInstalled.Add(mod);
+	}
+
+	Algo::Sort(NotInstalled, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
 		return FName(B->Underlying.GetModProfile().ProfileName)
 			.LexicalLess(FName(A->Underlying.GetModProfile().ProfileName));
 	});
+
+	Algo::Sort(Installed, [](UModioModCollectionEntryUI* A, UModioModCollectionEntryUI* B) {
+		return FName(B->Underlying.GetModProfile().ProfileName)
+			.LexicalLess(FName(A->Underlying.GetModProfile().ProfileName));
+	});
+
+	FilteredCollection.Empty();
+	FilteredCollection.Append(NotInstalled);
+	FilteredCollection.Append(Installed);
 
 	CollectionList->SetListItems(FilteredCollection);
 	CollectionList->RegenerateAllEntries();
@@ -277,18 +452,18 @@ void UModioCollectionView::UpdateModCount()
 		for (auto& item : CollectionList->GetListItems())
 		{
 			UModioModCollectionEntryUI* entry = Cast<UModioModCollectionEntryUI>(item);
-			if (entry->Underlying.GetModState() != EModioModState::Installed &&
-				!entry->bCachedSubscriptionStatus)
+			if (entry->Underlying.GetModState() != EModioModState::Installed && !entry->bCachedSubscriptionStatus)
 			{
 				numberOfVisibleMods--;
 			}
 		}
+
 		FString Count = FString::Printf(TEXT("(%d)"), numberOfVisibleMods);
 		CollectionCount->SetText(FText::FromString(Count));
 		if (numberOfVisibleMods <= 0)
 		{
 			InfoRichTextBlock->SetVisibility(ESlateVisibility::Visible);
-			InfoRichTextBlock->SetText(CachedCollection.Num() > 0 ? NoModsFoundText : NoSubscribedModsText);
+			InfoRichTextBlock->SetText(numberOfVisibleMods > 0 ? NoModsFoundText : NoSubscribedModsText);
 		}
 		else
 		{
@@ -299,16 +474,37 @@ void UModioCollectionView::UpdateModCount()
 
 void UModioCollectionView::ValidateAndSetFocus()
 {
-	if (CurrentNavIndex < CollectionList->GetNumItems() && CurrentNavIndex >= 0) 
+	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+	if (!IsValid(Subsystem))
+	{
+		return;
+	}
+
+	int32 CurrentPage = Subsystem->GetActiveTabIndex();
+	if (CurrentPage != (int32) EModioMenuScreen::EMMS_Collection)
+	{
+		return;
+	}
+
+	if (CurrentNavIndex >= CollectionList->GetNumItems())
+	{
+		CurrentNavIndex = CollectionList->GetNumItems() - 1;
+		CurrentNavIndex = FMath::Max(CurrentNavIndex, 0);
+	}
+
+	if (CollectionList->GetNumItems() > 0 && CurrentNavIndex >= 0)
 	{
 		CollectionList->NavigateToIndex(CurrentNavIndex);
 		CollectionList->SetSelectedIndex(CurrentNavIndex);
-		CurrentTile = Cast<UModioModCollectionTile>(CollectionList->GetEntryWidgetFromItem(CollectionList->GetSelectedItem()));
+		CurrentTile =
+			Cast<UModioModCollectionTile>(CollectionList->GetEntryWidgetFromItem(CollectionList->GetSelectedItem()));
 	}
 	else
 	{
 		CurrentNavIndex = -1;
-		GetWorld()->GetTimerManager().SetTimerForNextTick(SearchInput, &UModioEditableTextBox::StartInput);
+		SearchCaretPosition = 0;
+		FetchButton->SetFocus();
 	}
 }
 
@@ -316,7 +512,8 @@ FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, 
 {
 	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
-	if (CollectionList->GetNumItems() > 0 && IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+	if (CollectionList->GetNumItems() > 0 && IsValid(Subsystem) &&
+		!(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
 	{
 		ValidateAndSetFocus();
 	}
@@ -324,7 +521,7 @@ FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, 
 	else
 	{
 		CurrentNavIndex = -1;
-		GetWorld()->GetTimerManager().SetTimerForNextTick(SearchInput, &UModioEditableTextBox::StartInput);
+		FetchButton->SetFocus();
 	}
 
 	return FReply::Handled();
@@ -333,58 +530,52 @@ bool UModioCollectionView::ValidateSearchInput(const FKeyEvent& InKeyEvent)
 {
 	return InKeyEvent.GetKey() != EKeys::Up && InKeyEvent.GetKey() != EKeys::Down &&
 		   InKeyEvent.GetKey() != EKeys::Left && InKeyEvent.GetKey() != EKeys::Right &&
-		   InKeyEvent.GetKey() != EKeys::Escape;
+		   InKeyEvent.GetKey() != EKeys::Escape && InKeyEvent.GetKey() != EKeys::Tab &&
+		   InKeyEvent.GetKey() != EKeys::Enter;
 }
 
 FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	if (SearchInput->HasFocusedDescendants() && ValidateSearchInput(InKeyEvent))
+	if (SearchInput->HasFocusedDescendants() && HandleSearchInput(InKeyEvent))
+	{
+		return FReply::Handled();
+	}
+	else if (SearchInput->HasFocusedDescendants() && ValidateSearchInput(InKeyEvent))
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UModioCollectionView::ApplyFiltersToCollection);
 
 		return FReply::Unhandled();
 	}
-	
+
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 
 	if (!IsValid(Subsystem))
 	{
-		return FReply::Handled();
+		return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 	}
 
-	UModioMenu* Menu = Cast <UModioMenu>(Subsystem->ModBrowserInstance);
+	UModioMenu* Menu = Cast<UModioMenu>(Subsystem->ModBrowserInstance);
 
 	if (IsValid(Menu) && Menu->IsAnyDrawerExpanded())
 	{
-		return FReply::Handled();
+		return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 	}
 
 	UModioUI4Subsystem* UI4Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
 	if (IsValid(UI4Subsystem) && UI4Subsystem->IsAnyDialogOpen())
 	{
-		return FReply::Handled();
+		return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 	}
 
 	if (ProcessCommandForEvent(InKeyEvent))
 	{
-		return FReply::Handled();
+		return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::DownloadQueue && CurrentNavIndex != 0)
+	if (InKeyEvent.GetKey() == EKeys::Tab && SearchInput->HasFocusedDescendants())
 	{
-		OnProfileOpened.Broadcast();
-		return FReply::Handled();
-	}
-
-	if (Subsystem->IsDownloadDrawerOpen())
-	{
-		return FReply::Handled();
-	}
-
-	if (InKeyEvent.GetKey() == EKeys::Enter && SearchInput->HasFocusedDescendants())
-	{
-		OnFetchUpdatesClicked();
+		FetchButton->SetKeyboardFocus();
 		return FReply::Handled();
 	}
 
@@ -394,16 +585,17 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		return FReply::Handled();
 	}
 
-	if (!HasFocusedDescendants()) 
+	if (!HasFocusedDescendants())
 	{
 		SearchInput->StartInput();
+		SearchCaretPosition = 0;
 		return FReply::Handled();
 	}
 
 	if (IsValid(Subsystem))
 	{
-		
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::RefineSearch && (!SearchInput->HasFocusedDescendants() || InKeyEvent.GetKey().IsGamepadKey()))
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::RefineSearch) &&
+			(!SearchInput->HasFocusedDescendants() || InKeyEvent.GetKey().IsGamepadKey()))
 		{
 			OnFetchUpdatesClicked();
 			return FReply::Handled();
@@ -416,21 +608,23 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 			{
 				CurrentNavIndex = currentIndex;
 			}
-			if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+			if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down))
 			{
+				
 				if (CurrentTile && CurrentTile->MoreOptionsMenu->GetIsMenuOpen())
 				{
 					return FReply::Unhandled();
 				}
 				else if ((SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()) ||
-					(ModGroupSelection->HasFocusedDescendants() && !ModGroupSelection->IsComboBoxOpen()) || SearchInput->HasFocusedDescendants())
+						 (ModGroupSelection->HasFocusedDescendants() && !ModGroupSelection->IsComboBoxOpen()) ||
+						 SearchInput->HasFocusedDescendants() || FetchButton->HasKeyboardFocus())
 				{
 					CurrentNavIndex = 0;
 					ValidateAndSetFocus();
 					return FReply::Handled();
 				}
-				else if (CurrentNavIndex < CollectionList->GetNumItems() - 1 &&
-						 !ModGroupSelection->IsComboBoxOpen() && !SortBy->IsComboBoxOpen())
+				else if (CurrentNavIndex < CollectionList->GetNumItems() - 1 && !ModGroupSelection->IsComboBoxOpen() &&
+						 !SortBy->IsComboBoxOpen())
 				{
 					CurrentNavIndex++;
 					ValidateAndSetFocus();
@@ -438,13 +632,14 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 				}
 			}
 
-			if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+			if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Up))
 			{
 				if (CurrentTile && CurrentTile->MoreOptionsMenu->GetIsMenuOpen())
 				{
 					return FReply::Unhandled();
 				}
-				else if (CurrentNavIndex == 0 && !SearchInput->HasFocusedDescendants() && !ModGroupSelection->HasFocusedDescendants() && !SortBy->HasFocusedDescendants())
+				else if (CurrentNavIndex == 0 && !SearchInput->HasFocusedDescendants() &&
+						 !ModGroupSelection->HasFocusedDescendants() && !SortBy->HasFocusedDescendants())
 				{
 					SearchInput->StartInput();
 					return FReply::Handled();
@@ -456,10 +651,51 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 					return FReply::Handled();
 				}
 			}
-			
+		}
+
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Right) && SortBy->HasFocusedDescendants())
+		{
+			SearchInput->StartInput();
+			SearchCaretPosition = 0;
+			return FReply::Handled();
 		}
 	}
 	return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
+}
+
+bool UModioCollectionView::HandleSearchInput(const FKeyEvent& InKeyEvent)
+{
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Left))
+	{
+		SearchCaretPosition++;
+		if (SearchCaretPosition > SearchInput->GetText().ToString().Len())
+		{
+			SortBy->SetFocusToButton();
+			SearchCaretPosition = 0;
+			return true;
+		}
+	}
+	else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Right))
+	{
+		SearchCaretPosition--;
+		if (SearchCaretPosition < 0)
+		{
+			FetchButton->SetKeyboardFocus();
+			SearchCaretPosition = 0;
+			return true;
+		}
+	}
+	return false;
+}
+
+void UModioCollectionView::OnCollectionEntryHovered(UObject* Item, bool bNewHoveredState)
+{
+	if (CollectionList && bNewHoveredState)
+	{
+		CollectionList->SetSelectedItem(Item);
+		CurrentNavIndex = CollectionList->GetIndexForItem(Item);
+		ValidateAndSetFocus();
+	}
 }
 
 #include "Loc/EndModioLocNamespace.h"

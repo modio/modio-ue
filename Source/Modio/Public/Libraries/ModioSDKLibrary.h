@@ -145,4 +145,20 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
 	static MODIO_API FText RoundNumberString(FText inputText);
+
+	/**
+	 * @brief Gets the time span between present and specified past date FString
+	 *
+	 * @param Input value of date FString in the past
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
+	static MODIO_API FString GetTimeSpanAsString(FString PastDateString);
+
+	/**
+	 * @brief Shortens the specified large number
+	 *
+	 * @param Input value of large number to shorten
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
+	static MODIO_API FString GetShortenedNumberAsString(int64 Number);
 };

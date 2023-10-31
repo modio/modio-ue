@@ -184,6 +184,10 @@ UWidget* UModioCommonFeaturedPrimaryView::NativeGetDesiredFocusTarget() const
 			const FModioModID ModID = IModioModInfoUIDetails::Execute_GetModID(LargeModEntry);
 			IModioCommonModListViewInterface::Execute_SetModSelectionByID(ModList, ModID);
 		}
+		if (ModList->Implements<UModioCommonModListViewInterface>())
+		{
+			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(ModList);
+		}
 		return ModList;
 	}
 	return LargeModEntry;

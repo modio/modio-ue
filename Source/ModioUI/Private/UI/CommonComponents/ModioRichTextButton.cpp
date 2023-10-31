@@ -87,7 +87,21 @@ TSharedRef<SWidget> UModioRichTextButton::RebuildWidget()
 	.Padding(FMargin(8, 0, 0, 0))
 	.Expose(MyHintImageSlot)
 	[
-		InputHintImage->TakeWidget()
+		SNew(SBox)
+		.MaxDesiredHeight(20)
+		.MaxDesiredWidth(20)
+		.VAlign(VAlign_Center)
+		.HAlign(HAlign_Center)
+		[
+			SNew(SScaleBox)
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			.Stretch(EStretch::ScaleToFit)
+			.StretchDirection(EStretchDirection::DownOnly)
+			[
+				InputHintImage->TakeWidget()
+			]
+		]
 	];
 	// clang-format on
 	MyContentGrid->SetColumnFill(0, 1);
@@ -132,7 +146,7 @@ ESlateVisibility UModioRichTextButton::GetInputHintVisibility(EModioUIInputMode 
 {
 	UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
 
-	if (Settings->bDisableInputGlyphsCompletely)
+	if (Settings->bDisableInputGlyphsCompletely || !bIsInputHintVisible)
 	{
 		return ESlateVisibility::Collapsed;
 	}
@@ -145,6 +159,12 @@ ESlateVisibility UModioRichTextButton::GetInputHintVisibility(EModioUIInputMode 
 	{
 		return ESlateVisibility::SelfHitTestInvisible;
 	}
+}
+
+void UModioRichTextButton::SetInputHintVisibility(bool bVisible) 
+{
+	bIsInputHintVisible = bVisible;
+	InputHintImage->SetVisibility(bIsInputHintVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 }
 
 const FModioRichTextStyle& UModioRichTextButton::GetRichTextStyle() const

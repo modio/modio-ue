@@ -18,6 +18,8 @@
 class UModioCommonButtonStyle;
 class UModioCommonTextStyle;
 class UModioCommonListViewStyle;
+class UModioCommonTabButtonBase;
+class UModioCommonTabButtonStyle;
 
 /**
  * @brief The style of the Collection View within the Mod.io Common UI styling system
@@ -30,7 +32,13 @@ class MODIOUI5_API UModioCommonCollectionViewStyle : public UObject
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonListViewStyle> ModListStyle;
-	
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Mod.io Common UI|Style|Tab")
+	TSubclassOf<UModioCommonTabButtonBase> CategoryTabButtonClass;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Mod.io Common UI|Style|Tab")
+	TSubclassOf<UModioCommonTabButtonStyle> CategoryTabButtonStyle;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonTextStyle> DownloadingModsLabelTextStyle;
 

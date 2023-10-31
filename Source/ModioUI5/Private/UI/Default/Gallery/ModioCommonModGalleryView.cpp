@@ -151,6 +151,7 @@ void UModioCommonModGalleryView::RefreshGallery_Implementation()
 		SelectedGalleryImage->LoadImageFromGallery(ModInfo.ModId, EModioGallerySize::Original, CurrentImageGalleryIndex);
 		if (ImageNavButtons)
 		{
+			ImageNavButtons->SetSelectedIndex(CurrentImageGalleryIndex);
 			ImageNavButtons->ScrollIndexIntoView(CurrentImageGalleryIndex);
 		}
 	}

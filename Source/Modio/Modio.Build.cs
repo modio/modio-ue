@@ -215,7 +215,7 @@ public class Modio : ModuleRules
 
     private ModioTestConfigFile LoadTestConfig()
     {
-        string TestConfigPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/tests", "UnrealTestConfig.json");
+        string TestConfigPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/tests", "UnrealTestConfig.json"); 
         if (File.Exists(TestConfigPath))
         {
 #if UE_5_0_OR_LATER

@@ -65,4 +65,11 @@ public:
 	virtual void SynchronizeProperties() override;
 protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+	virtual void NativeOnItemSelectionChanged(bool bIsSelected) override;
+
+	/**
+	 * @brief Updates the styling of the widget based on the current selection state
+	 * @param bIsListItemSelected Whether the entry is currently selected
+	 */
+	virtual void NativeUpdateStyling(bool bIsListItemSelected);
 };

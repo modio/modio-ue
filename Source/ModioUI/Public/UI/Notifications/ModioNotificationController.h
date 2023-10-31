@@ -38,9 +38,15 @@ protected:
 	virtual void NativeDisplayNotification(const TScriptInterface<class IModioUINotification>& Notification) override;
 	virtual void NativeDisplayNotificationParams(const FModioNotificationParams& Params) override;
 	virtual void NativeDisplayNotificationManual(const FText& Title, const FText& Message, bool bIsError) override;
+
+	bool TryAddRecentMessage(FString message);
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUINotification"), Category = "Widgets")
 	TSubclassOf<UUserWidget> ErrorNotificationClass;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	class UVerticalBox* NotificationList;
+
+	UPROPERTY()
+	TArray<FString> RecentMessages;
 };

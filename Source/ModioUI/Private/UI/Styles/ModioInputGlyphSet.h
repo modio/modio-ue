@@ -31,4 +31,6 @@ public:
 	TMap<FKey, UTexture2D*> PngGlyphs;
 
 	UMaterialInterface* GetGlyphForKey(const FKey& Key);
+
+	UTexture2D* GetTextureForKey(const FKey& Key);
 };

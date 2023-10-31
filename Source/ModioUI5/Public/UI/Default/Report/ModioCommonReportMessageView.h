@@ -40,6 +40,9 @@ protected:
 	TObjectPtr<UModioCommonTextBlock> ValidationTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
+	TObjectPtr<UModioCommonTextBlock> ErrorMessageTextBlock;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonMultiLineEditableTextBox> MessageTextBox;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
@@ -52,7 +55,8 @@ protected:
 	TObjectPtr<UModioCommonButtonBase> CancelButton;
 
 public:
-	void SetValidationTextVisibility(ESlateVisibility Visbility);
+	void SetValidationTextVisibility(ESlateVisibility EVisbility);
+	void SetErrorMessage(ESlateVisibility EVisibility);
 	bool IsMessageValid(const FString& Message);
 
 	UFUNCTION()

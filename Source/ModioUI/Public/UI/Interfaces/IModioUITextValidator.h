@@ -16,10 +16,13 @@
 
 #include "IModioUITextValidator.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTextValidation, bool, bIsValid);
 /**
  * Enumeration for the possible validation rules
  * ScriptName meta specifier suppresses a duplicate name LogPython warning
  **/
+
 UENUM(BlueprintType, meta = (ScriptName = "ModioTextRuleForValidation"))
 enum class EModioTextValidationRule : uint8
 {
@@ -228,7 +231,7 @@ public:
 			case EModioTextValidationRule::ETVR_ValidateAllLetters:
 				if (!ValidateAllLetters(TextToValidate))
 				{
-					ValidationMessageText =
+					ValidationMessageText = 
 						FText::Format(Rule.ValidationMessage, FFormatNamedArguments {{"InputText", TextToValidate}});
 					return false;
 				}
@@ -265,7 +268,8 @@ public:
 				if (!ValidateLength(TextToValidate, Rule.MaximumLength, Rule.MinimumLength))
 				{
 					ValidationMessageText =
-						FText::Format(Rule.ValidationMessage, FFormatNamedArguments {{"InputText", TextToValidate}});
+						FText::Format(Rule.ValidationMessage,FFormatNamedArguments {{"InputText", FText::FromString(FString::FromInt(
+															TextToValidate.ToString().Len() - Rule.MaximumLength))}});
 					return false;
 				}
 				else
@@ -334,6 +338,7 @@ protected:
 			if (!UModioUIInputValidationLibrary::ValidateUsingRule(CurrentRule, InputText, ValidationMessageText))
 			{
 				SetValidationError_Implementation(ValidationMessageText);
+				OnTextValidation.Broadcast(false);
 				return false;
 			}
 		}
@@ -341,6 +346,7 @@ protected:
 		FText Empty;
 
 		SetValidationError_Implementation(Empty);
+		OnTextValidation.Broadcast(true);
 		return true;
 	}
 
@@ -387,4 +393,6 @@ public:
 	{
 		return NativeValidateText(InputText, ValidationMessageText);
 	}
+
+	FOnTextValidation OnTextValidation;
 };

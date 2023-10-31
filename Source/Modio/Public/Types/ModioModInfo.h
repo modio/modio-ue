@@ -177,6 +177,10 @@ struct MODIO_API FModioModInfo
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Status")
 	EModioModServerSideStatus ModStatus {};
 
+	/** @brief Price of this mod */
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Monetization")
+	int32 Price;
+
 	friend struct FModioModInfo ToUnreal(const struct Modio::ModInfo& In);
 };
 

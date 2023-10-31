@@ -45,6 +45,7 @@ struct FModioHeaderImage ToUnreal(const Modio::HeaderImage& In);
 struct FModioIcon ToUnreal(const Modio::Detail::Icon& In);
 struct FModioGameStats ToUnreal(const Modio::GameStats& In);
 EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& In);
+struct FModioGamePlatform ToUnreal(const Modio::GamePlatform& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
@@ -65,6 +66,7 @@ Modio::Environment ToModio(EModioEnvironment Environment);
 Modio::ModfilePlatform ToModio(EModioModfilePlatform Platform);
 Modio::Portal ToModio(EModioPortal Portal);
 Modio::Language ToModio(EModioLanguage Language);
+Modio::EntitlementParams ToModio(const FModioEntitlementParams& InParams);
 
 #pragma region ToModio implementation
 

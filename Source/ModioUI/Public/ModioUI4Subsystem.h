@@ -18,13 +18,16 @@
 #include "Engine/Engine.h"
 #include "Framework/Commands/UICommandList.h"
 #include "ModioSubsystem.h"
+#include "UI/ModioUIStatics.h"
 #include "Subsystems/EngineSubsystem.h"
 
 #include "ModioUI4Subsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMenuTabIndexChanged, int, TabIndex);
-
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRetryAllAsyncLoaders);
+DECLARE_MULTICAST_DELEGATE(FOnGlobalMouseClick);
+DECLARE_DELEGATE_RetVal(int32, FOnGetCurrentTabIndex);
+DECLARE_DELEGATE_RetVal(bool, FOnGetMenuState);
 /**
  *
  */
@@ -63,6 +66,9 @@ public:
 	UFUNCTION()
 	void HandleInputModeChanged(EModioUIInputMode NewDevice);
 
+	UFUNCTION()
+	void HandleOnGlobalMouseClick();
+
 	int32 GetActiveTabIndex();
 
 	TSharedPtr<FUICommandList> GetCommandList()
@@ -79,8 +85,8 @@ public:
 	void CloseDownloadDrawer();
 	void ShowReportEmailDialog(UObject* DialogDataSource);
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
+	void RetryAllAsyncLoaders();
 	bool IsAnyDialogOpen();
-	bool IsDownloadDrawerOpen();
 
 	EModioUIInputMode GetLastInputDevice()
 	{
@@ -89,6 +95,12 @@ public:
 
 	FOnMenuTabIndexChanged OnMenuTabIndexChanged;
 	FOnInputDeviceChanged OnInputDeviceChanged;
+	FOnRetryAllAsyncLoaders OnRetryAllAsyncLoaders;
+	FOnGlobalMouseClick OnGlobalMouseClick;
+	FOnCursorVisibilityChanged OnCursorVisibilityChanged;
+	FOnGetCurrentTabIndex OnGetCurrentTabIndex;
+	FOnMenuAction OnMenuAction;
+	FOnGetMenuState OnGetIsDialogStackOpen;
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUI4Subsystem")
 	class UModioUIStyleSet* GetDefaultStyleSet();
@@ -100,6 +112,9 @@ public:
 	UMaterialInterface* GetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUI4Subsystem")
+	UTexture2D* GetInputGlyphTextureForInputType(FKey VirtualInput, EModioUIInputMode InputType);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUI4Subsystem")
 	TArray<FName> GetAllNamedStyleNames();
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUI4Subsystem")
@@ -107,7 +122,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUI4Subsystem")
 	UWidget* GetCurrentFocusTarget();
-
+	
 	void SetControllerOverrideType(EModioUIInputMode NewOverride);
 	void ClearControllerOverride();
 

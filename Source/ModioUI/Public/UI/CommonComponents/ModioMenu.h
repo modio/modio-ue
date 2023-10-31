@@ -22,6 +22,7 @@
 #include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
 #include "UI/Interfaces/IModioInputMappingAccessor.h"
 #include "UI/Interfaces/IModioModBrowser.h"
+#include "UI/Interfaces/IModioUIActionHandler.h"
 #include "UI/Views/CategoryBrowser/ModioFeaturedView.h"
 #include "UI/Views/Collection/ModioCollectionView.h"
 
@@ -65,17 +66,15 @@ enum class EModioMenuDrawer : uint8
 * other visual instances like a controller
 **/
 UCLASS()
-class MODIOUI_API UModioMenu : public UModioUserWidgetBase, public IModioUIUserChangedReceiver, public IModioModBrowserInterface
+class MODIOUI_API UModioMenu : public UModioUserWidgetBase, public IModioUIUserChangedReceiver, public IModioModBrowserInterface, public IModioUIActionHandler
 {
 public:
 	virtual void ShowUserAuth_Implementation() override;
-	void SetPageIndex(int Index, bool bForce = false);
 	virtual void ShowModUnsubscribeDialog_Implementation(UObject* DialogDataSource) override;
 	virtual void LogOut_Implementation() override;
-	virtual bool IsDownloadDrawerOpen_Implementation() override;
 	void ShowReportEmailDialog(UObject* DialogDataSource);
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
-	void SetShowCursor(bool bShow);
+
 	void CreateHideMouseCursorWidget(TSubclassOf<UUserWidget> widgetClass);
 	int32 GetPageIndex();
 	void RefreshDownloadQueue();
@@ -83,6 +82,13 @@ public:
 	void RefreshView(int32 ViewIndex);
 	void CacheCurrentPage();
 	void RestoreCachedPage();
+	virtual bool GetIsCollectionModDisableUIEnabled_Implementation() override;
+
+	UFUNCTION()
+	void SetPageIndex(int Index);
+
+	UFUNCTION()
+	void SetShowCursor(bool bShow);
 
 	FDownloadQueueClosed OnDownloadQueueClosed;
 
@@ -91,7 +97,6 @@ private:
 	bool bRoutedOnViewChanged = false;
 
 	bool bMenuFocused = false;
-	bool bDownloadDrawerOpen = false;
 
 	EMouseCursor::Type CachedBacgroundCursorType;
 
@@ -129,6 +134,10 @@ protected:
 
 	virtual void NativeOnInitialized() override;
 
+	bool GetIsAnyDialogOpen();
+
+	virtual void NativeOnCursorVisibilityChanged(bool bNewVisibility) override;
+
 	void UpdateRefineSearchDrawerSettings(FModioFilterParams Settings);
 
 	UFUNCTION()
@@ -137,9 +146,6 @@ protected:
 	UFUNCTION()
 	void HandleViewChanged(int32 ViewIndex);
 
-	UFUNCTION()
-	void OnDrawerAnimatedOut(int32 SlotIndex);
-
 	virtual void NativeOnViewChanged(int64 ViewIndex);
 	virtual void NativeTick(const FGeometry& InGeometry, float DeltaTime) override;
 
@@ -147,6 +153,8 @@ protected:
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InPointerEvent) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+
+	void TrySetFocus();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnViewChanged(int64 ViewIndex);
@@ -210,6 +218,7 @@ protected:
 	TSubclassOf<UModioDrawer> RefineSearchDrawer;
 
 	int CachedPageIndex = 0;
+	FModioModID CachedModID;
 
 	UUserWidget* ActiveViewWidget;
 

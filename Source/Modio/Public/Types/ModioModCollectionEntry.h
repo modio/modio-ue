@@ -13,6 +13,7 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioModInfo.h"
 #include "Types/ModioUnsigned64.h"
+#include "Types/ModioErrorCode.h"
 
 #include "ModioModCollectionEntry.generated.h"
 
@@ -51,6 +52,8 @@ struct MODIO_API FModioModCollectionEntry
 
 	FModioUnsigned64 GetSizeOnDisk() const;
 
+	FModioErrorCode GetLastError();
+
 private:
 	friend struct FModioModCollectionEntry ToUnreal(const class Modio::ModCollectionEntry& In);
 	FModioUnsigned64 SizeOnDisk;
@@ -58,4 +61,5 @@ private:
 	FModioModID ModID;
 	TOptional<FString> ModPath;
 	FModioModInfo ModProfile;
+	FModioErrorCode LastError;
 };

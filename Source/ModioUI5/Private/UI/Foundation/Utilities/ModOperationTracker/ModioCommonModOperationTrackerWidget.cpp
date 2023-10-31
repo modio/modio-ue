@@ -175,6 +175,15 @@ bool UModioCommonModOperationTrackerWidget::IsModEnabled_Implementation()
 	}
 #endif
 
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		if (!Subsystem->GetIsCollectionModDisableUIEnabled())
+		{
+			UE_LOG(ModioUI5, Verbose, TEXT("Mod enable/disable functionality is disabled, returning true for IsModEnabled"));
+			return true;
+		}
+	}
+
 	const FModioModID ModID = Execute_GetModID(this);
 	return QueryModEnabled(ModID);
 }

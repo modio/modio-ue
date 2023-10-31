@@ -170,9 +170,6 @@ protected:
 	void SwitchSpeedVisibility(bool bIsVisible);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Visibility")
-	void SwitchSubscribeButtonVisibility(bool bIsVisible);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Visibility")
 	void SwitchCancelButtonVisibility(bool bIsVisible);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Visibility")
@@ -196,4 +193,7 @@ protected:
 
 private:
 	bool bObtainedModImage = false;
+
+	/** Timer used to reduce flickering between focus changing */
+	FTimerHandle DelesectTimerHandle;
 };

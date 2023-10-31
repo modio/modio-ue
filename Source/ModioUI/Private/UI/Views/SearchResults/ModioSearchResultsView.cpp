@@ -43,9 +43,7 @@ void UModioSearchResultsView::NativeOnInitialized()
 		NoResultsRefineSearchButton->OnClicked.AddDynamic(this, &UModioSearchResultsView::OnRefineSearchButtonClicked);
 	}
 
-	RetryDelegate.Clear();
-	RetryDelegate.BindDynamic(this, &UModioSearchResultsView::OnRetryPressed);
-	ModioErrorWithRetryWidget->Execute_SetRetryRequestedDelegate(this, RetryDelegate);
+	ModioErrorWithRetryWidget->RetryButton->OnClicked.AddUniqueDynamic(this, &UModioSearchResultsView::OnRetryPressed);
 
 	if (ResultLoader)
 	{
@@ -233,6 +231,7 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 					NewObj->Underlying = ModInfo;
 					return NewObj;
 				});
+
 				ResultsTileView->SetListItems(SearchResults);
 				ResultsTileView->SetAllNavigationRules(EUINavigationRule::Stop, TEXT("None"));
 				ResultsTileView->RequestRefresh();
@@ -251,9 +250,14 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 							}
 						}
 
-						if (PreviousRequestIdentifier != RequestIdentifier)
+						if (PreviousRequestIdentifier != RequestIdentifier || !WasPreviousSearchTagsIdentical())
 						{
-							TryNavigateGrid();
+							CurrentRow = 0;
+
+							FTimerHandle TimerHandle;
+							GetWorld()->GetTimerManager().SetTimer(
+								TimerHandle, [this]() { TryNavigateGrid(); }, 0.2f, false);
+
 						}
 					}
 					else
@@ -287,6 +291,7 @@ void UModioSearchResultsView::NativeOnListAllModsRequestCompleted(FString Reques
 			}
 
 			PreviousRequestIdentifier = RequestIdentifier;
+			PreviousTagNames = Params->Underlying.Tags;
 		}
 	}
 
@@ -464,17 +469,20 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 			return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
 		}
 	}
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Up))
 	{
 		if (CurrentRow == 0 && !SortBy->HasFocusedDescendants() && !RefineSearchButton->HasAnyUserFocus())
 		{
 			RefineSearchButton->SetKeyboardFocus();
 			return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
 		}
+		else if (SortBy->HasFocusedDescendants() && SortBy->IsComboBoxOpen())
+		{
+			return Super::NativeOnPreviewKeyDown(MyGeometry, InKeyEvent);
+		}
 
 		if (!SortBy->HasFocusedDescendants() && !RefineSearchButton->HasAnyUserFocus())
 		{
-			SetFocus();
 			CurrentRow = (CurrentRow - itemsPerRow >= 0 ? CurrentRow - itemsPerRow : CurrentRow);
 			return TryNavigateGrid();
 		}
@@ -483,7 +491,7 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 			return TryNavigateGrid();
 		}
 	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+	else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down))
 	{
 		
 		if (RefineSearchButton->HasAnyUserFocus() || (SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()))
@@ -506,7 +514,7 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 			return TryNavigateGrid();
 		}
 	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left)
+	else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Left))
 	{
 		if (SortBy->HasFocusedDescendants()) 
 		{
@@ -520,7 +528,7 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 			return TryNavigateGrid();
 		}
 	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right)
+	else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Right))
 	{
 		if (SortBy->HasFocusedDescendants())
 		{
@@ -547,6 +555,7 @@ FReply UModioSearchResultsView::TryNavigateGrid()
 	// Index has to be selected manually since NavigateToIndex does not select the target
 	ResultsTileView->NavigateToIndex(CurrentListIndex + CurrentRow);
 	ResultsTileView->SetSelectedIndex(CurrentListIndex + CurrentRow);
+
 	return FReply::Handled();
 }
 
@@ -569,6 +578,27 @@ void UModioSearchResultsView::OnDrawerClosed() {}
 void UModioSearchResultsView::SetSearchInputString(FString input)
 {
 	SearchInputString = input;
+}
+
+bool UModioSearchResultsView::WasPreviousSearchTagsIdentical()
+{
+	if (UModioFilterParamsUI* Params = Cast<UModioFilterParamsUI>(DataSource))
+	{
+		if (PreviousTagNames.Num() != Params->Underlying.Tags.Num())
+		{
+			return false;
+		}
+
+		for (int i = 0; i < PreviousTagNames.Num(); i++)
+		{
+			if (PreviousTagNames[i] != Params->Underlying.Tags[i])
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 #include "Loc/EndModioLocNamespace.h"

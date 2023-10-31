@@ -169,10 +169,8 @@ public:
 			FVector2D RealSize =
 				FVector2D(AllottedGeometry.GetLocalSize().X,
 						  ComputeDesiredSize(CachedScaleMultiplier).Y + MyListView->GetDesiredSize().Y);
-			OutDrawElements.QueueDeferredPainting(FSlateWindowElementList::FDeferredPaint(
-				ChildSlot.GetWidget(), Args.WithNewParent(this),
-				AllottedGeometry.MakeChild(RealSize, ComputeLocalTransform()), InWidgetStyle, bParentEnabled));
-			return LayerId;
+			return SCompoundWidget::OnPaint(Args.WithNewParent(this),
+											AllottedGeometry.MakeChild(RealSize, ComputeLocalTransform()), MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
 		}
 		return SCompoundWidget::OnPaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle,
 										bParentEnabled);

@@ -45,7 +45,7 @@ protected:
 	TArray<FString> GetAllProjectInputNames();
 	TArray<FKey> GetModioInputKeys();
 	TArray<FKey> GetKeyForModioInputName(const FName Name);
-	TOptional<FKey> GetCommandKeyForEvent(const FKeyEvent& Event) const;
+	TArray<TOptional<FKey>> GetCommandKeyForEvent(const FKeyEvent& Event) const;
 	TOptional<FKey> GetCommandKeyForPointerEvent(const FPointerEvent& Event) const;
 	TOptional<FKey> GetCommandKeyForAnalogEvent(const FAnalogInputEvent& Event) const;
 };

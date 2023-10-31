@@ -28,6 +28,8 @@
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnSubscriptionCompleted, FModioErrorCode, FModioModID);
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnModSubscriptionStatusChanged, FModioModID, bool);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnModSubscribeFailed, FModioModID);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnModUnsubscribeFailed, FModioModID);
 
 DECLARE_MULTICAST_DELEGATE_FourParams(FOnModLogoDownloadCompleted, FModioModID, FModioErrorCode,
 									   TOptional<FModioImageWrapper>, EModioLogoSize);
@@ -63,7 +65,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnModEnabledChanged, FModioModID, 
 DECLARE_DYNAMIC_DELEGATE(FOnModBrowserClosed);
 
 DECLARE_MULTICAST_DELEGATE(FOnAuthenticationChangeStarted);
-
+DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnDisplaySearchResults, FModioFilterParams, Params);
 
 
 /**
@@ -89,10 +91,6 @@ protected:
 	friend class IModioUIModEnableWidget;
 	friend class IModioUINotificationController;
 	friend class IModioUIModDetailsDisplay;
-
-	bool QueryIsModEnabled(FModioModID ID);
-
-	bool RequestModEnabledState(FModioModID ID, bool bNewEnabledState);
 
 	UFUNCTION()
 	void SubscriptionHandler(FModioErrorCode ErrorCode, FModioModID ID);
@@ -148,10 +146,12 @@ public:
 	FOnDisplayNotificationWidget OnDisplayNotificationWidget;
 	FOnDisplayNotificationParams OnDisplayNotificationParams;
 	FOnDisplayErrorManualParams OnDisplayManualParams;
-
-protected:
 	FOnDisplayModDetails OnDisplayModDetails;
 	FOnDisplayModDetailsForID OnDisplayModDetailsForID;
+	FOnDisplaySearchResults OnDisplaySearchResults;
+
+protected:
+	
 
 	TOptional<FModioModTagOptions> CachedModTags;
 
@@ -181,6 +181,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestRemoveSubscriptionForModID(FModioModID ID);
 
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	bool QueryIsModEnabled(FModioModID ID);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	bool RequestModEnabledState(FModioModID ID, bool bNewEnabledState);
+
 	void RequestRemoveSubscriptionForModID(FModioModID ID, FOnErrorOnlyDelegateFast DedicatedCallback);
 	void OnRatingSubmissionComplete(FModioErrorCode ErrorCode, EModioRating ModioRating);
 	void OnExternalUpdatesFetched(FModioErrorCode ErrorCode);
@@ -193,7 +199,6 @@ public:
 	void ShowLogoutDialog();
 	void OnLogoutComplete(FModioErrorCode ModioErrorCode);
 	void LogOut(FOnErrorOnlyDelegateFast DedicatedCallback);
-	bool IsDownloadDrawerOpen();
 	
 	// Delegate for the subscription success or fail
 	FOnSubscriptionCompleted OnSubscriptionRequestCompleted;
@@ -201,10 +206,14 @@ public:
 	// Perhaps this should also carry the error code and a TOptional<bool> for the newly changed state?
 	FOnModSubscriptionStatusChanged OnSubscriptionStatusChanged;
 
+	FOnModSubscribeFailed OnModSubscribeFailed;
+	FOnModUnsubscribeFailed OnModUnsubscribeFailed;
+
 	UPROPERTY(BlueprintAssignable, Category = "ModioUISubsystem")
 	FOnModEnabledChanged OnModEnabledChanged;
 	
 	// RetVal delegates can be accessed only by setting them BlueprintReadOnly
+	// Overriding or binding this delegate will disable the default enabled mod lookup
 	UPROPERTY(BlueprintReadWrite, Category = "ModioUISubsystem")
 	FOnGetModEnabled GetModEnabledDelegate;
 
@@ -271,7 +280,7 @@ public:
 	void DisplayErrorDialog(FModioErrorCode ErrorCode);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	FOnGetModEnabled GetOnModEnabled();
+	bool GetIsCollectionModDisableUIEnabled();
 
 	void ExecuteOnModBrowserClosedDelegate();
 

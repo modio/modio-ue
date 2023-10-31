@@ -38,12 +38,6 @@ void UModioCommonSearchResultsView::ShowSearchView_Implementation()
 	}
 }
 
-void UModioCommonSearchResultsView::NativeOnActivated()
-{
-	Super::NativeOnActivated();
-	ShowSearchView();
-}
-
 UWidget* UModioCommonSearchResultsView::NativeGetDesiredFocusTarget() const
 {
 	if (UWidget* WidgetToFocus = BP_GetDesiredFocusTarget())
@@ -95,7 +89,7 @@ void UModioCommonSearchResultsView::SynchronizeProperties()
 
 		if (KeywordsDetailsTextBlock)
 		{
-			const FText KeywordsDetailsText = Keywords.IsEmpty() ? (Tags.IsEmpty() ? Settings->ShowingAllModsLabel : FText::GetEmpty()) : FText::FromString(Keywords);
+			const FText KeywordsDetailsText = Keywords.IsEmpty() ? (Tags.IsEmpty() && DataSource ? Settings->ShowingAllModsLabel : FText::GetEmpty()) : FText::FromString(Keywords);
 			KeywordsDetailsTextBlock->SetText(KeywordsDetailsText);
 			KeywordsDetailsTextBlock->SetVisibility(KeywordsDetailsText.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
 			if (KeywordsLabelTextBlock)
@@ -198,13 +192,14 @@ void UModioCommonSearchResultsView::NativeOnSetDataSource()
 		}
 	}
 
-	if (Direction == FilterParams.Direction && Tags == FilterParams.Tags && Keywords == NewKeywords && bWasEverPopulated)
+	if (SortField == FilterParams.SortField && Direction == FilterParams.Direction && Tags == FilterParams.Tags && Keywords == NewKeywords && bWasEverPopulated)
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Skipping data source update for '%s': Data source is already up to date"), *GetName());
 		return;
 	}
 
 	bWasEverPopulated = true;
+	SortField = FilterParams.SortField;
 	Direction = FilterParams.Direction;
 	Tags = FilterParams.Tags;
 	Keywords = MoveTemp(NewKeywords);

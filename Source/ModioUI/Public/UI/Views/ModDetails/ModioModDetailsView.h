@@ -147,6 +147,12 @@ protected:
 	virtual void OnModSubscriptionStatusChanged(FModioModID ID, bool Subscribed);
 
 	UFUNCTION()
+	void OnModSubscribeFailed(FModioModID ID);
+
+	UFUNCTION()
+	void OnModUnsubscribeFailed(FModioModID ID);
+
+	UFUNCTION()
 	void NativeSubscribeClicked();
 
 	void NativeOnSetDataSource() override;

@@ -10,6 +10,7 @@
 
 #include "UI/Default/Gallery/ModioCommonModGalleryEntry.h"
 
+#include "ModioUI5.h"
 #include "UI/Default/Gallery/ModioCommonModGalleryEntryStyle.h"
 #include "UI/Default/Gallery/ModioCommonModGalleryView.h"
 #include "UI/Foundation/Components/Image/ModioCommonDynamicImage.h"
@@ -25,22 +26,13 @@ void UModioCommonModGalleryEntry::SetStyle(TSubclassOf<UModioCommonModGalleryEnt
 void UModioCommonModGalleryEntry::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
-
-	if (UModioCommonModGalleryEntryStyle* StyleCDO = ModioStyle.GetDefaultObject())
-	{
-		if (ModImage)
-		{
-			if (TSubclassOf<UModioCommonDynamicImageStyle> ImageStyle = StyleCDO->ModImageStyle)
-			{
-				ModImage->SetStyle(ImageStyle);
-			}
-		}
-	}
+	NativeUpdateStyling(IsListItemSelected());
 }
 
 void UModioCommonModGalleryEntry::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
+	NativeUpdateStyling(IsListItemSelected());
 
 	if (UModioCommonModGalleryItem* GalleryItem = Cast<UModioCommonModGalleryItem>(ListItemObject))
 	{
@@ -55,5 +47,35 @@ void UModioCommonModGalleryEntry::NativeOnListItemObjectSet(UObject* ListItemObj
 				ModImage->LoadImageFromGallery(GalleryItem->ModInfo.ModId, EModioGallerySize::Thumb320, GalleryItem->ImageGalleryIndex);
 			}
 		}
+	}
+}
+
+void UModioCommonModGalleryEntry::NativeOnItemSelectionChanged(bool bIsSelected)
+{
+	IUserObjectListEntry::NativeOnItemSelectionChanged(bIsSelected);
+	NativeUpdateStyling(IsListItemSelected());
+}
+
+void UModioCommonModGalleryEntry::NativeUpdateStyling(bool bIsListItemSelected)
+{
+	if (!ModioStyle)
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to update styling for mod gallery entry '%s': ModioStyle is invalid"), *GetName());
+		return;
+	}
+
+	TSubclassOf<UModioCommonDynamicImageStyle> CurrentStateStyle = bIsListItemSelected
+																			 ? ModioStyle.GetDefaultObject()->ModImageSelectedStyle
+																			 : ModioStyle.GetDefaultObject()->ModImageNormalStyle;
+
+	if (!CurrentStateStyle)
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to update styling for mod gallery entry '%s': CurrentStateStyle is invalid"), *GetName());
+		return;
+	}
+
+	if (ModImage)
+	{
+		ModImage->SetStyle(CurrentStateStyle);
 	}
 }

@@ -27,6 +27,8 @@
 #include "UI/Foundation/Base/Report/ModioCommonReportViewBase.h"
 #include "UI/Foundation/Base/Dialog/ModioCommonDialogViewBase.h"
 #include "Loc/BeginModioLocNamespace.h"
+#include "UI/Default/Dialog/ModioCommonDialogInfo.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 
 // These are only for the internal identification of the tabs
 const FName FeaturedTabId = FName(TEXT("Featured"));
@@ -74,6 +76,12 @@ void UModioCommonModBrowser::NativeOnInitialized()
 			
 			ContentSwitcher->SetActiveWidget(SelectedView);
 			UE_LOG(ModioUI5, Log, TEXT("Tab '%s' with view '%s' selected"), *TabNameID.ToString(), *SelectedView->GetName());
+
+			// If we open the search results tab explicitly, by the tab selection, we want to show the search view
+			if (bShowSearchViewOnSearchResults && TabNameID == SearchResultsTabId)
+			{
+				ShowSearchView();
+			}
 		});
 	}
 	else
@@ -599,7 +607,10 @@ void UModioCommonModBrowser::ShowSearchResults_Implementation(const FModioFilter
 
 	if (TabList)
 	{
+		const bool bPreviousShowSearchViewOnSearchResults = bShowSearchViewOnSearchResults;
+		bShowSearchViewOnSearchResults = false;
 		TabList->SelectTabByID(SearchResultsTabId);
+		bShowSearchViewOnSearchResults = bPreviousShowSearchViewOnSearchResults;
 	}
 }
 
@@ -633,10 +644,17 @@ void UModioCommonModBrowser::ShowReportMod_Implementation(UObject* DialogDataSou
 	HideSearchView();
 }
 
-void UModioCommonModBrowser::ShowDialog_Implementation(FModioModInfo ModInfo)
+bool UModioCommonModBrowser::GetIsCollectionModDisableUIEnabled_Implementation()
 {
-	Super::ShowDialog_Implementation(ModInfo);
+	if (const UModioCommonUISettings* Settings = GetDefault<UModioCommonUISettings>())
+	{
+		return Settings->bEnableCollectionModDisableUI;
+	}
+	return Super::GetIsCollectionModDisableUIEnabled_Implementation();
+}
 
+void UModioCommonModBrowser::ShowDialog(UModioCommonDialogInfo* DialogInfo)
+{
 	if (!DialogStack)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog: DialogStack is not bound"));
@@ -646,21 +664,19 @@ void UModioCommonModBrowser::ShowDialog_Implementation(FModioModInfo ModInfo)
 	const UModioCommonModBrowserStyle* StyleCDO = Cast<UModioCommonModBrowserStyle>(ModioStyle.GetDefaultObject());
 	if (!StyleCDO)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog for mod '%s': Style is invalid"), *ModInfo.ProfileName);
+		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog for mod '%s': Style is invalid"), *DialogInfo->TitleText.ToString());
 		return;
 	}
 
 	if (!StyleCDO->DialogClass)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog for mod '%s': DialogClass in Style '%s' is invalid"),
-			   *ModInfo.ProfileName, *ModioStyle->GetName());
+			   *DialogInfo->TitleText.ToString(), *ModioStyle->GetName());
 		return;
 	}
 
 	UModioCommonDialogViewBase* DialogView = DialogStack->AddWidget<UModioCommonDialogViewBase>(StyleCDO->DialogClass);
-	UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
-	ModInfoObj->Underlying = ModInfo;
-	DialogView->SetDataSource(ModInfoObj);
+	DialogView->SetDataSource(DialogInfo);
 
 	HideQuickAccessView();
 	HideSearchView();

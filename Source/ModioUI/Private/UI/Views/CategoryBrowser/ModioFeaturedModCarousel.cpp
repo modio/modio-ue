@@ -205,7 +205,7 @@ FReply UModioFeaturedModCarousel::NativeOnPreviewKeyDown(const FGeometry& InGeom
 		return FReply::Unhandled();
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left && AnimationTimer > ScrollInputDelay)  // just a bit of delay, keyboards can spam inputs every frame
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Left) && AnimationTimer > ScrollInputDelay)  // just a bit of delay, keyboards can spam inputs every frame
 	{
 		if (bIsAnimating)
 		{
@@ -216,7 +216,7 @@ FReply UModioFeaturedModCarousel::NativeOnPreviewKeyDown(const FGeometry& InGeom
 		NavigateToIndex(ScrollTargetIndex <= 0 ? GeneratedWidgets.Num() - 1 : ScrollTargetIndex - 1);
 		return FReply::Handled();
 	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right && AnimationTimer > ScrollInputDelay)
+	else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Right) && AnimationTimer > ScrollInputDelay)
 	{
 		if (bIsAnimating)
 		{

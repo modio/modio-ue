@@ -24,15 +24,18 @@ class MODIOUI_API UModioDefaultInputGlyphProvider : public UObject, public IModi
 
 protected:
 	virtual UMaterialInterface* NativeGetInputGlyphMaterialForInputType(FKey VirtualInput, EModioUIInputMode InputType) override;
+	virtual UTexture2D* NativeGetInputGlyphTextureForInputType(FKey VirtualInput, EModioUIInputMode InputType) override;
 
 private:
 	TSoftObjectPtr<UModioInputGlyphSet> KeyboardGlyphSetRef;
+	TSoftObjectPtr<UModioInputGlyphSet> MacKeyboardGlyphSetRef;
 	TSoftObjectPtr<UModioInputGlyphSet> XBoxGlyphSetRef;
 	TSoftObjectPtr<UModioInputGlyphSet> Playstation4GlyphSetRef;
 	TSoftObjectPtr<UModioInputGlyphSet> Playstation5GlyphSetRef;
 	TSoftObjectPtr<UModioInputGlyphSet> NintendoSwitchGlyphSetRef;
 
 	UModioInputGlyphSet* KeyboardGlyphSet;
+	UModioInputGlyphSet* MacKeyboardGlyphSet;
 	UModioInputGlyphSet* XBoxGlyphSet;
 	UModioInputGlyphSet* PlaystationGlyphSet;
 	UModioInputGlyphSet* NintendoSwitchGlyphSet;

@@ -105,6 +105,7 @@ protected:
 	virtual void NativeUserChanged(TOptional<FModioUser> NewUser) override;
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 	virtual void NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState) override;
+	virtual void NativeOnModEnabledStateChanged(FModioModID ModID, bool bNewSubscriptionState) override;
 
 	/**
 	 * @brief Updates the styling of the widget based on the current selection state

@@ -15,6 +15,7 @@
 #include "Input/Reply.h"
 #include "Layout/Visibility.h"
 #include "Misc/Attribute.h"
+#include "TimerManager.h"
 #include "UI/Interfaces/IModioUIDataSourceWidget.h"
 #include "UI/Interfaces/IModioUINotification.h"
 #include "UI/Notifications/ModioNotificationWidgetBase.h"
@@ -64,6 +65,11 @@ void UModioNotificationControllerBase::NativeDisplayNotificationParams(const FMo
 		return;
 	}
 
+	if (!TryAddRecentMessage(Params.ErrorCode.GetErrorMessage()))
+	{
+		return;
+	}
+
 	if (*ErrorNotificationClass)
 	{
 		TSubclassOf<UWidget> ActualClass;
@@ -95,6 +101,11 @@ void UModioNotificationControllerBase::NativeDisplayNotificationManual(const FTe
 		return;
 	}
 
+	if (!TryAddRecentMessage(message.ToString()))
+	{
+		return;
+	}
+
 	if (NotificationList)
 	{
 		UUserWidget* UnderlyingWidget = CreateWidget<UUserWidget>(this, ErrorNotificationClass);
@@ -114,4 +125,21 @@ void UModioNotificationControllerBase::NativeDisplayNotificationManual(const FTe
 		IModioUINotification::Execute_Display(UnderlyingWidget);
 		
 	}
+}
+
+bool UModioNotificationControllerBase::TryAddRecentMessage(FString message)
+{
+	if (RecentMessages.Contains(message))
+	{
+		return false;
+	}
+
+	RecentMessages.Add(message);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, message]() { 
+			RecentMessages.Remove(message);
+		}, 1.0f, false);
+
+	return true;
 }

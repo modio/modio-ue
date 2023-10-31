@@ -253,6 +253,19 @@ void UModioCommonModEntryBase::NativeOnSubscriptionsChanged(FModioModID ModID, b
 	}
 }
 
+void UModioCommonModEntryBase::NativeOnModEnabledStateChanged(FModioModID ModID, bool bNewSubscriptionState)
+{
+	IModioUIModEnableWidget::NativeOnModEnabledStateChanged(ModID, bNewSubscriptionState);
+
+	const FModioModID CurrentModID = Execute_GetModID(this);
+
+	if (CurrentModID == ModID)
+	{
+		SetDataSource(DataSource);
+		UpdateInputActions();
+	}
+}
+
 void UModioCommonModEntryBase::NativeUpdateStyling(bool bIsListItemSelected)
 {
 	UpdateStyling(bIsListItemSelected);

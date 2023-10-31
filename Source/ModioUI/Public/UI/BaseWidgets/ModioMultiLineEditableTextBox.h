@@ -16,8 +16,23 @@
 #include "UI/Interfaces/IModioUIStringInputWidget.h"
 #include "UI/Interfaces/IModioUITextValidator.h"
 #include "UI/Styles/ModioUIStyleRef.h"
+#include "Widgets/Input/SMultiLineEditableTextBox.h"
 
 #include "ModioMultiLineEditableTextBox.generated.h"
+
+/**
+ * Modio Multi Line Editable Text Box. Supports keyboard/gamepad navigation
+ */
+class MODIOUI_API SModioMultiLineEditableTextBox : public SMultiLineEditableTextBox
+{
+public:
+	virtual bool SupportsKeyboardFocus() const override { return true; }
+	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual void HandleOnTextCursorMoved(const FTextLocation& NewCursorPosition);
+
+protected:
+	FTextLocation LastCursorPosition;
+};
 
 /**
  * This class facilitates an editable text box with multiline support as well an
@@ -29,6 +44,9 @@ class MODIOUI_API UModioMultiLineEditableTextBox : public UMultiLineEditableText
 												   public IModioUITextValidator
 {
 	GENERATED_BODY()
+
+	void HandleOnTextCursorMoved(const FTextLocation& NewCursorPosition);
+
 public:
 	TSharedPtr<SMultiLineEditableTextBox> GetEditableTextBox();
 
@@ -70,7 +88,6 @@ protected:
 
 	TSharedPtr<SVerticalBox> MyVerticalBox;
 	TSharedPtr<SModioRichTextBlock> MyErrorTextBlock;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioMultiLineEditableTextBoxStyle"),
 			  Category = "Widgets")
 	FModioUIStyleRef TextBoxStyle = FModioUIStyleRef {"DefaultMultiLineEditableTextBoxStyle"};

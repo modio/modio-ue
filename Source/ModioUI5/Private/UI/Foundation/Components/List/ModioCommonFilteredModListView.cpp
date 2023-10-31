@@ -26,6 +26,26 @@ void UModioCommonFilteredModListView::SetStyle(TSubclassOf<UModioCommonFilteredM
 	SynchronizeProperties();
 }
 
+int32 UModioCommonFilteredModListView::GetNumItemsSelected_Implementation() const
+{
+	if (ModList)
+	{
+		return ModList->GetNumItemsSelected();
+	}
+	UE_LOG(ModioUI5, Error, TEXT("Unable to get number of selected items in '%s': Mod list is invalid"), *GetName());
+	return 0;
+}
+
+int32 UModioCommonFilteredModListView::GetNumItems_Implementation() const
+{
+	if (ModList)
+	{
+		return ModList->GetNumItems();
+	}
+	UE_LOG(ModioUI5, Error, TEXT("Unable to get number of items in '%s': Mod list is invalid"), *GetName());
+	return 0;
+}
+
 UWidget* UModioCommonFilteredModListView::NativeGetDesiredFocusTarget() const
 {
 	if (UWidget* WidgetToFocus = BP_GetDesiredFocusTarget())
@@ -34,6 +54,10 @@ UWidget* UModioCommonFilteredModListView::NativeGetDesiredFocusTarget() const
 	}
 	if (ModList)
 	{
+		if (ModList->Implements<UModioCommonModListViewInterface>())
+		{
+			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(ModList);
+		}
 		return ModList;
 	}
 	return Super::NativeGetDesiredFocusTarget();
@@ -59,9 +83,14 @@ void UModioCommonFilteredModListView::NativeOnSetDataSource()
 
 	ClearListeningInputActions();
 
+	const bool bFocusOnceListIsPopulated = GetNumItemsSelected() > 0;
 	if (Implements<UModioCommonModListViewInterface>())
 	{
 		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(this);
+		if (bFocusOnceListIsPopulated)
+		{
+			IModioCommonModListViewInterface::Execute_SetFocusOnceListIsPopulated(this, bFocusOnceListIsPopulated);
+		}
 	}
 	if (ModList)
 	{
@@ -69,8 +98,11 @@ void UModioCommonFilteredModListView::NativeOnSetDataSource()
 	}
 	
 	SetPageNavigationVisibility(false);
+	SetInitialScreenVisibility(false);
 	SetNoResultsVisibility(false);
 	SetLoadingVisibility(true);
+
+	OnSetModsFromModInfoListStarted.Broadcast();
 
 	const FModioFilterParams& FilterParams = FilterParamsPtr->Underlying;
 	Subsystem->RequestListAllMods(FilterParams, GetRequestIdentifier());
@@ -98,6 +130,7 @@ void UModioCommonFilteredModListView::NativePreConstruct()
 		CurrentPageIndex = PreviewCurrentPageIndex;
 		TotalMods = PreviewTotalMods;
 		PageSize = PreviewPageSize;
+		SetInitialScreenVisibility(bPreviewShowInitialScreen);
 		SetNoResultsVisibility(bPreviewShowNoResults);
 		SetLoadingVisibility(bPreviewShowLoading);
 		SetPageNavigationVisibility(bPreviewShowPageNavigation);
@@ -109,7 +142,8 @@ void UModioCommonFilteredModListView::NativePreConstruct()
 void UModioCommonFilteredModListView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	SetNoResultsVisibility(true);
+	SetInitialScreenVisibility(true);
+	SetNoResultsVisibility(false);
 	SetLoadingVisibility(false);
 	SetPageNavigationVisibility(false);
 	IModioUIModInfoReceiver::Register<UModioCommonFilteredModListView>(EModioUIModInfoEventType::ListAllMods);
@@ -229,6 +263,7 @@ void UModioCommonFilteredModListView::NativeSetListItems(const TArray<UObject*>&
 	if (ModList && ModList->Implements<UModioCommonModListViewInterface>())
 	{
 		Cast<IModioCommonModListViewInterface>(ModList)->NativeSetListItems(InListItems, bAddToExisting);
+		OnSetModsFromModInfoListFinished.Broadcast();
 	}
 	else
 	{
@@ -270,28 +305,37 @@ void UModioCommonFilteredModListView::NativeOnListAllModsRequestCompleted(FStrin
 
 	if (Implements<UModioCommonModListViewInterface>())
 	{
-		Execute_SetFocusOnceListIsPopulated(this, true);
 		Execute_SetModsFromModInfoList(this, List.GetValue(), false);
 	}
 
 	if (TotalMods > 0)
 	{
 		SetPageNavigationVisibility(true);
+		SetInitialScreenVisibility(false);
 		SetNoResultsVisibility(false);
 	}
 	else
 	{
-		SetNoResultsVisibility(true);
+		if (bHasSearchedBefore)
+		{
+			SetInitialScreenVisibility(false);
+			SetNoResultsVisibility(true);
+		}
+		else
+		{
+			SetInitialScreenVisibility(true);
+			SetNoResultsVisibility(false);
+		}
 	}
 
 	SetLoadingVisibility(false);
 }
 
-void UModioCommonFilteredModListView::SetLoadingVisibility_Implementation(bool bVisible)
+void UModioCommonFilteredModListView::SetInitialScreenVisibility_Implementation(bool bVisible)
 {
-	if (LoadingContainer)
+	if (InitialScreenContainer)
 	{
-		LoadingContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+		InitialScreenContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 
@@ -300,6 +344,14 @@ void UModioCommonFilteredModListView::SetNoResultsVisibility_Implementation(bool
 	if (NoResultsContainer)
 	{
 		NoResultsContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+	}
+}
+
+void UModioCommonFilteredModListView::SetLoadingVisibility_Implementation(bool bVisible)
+{
+	if (LoadingContainer)
+	{
+		LoadingContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 

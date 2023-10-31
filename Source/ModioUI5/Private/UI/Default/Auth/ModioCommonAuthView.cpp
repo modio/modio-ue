@@ -59,6 +59,7 @@ void UModioCommonAuthView::NativeOnActivated()
 					TermsOfUseView = CreateWidget<UModioCommonTermsOfUseViewBase>(this, TermsOfUseViewClass);
 					TermsOfUseView->OnCancelClicked.BindUObject(this, &UModioCommonAuthView::OnTermsOfUseViewCancelClicked);
 					TermsOfUseView->OnSubmitClicked.BindUObject(this, &UModioCommonAuthView::OnTermsOfUseViewSubmitClicked);
+					TermsOfUseView->OnLinkClicked.BindUObject(this, &UModioCommonAuthView::OnTermsOfUseViewLinkClicked);
 					TermsOfUseView->Terms = Terms.Get(FModioTerms());
 					TermsOfUseView->SynchronizeProperties();
 					SwitcherSlots.Add(Cast<UWidgetSwitcherSlot>(AuthSwitcher->AddChild(TermsOfUseView)));
@@ -136,6 +137,11 @@ void UModioCommonAuthView::OnTermsOfUseViewSubmitClicked_Implementation()
 	{
 		AuthSwitcher->SetActiveWidget(EmailAuthView);
 	}
+}
+
+void UModioCommonAuthView::OnTermsOfUseViewLinkClicked_Implementation(const FString& URL) 
+{
+	FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
 }
 
 void UModioCommonAuthView::OnTermsOfUseViewCancelClicked_Implementation()

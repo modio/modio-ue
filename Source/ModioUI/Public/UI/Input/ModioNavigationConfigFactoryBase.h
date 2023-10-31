@@ -33,7 +33,14 @@ protected:
 	virtual EUINavigation GetNavigationDirectionFromKey(const FKeyEvent& InKeyEvent) const
 	{
 		// Check if the physical key has a mapping to our virtual keys
-		if (TOptional<FKey> VirtualKey = IModioInputMappingAccessor::GetCommandKeyForEvent(InKeyEvent))
+		TArray<TOptional<FKey>> mappings = IModioInputMappingAccessor::GetCommandKeyForEvent(InKeyEvent);
+
+		if (mappings.Num() <= 0)
+		{
+			return EUINavigation::Invalid;
+		}
+
+		if (TOptional<FKey> VirtualKey = mappings[0])
 		{
 			// If the physical key has a mapping to a virtual key, check if that virtual key maps to a navigation
 			// direction
@@ -49,7 +56,14 @@ protected:
 	virtual EUINavigationAction GetNavigationActionFromKey(const FKeyEvent& InKeyEvent) const
 	{
 		// Check if the physical key has a mapping to our virtual keys
-		if (TOptional<FKey> VirtualKey = IModioInputMappingAccessor::GetCommandKeyForEvent(InKeyEvent))
+		TArray<TOptional<FKey>> mappings = IModioInputMappingAccessor::GetCommandKeyForEvent(InKeyEvent);
+
+		if (mappings.Num() <= 0)
+		{
+			return EUINavigationAction::Invalid;
+		}
+
+		if (TOptional<FKey> VirtualKey = mappings[0])
 		{
 			// If the physical key has a mapping to a virtual key, check if that virtual key maps to a navigation
 			// action

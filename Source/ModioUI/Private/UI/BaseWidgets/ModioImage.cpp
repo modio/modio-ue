@@ -61,6 +61,10 @@ void UModioImage::ImageLoadHandler(UTexture2DDynamic* Texture, UMaterialInterfac
 		CachedMaterial->SetScalarParameterValue("UseRenderTarget", 1);
 		InvalidateLayoutAndVolatility();
 	}
+	else
+	{
+		OnImageLoadFailed.Broadcast();
+	}
 }
 
 void UModioImage::LoadImageFromFileWithMaterialAsync(FModioImageWrapper ImageLoader, UMaterialInterface* Material,

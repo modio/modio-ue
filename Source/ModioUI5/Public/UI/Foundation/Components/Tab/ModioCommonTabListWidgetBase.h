@@ -54,6 +54,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void RemoveAllDynamicTabs();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void HandleNavigateToNextTab();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void HandleNavigateToPreviousTab();
+
 public:
 	virtual void SynchronizeProperties() override;
 protected:

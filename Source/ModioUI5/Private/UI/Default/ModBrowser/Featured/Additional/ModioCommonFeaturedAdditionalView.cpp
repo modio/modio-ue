@@ -15,9 +15,10 @@
 #include "UI/Default/ModBrowser/Featured/ModioCommonFeaturedViewStyle.h"
 #include "UI/Foundation/Components/Tab/ModioCommonTabButtonBase.h"
 #include "UI/Foundation/Components/Tab/ModioCommonTabListWidgetBase.h"
-#include "UI/Foundation/Components/List/ModioCommonModTileView.h"
 #include "UI/Settings/Params/ModioCommonModBrowserParams.h"
 #include "Algo/Find.h"
+#include "Core/ModioFilterParamsUI.h"
+#include "UI/Foundation/Components/List/ModioCommonFilteredModListView.h"
 #include "UI/Foundation/Components/List/ModioCommonListView.h"
 
 UModioCommonFeaturedAdditionalView::UModioCommonFeaturedAdditionalView()
@@ -33,18 +34,18 @@ void UModioCommonFeaturedAdditionalView::SetStyle(TSubclassOf<UModioCommonFeatur
 
 bool UModioCommonFeaturedAdditionalView::IsAnyModSelected_Implementation()
 {
-	if (ModList)
+	if (FilteredModListView)
 	{
-		return ModList->GetNumItemsSelected() > 0;
+		return FilteredModListView->GetNumItemsSelected() > 0;
 	}
 	return false;
 }
 
 void UModioCommonFeaturedAdditionalView::ClearModSelection_Implementation()
 {
-	if (ModList && ModList->Implements<UModioCommonModListViewInterface>())
+	if (FilteredModListView && FilteredModListView->Implements<UModioCommonModListViewInterface>())
 	{
-		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(ModList);
+		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(FilteredModListView);
 	}
 }
 
@@ -72,22 +73,20 @@ void UModioCommonFeaturedAdditionalView::SynchronizeProperties()
 				}
 			}
 
-			if (ModList)
+			if (FilteredModListView)
 			{
-				if (UModioCommonListView* ModListView = Cast<UModioCommonListView>(ModList))
-				{
-					ModListView->SetStyle(StyleCDO->ModListStyle);
-				}
-				else if (UModioCommonModTileView* ModTileView = Cast<UModioCommonModTileView>(ModList))
-				{
-					ModTileView->SetStyle(StyleCDO->ModListStyle);
-				}
+				FilteredModListView->SetStyle(StyleCDO->FilteredModListViewStyle);
 			}
 		}
 
-		if (ModList && ModList->GetNumItems() == 0 && Settings->AdditionalCategoryParams.Num() > 0)
+		if (FilteredModListView && FilteredModListView->GetNumItems() == 0 && Settings->AdditionalCategoryParams.Num() > 0)
 		{
-			RefreshList(Settings->AdditionalCategoryParams[0].ToFilterParams());
+			FModioCommonFeaturedCategoryParams AdditionalCategoryParams = Settings->AdditionalCategoryParams[0];
+			if (OverriddenModsCount > 0)
+			{
+				AdditionalCategoryParams.Count = OverriddenModsCount;
+			}
+			RefreshList(AdditionalCategoryParams.ToFilterParams());
 		}
 	}
 }
@@ -98,16 +97,34 @@ UWidget* UModioCommonFeaturedAdditionalView::NativeGetDesiredFocusTarget() const
 	{
 		return WidgetToFocus;
 	}
-	if (ModList)
+	if (FilteredModListView)
 	{
-		return ModList;
+		if (UWidget* WidgetToFocus = FilteredModListView->GetDesiredFocusTarget())
+		{
+			return WidgetToFocus;
+		}
 	}
 	return Super::NativeGetDesiredFocusTarget();
 }
 
-void UModioCommonFeaturedAdditionalView::RefreshList(const FModioFilterParams& Filter)
+void UModioCommonFeaturedAdditionalView::RefreshList_Implementation(const FModioFilterParams& Filter)
 {
-	if (!ModList)
+	if (!FilteredModListView)
+	{
+		return;
+	}
+
+	if (CurrentFilter.ToString() != Filter.ToString())
+	{
+		UModioFilterParamsUI* FilterParamsUI = NewObject<UModioFilterParamsUI>();
+		FilterParamsUI->Underlying = Filter;
+		FilteredModListView->SetDataSource(FilterParamsUI);
+	}
+}
+
+void UModioCommonFeaturedAdditionalView::RefreshListByTabId_Implementation(FName TabId)
+{
+	if (!FilteredModListView)
 	{
 		return;
 	}
@@ -116,18 +133,37 @@ void UModioCommonFeaturedAdditionalView::RefreshList(const FModioFilterParams& F
 	if (!IsDesignTime())
 #endif
 	{
-		const bool bFocusOnceListIsPopulated = ModList->GetSelectedItem<UModioModInfoUI>() != nullptr;
-		IModioCommonModListViewInterface::Execute_SetFocusOnceListIsPopulated(ModList, bFocusOnceListIsPopulated);
-		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(ModList);
-		ModList->ClearListItems();
-		
-		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-		if (Subsystem && CurrentFilter.ToString() != Filter.ToString())
+		const UModioCommonFeaturedAdditionalParamsSettings* Settings = GetDefault<UModioCommonFeaturedAdditionalParamsSettings>();
+		if (!Settings)
 		{
-			CurrentFilter = Filter;
-			Subsystem->RequestListAllMods(Filter, GetRequestIdentifier());
+			return;
+		}
+
+		const FModioCommonFeaturedCategoryParams* SelectedAdditionalCategoryParamsPtr = Algo::FindByPredicate(Settings->AdditionalCategoryParams,
+			[this, TabId](const FModioCommonFeaturedCategoryParams& Params) {
+				return TabId == FName(*Params.CategoryName.ToString());
+			});
+
+		if (SelectedAdditionalCategoryParamsPtr)
+		{
+			FModioCommonFeaturedCategoryParams SelectedAdditionalCategoryParams = *SelectedAdditionalCategoryParamsPtr;
+			if (OverriddenModsCount > 0)
+			{
+				SelectedAdditionalCategoryParams.Count = OverriddenModsCount;
+			}
+			RefreshList(SelectedAdditionalCategoryParams.ToFilterParams());
 		}
 	}
+}
+
+void UModioCommonFeaturedAdditionalView::HandleSetModsFromModInfoListFinished_Implementation()
+{
+	
+}
+
+void UModioCommonFeaturedAdditionalView::HandleSetModsFromModInfoListStarted_Implementation()
+{
+	
 }
 
 void UModioCommonFeaturedAdditionalView::NativeConstruct()
@@ -140,7 +176,6 @@ void UModioCommonFeaturedAdditionalView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	IModioUIModInfoReceiver::Register<UModioCommonFeaturedAdditionalView>(EModioUIModInfoEventType::ListAllMods);
 	IModioUIUserChangedReceiver::Register<UModioCommonFeaturedAdditionalView>();
 	IModioUISubscriptionsChangedReceiver::Register<UModioCommonFeaturedAdditionalView>();
 	IModioUIModManagementEventReceiver::Register<UModioCommonFeaturedAdditionalView>();
@@ -152,55 +187,26 @@ void UModioCommonFeaturedAdditionalView::NativeOnInitialized()
 			{
 				return;
 			}
-
-			const UModioCommonFeaturedAdditionalParamsSettings* Settings = GetDefault<UModioCommonFeaturedAdditionalParamsSettings>();
-			if (!Settings)
-			{
-				return;
-			}
-
-			const FModioCommonFeaturedCategoryParams* SelectedAdditionalCategoryParam = Algo::FindByPredicate(Settings->AdditionalCategoryParams,
-				[this, TabId](const FModioCommonFeaturedCategoryParams& Params) {
-					return TabId == FName(*Params.CategoryName.ToString());
-				});
-
-			if (SelectedAdditionalCategoryParam)
-			{
-				RefreshList(SelectedAdditionalCategoryParam->ToFilterParams());
-			}
+			RefreshListByTabId(TabId);
 		});
 	}
 
-	if (ModList)
+	if (FilteredModListView)
 	{
-		ModList->OnItemSelectionChanged().AddWeakLambda(this, [this](UObject* Item) {
-			if (!ModList)
+		FilteredModListView->OnSetModsFromModInfoListStarted.AddWeakLambda(this, [this]() {
+			if (!IsActivated())
 			{
 				return;
 			}
-			
-			UModioModInfoUI* ModInfo = ModList->GetSelectedItem<UModioModInfoUI>();
-			if (ModInfo && ModInfo == Item)
-			{
-				ModList->RequestScrollItemIntoView(ModInfo);
-			}
+			HandleSetModsFromModInfoListStarted();
 		});
-	}
-}
-
-void UModioCommonFeaturedAdditionalView::NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ErrorCode, TOptional<FModioModInfoList> List)
-{
-	IModioUIModInfoReceiver::NativeOnListAllModsRequestCompleted(RequestIdentifier, ErrorCode, List);
-	if (RequestIdentifier == GetRequestIdentifier())
-	{
-		if (ErrorCode)
-		{
-			UE_LOG(ModioUI5, Error, TEXT("Unable set mod list in '%s' due to error '%s'"), *GetName(), *ErrorCode.GetErrorMessage());
-		}
-		if (List.IsSet() && ModList && ModList->Implements<UModioCommonModListViewInterface>())
-		{
-			IModioCommonModListViewInterface::Execute_SetModsFromModInfoList(ModList, List.GetValue(), false);
-		}
+		FilteredModListView->OnSetModsFromModInfoListFinished.AddWeakLambda(this, [this]() {
+			if (!IsActivated())
+			{
+				return;
+			}
+			HandleSetModsFromModInfoListFinished();
+		});
 	}
 }
 

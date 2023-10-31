@@ -14,13 +14,22 @@
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "UI/Foundation/Components/Text/MultiLineEditableTextBox/ModioCommonMultiLineEditableTextBox.h"
 #include "Core/ModioModInfoUI.h"
+#include <Containers/UnrealString.h>
 
-void UModioCommonReportMessageView::SetValidationTextVisibility(ESlateVisibility Visbility)
+void UModioCommonReportMessageView::SetValidationTextVisibility(ESlateVisibility EVisibility)
 {
 	if (ValidationTextBlock)
 	{
-		ValidationTextBlock->SetVisibility(Visbility);
-		CharactersTextBlock->SetVisibility(Visbility);
+		ValidationTextBlock->SetVisibility(EVisibility);
+		CharactersTextBlock->SetVisibility(EVisibility);
+	}
+}
+
+void UModioCommonReportMessageView::SetErrorMessage(ESlateVisibility EVisibility) 
+{
+	if (ErrorMessageTextBlock)
+	{
+		ErrorMessageTextBlock->SetVisibility(EVisibility);
 	}
 }
 
@@ -131,18 +140,24 @@ bool UModioCommonReportMessageView::IsMessageValid(const FString& Message)
 {
 	const UModioCommonReportMessageParamsSettings* Settings = GetDefault<UModioCommonReportMessageParamsSettings>();
 	if (Settings)
-	{
-		if (Message.Len() > Settings->MessageLength)
+	{	
+		FString TempString = FString(Message);
+		TempString.RemoveSpacesInline();
+		
+		if (Message.IsEmpty() || TempString.IsEmpty() || Message.Len() > Settings->MessageLength)
 		{
+			SetErrorMessage(ESlateVisibility::Visible);
 			return false;
 		}
 	}
-
+	SetErrorMessage(ESlateVisibility::Hidden);
 	return true;
 }
 
 void UModioCommonReportMessageView::OnMultiLineTextBoxTextChanged(const FText& Text) 
 {
+	SetErrorMessage(ESlateVisibility::Hidden);
+
 	const UModioCommonReportMessageParamsSettings* Settings = GetDefault<UModioCommonReportMessageParamsSettings>();
 	int remaining = Settings->MessageLength - Text.ToString().Len();
 	int exceeded = Text.ToString().Len() - Settings->MessageLength;

@@ -28,6 +28,21 @@ FORCEINLINE Modio::FilterParams::SortDirection ToModio(EModioSortDirection SortD
 	return Modio::FilterParams::SortDirection::Ascending;
 }
 
+FORCEINLINE Modio::FilterParams::RevenueFilterType ToModio(EModioRevenueFilterType Revenue)
+{
+	switch(Revenue)
+	{
+		case EModioRevenueFilterType::Free:
+			return Modio::FilterParams::RevenueFilterType::Free;
+		case EModioRevenueFilterType::Paid:
+			return Modio::FilterParams::RevenueFilterType::Paid;
+		case EModioRevenueFilterType::FreeAndPaid:
+			return Modio::FilterParams::RevenueFilterType::FreeAndPaid;
+	}
+
+	return Modio::FilterParams::RevenueFilterType::Free;
+}
+
 FORCEINLINE Modio::FilterParams::SortFieldType ToModio(EModioSortFieldType Environment)
 {
 	switch (Environment)
@@ -78,6 +93,11 @@ FORCEINLINE Modio::FilterParams ToModio(const FModioFilterParams& In)
 	if (In.MetadataBlobSearchString.IsSet())
 	{
 		Out.MetadataLike(ToModio(In.MetadataBlobSearchString.GetValue()));
+	}
+
+	if (In.Revenue.IsSet())
+	{
+		Out.RevenueType(ToModio(In.Revenue.GetValue()));
 	}
 
 	return Out.SortBy(ToModio(In.SortField), ToModio(In.Direction))

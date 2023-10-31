@@ -24,6 +24,10 @@ const FName FModioInputNames::Subscribe("ModioInput_Subscribe");
 const FName FModioInputNames::DownloadQueue("ModioInput_DownloadQueue");
 const FName FModioInputNames::EnableDisableMod("ModioInput_EnableDisableMod");
 const FName FModioInputNames::Collapse("ModioInput_Collapse");
+const FName FModioInputNames::LogOut("ModioInput_LogOut");
+const FName FModioInputNames::RateUp("ModioInput_RateUp");
+const FName FModioInputNames::RateDown("ModioInput_RateDown");
+const FName FModioInputNames::Report("ModioInput_Report");
 
 const FKey FModioInputKeys::Up(FModioInputNames::Up);
 const FKey FModioInputKeys::Down(FModioInputNames::Down);
@@ -39,3 +43,7 @@ const FKey FModioInputKeys::Subscribe(FModioInputNames::Subscribe);
 const FKey FModioInputKeys::DownloadQueue(FModioInputNames::DownloadQueue);
 const FKey FModioInputKeys::EnableDisableMod(FModioInputNames::EnableDisableMod);
 const FKey FModioInputKeys::Collapse(FModioInputNames::Collapse);
+const FKey FModioInputKeys::LogOut(FModioInputNames::LogOut);
+const FKey FModioInputKeys::RateUp(FModioInputNames::RateUp);
+const FKey FModioInputKeys::RateDown(FModioInputNames::RateDown);
+const FKey FModioInputKeys::Report(FModioInputNames::Report);

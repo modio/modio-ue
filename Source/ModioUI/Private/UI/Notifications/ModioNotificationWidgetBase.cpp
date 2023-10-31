@@ -120,7 +120,7 @@ void UModioNotificationErrorWidgetBase::NativeConfigureManual(const FText& Title
 
 	if (NotificationTitle)
 	{
-		NotificationTitle->SetText(Title);	
+		NotificationTitle->SetText(Title);
 	}
 	
 	if (NotificationMessage)

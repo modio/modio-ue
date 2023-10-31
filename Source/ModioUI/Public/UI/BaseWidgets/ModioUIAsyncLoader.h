@@ -50,4 +50,9 @@ protected:
 	TSharedRef<SWidget> RebuildWidget() override;
 
 	virtual UWidget* GetContentWidget();
+
+public:
+
+	UFUNCTION()
+	void Retry();
 };

@@ -77,7 +77,7 @@ public:
 	TSubclassOf<UModioCommonButtonStyle> CloseButtonStyle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonButtonStyle> MyProfileButtonStyle;
+	TSubclassOf<UModioCommonButtonStyle> MainGameMenuButtonStyle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonButtonStyle> AuthButtonStyle;

@@ -40,12 +40,16 @@ protected:
 	virtual void NativeOnSetDataSource() override;
 	virtual void NativeOnSetExpandedState(bool bExpanded) override;
 	virtual void NativeConstruct() override;
+	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+	virtual void NativeSubscribeClicked() override;
 	FReply NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	void SetTileFrameColor(bool bEnabledState);
+	void UpdateDiskSize();
 	UFUNCTION()
 	void OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating);
 	UFUNCTION()
@@ -62,6 +66,10 @@ protected:
 	void NativeCollectionTileClicked();
 	UFUNCTION()
 	void ShowModDetails();
+	UFUNCTION()
+	void OnModEnableButtonPressed();
+	UFUNCTION()
+	void OnEnabledStateChanged(FModioModID ModID, bool bNewSubscriptionState);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* SizeOnDiskLabel;
@@ -75,6 +83,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* TileButton; 
 
+	UPROPERTY(meta = (BindWidgetOptional))
+	class UModioEnableModSwitch* EnableModSwitch; 
+
 	// We don't need a text for any other status because all mods are either subscribed for the local user or installed
 	// for another user
 
@@ -83,6 +94,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = Localization)
 	FText InstalledStatusText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = Localization)
+	FText EnabledStatusText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = Localization)
+	FText DisabledStatusText;
 
 	virtual void NativeOnInitialized() override;
 
@@ -101,6 +118,15 @@ protected:
 public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioPopupMenu* MoreOptionsMenu;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
+	FModioUIColorRef InnerTileEnabledColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
+	FModioUIColorRef InnerTileDisabledColor;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
+	FModioUIColorRef InnerTileErrorColor;
 
 	bool bHasFocus = false;
 };

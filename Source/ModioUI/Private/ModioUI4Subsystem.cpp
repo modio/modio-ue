@@ -55,6 +55,9 @@ void UModioUI4Subsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Processor = MakeShared<FModioUIInputProcessor>();
 	// Bind to event on the processor
 	Processor->OnInputDeviceChanged().AddUObject(this, &UModioUI4Subsystem::HandleInputModeChanged);
+	Processor->OnInputProcessorGlobalMouseClick.AddUObject(this, &UModioUI4Subsystem::HandleOnGlobalMouseClick);
+	
+
 	if (FSlateApplication::IsInitialized())
 	{
 		// Register the input processor so we can detect input device changes
@@ -161,6 +164,40 @@ UMaterialInterface* UModioUI4Subsystem::GetInputGlyphMaterialForInputType(FKey V
 	return nullptr;
 }
 
+UTexture2D* UModioUI4Subsystem::GetInputGlyphTextureForInputType(FKey VirtualInput, EModioUIInputMode InputType)
+{
+	if (UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>()) 
+	{
+#if WITH_EDITOR
+		// This if for switching the glyphsets while testing. If it's set to Unknown in the settings,
+		// this will have no effect, otherwise it will override the glyphset
+		if (Settings->InputDevicesForTesting != EModioUIInputMode::Unknown && Processor &&
+			!Processor->HasControllerOverrideType())
+		{
+			InputType = Settings->InputDevicesForTesting;
+		}
+#endif
+		if (UClass* GlyphProviderClass = Settings->InputHintGlyphProvider.Get())
+		{
+			if (UObject* TmpProvider = NewObject<UObject>(this, GlyphProviderClass))
+			{
+				return IModioUIInputHintGlyphProvider::Execute_GetInputGlyphTextureForInputType(
+					TmpProvider, VirtualInput, InputType);
+			}
+		}
+		else if (UClass* testClass = UModioDefaultInputGlyphProvider::StaticClass())
+		{
+			if (UObject* testProvider = NewObject<UObject>(this, testClass))
+			{
+				return IModioUIInputHintGlyphProvider::Execute_GetInputGlyphTextureForInputType(
+					testProvider, VirtualInput, InputType);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 TArray<FName> UModioUI4Subsystem::GetAllNamedStyleNames()
 {
 	TArray<FName> StyleNames;
@@ -208,62 +245,21 @@ void UModioUI4Subsystem::SendCommandToBrowserUI(FKey CommandKey, int32 UserIndex
 
 void UModioUI4Subsystem::HandleInputModeChanged(EModioUIInputMode NewDevice)
 {
-	UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-	if (!ModioUISubsystem)
-	{
-		return;
-	}
-	
 	OnInputDeviceChanged.Broadcast(NewDevice);
 	LastInputMode = NewDevice;
+	OnCursorVisibilityChanged.Broadcast(NewDevice == EModioUIInputMode::Mouse);
+}
 
-	// If we're on a controller, then we want to disable Synthetic Cursor Moves in Slate.
-	// This means that any element that the mouse cursor is hovering over won't re-take focus as you scroll through with
-	// a keyboard or controller
-	if (NewDevice == EModioUIInputMode::Controller || NewDevice == EModioUIInputMode::Keyboard)
-	{
-		UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance);
-		if (IsValid(MenuInstance))
-		{
-			MenuInstance->SetShowCursor(false);
-		}
-
-		if (IsValid(GetCurrentFocusTarget()) && !GetCurrentFocusTarget()->HasFocusedDescendants())
-		{
-			if (IsValid(MenuInstance) && MenuInstance->GetDrawerController()->IsAnyDrawerExpanded())
-			{
-				MenuInstance->GetDrawerController()->SetFocusToActiveDrawer();
-			}
-			else
-			{
-				GetCurrentFocusTarget()->SetFocus();
-			}
-		}
-		if (!IsValid(GetCurrentFocusTarget()))
-		{
-			if (IsValid(MenuInstance))
-			{
-				MenuInstance->RefreshView(GetActiveTabIndex());
-			}
-		}
-	}
-	else if (NewDevice == EModioUIInputMode::Mouse)
-	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			MenuInstance->SetShowCursor(true);
-		}
-	}
+void UModioUI4Subsystem::HandleOnGlobalMouseClick()
+{
+	OnGlobalMouseClick.Broadcast();
 }
 
 int32 UModioUI4Subsystem::GetActiveTabIndex()
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (OnGetCurrentTabIndex.IsBound())
 	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			return MenuInstance->GetPageIndex();
-		}
+		return OnGetCurrentTabIndex.Execute();
 	}
 
 	return INDEX_NONE;
@@ -271,81 +267,40 @@ int32 UModioUI4Subsystem::GetActiveTabIndex()
 
 void UModioUI4Subsystem::SetActiveTabIndex(int32 TabIndex)
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			OnMenuTabIndexChanged.Broadcast(TabIndex);
-			MenuInstance->SetPageIndex(TabIndex);
-		}
-	}
+	OnMenuTabIndexChanged.Broadcast(TabIndex);
 }
 
 void UModioUI4Subsystem::CloseSearchDrawer()
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			MenuInstance->ForceCloseSearchDrawer();
-		}
-	}
+	OnMenuAction.Broadcast(EMenuAction::CloseSearchDrawer, nullptr);
 }
+
 void UModioUI4Subsystem::CloseDownloadDrawer()
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			MenuInstance->ForceCloseDownloadDrawer();
-		}
-	}
+	OnMenuAction.Broadcast(EMenuAction::CloseDownloadDrawer, nullptr);
 }
+
 void UModioUI4Subsystem::ShowReportEmailDialog(UObject* DialogDataSource)
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			MenuInstance->ShowReportEmailDialog(DialogDataSource);
-		}
-	}
+	OnMenuAction.Broadcast(EMenuAction::ShowReportEmailDialog, DialogDataSource);
 }
 void UModioUI4Subsystem::ShowUninstallConfirmationDialog(UObject* DialogDataSource)
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			MenuInstance->ShowUninstallConfirmationDialog(DialogDataSource);
-		}
-	}
+	OnMenuAction.Broadcast(EMenuAction::ShowUninstallConfirmDialog, DialogDataSource);
 }
 
 bool UModioUI4Subsystem::IsAnyDialogOpen()
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	if (OnGetIsDialogStackOpen.IsBound())
 	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			return MenuInstance->GetDialogController()->DialogStack.Num() > 0;
-		}
+		return OnGetIsDialogStackOpen.Execute();
 	}
-
 	return false;
 }
 
-bool UModioUI4Subsystem::IsDownloadDrawerOpen()
+void UModioUI4Subsystem::RetryAllAsyncLoaders()
 {
-	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(ModioUISubsystem->ModBrowserInstance))
-		{
-			return MenuInstance->Execute_IsDownloadDrawerOpen(MenuInstance);
-		}
-	}
-
-	return false;
+	OnRetryAllAsyncLoaders.Broadcast();
 }
 
 #include "Loc/EndModioLocNamespace.h"

@@ -30,56 +30,64 @@ class MODIOUI5_API UModioCommonScrollBoxStyle : public UObject
 
 public:
 	/** @brief The style of the scroll box */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Main")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Main")
 	FScrollBoxStyle Style;
 
 	/** @brief The style of the scroll bar */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Main")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Main")
 	TSubclassOf<UModioCommonScrollBarStyle> ScrollBarStyle;
 
 	/** @brief Visibility of the scroll bar */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	ESlateVisibility ScrollBarVisibility;
 
 	/** @brief When mouse wheel events should be consumed. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	EConsumeMouseWheel ConsumeMouseWheel;
 
 	/** @brief Disable to stop scrollbars from activating inertial overscrolling */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	bool AllowOverscroll;
 
 	/** @brief Whether to back pad this scroll box, allowing user to scroll backward until child contents are no longer visible */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	bool BackPadScrolling;
 
 	/** @brief Whether to front pad this scroll box, allowing user to scroll forward until child contents are no longer visible */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	bool FrontPadScrolling;
 	
 	/** @brief True to lerp smoothly when wheel scrolling along the scroll box */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	bool bAnimateWheelScrolling = false;
 
 	/** @brief Sets where to scroll a widget to when using explicit navigation or if ScrollWhenFocusChanges is enabled */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	EDescendantScrollDestination NavigationDestination;
 
 	/**
 	 * @brief The amount of padding to ensure exists between the item being navigated to, at the edge of the scrollbox.  Use this if you want to ensure there's a preview of the next item the user could scroll to.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	float NavigationScrollPadding;
 
 	/** @brief Scroll behavior when user focus is given to a child widget */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	EScrollWhenFocusChanges ScrollWhenFocusChanges;
 	
 	/** @brief Option to disable right-click-drag scrolling */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	bool bAllowRightClickDragScrolling;
 
 	/** @brief The multiplier to apply when wheel scrolling */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Style|Scroll")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll")
 	float WheelScrollMultiplier = 1.f;
+
+	/** @brief Whether to scroll using the controller/keyboard navigation input. If true, the scroll box will scroll content when there's no visible/focusable widget in the navigated direction but there's room to scroll */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style|Scroll|Navigation")
+	bool bScrollByNavigationInput = false;
+
+	/** @brief The amount to scroll by the controller/keyboard input when there's no visible/focusable widget in the navigated direction but there's room to scroll. Only relevant if bScrollByNavigationInput is true */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bScrollByNavigationInput"), Category = "Mod.io Common UI|Style|Scroll|Navigation")
+	int32 NavigationScrollOffsetStep = 100;
 };

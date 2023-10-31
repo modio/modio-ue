@@ -199,4 +199,27 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
 	void HandleReportClicked();
+
+public:
+	/** Timer to put a delay between subscribe and unsubscribe */
+	FTimerHandle SubscriptionDelayTimer;
+
+	/** Timer to check if mod is about to rate limit */
+	FTimerHandle SubscriptionTrackTimer;
+
+	/** The mod details that was shown recently */
+	FModioModID LastModID;
+
+	/** Enables Subscribe button */
+	void AllowSubscription(bool allow);
+
+	/** Enables Rate Up and Rate Down button */
+	void AllowRating(bool allow);
+
+	/** The mod details that was shown recently */
+	bool IsRateLimited(FModioErrorCode ErrorCode);
+
+	/** Starts to track subscription whether it was successfully downloaded and extracted */
+	void StartTrackingSubscription();
+	void EndTrackingSubscription();
 };

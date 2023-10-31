@@ -92,7 +92,7 @@ void UModioTagSelectorWidgetBase::OnCategoryCollapseToggled()
 {
 	bCategoryCollapsed = !bCategoryCollapsed;
 	FWidgetTransform transform;
-	transform.Angle = bCategoryCollapsed ? 0.0f : 180.0f;
+	transform.Angle = bCategoryCollapsed ? 180.0f : 0.0f;
 	transform.Scale = FVector2D(1.0f, 1.0f);
 	TagCategoryCollapseImage->SetRenderTransform(transform);
 	CategoryVerticalBox->SetVisibility(bCategoryCollapsed ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);

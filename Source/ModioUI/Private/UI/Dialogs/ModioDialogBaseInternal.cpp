@@ -16,6 +16,7 @@
 #include "Core/ModioUIHelpers.h"
 #include "Misc/EngineVersionComparison.h"
 #include "Styling/SlateStyle.h"
+#include "TimerManager.h"
 #include "UI/BaseWidgets/ModioLoadingSpinner.h"
 #include "UI/BaseWidgets/ModioUIAsyncLoadingOverlay.h"
 #include "UI/BaseWidgets/ModioMultiLineEditableTextBox.h"
@@ -351,8 +352,17 @@ FReply UModioDialogBaseInternal::OnButtonClicked(TSharedPtr<FModioDialogButtonIn
 
 								Controller->ShowLoadingDialog();
 								// Selected Destination in editor is ignored
-								Controller->ShowTermsOfUseDialog(
-									MakeShared<FModioUIAuthenticationProviderInfo>(ProviderInfo));
+
+								FTimerHandle handle;
+								Controller->GetWorld()->GetTimerManager().SetTimer(
+									handle,
+									[this, ProviderInfo]()
+									{
+										Controller->ShowTermsOfUseDialog(
+											MakeShared<FModioUIAuthenticationProviderInfo>(ProviderInfo));
+									},
+									1.0f, false);
+								
 							}
 						}
 						break;
@@ -680,12 +690,27 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 				}
 				if (InputWidget)
 				{
-					IModioUIStringInputWidget::Execute_SetHint(InputWidget, DialogDescriptor->InputWidgetHintText);
+					if (InputWidget->Implements<UModioUIStringInputWidget>())
+					{
+						IModioUIStringInputWidget::Execute_SetHint(InputWidget, DialogDescriptor->InputWidgetHintText);
+					}
+
 					TSharedPtr<SBox> MySizeBox = nullptr;
 
 					if (InputWidget->Implements<UModioUIDataSourceWidget>())
 					{
 						IModioUIDataSourceWidget::Execute_SetDataSource(InputWidget, DataSource);
+					}
+
+					if (InputWidget->Implements<UModioUIDialogButtonWidget>()) 
+					{
+						// Added so we can have Input Widgets that require the button styling
+						IModioUIDialogButtonWidget::Execute_SetDialogController(InputWidget, Controller.Get());
+
+						if (const FModioDialogStyle* ResolvedDialogStyle = DialogStyle.FindStyle<FModioDialogStyle>())
+						{
+							IModioUIDialogButtonWidget::Execute_SetStyle(InputWidget, *ResolvedDialogStyle);
+						}
 					}
 
 					InputWidgetSlot->AttachWidget(
@@ -702,7 +727,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 #if UE_VERSION_OLDER_THAN(5, 0, 0)
 
 					InputWidgetSlot->NotifySlotChanged(false);
-#endif
+#endif			
 				}
 				else
 				{
@@ -792,6 +817,11 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 		FCustomWidgetNavigationDelegate navDelegate;
 		navDelegate.BindUFunction(this, "OnNavigateDownFromCodeInputWidget");
 		InputWidget->SetNavigationRuleCustom(EUINavigation::Down, navDelegate);
+		if (InputWidget->Implements<UModioUITextValidator>())
+		{
+			Cast<IModioUITextValidator>(InputWidget)
+				->OnTextValidation.AddUniqueDynamic(this, &UModioDialogBaseInternal::ToggleSubmitButton);
+		}
 	}	
 
 	UModioEditableTextBox* inputWidget = Cast<UModioEditableTextBox>(InputWidget);
@@ -800,6 +830,7 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 		inputWidget->OnSubmit.AddUFunction(this, FName("OnSubmitKeyPressed"));
 		inputWidget->OnNavigateDown.AddUFunction(this, FName("OnNavigateDownFromCodeInputWidget"));
 	}
+
 
 	UModioCodeInputWidget* codeInput = Cast<UModioCodeInputWidget>(InputWidget);
 	if (codeInput)
@@ -814,6 +845,19 @@ void UModioDialogBaseInternal::InitializeFromDialogInfo(class UModioDialogInfo* 
 
 
 	ApplyStyling();
+}
+
+// This could be refined to work with all dialogs but text validation needs to be implemented also for input, not for submit only
+void UModioDialogBaseInternal::ToggleSubmitButton(bool bEnabled)
+{
+	for (int i = 0; i < ButtonParams.Num(); i++)
+	{
+		if (ButtonParams[i]->OperationCallType == EModioDialogOperationCall::SetReportDetails &&
+			GeneratedButtons.IsValidIndex(i))
+		{
+			GeneratedButtons[i]->SetEnabled(bEnabled);
+		}
+	}
 }
 
 TOptional<FString> UModioDialogBaseInternal::GetInputWidgetString()

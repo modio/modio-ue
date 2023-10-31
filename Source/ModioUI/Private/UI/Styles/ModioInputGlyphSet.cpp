@@ -96,3 +96,41 @@ UMaterialInterface* UModioInputGlyphSet::GetGlyphForKey(const FKey& Key)
 
 	return nullptr;
 }
+
+UTexture2D* UModioInputGlyphSet::GetTextureForKey(const FKey& Key)
+{
+	if (UModioUISettings* CurrentUISettings = GetMutableDefault<UModioUISettings>(UModioUISettings::StaticClass()))
+	{
+		if (UInputSettings* CurrentInputSettings = UInputSettings::GetInputSettings())
+		{
+			FModioInputMapping MappedKey;
+
+			for (int i = 0; i < CurrentUISettings->ModioToProjectInputMappings.Num(); i++)
+			{
+				if (CurrentUISettings->ModioToProjectInputMappings[i].VirtualKey == Key)
+				{
+					MappedKey = CurrentUISettings->ModioToProjectInputMappings[i];
+					break;
+				}
+			}
+
+			if (!MappedKey.MappedProjectInputs.IsValidIndex(0))
+			{
+				return nullptr;
+			}
+
+			TArray<FInputActionKeyMapping> ActionMappings;
+			CurrentInputSettings->GetActionMappingByName(MappedKey.MappedProjectInputs[0], ActionMappings);
+
+			for (auto& ActionMapping : ActionMappings)
+			{
+				if (PngGlyphs.Contains(ActionMapping.Key))
+				{
+					return PngGlyphs.FindRef(ActionMapping.Key);
+				}
+			}
+		}
+	}
+	return nullptr;
+}
+

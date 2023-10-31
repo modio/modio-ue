@@ -17,7 +17,7 @@
 #include "Internal/Convert/Theme.h"
 #include "Internal/ModioConvert.h"
 #include "ModioSDK.h"
-#include "Types/ModioGameInfo.h"
+#include "Types/ModioGameInfo.h" 
 
 FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 {
@@ -40,6 +40,9 @@ FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 	Out.Stats = ToUnreal(In.Stats);
 	Out.OtherUrls = ToUnreal<FModioOtherUrl>(In.OtherUrls);
 	Out.Platforms = ToUnreal<EModioModfilePlatform>(In.Platforms);
+	Out.GameMonetizationOptions = ToUnreal<EGameMonetizationFlags, Modio::GameMonetizationOptions>(In.GameMonetizationOptions);
+	Out.VirtualTokenName = ToUnreal(In.VirtualTokenName);
+	Out.PlatformSupport = ToUnreal<FModioGamePlatform>(In.PlatformSupport);
 
 	return Out;
 }

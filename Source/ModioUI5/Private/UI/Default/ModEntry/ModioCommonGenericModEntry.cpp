@@ -12,6 +12,7 @@
 #include "UI/Default/ModEntry/ModioCommonGenericModEntry.h"
 
 #include "ModioUI5.h"
+#include "TimerManager.h"
 #include "Components/ListView.h"
 #include "Core/ModioModInfoUI.h"
 #include "Libraries/ModioSDKLibrary.h"
@@ -83,6 +84,10 @@ void UModioCommonGenericModEntry::NativePreConstruct()
 void UModioCommonGenericModEntry::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
+	if (UWorld* World = GetWorld()) 
+	{
+		World->GetTimerManager().ClearTimer(DelesectTimerHandle);
+	}
 	if (IsModListItemValid())
 	{
 		SetFocus();
@@ -95,7 +100,17 @@ void UModioCommonGenericModEntry::NativeOnMouseLeave(const FPointerEvent& InMous
 	Super::NativeOnMouseLeave(InMouseEvent);
 	if (IsModListItemValid())
 	{
-		DeselectModListItem();
+		if (const UModioCommonModEntryParamsSettings* Settings = GetDefault<UModioCommonModEntryParamsSettings>())
+		{
+			if (UWorld* World = GetWorld()) 
+			{
+				World->GetTimerManager().ClearTimer(DelesectTimerHandle);
+				World->GetTimerManager().SetTimer(DelesectTimerHandle, FTimerDelegate::CreateWeakLambda(this, [this]() 
+				{ 
+					DeselectModListItem();								
+				}), Settings->DeselectionDelay, false);
+			}
+		}
 	}
 }
 
@@ -399,8 +414,8 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 	{
 		if (DownloadsDetailsTextBlock)
 		{
-			DownloadsDetailsTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%lld"), ModInfo.Stats.DownloadsTotal)));
-		}
+			DownloadsDetailsTextBlock->SetText(FText::FromString(UModioSDKLibrary::GetShortenedNumberAsString(ModInfo.Stats.DownloadsTotal)));
+		} 
 	}
 
 	// Size
@@ -421,12 +436,12 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 
 		if (RatingPositiveTextBlock)
 		{
-			RatingPositiveTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%lld"), ModInfo.Stats.RatingPositive)));
+			RatingPositiveTextBlock->SetText(FText::FromString(FString::FormatAsNumber(ModInfo.Stats.RatingPositive)));
 		}
 
 		if (RatingNegativeTextBlock)
 		{
-			RatingNegativeTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%lld"), ModInfo.Stats.RatingNegative)));
+			RatingNegativeTextBlock->SetText(FText::FromString(FString::FormatAsNumber(ModInfo.Stats.RatingNegative)));
 		}
 	}
 	
@@ -434,10 +449,9 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 	{
 		SubscribeButton->SetLabel(Execute_IsModSubscribed(this) ? Settings->UnsubscribeLabel : Settings->SubscribeLabel);
 	}
-
-	if (bModInstalled)
+	
+	if (bModInstalled && Subsystem->GetIsCollectionModDisableUIEnabled())
 	{
-		SwitchSubscribeButtonVisibility(false);
 		SwitchEnableButtonVisibility(!bModEnabled);
 		SwitchDisableButtonVisibility(bModEnabled);
 
@@ -451,14 +465,12 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 	}
 	else
 	{
-		SwitchSubscribeButtonVisibility(false);
 		SwitchEnableButtonVisibility(false);
 		SwitchDisableButtonVisibility(false);
 	}
 
 	if (SubscribeButton)
 	{
-		SubscribeButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		ListenForInputAction(SubscribeButton, Settings->SubscribeInputAction, Execute_IsModSubscribed(this) ? Settings->UnsubscribeLabel : Settings->SubscribeLabel, [this]() {
 			HandleSubscribeClicked();
 		});
@@ -512,14 +524,6 @@ void UModioCommonGenericModEntry::NativeOnModLogoDownloadCompleted(FModioModID M
 		{
 			ModImage->LoadImageFromFileAsync(Image.GetValue());
 		}
-	}
-}
-
-void UModioCommonGenericModEntry::SwitchSubscribeButtonVisibility_Implementation(bool bIsVisible)
-{
-	if (SubscribeButton)
-	{
-		SubscribeButton->SetVisibility(bIsVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 

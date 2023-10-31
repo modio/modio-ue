@@ -18,6 +18,7 @@
 #include "Internal/Convert/ErrorCode.h"
 #include "Internal/Convert/FilterParams.h"
 #include "Internal/Convert/GameInfo.h"
+#include "Internal/Convert/GamePlatform.h"
 #include "Internal/Convert/InitializeOptions.h"
 #include "Internal/Convert/List.h"
 #include "Internal/Convert/ModCollectionEntry.h"
@@ -32,6 +33,7 @@
 #include "Internal/Convert/Rating.h"
 #include "Internal/Convert/ReportParams.h"
 #include "Internal/Convert/Terms.h"
+#include "Internal/Convert/TransactionRecord.h"
 #include "Internal/Convert/User.h"
 #include "Internal/Convert/UserList.h"
 #include "Internal/ModioConvert.h"
@@ -198,13 +200,21 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 	}
 #endif
 
-	Modio::InitializeAsync(ToModio(Options), [this, OnInitComplete](Modio::ErrorCode ec) {
-		AsyncTask(ENamedThreads::GameThread, ([this, OnInitComplete, ec]() {
-					  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-					  InvalidateUserSubscriptionCache();
-					  OnInitComplete.ExecuteIfBound(ToUnreal(ec));
-				  }));
-	});
+	Modio::InitializeAsync(ToModio(Options),
+						   [WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnInitComplete](Modio::ErrorCode ec) {
+							   if (!WeakThis.IsValid())
+							   {
+								   return;
+							   }
+							   AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnInitComplete, ec]() {
+											 if (WeakThis.IsValid())
+											 {
+												 TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+												 WeakThis->InvalidateUserSubscriptionCache();
+												 OnInitComplete.ExecuteIfBound(ToUnreal(ec));
+											 }
+										 }));
+						   });
 }
 
 void UModioSubsystem::K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions,
@@ -227,51 +237,80 @@ void UModioSubsystem::ListAllModsAsync(const FModioFilterParams& Filter, FOnList
 
 void UModioSubsystem::SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegateFast OnSubscribeComplete)
 {
-	Modio::SubscribeToModAsync(
-		ToModio(ModToSubscribeTo), [this, OnSubscribeComplete](Modio::ErrorCode ec) {
-
-		AsyncTask(ENamedThreads::GameThread, ([this, OnSubscribeComplete, ec]() {
-					  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-					  InvalidateUserSubscriptionCache();
-					  OnSubscribeComplete.ExecuteIfBound(ToUnreal(ec));
+	Modio::SubscribeToModAsync(ToModio(ModToSubscribeTo), [WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
+														   OnSubscribeComplete](Modio::ErrorCode ec) {
+		if (!WeakThis.IsValid())
+		{
+			return;
+		}
+		AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnSubscribeComplete, ec]() {
+					  if (WeakThis.IsValid())
+					  {
+						  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+						  WeakThis->InvalidateUserSubscriptionCache();
+						  OnSubscribeComplete.ExecuteIfBound(ToUnreal(ec));
+					  }
 				  }));
-
-		});
+	});
 }
 
 void UModioSubsystem::UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 											  FOnErrorOnlyDelegateFast OnUnsubscribeComplete)
 {
-	Modio::UnsubscribeFromModAsync(ToModio(ModToUnsubscribeFrom),
-								   [this, OnUnsubscribeComplete](Modio::ErrorCode ec) {
-									   AsyncTask(ENamedThreads::GameThread, ([this, OnUnsubscribeComplete, ec]() {
-													 TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-													 InvalidateUserSubscriptionCache();
-													 OnUnsubscribeComplete.ExecuteIfBound(ToUnreal(ec));
-												 }));
-								   });
+	Modio::UnsubscribeFromModAsync(ToModio(ModToUnsubscribeFrom), [WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
+																   OnUnsubscribeComplete](Modio::ErrorCode ec) {
+		if (!WeakThis.IsValid())
+		{
+			return;
+		}
+		AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnUnsubscribeComplete, ec]() {
+					  if (WeakThis.IsValid())
+					  {
+						  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+						  WeakThis->InvalidateUserSubscriptionCache();
+						  OnUnsubscribeComplete.ExecuteIfBound(ToUnreal(ec));
+					  }
+				  }));
+	});
 }
 
 void UModioSubsystem::FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetchDone)
 {
-	Modio::FetchExternalUpdatesAsync([this, OnFetchDone](Modio::ErrorCode ec) {
-		AsyncTask(ENamedThreads::GameThread, ([this, OnFetchDone, ec]() {
-					  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-					  InvalidateUserSubscriptionCache();
-					  OnFetchDone.ExecuteIfBound(ToUnreal(ec));
-				  }));
-	});
+	Modio::FetchExternalUpdatesAsync(
+		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnFetchDone](Modio::ErrorCode ec) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnFetchDone, ec]() {
+						  if (WeakThis.IsValid())
+						  {
+							  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+							  WeakThis->InvalidateUserSubscriptionCache();
+							  OnFetchDone.ExecuteIfBound(ToUnreal(ec));
+						  }
+					  }));
+		});
 }
 
 FModioErrorCode UModioSubsystem::EnableModManagement(FOnModManagementDelegateFast Callback)
 {
-	return Modio::EnableModManagement([this, Callback](Modio::ModManagementEvent Event) {
-		AsyncTask(ENamedThreads::GameThread, ([this, Event, Callback]() {
-					  // @todo: For some smarter caching, look at the event and see if we should invalidate the cache
-					  InvalidateUserInstallationCache();
-					  Callback.ExecuteIfBound(ToUnreal(Event));
-				  }));
-	});
+	return Modio::EnableModManagement(
+		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), Callback](Modio::ModManagementEvent Event) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, Event, Callback]() {
+						  if (WeakThis.IsValid())
+						  {
+							  // @todo: For some smarter caching, look at the event and see if we should invalidate the
+							  // cache
+							  WeakThis->InvalidateUserInstallationCache();
+							  Callback.ExecuteIfBound(ToUnreal(Event));
+						  }
+					  }));
+		});
 }
 
 void UModioSubsystem::K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegate Callback)
@@ -332,22 +371,30 @@ void UModioSubsystem::KillBackgroundThread()
 
 void UModioSubsystem::ShutdownAsync(FOnErrorOnlyDelegateFast OnShutdownComplete)
 {
-	Modio::ShutdownAsync([this, OnShutdownComplete](Modio::ErrorCode ec) {
-#if WITH_EDITOR
-		bInitializedDuringPIE = false;
-#endif
-		KillBackgroundThread();
-
-		if (bUseBackgroundThread)
+	Modio::ShutdownAsync([WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnShutdownComplete](Modio::ErrorCode ec) {
+		if (!WeakThis.IsValid())
 		{
-			AsyncTask(ENamedThreads::GameThread, ([this, ec, OnShutdownComplete]() {
-						  InvalidateUserSubscriptionCache();
-						  OnShutdownComplete.ExecuteIfBound(ToUnreal(ec));
+			return;
+		}
+
+#if WITH_EDITOR
+		WeakThis->bInitializedDuringPIE = false;
+#endif
+		WeakThis->KillBackgroundThread();
+
+		if (WeakThis->bUseBackgroundThread)
+		{
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, ec, OnShutdownComplete]() {
+						  if (WeakThis.IsValid())
+						  {
+							  WeakThis->InvalidateUserSubscriptionCache();
+							  OnShutdownComplete.ExecuteIfBound(ToUnreal(ec));
+						  }
 					  }));
 		}
 		else
 		{
-			InvalidateUserSubscriptionCache();
+			WeakThis->InvalidateUserSubscriptionCache();
 			OnShutdownComplete.ExecuteIfBound(ToUnreal(ec));
 		}
 	});
@@ -426,7 +473,6 @@ void UModioSubsystem::GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegateFa
 	});
 }
 
-
 void UModioSubsystem::K2_GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegate Callback)
 {
 	GetModInfoAsync(ModId, FOnGetModInfoDelegateFast::CreateLambda(
@@ -456,86 +502,149 @@ void UModioSubsystem::K2_GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDel
 
 void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback)
 {
-	Modio::GetModMediaAsync(ToModio(ModId), ToModio(AvatarSize),
-							[Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
-								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								// because we already have a std::string -> FString overload of ToUnreal
-								// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
-								// function returning type T so we can be explicit about the expected type
-								if (Path)
-								{
-									FModioImageWrapper Out;
-									Out.ImagePath = ToUnreal(Path.value());
-									AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() {
-												  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-												  Callback.ExecuteIfBound(ec, Out);
-											  }));
-								}
-								else
-								{
-									AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() {
-												  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-												  Callback.ExecuteIfBound(ec, {});
-											  }));
-								}
-							});
+	const TTuple<FModioModID, EModioAvatarSize> ModIdAndSizePair = MakeTuple(ModId, AvatarSize);
+	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingModMediaAvatarRequests.Find(ModIdAndSizePair))
+	{
+		MulticastCallbackPtr->Add(Callback);
+		return;
+	}
+	PendingModMediaAvatarRequests.Add(ModIdAndSizePair).Add(Callback);
+	Modio::GetModMediaAsync(
+		ToModio(ModId), ToModio(AvatarSize),
+		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdAndSizePair](Modio::ErrorCode ec,
+																			 Modio::Optional<std::string> Path) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			// Manually calling ToUnreal on the path and assigning to the member of FModioImage
+			// because we already have a std::string -> FString overload of ToUnreal
+			// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
+			// function returning type T so we can be explicit about the expected type
+			if (Path)
+			{
+				FModioImageWrapper Out;
+				Out.ImagePath = ToUnreal(Path.value());
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec, Out]() {
+							  if (WeakThis.IsValid())
+							  {
+								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+								  WeakThis->PendingModMediaAvatarRequests.FindAndRemoveChecked(ModIdAndSizePair)
+									  .Broadcast(ec, Out);
+							  }
+						  }));
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec]() {
+							  if (WeakThis.IsValid())
+							  {
+								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+								  WeakThis->PendingModMediaAvatarRequests.FindAndRemoveChecked(ModIdAndSizePair)
+									  .Broadcast(ec, {});
+							  }
+						  }));
+			}
+		});
 }
 
 void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 									   FOnGetMediaDelegateFast Callback)
 {
-	Modio::GetModMediaAsync(ToModio(ModId), ToModio(GallerySize), Index,
-							[Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
-								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								// because we already have a std::string -> FString overload of ToUnreal
-								// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
-								// function returning type T so we can be explicit about the expected type
-								if (Path)
-								{
-									FModioImageWrapper Out;
-									Out.ImagePath = ToUnreal(Path.value());
+	const TTuple<FModioModID, EModioGallerySize> ModIdAndSizePair = MakeTuple(ModId, GallerySize);
+	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingModMediaGalleryRequests.Find(ModIdAndSizePair))
+	{
+		MulticastCallbackPtr->Add(Callback);
+		return;
+	}
+	PendingModMediaGalleryRequests.Add(ModIdAndSizePair).Add(Callback);
+	Modio::GetModMediaAsync(
+		ToModio(ModId), ToModio(GallerySize), Index,
+		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdAndSizePair](Modio::ErrorCode ec,
+																			 Modio::Optional<std::string> Path) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			// Manually calling ToUnreal on the path and assigning to the member of FModioImage
+			// because we already have a std::string -> FString overload of ToUnreal
+			// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
+			// function returning type T so we can be explicit about the expected type
+			if (Path)
+			{
+				FModioImageWrapper Out;
+				Out.ImagePath = ToUnreal(Path.value());
 
-									AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() {
-												  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-												  Callback.ExecuteIfBound(ec, Out);
-											  }));
-								}
-								else
-								{
-									AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() {
-												  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-												  Callback.ExecuteIfBound(ec, {});
-											  }));
-								}
-							});
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec, Out]() {
+							  if (WeakThis.IsValid())
+							  {
+								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+								  WeakThis->PendingModMediaGalleryRequests.FindAndRemoveChecked(ModIdAndSizePair)
+									  .Broadcast(ec, Out);
+							  }
+						  }));
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec]() {
+							  if (WeakThis.IsValid())
+							  {
+								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+								  WeakThis->PendingModMediaGalleryRequests.FindAndRemoveChecked(ModIdAndSizePair)
+									  .Broadcast(ec, {});
+							  }
+						  }));
+			}
+		});
 }
 
 void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSize, FOnGetMediaDelegateFast Callback)
 {
-	Modio::GetModMediaAsync(ToModio(ModId), ToModio(LogoSize),
-							[Callback](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
-								// Manually calling ToUnreal on the path and assigning to the member of FModioImage
-								// because we already have a std::string -> FString overload of ToUnreal
-								// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
-								// function returning type T so we can be explicit about the expected type
-								if (Path)
-								{
-									FModioImageWrapper Out;
-									Out.ImagePath = ToUnreal(Path.value());
+	const TTuple<FModioModID, EModioLogoSize> ModIdAndSizePair = MakeTuple(ModId, LogoSize);
+	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingModMediaLogoRequests.Find(ModIdAndSizePair))
+	{
+		MulticastCallbackPtr->Add(Callback);
+		return;
+	}
+	PendingModMediaLogoRequests.Add(ModIdAndSizePair).Add(Callback);
+	Modio::GetModMediaAsync(
+		ToModio(ModId), ToModio(LogoSize),
+		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdAndSizePair](Modio::ErrorCode ec,
+																			 Modio::Optional<std::string> Path) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			// Manually calling ToUnreal on the path and assigning to the member of FModioImage
+			// because we already have a std::string -> FString overload of ToUnreal
+			// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a template
+			// function returning type T so we can be explicit about the expected type
+			if (Path)
+			{
+				FModioImageWrapper Out;
+				Out.ImagePath = ToUnreal(Path.value());
 
-									AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() {
-												  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-												  Callback.ExecuteIfBound(ec, Out);
-											  }));
-								}
-								else
-								{
-									AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() {
-												  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-												  Callback.ExecuteIfBound(ec, {});
-											  }));
-								}
-							});
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec, Out]() {
+							  if (WeakThis.IsValid())
+							  {
+								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+								  WeakThis->PendingModMediaLogoRequests.FindAndRemoveChecked(ModIdAndSizePair)
+									  .Broadcast(ec, Out);
+							  }
+						  }));
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec]() {
+							  if (WeakThis.IsValid())
+							  {
+								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+								  WeakThis->PendingModMediaLogoRequests.FindAndRemoveChecked(ModIdAndSizePair)
+									  .Broadcast(ec, {});
+							  }
+						  }));
+			}
+		});
 }
 
 void UModioSubsystem::K2_GetModMediaAvatarAsync(FModioModID ModId, EModioAvatarSize AvatarSize,
@@ -578,15 +687,19 @@ void UModioSubsystem::GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Call
 	}
 	// TODO: @modio-UE4 capturing `this` is bad and we shouldn't do it. Better to store the cached tags as a TSharedPtr
 	// and capture that by value, so we are guaranteed lifetime
-	Modio::GetModTagOptionsAsync(
-		[this, Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModTagOptions> ModTagOptions) {
-			CachedModTags = ToUnrealOptional<FModioModTagOptions>(ModTagOptions);
+	Modio::GetModTagOptionsAsync([WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
+								  Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModTagOptions> ModTagOptions) {
+		if (!WeakThis.IsValid())
+		{
+			return;
+		}
+		WeakThis->CachedModTags = ToUnrealOptional<FModioModTagOptions>(ModTagOptions);
 
-			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, ModTagOptions]() {
-						  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-						  Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioModTagOptions>(ModTagOptions));
-					  }));
-		});
+		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, ModTagOptions]() {
+					  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+					  Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioModTagOptions>(ModTagOptions));
+				  }));
+	});
 }
 
 void UModioSubsystem::K2_GetModTagOptionsAsync(FOnGetModTagOptionsDelegate Callback)
@@ -656,25 +769,33 @@ void UModioSubsystem::K2_AuthenticateUserExternalAsync(const FModioAuthenticatio
 		User, Provider,
 		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
-
+// Deprecated
 void UModioSubsystem::GetTermsOfUseAsync(EModioAuthenticationProvider Provider, EModioLanguage Locale,
 										 FOnGetTermsOfUseDelegateFast Callback)
 {
-	Modio::GetTermsOfUseAsync(
-		ToModio(Provider), ToModio(Locale), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms) {
-			AsyncTask(ENamedThreads::GameThread,
-					  ([Callback, ec, Terms]() { Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioTerms>(Terms)); }));
-		});
+	GetTermsOfUseAsync(Locale, Callback);
 }
 
-void UModioSubsystem::K2_GetTermsOfUseAsync(EModioAuthenticationProvider Provider, EModioLanguage Locale,
-											FOnGetTermsOfUseDelegate Callback)
+void UModioSubsystem::GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegateFast Callback)
 {
-	GetTermsOfUseAsync(
-		Provider, Locale,
-		FOnGetTermsOfUseDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioTerms> Terms) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalTerms>(Terms));
-		}));
+	Modio::GetTermsOfUseAsync(ToModio(Locale), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms) {
+		AsyncTask(ENamedThreads::GameThread,
+				  ([Callback, ec, Terms]() { Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioTerms>(Terms)); }));
+	});
+}
+// Deprecated
+void UModioSubsystem::K2_GetTermsOfUseAsync_DEPRECATED(EModioAuthenticationProvider Provider, EModioLanguage Locale,
+													   FOnGetTermsOfUseDelegate Callback)
+{
+	K2_GetTermsOfUseAsync(Locale, Callback);
+}
+
+void UModioSubsystem::K2_GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegate Callback)
+{
+	GetTermsOfUseAsync(Locale, FOnGetTermsOfUseDelegateFast::CreateLambda(
+								   [Callback](FModioErrorCode ec, TOptional<FModioTerms> Terms) {
+									   Callback.ExecuteIfBound(ec, ToBP<FModioOptionalTerms>(Terms));
+								   }));
 }
 
 void UModioSubsystem::ClearUserDataAsync(FOnErrorOnlyDelegateFast Callback)
@@ -692,24 +813,41 @@ void UModioSubsystem::K2_ClearUserDataAsync(FOnErrorOnlyDelegate Callback)
 
 void UModioSubsystem::GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback)
 {
-	Modio::GetUserMediaAsync(
-		ToModio(AvatarSize), [Callback, this](Modio::ErrorCode ec, Modio::Optional<std::string> Media) {
-			// Manually calling ToUnreal on the path and assigning to the member of FModioImage
-			// because we already have a std::string -> FString overload of ToUnreal
-			// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a
-			// template function returning type T so we can be explicit about the expected type
-			if (Media)
-			{
-				FModioImageWrapper Out;
-				Out.ImagePath = ToUnreal(Media.value());
+	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingUserMediaRequests.Find(AvatarSize))
+	{
+		MulticastCallbackPtr->Add(Callback);
+		return;
+	}
+	PendingUserMediaRequests.Add(AvatarSize).Add(Callback);
+	Modio::GetUserMediaAsync(ToModio(AvatarSize), [WeakThis = TWeakObjectPtr<UModioSubsystem>(this), AvatarSize](
+													  Modio::ErrorCode ec, Modio::Optional<std::string> Media) {
+		// Manually calling ToUnreal on the path and assigning to the member of FModioImage
+		// because we already have a std::string -> FString overload of ToUnreal
+		// TODO: @modio-ue4 Potentially refactor ToUnreal(std::string) as a
+		// template function returning type T so we can be explicit about the expected type
+		if (!WeakThis.IsValid())
+		{
+			return;
+		}
 
-				AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() { Callback.ExecuteIfBound(ec, Out); }));
-			}
-			else
-			{
-				AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ec, {}); }));
-			}
-		});
+		if (Media)
+		{
+			FModioImageWrapper Out;
+			Out.ImagePath = ToUnreal(Media.value());
+
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, AvatarSize, ec, Out]() {
+						  if (WeakThis.IsValid())
+							  WeakThis->PendingUserMediaRequests.FindAndRemoveChecked(AvatarSize).Broadcast(ec, Out);
+					  }));
+		}
+		else
+		{
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, AvatarSize, ec]() {
+						  if (WeakThis.IsValid())
+							  WeakThis->PendingUserMediaRequests.FindAndRemoveChecked(AvatarSize).Broadcast(ec, {});
+					  }));
+		}
+	});
 }
 
 void UModioSubsystem::K2_GetUserMediaAvatarAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegate Callback)
@@ -767,7 +905,7 @@ void UModioSubsystem::K2_ForceUninstallModAsync(FModioModID ModToRemove, FOnErro
 void UModioSubsystem::SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::SubmitModRatingAsync(ToModio(Mod), ToModio(Rating), [Callback](FModioErrorCode ec) {
-			AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ec); }));
+		AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ec); }));
 	});
 }
 
@@ -807,15 +945,13 @@ TArray<FModioModDependency> ToUnreal(const std::vector<Modio::ModDependency>& Or
 void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback)
 {
 	Modio::GetModDependenciesAsync(
-		ToModio(ModID),
-		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModDependencyList> Dependencies) {
+		ToModio(ModID), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModDependencyList> Dependencies) {
 			if (Dependencies)
 			{
 				FModioModDependencyList Out;
 				Out.InternalList = ToUnreal(Dependencies->GetRawList());
 				Out.PagedResult = FModioPagedResult(Dependencies.value());
 				AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() { Callback.ExecuteIfBound(ec, Out); }));
-
 			}
 			else
 			{

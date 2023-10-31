@@ -35,6 +35,12 @@ public:
 
 		CancelInputAction.RowName = "Secondary";
 		CancelInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		PrivacyInputAction.RowName = "LeftTabSecondary";
+		PrivacyInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		TermsInputAction.RowName = "RightTabSecondary";
+		TermsInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
@@ -45,6 +51,12 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle CancelInputAction;
+
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	FDataTableRowHandle TermsInputAction;
+
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	FDataTableRowHandle PrivacyInputAction;
 
 	// Begin UDeveloperSettings Interface
 	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
@@ -152,6 +164,21 @@ class MODIOUI5_API UModioCommonTermsOfUseParamsSettings : public UDeveloperSetti
 public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText TitleText = NSLOCTEXT("Modio", "TermsOfUseTitle", "Terms Of Use");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText ContentText = NSLOCTEXT("Modio", "ContentText", "We use mod.io to support user-generated content in-game. By clicking \"I Agree\" you agree to the mod.io Terms of Use and a mod.io account will be created for you (using your display name, avatar and ID). Please sea the mod.io Privacy Policy on how mod.io processes your personal data.");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText SubmitButtonText = NSLOCTEXT("Modio", "SubmitButtonText", "I Agree");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "No, Thanks");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText TermsButtonText = NSLOCTEXT("Modio", "TermsOfUseTitle", "Terms of Use");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText PrivacyButtonText = NSLOCTEXT("Modio", "TermsOfUseTitle", "Privacy Policy");
 
 	// Begin UDeveloperSettings Interface
 	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }

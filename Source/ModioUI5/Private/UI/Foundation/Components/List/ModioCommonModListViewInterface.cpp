@@ -17,7 +17,32 @@
 #include "Core/ModioModInfoUI.h"
 #include "Types/ModioModInfoList.h"
 #include "Algo/Transform.h"
+#include "Components/ListView.h"
 
+
+void IModioCommonModListViewInterface::SetModSelectionByID_Implementation(FModioModID ModID)
+{
+	if (UListView* ListView = GetListView())
+	{
+		const TArray<UObject*> ModListItems = ListView->GetListItems();
+		for (UObject* CurrentItem : ModListItems)
+		{
+			if (CurrentItem->Implements<UModioModInfoUIDetails>())
+			{
+				if (IModioModInfoUIDetails::Execute_GetModID(CurrentItem) == ModID)
+				{
+					ListView->SetSelectedItem(CurrentItem);
+					if (UWidget* WidgetToFocus = Execute_GetDesiredListFocusTarget(Cast<UObject>(this)))
+					{
+						WidgetToFocus->SetFocus();
+					}
+					ListView->RequestRefresh();
+					return;
+				}
+			}
+		}
+	}
+}
 
 void IModioCommonModListViewInterface::SetModsFromModInfoList_Implementation(const FModioModInfoList& InList, bool bAddToExisting)
 {
@@ -61,4 +86,82 @@ void IModioCommonModListViewInterface::SetModsFromModCollectionEntryArray_Implem
 						return WrappedModCollectionEntry;
 					});
 	NativeSetListItems(CachedCollection, bAddToExisting);
+}
+
+void IModioCommonModListViewInterface::RequestFullClearSelection_Implementation()
+{
+	if (UListView* ListView = GetListView())
+	{
+		ListView->ClearSelection();
+		for (UUserWidget* CurrentWidget : ListView->GetDisplayedEntryWidgets())
+		{
+			IUserListEntry::UpdateItemSelection(*CurrentWidget, false);
+		}
+		ListView->RequestRefresh();
+	}
+}
+
+bool IModioCommonModListViewInterface::GetSelectedModItem_Implementation(bool bIncludePreviouslySelected, UObject*& OutModItem)
+{
+	if (UListView* ListView = GetListView())
+	{
+		if (UObject* SelectedItem = ListView->GetSelectedItem<UObject>())
+		{
+			OutModItem = SelectedItem;
+			return true;
+		}
+		const TArray<UObject*> ModListItems = ListView->GetListItems();
+		if (PreviouslySelectedModID.IsSet())
+		{
+			for (UObject* CurrentItem : ModListItems)
+			{
+				if (CurrentItem->Implements<UModioModInfoUIDetails>())
+				{
+					if (IModioModInfoUIDetails::Execute_GetModID(CurrentItem) == PreviouslySelectedModID.GetValue())
+					{
+						OutModItem = CurrentItem;
+						return true;
+					}
+				}
+			}
+		}
+		if (ModListItems.Num() > 0)
+		{
+			OutModItem = ModListItems[0];
+			return true;
+		}
+	}
+	return false;
+}
+
+bool IModioCommonModListViewInterface::GetEntryWidgetFromItem_Implementation(UObject* InItem, UWidget*& OutEntryWidget)
+{
+	if (UListView* ListView = GetListView())
+	{
+		UWidget* EntryWidget = ListView->GetEntryWidgetFromItem(InItem);
+		if (EntryWidget)
+		{
+			OutEntryWidget = EntryWidget;
+			return true;
+		}
+	}
+	return false;
+}
+
+UWidget* IModioCommonModListViewInterface::GetDesiredListFocusTarget_Implementation()
+{
+	if (UListView* ListView = GetListView())
+	{
+		UObject* SelectedModItem;
+		if (IModioCommonModListViewInterface::Execute_GetSelectedModItem(ListView, true, SelectedModItem))
+		{
+			if (UWidget* WidgetToFocus = ListView->GetEntryWidgetFromItem(SelectedModItem))
+			{
+				ListView->SetSelectedItem(SelectedModItem);
+				return WidgetToFocus;
+			}
+		}
+		return ListView;
+	}
+	return nullptr;
 }

@@ -13,6 +13,7 @@
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SSpacer.h"
+#include "ModioUI4Subsystem.h"
 
 void UModioUIAsyncLoader::NativeLinkAsyncOperationWidget(const TScriptInterface<IModioUIAsyncOperationWidget>& Widget)
 {
@@ -90,12 +91,20 @@ void UModioUIAsyncLoader::SynchronizeProperties()
 		FOnRetryRequested Delegate;
 		Delegate.BindDynamic(this, &UModioUIAsyncLoader::OnRetryRequested);
 		IModioUIAsyncRetryWidget::Execute_SetRetryRequestedDelegate(RetryWidget, Delegate);
+
+		UModioUI4Subsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+		UISubsystem->OnRetryAllAsyncLoaders.AddUniqueDynamic(this, &UModioUIAsyncLoader::Retry);
 	}
 }
 
 void UModioUIAsyncLoader::OnRetryRequested()
 {
-	
+	UModioUI4Subsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+	UISubsystem->RetryAllAsyncLoaders();
+}
+
+void UModioUIAsyncLoader::Retry()
+{
 	if (UWidget* ContentWidget = GetContentForSlot("Widget"))
 	{
 		IModioUIAsyncOperationWidget::Execute_RequestOperationRetry(ContentWidget);
@@ -106,6 +115,18 @@ void UModioUIAsyncLoader::NativeHandleAsyncOperationStateChange(EModioUIAsyncOpe
 {
 	if (NewState != CurrentState)
 	{
+		if (NewState == EModioUIAsyncOperationWidgetState::Success && IsValid(GetContentForSlot("Loading Widget"))
+			&& IsValid(GetContentForSlot("Widget")))
+		{
+			GetContentForSlot("Loading Widget")->SetVisibility(ESlateVisibility::Collapsed);
+			GetContentForSlot("Widget")->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
+		if (NewState == EModioUIAsyncOperationWidgetState::InProgress && IsValid(GetContentForSlot("Loading Widget")) &&
+			IsValid(GetContentForSlot("Widget")))
+		{
+			GetContentForSlot("Loading Widget")->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			GetContentForSlot("Widget")->SetVisibility(ESlateVisibility::Collapsed);
+		}
 		CurrentState = NewState;
 		if (MyBox.IsValid())
 		{

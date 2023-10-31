@@ -31,7 +31,7 @@ TSharedRef<SWidget> UModioReportSummaryWidget::RebuildWidget()
 							  FText::FromString(ReportInfo->ReportData.ReporterContact.GetValue()),
 							  LOCTEXT("DetailsOfInfringement", "Details of Infringement"),
 							  FText::FromString(ReportInfo->ReportData.ReportDescription));
-
+			WrappingPolicy = ETextWrappingPolicy::AllowPerCharacterWrapping;
 			SetText(ReportText);
 		}
 	}

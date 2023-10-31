@@ -167,9 +167,9 @@ void UModioCommonQuickAccessTabView::HandleOnCloseButtonClicked_Implementation()
 	DeactivateWidget();
 }
 
-void UModioCommonQuickAccessTabView::HandleOnMyProfileButtonClicked_Implementation()
+void UModioCommonQuickAccessTabView::HandleOnMainGameMenuButtonClicked_Implementation()
 {
-	UE_LOG(ModioUI5, Log, TEXT("UModioCommonQuickAccessTabView::HandleOnMyProfileButtonClicked_Implementation - Not implemented"));
+	UE_LOG(ModioUI5, Warning, TEXT("HandleOnMainGameMenuButtonClicked should be implemented manually"));
 }
 
 void UModioCommonQuickAccessTabView::HandleOnAuthButtonClicked_Implementation()
@@ -215,14 +215,26 @@ UWidget* UModioCommonQuickAccessTabView::NativeGetDesiredFocusTarget() const
 
 	if (CurrentDownloadsModList && CurrentDownloadsModList->GetNumItems() > 0)
 	{
+		if (CurrentDownloadsModList && CurrentDownloadsModList->Implements<UModioCommonModListViewInterface>())
+		{
+			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(CurrentDownloadsModList);
+		}
 		return CurrentDownloadsModList;
 	}
 	if (InQueueModList && InQueueModList->GetNumItems() > 0)
 	{
+		if (InQueueModList && InQueueModList->Implements<UModioCommonModListViewInterface>())
+		{
+			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(InQueueModList);
+		}
 		return InQueueModList;
 	}
 	if (CompletedModList && CompletedModList->GetNumItems() > 0)
 	{
+		if (CompletedModList && CompletedModList->Implements<UModioCommonModListViewInterface>())
+		{
+			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(CompletedModList);
+		}
 		return CompletedModList;
 	}
 	return CloseButton;
@@ -243,7 +255,7 @@ void UModioCommonQuickAccessTabView::NativeOnInitialized()
 				IModioCommonModListViewInterface::Execute_RequestFullClearSelection(InQueueModList);
 				IModioCommonModListViewInterface::Execute_RequestFullClearSelection(CompletedModList);
 			}
-			UpdateInputActions();
+			UpdateInputActions(false, false);
 		});
 	}
 
@@ -256,7 +268,7 @@ void UModioCommonQuickAccessTabView::NativeOnInitialized()
 				IModioCommonModListViewInterface::Execute_RequestFullClearSelection(CurrentDownloadsModList);
 				IModioCommonModListViewInterface::Execute_RequestFullClearSelection(CompletedModList);
 			}
-			UpdateInputActions();
+			UpdateInputActions(false, false);
 		});
 	}
 
@@ -269,7 +281,7 @@ void UModioCommonQuickAccessTabView::NativeOnInitialized()
 				IModioCommonModListViewInterface::Execute_RequestFullClearSelection(InQueueModList);
 				IModioCommonModListViewInterface::Execute_RequestFullClearSelection(CurrentDownloadsModList);
 			}
-			UpdateInputActions();
+			UpdateInputActions(false, true);
 		});
 	}
 
@@ -284,22 +296,22 @@ void UModioCommonQuickAccessTabView::NativeOnInitialized()
 	{
 		CloseButton->OnFocusReceived().AddWeakLambda(this, [this]() {
 			ClearModsViewSelection();
-			UpdateInputActions();
+			UpdateInputActions(true, false);
 		});
 	}
 
-	if (MyProfileButton)
+	if (MainGameMenuButton)
 	{
 		const UModioCommonQuickAccessParamsSettings* Settings = GetDefault<UModioCommonQuickAccessParamsSettings>();
 		if (Settings) 
 		{
-			MyProfileButton->SetVisibility(Settings->ShowProfileButton ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+			MainGameMenuButton->SetVisibility(Settings->bShowMainGameMenu ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 			
-			if (Settings->ShowProfileButton) 
+			if (Settings->bShowMainGameMenu) 
 			{
-				MyProfileButton->OnFocusReceived().AddWeakLambda(this, [this]() {
+				MainGameMenuButton->OnFocusReceived().AddWeakLambda(this, [this]() {
 					ClearModsViewSelection();
-					UpdateInputActions();
+					UpdateInputActions(true, false);
 				});
 			}
 		}
@@ -309,22 +321,15 @@ void UModioCommonQuickAccessTabView::NativeOnInitialized()
 	{
 		AuthButton->OnFocusReceived().AddWeakLambda(this, [this]() {
 			ClearModsViewSelection();
-			UpdateInputActions();
+			UpdateInputActions(true, false);
 		});
 	}
 
 	if (MyCollectionButton)
 	{
 		MyCollectionButton->OnFocusReceived().AddWeakLambda(this, [this]() {
-			if (GetOwningPlayer() && CompletedModList && CompletedModList->GetNumItems() > 0)
-			{
-				CompletedModList->SetFocus();
-			}
-			else
-			{
-				ClearModsViewSelection();
-			}
-			UpdateInputActions();
+			ClearModsViewSelection();
+			UpdateInputActions(false, true);
 		});
 	}
 }
@@ -419,38 +424,43 @@ void UModioCommonQuickAccessTabView::ClearModsViewSelection_Implementation()
 	}
 }
 
-void UModioCommonQuickAccessTabView::UpdateInputActions_Implementation()
+void UModioCommonQuickAccessTabView::UpdateInputActions_Implementation(bool bActivateTopButtons, bool bActivateBottomButtons)
 {
 	ClearListeningInputActions();
 
 	if (const UModioCommonQuickAccessParamsSettings* Settings = GetDefault<UModioCommonQuickAccessParamsSettings>())
 	{
-		if (CloseButton)
+		if (bActivateTopButtons)
 		{
-			ListenForInputAction(CloseButton, Settings->CloseInputAction, Settings->CloseButtonLabel, [this]() {
-				HandleOnCloseButtonClicked();
-			});
-		}
+			if (CloseButton)
+			{
+				ListenForInputAction(CloseButton, Settings->CloseInputAction, Settings->CloseButtonLabel, [this]() {
+					HandleOnCloseButtonClicked();
+				});
+			}
 
-		if (MyProfileButton)
-		{
-			ListenForInputAction(MyProfileButton, Settings->MyProfileInputAction, Settings->MyProfileButtonLabel, [this]() {
-				HandleOnMyProfileButtonClicked();
-			});
-		}
+			if (MainGameMenuButton && Settings->bShowMainGameMenu)
+			{
+				ListenForInputAction(MainGameMenuButton, Settings->MainGameMenuInputAction, Settings->MainGameMenuButtonLabel, [this]() {
+					HandleOnMainGameMenuButtonClicked();
+				});
+			}
 
-		if (AuthButton)
-		{
-			ListenForInputAction(AuthButton, Settings->AuthInputAction, IsUserAuthenticated() ? Settings->LogOutButtonLabel : Settings->LogInButtonLabel, [this]() {
-				HandleOnAuthButtonClicked();
-			});
+			if (AuthButton)
+			{
+				ListenForInputAction(AuthButton, Settings->AuthInputAction, IsUserAuthenticated() ? Settings->LogOutButtonLabel : Settings->LogInButtonLabel, [this]() {
+					HandleOnAuthButtonClicked();
+				});
+			}
 		}
-
-		if (MyCollectionButton)
+		else
 		{
-			ListenForInputAction(MyCollectionButton, Settings->MyCollectionInputAction, Settings->MyCollectionButtonLabel, [this]() {
-				HandleOnCollectionButtonClicked();
-			});
+			if (MyCollectionButton && bActivateBottomButtons)
+			{
+				ListenForInputAction(MyCollectionButton, Settings->MyCollectionInputAction, Settings->MyCollectionButtonLabel, [this]() {
+					HandleOnCollectionButtonClicked();
+				});
+			}
 		}
 	}
 	else
@@ -499,9 +509,9 @@ void UModioCommonQuickAccessTabView::SynchronizeProperties()
 			CloseButton->SetLabel(Settings->CloseButtonLabel);
 		}
 
-		if (MyProfileButton)
+		if (MainGameMenuButton)
 		{
-			MyProfileButton->SetLabel(Settings->MyProfileButtonLabel);
+			MainGameMenuButton->SetLabel(Settings->MainGameMenuButtonLabel);
 		}
 
 		if (AuthButton)
@@ -629,9 +639,9 @@ void UModioCommonQuickAccessTabView::SynchronizeProperties()
 			CloseButton->SetStyle(StyleCDO->CloseButtonStyle);
 		}
 
-		if (MyProfileButton)
+		if (MainGameMenuButton)
 		{
-			MyProfileButton->SetStyle(StyleCDO->MyProfileButtonStyle);
+			MainGameMenuButton->SetStyle(StyleCDO->MainGameMenuButtonStyle);
 		}
 
 		if (AuthButton)

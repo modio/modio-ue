@@ -10,7 +10,10 @@
 
 
 #include "UI/Foundation/Components/List/ModioCommonListView.h"
+
+#include "CommonButtonBase.h"
 #include "UI/Foundation/Components/List/ModioCommonListViewStyle.h"
+#include "UI/Foundation/Components/List/SModioCommonButtonTableRow.h"
 
 void UModioCommonListView::SetStyle(TSubclassOf<UModioCommonListViewStyle> InStyle)
 {
@@ -29,4 +32,13 @@ void UModioCommonListView::SynchronizeProperties()
 	}
 
 	Super::SynchronizeProperties();
+}
+
+UUserWidget& UModioCommonListView::OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable)
+{
+	if (DesiredEntryClass->IsChildOf<UCommonButtonBase>())
+	{
+		return GenerateTypedEntry<UUserWidget, SModioCommonButtonTableRow<UObject*>>(DesiredEntryClass, OwnerTable);
+	}
+	return GenerateTypedEntry(DesiredEntryClass, OwnerTable);
 }

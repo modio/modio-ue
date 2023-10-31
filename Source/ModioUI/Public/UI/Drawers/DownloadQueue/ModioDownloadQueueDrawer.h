@@ -18,9 +18,11 @@
 #include "UI/BaseWidgets/ModioListView.h"
 #include "UI/BaseWidgets/ModioRichTextBlock.h"
 #include "UI/BaseWidgets/ModioUserWidgetBase.h"
+#include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
 #include "UI/CommonComponents/ModioDownloadListWidgetBase.h"
 #include "UI/CommonComponents/ModioRichTextButton.h"
 #include "UI/CommonComponents/ModioUserProfileButton.h"
+#include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueOpProgress.h"
 #include "UI/Drawers/DownloadQueue/ModioDownloadQueueEntry.h"
 #include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
@@ -98,9 +100,17 @@ protected:
 
 	virtual FReply NativeOnPreviewKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override
 	{
+		if (UModioDrawerControllerSlot* controllerSlot = Cast<UModioDrawerControllerSlot>(Slot))
+		{
+			if (!controllerSlot->GetExpandedState())
+			{
+				return FReply::Unhandled();
+			}
+		}
+
 		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
-		if (Subsystem && (Subsystem->IsAnyDialogOpen() || !Subsystem->IsDownloadDrawerOpen()))
+		if (Subsystem && (Subsystem->IsAnyDialogOpen()))
 		{
 			return FReply::Unhandled();
 		}
@@ -110,8 +120,21 @@ protected:
 		{
 			CurrentNavIndex = 0;
 		}
+
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::LogOut))
+		{
+			OnLogoutClicked();
+			return FReply::Handled();
+		}
+
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Subscribe) && !InKeyEvent.IsRepeat() &&
+			CurrentOpProgress->CurrentStatus == EModioModManagementEventType::BeginInstall)
+		{
+			CurrentOpProgress->OnUnsubscribeShortcutClicked();
+			return FReply::Handled();
+		}
 		
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down) {
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down)) {
 
 			if (NavigationPath.IsValidIndex(CurrentNavIndex + 1)) {
 
@@ -123,7 +146,7 @@ protected:
 			}
 			return FReply::Handled();
 		}
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Up))
 		{
 			if (NavigationPath.IsValidIndex(CurrentNavIndex - 1))
 			{
@@ -185,9 +208,18 @@ protected:
 	UFUNCTION()
 	void OnSubsricptionChanged(FModioModID ID, bool Subscribed)
 	{
+
+		if (UModioDrawerControllerSlot* controllerSlot = Cast<UModioDrawerControllerSlot>(Slot))
+		{
+			if (!controllerSlot->GetExpandedState())
+			{
+				return;
+			}
+		}
+
 		UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 
-		if (Subsystem && (Subsystem->IsAnyDialogOpen() || !Subsystem->IsDownloadDrawerOpen()))
+		if (Subsystem && Subsystem->IsAnyDialogOpen())
 		{
 			return;
 		}
@@ -291,12 +323,15 @@ public:
 			{
 				if (CurrentOpProgress)
 				{
-					if (UModioModInfoUI* NewModInfoWrapper = NewObject<UModioModInfoUI>())
+					if (FModioModCollectionEntry* CollectionEntryPtr = UserSubscriptions.Find(CurrentProgress->ID))
 					{
-						NewModInfoWrapper->Underlying = UserSubscriptions[CurrentProgress->ID].GetModProfile();
-						CurrentOpProgress->SetDataSource(NewModInfoWrapper);
-						CurrentOpProgress->SetVisibility(ESlateVisibility::Visible);
-						CurrentOpProgress->UnsubscribeButton->IsFocusable = true;
+						if (UModioModInfoUI* NewModInfoWrapper = NewObject<UModioModInfoUI>())
+						{
+							NewModInfoWrapper->Underlying = CollectionEntryPtr->GetModProfile();
+							CurrentOpProgress->SetDataSource(NewModInfoWrapper);
+							CurrentOpProgress->SetVisibility(ESlateVisibility::Visible);
+							CurrentOpProgress->UnsubscribeButton->IsFocusable = true;
+						}
 					}
 				}
 				if (StatusText)

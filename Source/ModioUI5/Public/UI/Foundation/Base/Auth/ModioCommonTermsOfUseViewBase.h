@@ -30,6 +30,9 @@ public:
 	DECLARE_DELEGATE(FOnModioCommonTermsOfUseViewCancelClicked);
 	FOnModioCommonTermsOfUseViewCancelClicked OnCancelClicked;
 
+	DECLARE_DELEGATE_OneParam(FOnModioCommonTermsOfUseLinkClicked, const FString&);
+	FOnModioCommonTermsOfUseLinkClicked OnLinkClicked;
+
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI")
 	FModioTerms Terms;
 };

@@ -1,0 +1,79 @@
+== mod.io Mod Browser UE5 UI
+
+Mod.io UE5 UI is built upon the concepts outlined in the link:https://docs.unrealengine.com/5.0/en-US/common-ui-plugin-for-advanced-user-interfaces-in-unreal-engine/[Common UI approach].
+
+=== Organization
+
+==== Foundation
+
+This contains general widgets that are likely to be used across different UI elements and views. This is located in C++ and contains the following folders:
+
+* Base: Contains base widgets that are intended to be inherited and mainly used as separate views. Examples include Activatable Widget, Base Mod Browser, Base Mod Details, etc.
+
+* Components: Contains widgets that are likely to be attached to different views as components or building blocks. These widgets are mostly stylized within the Mod.io styling system. Examples include buttons, progress bars, scroll boxes, and more.
+
+==== Default
+
+This contains the default widgets used in the provided generic design. Many of these widgets are inherited from the **Foundation->Base** widgets, such as Activatable Widget. Some of these widgets can also be stylized separately, such as Collection View, Featured View, Generic Mod Entry, etc. You can inherit from these widgets as well if you want to maintain the same default functionality as implemented in C++, but modify the layout, positioning, and other details as needed.
+
+=== Widget Styling
+
+Each widget that supports Mod.io Common UI stylization has a property called **Style** (**ModioStyle** in C++) and a function **SetStyle**. The approach leverages the same mechanism as in Common UI but provides a wider range of widgets to be stylized, with a greater number of customization options.
+
+The styles are primarily intended to be applied in the designer view in UMG. However, you can also call the function **SetStyle** directly for those widgets dynamically, and the widgets will be synchronized accordingly with the applied styles.
+
+As mentioned earlier, the styling system leverages the same approach as presented in Common UI. This involves creating separate styling assets based on separately created styling classes and applying them to the needed UMG widgets. You can read more about this approach link:https://docs.unrealengine.com/5.0/en-US/common-ui-quickstart-guide-for-unreal-engine/[here].
+
+For example, take a look at the **Collection View (W_ModioCommonCollectionView)**, located at UI5/Default/Widgets/ModBrowser/Collection/W_ModioCommonCollectionView.uasset path. This is one of the default widgets that supports the Mod.io styling system. While the default widgets already come with pre-applied styles based on the default design, you have the flexibility to modify, inherit, customize, and more according to your needs.
+
+[cols="a,a", frame=none, grid=none]
+|===
+| image::img/UE5/plugin_ui_collection_view_properties.png[]
+| image::img/UE5/plugin_ui_collection_view_style.png[]
+|===
+
+=== Customizing Text and Input Actions
+
+For most of the default widgets where the text and actions are available, they can be customized in the project settings. There are different Params sections for most of the widgets where you can specify your own text and input action details.
+
+image::img/UE5/plugin_ui_settings_params.png[]
+
+To alter the input keys themselves, navigate to the plugin's **UI5->Default->Platform->Input** folder. Open the `ModioInputActionDataTable` and modify the corresponding input keys or actions. Note that removing or renaming actions can cause issues in widgets where they are bound, so it's advisable to retain the same action names and rather change the input keys or add new actions as needed.
+
+[cols="a,a", frame=none, grid=none]
+|===
+| image::img/UE5/plugin_ui_inputactiondatatable_drawer.png[]
+| image::img/UE5/plugin_ui_inputactiondatatable_details.png[]
+|===
+
+To change the key brushes associated with input keys, select the relevant platform folder within **UI5->Default->Platform->Input** (e.g., `Xbox`). Open the controller data asset (e.g., `ModioCommonInput_Xbox`) and make the necessary changes to the corresponding key brushes.
+
+[cols="a,a", frame=none, grid=none]
+|===
+| image::img/UE5/plugin_ui_input_controller_data_drawer.png[]
+| image::img/UE5/plugin_ui_input_controller_data_details.png[]
+|===
+
+
+=== Manual Action Binding
+
+The `ModioCommonActivatableWidget`, from which the majority of widgets in this UI inherit, provides several useful functions primarily intended for use in C++:
+
+1) `ListenForInputAction` and `ClearListeningInputActions`: The former function listens for a specified input action and invokes a defined function upon the action's triggering. The latter function clears the active listening action. Typically, `ListenForInputAction` is intended to be invoked during widget initialization, automatically binding the actions (`BindInputActions`) upon construction and unbinding them (`UnbindInputActions`) upon destruction. You can also manually call these functions based on your specific requirements.
+
+2) `BindInputActions` and `UnbindInputActions`: These functions perform the binding and unbinding of input actions. When `bAutoBindInputAction` is set to `true` (which is the default value), these functions are automatically called during widget construction and destruction. If you prefer manual control over input action binding and unbinding, you can set `bAutoBindInputAction` to `false` and call these functions manually, as needed.
+
+As an illustrative example, consider the straightforward `UModioCommonEmailAuthView` widget. This widget features a text box for users to input their email address, along with three buttons: Back, Submit, and Cancel. Here, the `ListenForInputAction` function is invoked during initialization, and no further action is required. The input actions are automatically bound upon widget construction and unbound upon destruction.
+
+In contrast, there is a `UModioCommonModEntryBase` class, which is responsible for displaying mod entries. This class performs manual input action binding and unbinding. With `bAutoBindInputAction` set to `false`, the class calls `BindInputActions` and `UnbindInputActions` based on the mod entry's selection state in the list. And the `UModioCommonGenericModEntry` class, which implements the default generic mod entry inherited from `UModioCommonModEntryBase`, calls `ListenForInputAction` and `ClearListeningInputActions` based on available options (e.g., subscribing, unsubscribing, opening mod details, etc.).
+
+Here's a code snippet to demonstrate the typical use case that is intended to be invoked during the widget's initialization:
+```cpp
+// Listen for input actions and execute the OnSubmitClicked delegate when the action is triggered
+if (SubmitButton)
+{
+	ListenForInputAction(SubmitButton, AuthSettings->SubmitInputAction, AuthCodeSettings->SubmitButtonText, [this]() {
+		if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(GetInputText());
+	});
+}
+```

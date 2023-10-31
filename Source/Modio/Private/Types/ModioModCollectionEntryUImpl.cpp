@@ -42,3 +42,8 @@ FModioUnsigned64 FModioModCollectionEntry::GetSizeOnDisk() const
 {
 	return FModioUnsigned64(SizeOnDisk);
 }
+
+FModioErrorCode FModioModCollectionEntry::GetLastError()
+{
+	return LastError;
+}

@@ -40,4 +40,7 @@ protected:
 
 public:
 	virtual void SynchronizeProperties() override;
+
+protected:
+	virtual UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable) override;
 };

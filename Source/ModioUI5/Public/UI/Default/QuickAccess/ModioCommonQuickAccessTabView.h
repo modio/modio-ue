@@ -79,7 +79,7 @@ protected:
 	TObjectPtr<UModioCommonButtonBase> CloseButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
-	TObjectPtr<UModioCommonButtonBase> MyProfileButton;
+	TObjectPtr<UModioCommonButtonBase> MainGameMenuButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonButtonBase> AuthButton;
@@ -118,12 +118,11 @@ public:
 	UModioCommonQuickAccessTabView();
 
 protected:
-
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void ClearModsViewSelection();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void UpdateInputActions();
+	void UpdateInputActions(bool bActivateTopButtons, bool bActivateBottomButtons);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void UpdateCurrentDownloadsMods();
@@ -144,7 +143,7 @@ protected:
 	void HandleOnCloseButtonClicked();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void HandleOnMyProfileButtonClicked();
+	void HandleOnMainGameMenuButtonClicked();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void HandleOnAuthButtonClicked();

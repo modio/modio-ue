@@ -16,11 +16,11 @@
 #include "Core/ModioModInfoUI.h"
 #include "Libraries/ModioSDKLibrary.h"
 
-void UModioCommonReportEmailView::SetValidationTextVisibility_Implementation(ESlateVisibility Visbility) 
+void UModioCommonReportEmailView::SetValidationTextVisibility_Implementation(ESlateVisibility EVisbility) 
 {
 	if (ValidationTextBlock) 
 	{
-		ValidationTextBlock->SetVisibility(Visbility);
+		ValidationTextBlock->SetVisibility(EVisbility);
 	}
 }
 

@@ -30,8 +30,8 @@ public:
 		CloseInputAction.RowName = "Primary";
 		CloseInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		MyProfileInputAction.RowName = "Tertiary";
-		MyProfileInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+		MainGameMenuInputAction.RowName = "Tertiary";
+		MainGameMenuInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
 		AuthInputAction.RowName = "Secondary";
 		AuthInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -53,7 +53,7 @@ public:
 	FText CloseButtonLabel = NSLOCTEXT("Modio", "CloseButtonLabel", "Close");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText MyProfileButtonLabel = NSLOCTEXT("Modio", "MyProfile", "My Profile");
+	FText MainGameMenuButtonLabel = NSLOCTEXT("Modio", "MainGameMenu", "Main Game Menu");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText MyCollectionButtonLabel = NSLOCTEXT("Modio", "MyCollection", "My Collection");
@@ -71,7 +71,7 @@ public:
 	FDataTableRowHandle CloseInputAction;
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
-	FDataTableRowHandle MyProfileInputAction;
+	FDataTableRowHandle MainGameMenuInputAction;
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle AuthInputAction;
@@ -80,7 +80,7 @@ public:
 	FDataTableRowHandle MyCollectionInputAction;
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Bool")
-	bool ShowProfileButton = false;
+	bool bShowMainGameMenu = true;
 
 	// Begin UDeveloperSettings Interface
 	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }

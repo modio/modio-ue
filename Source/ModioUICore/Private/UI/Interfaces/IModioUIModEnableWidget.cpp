@@ -14,7 +14,7 @@
 #include "Core/ModioModInfoUI.h"
 #include "Loc/BeginModioLocNamespace.h"
 
-void IModioUIModEnableWidget::ModEnabledStateChangedHandler(FModioModID ModID, bool bNewSubscriptionState)
+void IModioUIModEnableWidget::ModEnabledStateChangedHandler_Implementation(FModioModID ModID, bool bNewSubscriptionState)
 {
 	bRoutedModEnabledStateChanged = false;
 	NativeOnModEnabledStateChanged(ModID, bNewSubscriptionState);
@@ -49,19 +49,22 @@ void IModioUIModEnableWidget::RequestModEnabledState(FModioModID ModID, bool bNe
 		{
 			if (UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 			{
+				
 				const bool bSuccess = UISubsystem->RequestModEnabledState(ModID, bNewStateIsEnabled) && !ErrorCode;
-				const FText DescriptionText = bSuccess
-					                              ? (bNewStateIsEnabled
-						                                 ? LOCTEXT("ModEnabled", "Mod enabled")
-						                                 : LOCTEXT("ModDisabled", "Mod disabled"))
-					                              : (ErrorCode
-						                                 ? FText::Format(
-							                                 LOCTEXT("ErrorCode", "{0}: {1}"),
-							                                 FText::FromString(ErrorCode.GetErrorMessage()),
-							                                 FText::AsNumber(ErrorCode))
-						                                 : LOCTEXT("RequestModEnabledStateFailed", "Mod enable request failed"));
-
-				UISubsystem->DisplayNotificationManual(FText::FromString(ModInfo.Get(FModioModInfo()).ProfileName), DescriptionText, !bSuccess);
+				// We currently don't want to show a notification for the end user
+				//
+				//const FText DescriptionText = bSuccess
+				//	                              ? (bNewStateIsEnabled
+				//		                                 ? LOCTEXT("ModEnabled", "Mod enabled")
+				//		                                 : LOCTEXT("ModDisabled", "Mod disabled"))
+				//	                              : (ErrorCode
+				//		                                 ? FText::Format(
+				//			                                 LOCTEXT("ErrorCode", "{0}: {1}"),
+				//			                                 FText::FromString(ErrorCode.GetErrorMessage()),
+				//			                                 FText::AsNumber(ErrorCode))
+				//		                                 : LOCTEXT("RequestModEnabledStateFailed", "Mod enable request failed"));
+				//
+				//UISubsystem->DisplayNotificationManual(FText::FromString(ModInfo.Get(FModioModInfo()).ProfileName), DescriptionText, !bSuccess);
 			}
 		}));
 	}

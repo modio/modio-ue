@@ -66,6 +66,22 @@ void UModioCommonTabListWidgetBase::RemoveAllDynamicTabs_Implementation()
 #endif
 }
 
+void UModioCommonTabListWidgetBase::HandleNavigateToNextTab_Implementation()
+{
+	if (TabButtonGroup)
+	{
+		TabButtonGroup->SelectNextButton();
+	}
+}
+
+void UModioCommonTabListWidgetBase::HandleNavigateToPreviousTab_Implementation()
+{
+	if (TabButtonGroup)
+	{
+		TabButtonGroup->SelectPreviousButton();
+	}
+}
+
 void UModioCommonTabListWidgetBase::SynchronizeProperties()
 {
 	if (!GetInputSubsystem())

@@ -53,6 +53,8 @@ protected:
 
 	void OnSelectionChanged(FModioUIAction ModioUIAction, ESelectInfo::Type Arg);
 
+	bool WasPreviousSearchTagsIdentical();
+
 	virtual void NativeOnInitialized() override;
 	virtual void NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ec,
 													 TOptional<FModioModInfoList> List) override;
@@ -131,12 +133,12 @@ protected:
 
 	bool HasSortActionApplied;
 	FModioUIAction CurrentSortAction;
-	FOnRetryRequested RetryDelegate;
 	int CurrentListIndex = 0;
 	int CurrentRow = 0;
 
 	TArray<FModioModTag> DefaultTags;
 	TArray<FString> TagNames;
+	TArray<FString> PreviousTagNames;
 	FString SearchInputString;
 	FString PreviousRequestIdentifier;
 

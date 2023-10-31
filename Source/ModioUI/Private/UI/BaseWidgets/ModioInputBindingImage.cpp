@@ -57,16 +57,38 @@ void UModioInputBindingImage::UpdateBrushImage(EModioUIInputMode InputDevice)
   
 	if (UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>())
 	{
-		UMaterialInterface* InputGlyphMaterial = Subsystem->GetInputGlyphMaterialForInputType(KeyToShow, InputDevice);
-		if (IsValid(InputGlyphMaterial))
+		
+		if (Settings->bOverridePlatformMaterials)
 		{
-			SetBrushFromMaterial(InputGlyphMaterial);
-			SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-		} else
-		{
-			SetVisibility(ESlateVisibility::Collapsed);
-			InvalidateLayoutAndVolatility();
+			UTexture2D* texture = Subsystem->GetInputGlyphTextureForInputType(KeyToShow, InputDevice);
+			if (texture)
+			{
+				SetBrushFromTexture(texture);
+				SetBrushSize(FVector2D(texture->GetSizeX(), texture->GetSizeY()));
+				SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			}
+			else
+			{
+				SetVisibility(ESlateVisibility::Collapsed);
+				InvalidateLayoutAndVolatility();
+			}
 		}
+		else
+		{
+			UMaterialInterface* InputGlyphMaterial =
+				Subsystem->GetInputGlyphMaterialForInputType(KeyToShow, InputDevice);
+			if (IsValid(InputGlyphMaterial))
+			{
+				SetBrushFromMaterial(InputGlyphMaterial);
+				SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			}
+			else
+			{
+				SetVisibility(ESlateVisibility::Collapsed);
+				InvalidateLayoutAndVolatility();
+			}
+		}
+		
 	}
 	if (GetVisibilityForMode.IsBound())
 	{

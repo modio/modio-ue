@@ -59,6 +59,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText InstalledLabelText;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText ErrorLabelText;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioRichTextBlock* StatusText;
 

@@ -11,18 +11,19 @@
 #include "UI/Views/Collection/ModioCollectionTileStatus.h"
 #include "Core/ModioModCollectionEntryUI.h"
 #include "Core/ModioModInfoUI.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 
 void UModioCollectionTileStatus::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
-	if (!DataSource) 
+	if (!DataSource)
 	{
 		return;
 	}
 
 	UModioModCollectionEntryUI* CollectionEntry = Cast<UModioModCollectionEntryUI>(DataSource);
 	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
-	
+
 	if (!IsValid(CollectionEntry) || !Subsystem)
 	{
 		return;
@@ -38,31 +39,56 @@ void UModioCollectionTileStatus::NativeOnSetDataSource()
 	ProgressBarSizeBox->SetVisibility(ESlateVisibility::Collapsed);
 	StatusPercent->SetVisibility(ESlateVisibility::Collapsed);
 
-	switch (UserMods[CollectionEntry->Underlying.GetID()].GetModState())
+	FModioErrorCode ec = UserMods[CollectionEntry->Underlying.GetID()].GetLastError();
+
+	if (ec)
 	{
-		case EModioModState::InstallationPending:
-			StatusText->SetText(PendingLabelText);
-			break;
-		case EModioModState::UninstallPending:
-			StatusText->SetText(UninstallPendingLabelText);
-			break;
-		case EModioModState::UpdatePending:
-			StatusText->SetText(UpdatePendingLabelText);
-			break;
-		case EModioModState::Downloading:
-			StatusText->SetText(DownloadingLabelText);
-			break;
-		case EModioModState::Extracting:
-			StatusText->SetText(ExtractingLabelText);
-			BeginTickIfNeeded(true);
-			break;
-		case EModioModState::Installed:
-			StatusText->SetText(InstalledLabelText);
-			break;
-		default:
+		if (StatusText)
+		{
+			StatusText->SetDefaultStyleName("error");
+			StatusText->SynchronizeProperties();
+
+			if (UModioErrorConditionLibrary::ErrorCodeMatches(ec, EModioErrorCondition::InsufficientSpace))
+			{
+				StatusText->SetText(NSLOCTEXT("Modio", "InsufficientSpaceError", "Insufficient disk space"));
+			} else
+			{
+				StatusText->SetText(FText::FromString(ec.GetErrorMessage()));	
+			}
+			
 			SetPercent(0.0f);
-			break;
+		}
+	} else
+	{
+		StatusText->SetDefaultStyleName("default");
+		StatusText->SynchronizeProperties();
+		switch (UserMods[CollectionEntry->Underlying.GetID()].GetModState())
+		{
+			case EModioModState::InstallationPending:
+				StatusText->SetText(PendingLabelText);
+				break;
+			case EModioModState::UninstallPending:
+				StatusText->SetText(UninstallPendingLabelText);
+				break;
+			case EModioModState::UpdatePending:
+				StatusText->SetText(UpdatePendingLabelText);
+				break;
+			case EModioModState::Downloading:
+				StatusText->SetText(DownloadingLabelText);
+				break;
+			case EModioModState::Extracting:
+				StatusText->SetText(ExtractingLabelText);
+				BeginTickIfNeeded(true);
+				break;
+			case EModioModState::Installed:
+				StatusText->SetText(InstalledLabelText);
+				break;
+			default:
+				SetPercent(0.0f);
+				break;
+		}
 	}
+
 }
 
 void UModioCollectionTileStatus::SetPercent(float InPercent)
@@ -108,7 +134,6 @@ void UModioCollectionTileStatus::UpdateProgress(const struct FModioModProgressIn
 		}
 		break;
 	}
-
 }
 
 void UModioCollectionTileStatus::NativeOnModManagementEvent(FModioModManagementEvent Event)
@@ -123,7 +148,32 @@ void UModioCollectionTileStatus::NativeOnModManagementEvent(FModioModManagementE
 			{
 				if (Event.Status)
 				{
-					// Display badge for error?
+					if (StatusText)
+					{
+						StatusText->SetDefaultStyleName("error");
+						StatusText->SynchronizeProperties();
+
+						if (UModioErrorConditionLibrary::ErrorCodeMatches(Event.Status,
+																		  EModioErrorCondition::InsufficientSpace))
+						{
+							StatusText->SetText(
+								NSLOCTEXT("Modio", "InsufficientSpaceError", "Insufficient disk space"));
+						}
+						else
+						{
+							StatusText->SetText(FText::FromString(Event.Status.GetErrorMessage()));
+						}
+
+						if (ProgressBarSizeBox)
+						{
+							ProgressBarSizeBox->SetVisibility(ESlateVisibility::Hidden);
+						}
+
+						if (StatusPercent)
+						{
+							StatusPercent->SetVisibility(ESlateVisibility::Hidden);
+						}
+					}
 				}
 				else
 				{

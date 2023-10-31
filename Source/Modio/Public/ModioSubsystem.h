@@ -37,6 +37,7 @@
 #include "Types/ModioRating.h"
 #include "Types/ModioReportParams.h"
 #include "Types/ModioTerms.h"
+#include "Types/ModioTransactionRecord.h"
 #include "Types/ModioUser.h"
 #include "Types/ModioUserList.h"
 #include "Types/ModioValidationError.h"
@@ -51,6 +52,7 @@ DECLARE_DELEGATE_TwoParams(FOnListAllModsDelegateFast, FModioErrorCode, TOptiona
 DECLARE_DELEGATE_TwoParams(FOnGetModInfoDelegateFast, FModioErrorCode, TOptional<FModioModInfo>);
 DECLARE_DELEGATE_TwoParams(FOnGetGameInfoDelegateFast, FModioErrorCode, TOptional<FModioGameInfo>);
 DECLARE_DELEGATE_TwoParams(FOnGetMediaDelegateFast, FModioErrorCode, TOptional<FModioImageWrapper>);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGetMediaMulticastDelegateFast, FModioErrorCode, TOptional<FModioImageWrapper>);
 DECLARE_DELEGATE_TwoParams(FOnGetModTagOptionsDelegateFast, FModioErrorCode, TOptional<FModioModTagOptions>);
 DECLARE_DELEGATE_TwoParams(FOnGetTermsOfUseDelegateFast, FModioErrorCode, TOptional<FModioTerms>);
 DECLARE_DELEGATE_TwoParams(FOnGetModDependenciesDelegateFast, FModioErrorCode, TOptional<FModioModDependencyList>);
@@ -85,6 +87,7 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModDependenciesDelegate, FModioErrorCod
 								   FModioOptionalModDependencyList, Dependencies);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnSubmitNewModDelegate, FModioErrorCode, ErrorCode, FModioOptionalModID, NewModID);
+
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnMuteUsersDelegate, FModioErrorCode, ErrorCode, FModioOptionalUserList,
 								   NewUserList);
 
@@ -389,6 +392,10 @@ public:
 	 **/
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSize, FOnGetMediaDelegateFast Callback);
 
+private:
+	TMap<TTuple<FModioModID, EModioLogoSize>, FOnGetMediaMulticastDelegateFast> PendingModMediaLogoRequests;
+
+public:
 	/**
 	 * @brief Get a gallery image for the specified mod ID. If it already exists on disk the file will be reused unless
 	 * it is outdated
@@ -407,6 +414,10 @@ public:
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 									FOnGetMediaDelegateFast Callback);
 
+private:
+	TMap<TTuple<FModioModID, EModioGallerySize>, FOnGetMediaMulticastDelegateFast> PendingModMediaGalleryRequests;
+
+public:
 	/**
 	 * @brief Downloads the creator avatar for a specified mod. Will use existing file if it is already present on disk
 	 * and not outdated
@@ -424,6 +435,10 @@ public:
 	 **/
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
 
+private:
+	TMap<TTuple<FModioModID, EModioAvatarSize>, FOnGetMediaMulticastDelegateFast> PendingModMediaAvatarRequests;
+
+public:
 	/**
 	 * @brief Fetches the available tags used on mods for the current game. These tags can them be used in conjunction
 	 * with the FilterParams passed to ListAllMods
@@ -587,9 +602,24 @@ public:
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @deprecated Deprecated as of 2023.10. Call GetTermsOfUseAsync() without an EModioAuthenticationProvider instead.
 	 **/
+	UE_DEPRECATED(
+		4.26, "Deprecated as of 2023.10. Call GetTermsOfUseAsync() without an EModioAuthenticationProvider instead.")
 	MODIO_API void GetTermsOfUseAsync(EModioAuthenticationProvider Provider, EModioLanguage Locale,
 									  FOnGetTermsOfUseDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
+	 * who wishes to create a mod.io account
+	 * @param Locale The language to display the terms of use in
+	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
+	 * @requires initialized-sdk
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 **/
+	MODIO_API void GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegateFast Callback);
 
 	/**
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
@@ -608,6 +638,10 @@ public:
 	 **/
 	MODIO_API void GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
 
+private:
+	TMap<EModioAvatarSize, FOnGetMediaMulticastDelegateFast> PendingUserMediaRequests;
+
+public:
 	/**
 	 * @brief Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a
 	 * rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this
@@ -736,7 +770,6 @@ private:
 	void InvalidateUserInstallationCache();
 
 private:
-
 	/** Maps two letter ISO 639-1 language codes to EModioLanguage values */
 	TMap<FString, EModioLanguage> LanguageMap;
 
@@ -1077,10 +1110,27 @@ public:
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @deprecated Deprecated as of 2023.10. Call K2_GetTermsOfUseAsync() without an EModioAuthenticationProvider
+	 *instead
+	 **/
+	// clang-format off
+	UFUNCTION(BlueprintCallable, DisplayName = "GetTermsOfUseAsync", Category = "mod.io|Authentication",
+			  meta = (DeprecatedFunction, DeprecationMessage = "Deprecated as of 2023.10. Call K2_GetTermsOfUseAsync() without an EModioAuthenticationProvider instead."))
+	MODIO_API void K2_GetTermsOfUseAsync_DEPRECATED(EModioAuthenticationProvider Provider, EModioLanguage Locale,
+													FOnGetTermsOfUseDelegate Callback);
+	// clang-format on
+
+	/**
+	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
+	 * who wishes to create a mod.io account
+	 * @param Locale The language to display the terms of use in
+	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
+	 * @requires initialized-sdk
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetTermsOfUseAsync", Category = "mod.io|Authentication")
-	MODIO_API void K2_GetTermsOfUseAsync(EModioAuthenticationProvider Provider, EModioLanguage Locale,
-										 FOnGetTermsOfUseDelegate Callback);
+	MODIO_API void K2_GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegate Callback);
 
 	/**
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data

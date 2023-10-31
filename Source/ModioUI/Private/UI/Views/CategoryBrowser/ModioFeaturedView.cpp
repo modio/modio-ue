@@ -88,6 +88,7 @@ void UModioFeaturedView::NativeOnInitialized()
 	}
 
 	FetchPrimaryCategoryMods();
+	bShouldShowBackButton = false;
 }
 
 void UModioFeaturedView::NativeRequestOperationRetry()
@@ -123,6 +124,7 @@ void UModioFeaturedView::FetchPrimaryCategoryMods()
 		IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::InProgress);
 	}
 }
+
 
 FNavigationReply UModioFeaturedView::NativeOnNavigation(const FGeometry& InGeometry,
                                                         const FNavigationEvent& InNavigationEvent)

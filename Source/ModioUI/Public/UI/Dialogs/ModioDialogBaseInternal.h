@@ -102,6 +102,7 @@ public:
 	void SetDialogController(UModioDialogController* DialogController);
 	void InitializeFromDialogInfo(class UModioDialogInfo* DialogDescriptor, bool bIsPreview = false,
 								  UObject* DialogDataSource = nullptr);
+
 	TOptional<FString> GetInputWidgetString();
 	void SetInputWidgetString(FString Input);
 	
@@ -110,4 +111,7 @@ public:
 
 	UFUNCTION(Category = "Widgets")
 	void SetDialogFocus();
+
+	UFUNCTION()
+	void ToggleSubmitButton(bool bEnabled);
 };

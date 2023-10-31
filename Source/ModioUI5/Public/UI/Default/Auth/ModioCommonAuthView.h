@@ -46,6 +46,9 @@ protected:
 	void OnTermsOfUseViewSubmitClicked();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void OnTermsOfUseViewLinkClicked(const FString& URL);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void OnEmailAuthViewBackClicked();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")

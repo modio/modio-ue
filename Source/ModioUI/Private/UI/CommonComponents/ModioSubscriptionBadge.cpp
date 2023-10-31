@@ -21,6 +21,12 @@
 void UModioSubscriptionBadge::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
+
+	// The badge will only be visible when something is happening for the mod
+	// Setting the pending label here as there is not a condition for the actual pending state
+	Label->SetText(PendingLabelText);
+	SetPercent(0.f);
+
 	if (!DataSource)
 	{
 		return;
@@ -62,7 +68,8 @@ void UModioSubscriptionBadge::NativeOnSetDataSource()
 			break;
 	}
 
-	SetVisibility(UserMods.Contains(Data->Underlying.ModId) ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+	SetVisibility(UserMods.Contains(Data->Underlying.ModId) ? ESlateVisibility::HitTestInvisible
+															: ESlateVisibility::Collapsed);
 }
 
 void UModioSubscriptionBadge::SetPercent(float InPercent)
@@ -72,7 +79,6 @@ void UModioSubscriptionBadge::SetPercent(float InPercent)
 		ProgressBar->SetPercent(InPercent);
 	}
 }
-
 
 void UModioSubscriptionBadge::UpdateProgress(const struct FModioModProgressInfo& ProgressInfo)
 {
@@ -114,7 +120,10 @@ void UModioSubscriptionBadge::NativeOnModManagementEvent(FModioModManagementEven
 			{
 				if (Event.Status)
 				{
-					// Display badge for error?
+					if (Label)
+					{
+						Label->SetText(ErrorLabelText);
+					}
 					SetPercent(0.f);
 				}
 				else

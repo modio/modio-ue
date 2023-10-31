@@ -55,7 +55,7 @@ FReply UModioRefineSearchDrawer::NativeOnFocusReceived(const FGeometry& InGeomet
 	ConstructNavigationPath();
 	BindCollapseButtons();
 	CurrentNavIndex = 0;
-	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UModioRefineSearchDrawer::ValidateAndSetFocus);
+	ValidateAndSetFocus();
 	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
@@ -187,11 +187,6 @@ void UModioRefineSearchDrawer::OnCollapse()
 
 void UModioRefineSearchDrawer::OnClearClicked()
 {
-	if (GEngine->GetEngineSubsystem<UModioUI4Subsystem>()->GetLastInputDevice() == EModioUIInputMode::Mouse)
-	{
-		SetFocus();
-	}
-
 	if (TagSelector)
 	{
 		TagSelector->ClearSelectedTags();
@@ -235,8 +230,8 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 		return FReply::Handled();
 	}
 
-	if ((GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Back ||
-		 GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::RefineSearch) &&
+	if ((GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Back) ||
+		 GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::RefineSearch)) &&
 		InKeyEvent.GetKey().IsGamepadKey() && SearchInput->HasFocusedDescendants())
 	{
 		CurrentNavIndex = NavigationPath.Num() - 3;
@@ -257,13 +252,13 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 		return FReply::Handled();
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down))
 	{
 		CurrentNavIndex += 1;
 		ValidateAndSetFocus();
 		return FReply::Handled();
 	}
-	else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+	else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Up))
 	{
 		CurrentNavIndex -= 1;
 		ValidateAndSetFocus();
@@ -271,14 +266,14 @@ FReply UModioRefineSearchDrawer::NativeOnPreviewKeyDown(const FGeometry& MyGeome
 	}
 	if (CurrentNavIndex >= NavigationPath.Num() - 3)
 {
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left)
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Left))
 		{
 			CurrentNavIndex--;
 			CurrentNavIndex = FMath::Clamp(CurrentNavIndex, NavigationPath.Num() - 3, NavigationPath.Num() - 1);
 			ValidateAndSetFocus();
 			return FReply::Handled();
 		}
-		else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right)
+		else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Right))
 		{
 			CurrentNavIndex++;
 			CurrentNavIndex = FMath::Clamp(CurrentNavIndex, NavigationPath.Num() - 3, NavigationPath.Num() - 1);
@@ -339,6 +334,12 @@ void UModioRefineSearchDrawer::CategoryNav(bool bMoveForward)
 	{
 		UModioTagSelectorWidgetBase* tagSelector = Cast<UModioTagSelectorWidgetBase>(
 			TagSelector->SelectorListScrollBox->GetAllChildren()[bCategoryHasSelection ? currentCategoryIndex : 0]);
+
+		if (!IsValid(tagSelector))
+		{
+			return;
+		}
+
 		if (tagSelector->CategoryVerticalBox->GetAllChildren().IsValidIndex(0) && !tagSelector->IsCollapsed())
 		{
 			UModioSelectableTag* tag = Cast<UModioSelectableTag>(tagSelector->CategoryVerticalBox->GetAllChildren()[0]);

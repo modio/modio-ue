@@ -27,7 +27,11 @@ class MODIOUICORE_API IModioUIModEnableWidget : public IInterface
 	GENERATED_BODY()
 
 	bool bRoutedModEnabledStateChanged = false;
+
+public:
+	UFUNCTION(BlueprintNativeEvent)
 	void ModEnabledStateChangedHandler(FModioModID ModID, bool bNewSubscriptionState);
+	virtual void ModEnabledStateChangedHandler_Implementation(FModioModID ModID, bool bNewSubscriptionState);
 
 protected:
 	template<typename ImplementingClass>
@@ -36,8 +40,8 @@ protected:
 		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 		if (Subsystem)
 		{
-			// Subsystem->OnSubscriptionStatusChanged.AddUObject(
-			//	Cast<ImplementingClass>(this), &IModioUIModEnableWidget::ModEnabledStateChangedHandler);
+			Subsystem->OnModEnabledChanged.RemoveDynamic(Cast<ImplementingClass>(this), &IModioUIModEnableWidget::ModEnabledStateChangedHandler);
+			Subsystem->OnModEnabledChanged.AddDynamic(Cast<ImplementingClass>(this), &IModioUIModEnableWidget::ModEnabledStateChangedHandler);
 		}
 	}
 

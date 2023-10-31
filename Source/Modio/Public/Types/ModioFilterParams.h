@@ -44,6 +44,15 @@ enum class EModioSortDirection : uint8
 	Descending
 };
 
+/// @brief Enum indicating filtering options based off revenue type
+UENUM(BlueprintType)
+enum class EModioRevenueFilterType : uint8
+{
+Free = 0, /** Return only free mods */
+Paid = 1, /** Return only paid mods */
+FreeAndPaid = 2 /** Return both free and paid mods */
+};
+
 /** @brief Class storing a set of filter parameters for use in xref:ListAllModsAsync[] */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioFilterParams
@@ -155,6 +164,13 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& PagedResults(uint64 PageNumber, uint64 PageSize);
 
 	/**
+	 * @brief Returned mods according to the specified revenue type (free, paid, both)
+	 * @param RevenueFilter Filter to use
+	 * @return *this
+	 */
+	FModioFilterParams& RevenueType(EModioRevenueFilterType RevenueFilter);
+
+	/**
 	 *  @brief Converts the filter params to a string suitable for use in the REST API.
 	 *  @note Performs a allocation to acquire the string
 	 *  @return FString containing the filter parameters
@@ -179,6 +195,7 @@ private:
 	TArray<FModioModID> IncludedIDs;
 	TArray<FModioModID> ExcludedIDs;
 	TOptional<FString> MetadataBlobSearchString;
+	TOptional<EModioRevenueFilterType> Revenue;
 	bool isPaged = false;
 	int64 Index = 0;
 	int64 Count = 100;

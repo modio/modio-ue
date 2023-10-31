@@ -12,6 +12,8 @@
 #include "Core/ModioModInfoUI.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Types/ModioModProgressInfo.h"
+#include "Core/Input/ModioInputKeys.h"
+#include "Settings/ModioUISettings.h"
 
 void UModioDownloadQueueOpProgress::UpdateSpeed(FModioUnsigned64 DeltaBytes, double DeltaTime)
 {
@@ -38,14 +40,35 @@ void UModioDownloadQueueOpProgress::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	bIsFocusable = true;
+
 	if (UnsubscribeButton)
 	{
 		UnsubscribeButton->OnClicked.AddDynamic(this, &UModioDownloadQueueOpProgress::OnUnsubscribeClicked);
+
+		UModioUISettings* Settings = UModioUISettings::StaticClass()->GetDefaultObject<UModioUISettings>();
+		bAllowUnsubscribeShortcut = Settings->bUnsubscribeShortcutInDownloadQueue;
+		UnsubscribeButton->KeyForInputHint = bAllowUnsubscribeShortcut ? FModioInputKeys::Subscribe : FKey();
 	}
+}
+
+void UModioDownloadQueueOpProgress::OnUnsubscribeShortcutClicked()
+{
+	if (!bAllowUnsubscribeShortcut)
+	{
+		return;
+	}
+
+	OnUnsubscribeClicked();
 }
 
 void UModioDownloadQueueOpProgress::OnUnsubscribeClicked()
 {
+	if (!IsValid(UnsubscribeButton) || !UnsubscribeButton->GetIsEnabled())
+	{
+		return;
+	}
+
 	UModioModInfoUI* ActualData = Cast<UModioModInfoUI>(DataSource);
 	if (ActualData)
 	{

@@ -13,6 +13,7 @@
 #include "Layout/Visibility.h"
 #include "Misc/Attribute.h"
 #include "UI/BaseWidgets/Slots/ModioDrawerControllerSlot.h"
+#include "UI/Interfaces/IModioUIDownloadQueueWidget.h"
 #include "ModioUISubsystem.h"
 #include "UI/CommonComponents/ModioMenu.h"
 
@@ -47,6 +48,8 @@ TSharedRef<SWidget> UModioDrawerController::RebuildWidget()
 {
 	TSharedRef<SWidget> Widget = Super::RebuildWidget();
 	Widget->SetOnMouseButtonUp(FPointerEventHandler::CreateUObject(this, &UModioDrawerController::OnMouseUp));
+
+	IModioUIActionHandler::Register<UModioDrawerController>();
 	return Widget;
 }
 
@@ -94,6 +97,19 @@ bool UModioDrawerController::ToggleDrawerExpanded(int32 SlotIndex, bool bCloseOt
 	return bNewDrawerState;
 }
 
+bool UModioDrawerController::IsDrawerExpanded(int32 SlotIndex)
+{
+	if (SlotIndex < Slots.Num())
+	{
+		if (UModioDrawerControllerSlot* TargetSlot = Cast<UModioDrawerControllerSlot>(Slots[SlotIndex]))
+		{
+			return TargetSlot->GetExpandedState();
+		}
+	}
+
+	return false;
+}
+
 void UModioDrawerController::SetDrawerExpanded(int32 SlotIndex, bool bExpandedState, bool bCloseOtherDrawers)
 {
 	if (SlotIndex < Slots.Num())
@@ -128,8 +144,6 @@ void UModioDrawerController::SetDrawerExpanded(int32 SlotIndex, bool bExpandedSt
 	// If we're closing the drawers, make sure to reset controller focus
 	if (bExpandedState == false) 
 	{
-		UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
-		FSlateApplication::Get().SetUserFocus(0, Subsystem->ModBrowserInstance->TakeWidget(), EFocusCause::SetDirectly);
 		OnDrawerClosed.Broadcast();
 	}
 }
@@ -177,4 +191,26 @@ bool UModioDrawerController::SetFocusToActiveDrawer()
 void UModioDrawerController::DrawerAnimatedOut()
 {
 	OnDrawerAnimatedOut.Broadcast(CurrentAnimatingOutDrawer);
+}
+
+void UModioDrawerController::NativeOnMenuAction(EMenuAction Action, UObject* OptionalData)
+{
+	switch (Action)
+	{
+		case EMenuAction::CloseDownloadDrawer:
+			SetDrawerExpanded((int32) EModioMenuDrawer::EMMD_DownloadQueue, false, false);
+			break;
+		case EMenuAction::CloseSearchDrawer:
+			SetDrawerExpanded((int32) EModioMenuDrawer::EMMD_RefineSearch, false, false);
+			break;
+		case EMenuAction::RefreshDownloadQueue:
+			for (UWidget* Child : GetAllChildren())
+			{
+				if (Child->Implements<UModioUIDownloadQueueWidget>())
+				{
+					IModioUIDownloadQueueWidget::Execute_RefreshDownloadQueue(Child);
+				}
+			}
+			break;
+	}
 }

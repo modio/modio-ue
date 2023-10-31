@@ -25,7 +25,7 @@ bool FModioGetModInfoTest::RunTest(const FString& Parameters)
 {
 	ADD_LATENT_AUTOMATION_COMMAND(FModioInitializeAsyncCommand(this));
 
-	//ADD_LATENT_AUTOMATION_COMMAND(FModioGetModInfoAsyncCommand(this, FModioModID(), FModioErrorCode {}));
+	ADD_LATENT_AUTOMATION_COMMAND(FModioGetModInfoAsyncCommand(this, FModioModID(50), EModioErrorCondition {}));
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));
 	return true;

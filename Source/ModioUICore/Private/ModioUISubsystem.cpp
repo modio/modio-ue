@@ -19,7 +19,6 @@
 #include "Math/IntPoint.h"
 #include "ModioErrorCondition.h"
 #include "ModioSubsystem.h"
-#include "UI/Interfaces/IModioUINotification.h"
 #include "ModioUICore.h"
 #include "Core/ModioModInfoUI.h"
 #include "UI/Interfaces/IModioModBrowser.h"
@@ -32,24 +31,20 @@ void UModioUISubsystem::GetPreloadDependencies(TArray<UObject*>& OutDeps)
 
 bool UModioUISubsystem::QueryIsModEnabled(FModioModID ID)
 {
+	// First we check if the user has overridden the default functionality
 	if (GetModEnabledDelegate.IsBound())
 	{
 		return GetModEnabledDelegate.Execute(ID);
 	}
-	else
-	{
-		return false;
-	}
+
+	// Mods should be enabled as default
+	return true;
 }
 
 bool UModioUISubsystem::RequestModEnabledState(FModioModID ID, bool bNewEnabledState)
 {
-	if (OnModEnabledChanged.IsBound())
-	{
-		OnModEnabledChanged.Broadcast(ID, bNewEnabledState);
-		return true;
-	}
-	return false;
+	OnModEnabledChanged.Broadcast(ID, bNewEnabledState);
+	return OnModEnabledChanged.IsBound();
 }
 
 void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ErrorCode, FModioModID ID)
@@ -63,6 +58,7 @@ void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ErrorCode, FModioMod
 	if (!ErrorCode)
 	{
 		OnSubscriptionStatusChanged.Broadcast(ID, true);
+		RequestModEnabledState(ID, true);
 	}
 
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
@@ -72,6 +68,8 @@ void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ErrorCode, FModioMod
 			ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
 			DisplayNotificationParams(UModioNotificationParamsLibrary::CreateSubscriptionNotification(ErrorCode, ModInfoObj));
 		}));
+
+		OnModSubscribeFailed.Broadcast(ID);
 	}
 }
 
@@ -91,6 +89,7 @@ void UModioUISubsystem::UnsubscribeHandler(FModioErrorCode ErrorCode, FModioModI
 	}
 	else
 	{
+		OnModUnsubscribeFailed.Broadcast(ID);
 		DisplayErrorDialog(ErrorCode);
 	}
 }
@@ -385,7 +384,7 @@ UUserWidget* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UUserWidge
 	return ModBrowserInstance;
 }
 
-void UModioUISubsystem::HideModBrowserUI()
+void UModioUISubsystem::HideModBrowserUI() 
 {
 	if (IsValid(ModBrowserInstance))
 	{
@@ -406,6 +405,15 @@ void UModioUISubsystem::CloseModBrowserUI()
 	}
 }
 
+bool UModioUISubsystem::GetIsCollectionModDisableUIEnabled()
+{
+	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
+	{
+		return IModioModBrowserInterface::Execute_GetIsCollectionModDisableUIEnabled(ModBrowserInstance);
+	}
+	return false;
+}
+
 void UModioUISubsystem::ExecuteOnModBrowserClosedDelegate()
 {
 	// Host application must bind BrowserClosedDelegate before creating ModBrowserUI
@@ -422,7 +430,8 @@ void UModioUISubsystem::ShowUserAuth()
 
 void UModioUISubsystem::ShowDetailsForMod(FModioModID ID)
 {
-	// OnDisplayModDetailsForID.Broadcast(ID);
+	OnDisplayModDetailsForID.Broadcast(ID);
+
 	// For now we need to do this so that we get the widget switcher to show the menu page. Eventually should be
 	// decoupled further I think
 	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
@@ -433,6 +442,11 @@ void UModioUISubsystem::ShowDetailsForMod(FModioModID ID)
 
 bool UModioUISubsystem::ShowSearchResults(FModioFilterParams SearchParameters)
 {
+	if (OnDisplaySearchResults.IsBound())
+	{
+		return OnDisplaySearchResults.Execute(SearchParameters);
+	}
+
 	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
 	{
 		IModioModBrowserInterface::Execute_ShowSearchResults(ModBrowserInstance, SearchParameters);
@@ -460,13 +474,8 @@ void UModioUISubsystem::DisplayErrorDialog(FModioErrorCode ErrorCode)
 	DisplayNotificationManual(LOCTEXT("Error", "Error"), FText::Format(LOCTEXT("ErrorCode", "{0}: {1}"), FText::FromString(ErrorCode.GetErrorMessage()), FText::AsNumber(ErrorCode)), true);
 }
 
-FOnGetModEnabled UModioUISubsystem::GetOnModEnabled()
-{
-	return GetModEnabledDelegate;
-}
-
 void UModioUISubsystem::LogoDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image, FModioModID ID,
-											EModioLogoSize LogoSize)
+                                            EModioLogoSize LogoSize)
 {
 	OnModLogoDownloadCompleted.Broadcast(ID, ec, Image, LogoSize);
 }
@@ -595,16 +604,6 @@ void UModioUISubsystem::OnLogoutComplete(FModioErrorCode ec)
 	{
 		OnUserChanged.Broadcast({});
 	}
-}
-
-bool UModioUISubsystem::IsDownloadDrawerOpen()
-{
-	if (ModBrowserInstance->Implements<UModioModBrowserInterface>())
-	{
-		return IModioModBrowserInterface::Execute_IsDownloadDrawerOpen(ModBrowserInstance);
-	}
-
-	return false;
 }
 
 TOptional<FModioModTagOptions> UModioUISubsystem::GetTagOptionsList()

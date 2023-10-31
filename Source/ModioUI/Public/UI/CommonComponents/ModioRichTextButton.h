@@ -63,6 +63,8 @@ protected:
 	UFUNCTION()
 	ESlateVisibility GetInputHintVisibility(EModioUIInputMode InputMode);
 
+	bool bIsInputHintVisible = true;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	FKey KeyForInputHint;
@@ -89,4 +91,6 @@ public:
 	* @param NewJustification Update text orientation
 	**/
 	void SetJustification(ETextJustify::Type NewJustification);
+
+	void SetInputHintVisibility(bool bVisible);
 };

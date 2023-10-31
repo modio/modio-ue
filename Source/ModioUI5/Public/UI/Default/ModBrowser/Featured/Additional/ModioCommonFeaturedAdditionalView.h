@@ -18,7 +18,7 @@
 #include "UI/Foundation/Base/ModioCommonActivatableWidget.h"
 #include "ModioCommonFeaturedAdditionalView.generated.h"
 
-class UListView;
+class UModioCommonFilteredModListView;
 class UModioCommonTabButtonBase;
 class UModioCommonTabListWidgetBase;
 class UModioCommonFeaturedAdditionalViewStyle;
@@ -30,7 +30,6 @@ class UModioCommonFeaturedAdditionalViewStyle;
 UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
 class MODIOUI5_API UModioCommonFeaturedAdditionalView
 	: public UModioCommonActivatableWidget,
-	  public IModioUIModInfoReceiver,
 	  public IModioUIUserChangedReceiver,
 	  public IModioUISubscriptionsChangedReceiver,
 	  public IModioUIModManagementEventReceiver
@@ -53,11 +52,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style", Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonFeaturedAdditionalViewStyle> ModioStyle;
 	
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, MustImplement = "ModioCommonModListViewInterface"), Category = "Mod.io Common UI")
-	TObjectPtr<UListView> ModList;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
+	TObjectPtr<UModioCommonFilteredModListView> FilteredModListView;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	UModioCommonTabListWidgetBase* CategoryTabList;
+	TObjectPtr<UModioCommonTabListWidgetBase> CategoryTabList;
 
 public:
 	/**
@@ -80,12 +79,21 @@ protected:
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 	
 public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
 	void RefreshList(const FModioFilterParams& Filter);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	void RefreshListByTabId(FName TabId);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	void HandleSetModsFromModInfoListStarted();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	void HandleSetModsFromModInfoListFinished();
 
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeOnInitialized() override;
-	virtual void NativeOnListAllModsRequestCompleted(FString RequestIdentifier, FModioErrorCode ErrorCode, TOptional<FModioModInfoList> List) override;
 
 	virtual void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
@@ -95,4 +103,7 @@ protected:
 protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI")
 	FModioFilterParams CurrentFilter;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Mod.io Common UI")
+	int64 OverriddenModsCount = INDEX_NONE;
 };

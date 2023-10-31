@@ -115,3 +115,8 @@ bool UModioCommonTypesLibrary::NotEqualTo(const FModioModID& A, const FModioModI
 {
 	return A != B;
 }
+
+FModioEntitlementParams UModioCommonTypesLibrary::MakeEntitlementParams(const TMap<FString, FString>& ExtendedParameters)
+{
+	return FModioEntitlementParams(ExtendedParameters);
+}

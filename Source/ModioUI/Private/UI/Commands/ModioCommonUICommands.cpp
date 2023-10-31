@@ -53,6 +53,26 @@ FModioUIMenuEntry UModioUICommandInfoLibrary::CollapseCommand()
 	return FModioUIMenuEntry {FModioCommonUICommands::Get().Collapse->GetLabel()};
 }
 
+FModioUIMenuEntry UModioUICommandInfoLibrary::LogOutCommand()
+{
+	return FModioUIMenuEntry {FModioCommonUICommands::Get().LogOut->GetLabel()};
+}
+
+FModioUIMenuEntry UModioUICommandInfoLibrary::RateUpCommand()
+{
+	return FModioUIMenuEntry {FModioCommonUICommands::Get().RateUp->GetLabel()};
+}
+
+FModioUIMenuEntry UModioUICommandInfoLibrary::RateDownCommand()
+{
+	return FModioUIMenuEntry {FModioCommonUICommands::Get().RateDown->GetLabel()};
+}
+
+FModioUIMenuEntry UModioUICommandInfoLibrary::ReportCommand()
+{
+	return FModioUIMenuEntry {FModioCommonUICommands::Get().Report->GetLabel()};
+}
+
 FUIAction FModioCommonUICommands::GetNullAction()
 {
 	return FUIAction(FExecuteAction::CreateLambda([]() {}), FCanExecuteAction::CreateLambda([]() { return false; }));
@@ -111,6 +131,24 @@ void FModioCommonUICommands::RegisterCommands()
 		LOCTEXT("Collapse.Desc", "Toggle collapse tag category"), FSlateIcon(),
 									EUserInterfaceActionType::Button,
 									FInputChord(FModioInputKeys::Collapse, EModifierKey::None));
+
+		FUICommandInfo::MakeCommandInfo(this->AsShared(), LogOut, "LogOut", LOCTEXT("LogOut.Label", "LogOut"),
+									LOCTEXT("LogOut.Desc", "Logout from modio"), FSlateIcon(),
+									EUserInterfaceActionType::Button,
+									FInputChord(FModioInputKeys::LogOut, EModifierKey::None));
+
+	FUICommandInfo::MakeCommandInfo(this->AsShared(), RateUp, "RateUp", LOCTEXT("RateUp.Label", "RateUp"),
+									LOCTEXT("RateUp.Desc", "Rate up a mod"), FSlateIcon(),
+									EUserInterfaceActionType::Button, FInputChord(FModioInputKeys::RateUp, EModifierKey::None));
+
+	FUICommandInfo::MakeCommandInfo(
+		this->AsShared(), RateDown, "RateDown", LOCTEXT("RateDown.Label", "RateDown"), LOCTEXT("RateDown.Desc", "Rate down a mod"),
+		FSlateIcon(), EUserInterfaceActionType::Button, FInputChord(FModioInputKeys::RateDown, EModifierKey::None));
+
+	FUICommandInfo::MakeCommandInfo(this->AsShared(), Report, "Report", LOCTEXT("Report.Label", "Report"),
+									LOCTEXT("Report.Desc", "Report a mod"), FSlateIcon(),
+									EUserInterfaceActionType::Button,
+									FInputChord(FModioInputKeys::Report, EModifierKey::None));
 }
 
 #include "Loc/EndModioLocNamespace.h"

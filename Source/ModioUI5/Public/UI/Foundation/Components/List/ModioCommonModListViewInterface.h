@@ -17,6 +17,8 @@
 #include "Types/ModioModCollectionEntry.h"
 #include "ModioCommonModListViewInterface.generated.h"
 
+class UListView;
+
 // This class does not need to be modified.
 UINTERFACE()
 class UModioCommonModListViewInterface : public UInterface
@@ -32,28 +34,46 @@ class MODIOUI5_API IModioCommonModListViewInterface
 	GENERATED_BODY()
 
 protected:
+	virtual void SetModSelectionByID_Implementation(FModioModID ModID);
 	virtual void SetModsFromModInfoList_Implementation(const FModioModInfoList& InList, bool bAddToExisting);
 	virtual void SetModsFromModInfoArray_Implementation(const TArray<FModioModInfo>& InArray, bool bAddToExisting);
 	virtual void SetModsFromModCollectionEntryArray_Implementation(const TArray<FModioModCollectionEntry>& InArray, bool bAddToExisting);
+	virtual void RequestFullClearSelection_Implementation();
+	virtual bool GetSelectedModItem_Implementation(bool bIncludePreviouslySelected, UObject*& OutModItem);
+	virtual bool GetEntryWidgetFromItem_Implementation(UObject* InItem, UWidget*& OutEntryWidget);
+	virtual UWidget* GetDesiredListFocusTarget_Implementation();
 
 public:
-	UFUNCTION(BlueprintNativeEvent)
+	virtual UListView* GetListView() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
 	void SetModSelectionByID(FModioModID ModID);
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
 	void SetFocusOnceListIsPopulated(bool bFocus);
-	
-	UFUNCTION(BlueprintNativeEvent)
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
 	void SetModsFromModInfoList(const FModioModInfoList& InList, bool bAddToExisting);
 	
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
 	void SetModsFromModInfoArray(const TArray<FModioModInfo>& InArray, bool bAddToExisting);
 	
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
 	void SetModsFromModCollectionEntryArray(const TArray<FModioModCollectionEntry>& InArray, bool bAddToExisting);
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
 	void RequestFullClearSelection();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
+	bool GetSelectedModItem(bool bIncludePreviouslySelected, UObject*& OutModItem);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
+	bool GetEntryWidgetFromItem(UObject* InItem, UWidget*& OutEntryWidget);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
+	UWidget* GetDesiredListFocusTarget();
+
+	TOptional<FModioModID> PreviouslySelectedModID;
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:

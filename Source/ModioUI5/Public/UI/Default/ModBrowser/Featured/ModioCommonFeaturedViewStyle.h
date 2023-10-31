@@ -18,6 +18,7 @@
 
 class UModioCommonGenericModEntryStyle;
 class UModioCommonListViewStyle;
+class UModioCommonFilteredModListViewStyle;
 class UModioCommonTabButtonStyle;
 class UModioCommonButtonStyle;
 class UModioCommonTextStyle;
@@ -34,7 +35,7 @@ class MODIOUI5_API UModioCommonFeaturedAdditionalViewStyle : public UObject
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonListViewStyle> ModListStyle;
+	TSubclassOf<UModioCommonFilteredModListViewStyle> FilteredModListViewStyle;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Tab")
 	TSubclassOf<UModioCommonTabButtonBase> CategoryTabButtonClass;

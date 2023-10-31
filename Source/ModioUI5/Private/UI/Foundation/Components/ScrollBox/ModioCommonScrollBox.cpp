@@ -77,4 +77,93 @@ void UModioCommonScrollBox::SynchronizeProperties()
 #endif
 	}
 	Super::SynchronizeProperties();
+	UpdateNavigationData(GetScrollOffset());
+}
+
+TSharedRef<SWidget> UModioCommonScrollBox::RebuildWidget()
+{
+	UpdateNavigationData(GetScrollOffset());
+	OnUserScrolled.RemoveDynamic(this, &UModioCommonScrollBox::OnUserScrolledHandle);
+	OnUserScrolled.AddDynamic(this, &UModioCommonScrollBox::OnUserScrolledHandle);
+	return Super::RebuildWidget();
+}
+
+void UModioCommonScrollBox::OnUserScrolledHandle_Implementation(float CurrentOffset)
+{
+	UpdateNavigationData(CurrentOffset);
+}
+
+void UModioCommonScrollBox::UpdateNavigationData_Implementation(int32 PendingScrollOffset)
+{
+	if (!IsValid(Navigation))
+	{
+		return;
+	}
+
+	if (IsDesignTime() || !IsValid(UserDefinedNavigation))
+	{
+		UserDefinedNavigation = NewObject<UWidgetNavigation>(this);
+		UserDefinedNavigation->Up = Navigation->Up;
+		UserDefinedNavigation->Down = Navigation->Down;
+		UserDefinedNavigation->Left = Navigation->Left;
+		UserDefinedNavigation->Right = Navigation->Right;
+	}
+
+	if (UModioCommonScrollBoxStyle* StyleCDO = ModioStyle.GetDefaultObject())
+	{
+		FCustomWidgetNavigationDelegate NavigationDelegate;
+		NavigationDelegate.BindUFunction(this, "HandleCustomBoundaryNavigation");
+
+		if (Orientation == EOrientation::Orient_Vertical)
+		{
+			SetNavigationRuleCustomBoundary(EUINavigation::Down, NavigationDelegate);
+			SetNavigationRuleCustomBoundary(EUINavigation::Up, NavigationDelegate);
+		}
+		else if (Orientation == EOrientation::Orient_Horizontal)
+		{
+			SetNavigationRuleCustomBoundary(EUINavigation::Right, NavigationDelegate);
+			SetNavigationRuleCustomBoundary(EUINavigation::Left, NavigationDelegate);
+		}
+
+		if (!StyleCDO->bScrollByNavigationInput || IsDesignTime())
+		{
+			Navigation = UserDefinedNavigation;
+			BuildNavigation();
+		}
+		else if (PendingScrollOffset != INDEX_NONE && (PendingScrollOffset <= 0 || PendingScrollOffset >= GetScrollOffsetOfEnd()))
+		{
+			if (PendingScrollOffset <= 0)
+			{
+				Navigation->Up = UserDefinedNavigation->Up;
+				Navigation->Left = UserDefinedNavigation->Left;
+			}
+			if (PendingScrollOffset >= GetScrollOffsetOfEnd())
+			{
+				Navigation->Right = UserDefinedNavigation->Right;
+				Navigation->Down = UserDefinedNavigation->Down;
+			}
+			BuildNavigation();
+		}
+	}
+}
+
+UWidget* UModioCommonScrollBox::HandleCustomBoundaryNavigation_Implementation(EUINavigation InNavigation)
+{
+	if (UModioCommonScrollBoxStyle* StyleCDO = ModioStyle.GetDefaultObject())
+	{
+		const float NewOffset = [this, StyleCDO, InNavigation]() {
+			if (InNavigation == EUINavigation::Down || InNavigation == EUINavigation::Right)
+			{
+				return GetScrollOffset() + StyleCDO->NavigationScrollOffsetStep;
+			}
+			if (InNavigation == EUINavigation::Up || InNavigation == EUINavigation::Left)
+			{
+				return GetScrollOffset() - StyleCDO->NavigationScrollOffsetStep;
+			}
+			return static_cast<float>(INDEX_NONE);
+		}();
+		SetScrollOffset(NewOffset);
+		UpdateNavigationData(NewOffset);
+	}
+	return nullptr;
 }

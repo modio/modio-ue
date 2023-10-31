@@ -52,17 +52,20 @@ protected:
 	FModioUIStyleRef BadgeStyle;
 
 	// These could possibly be moved into the global style
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText PendingLabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText DownloadingLabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText ExtractingLabelText;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
 	FText SubscribedLabelText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Localization")
+	FText ErrorLabelText;
 
 	void UpdateProgress(const struct FModioModProgressInfo& ProgressInfo) override;
 

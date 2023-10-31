@@ -149,6 +149,18 @@ void UModioFeaturedMod::NativeOnInitialized()
 		MenuEntries.MappedActions.Add(FModioUIMenuEntry {LOCTEXT("Report", "Report")}, FModioUIAction {ReportDelegate});
 
 		MoreOptionsMenu->SetMenuEntries(MenuEntries);
+
+		UModioUI4Subsystem* UE4Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
+
+		if (IsValid(UE4Subsystem))
+		{
+			UE4Subsystem->OnGlobalMouseClick.AddWeakLambda(this, [this](){
+				if (!MoreOptionsMenu->IsHovered())
+				{
+					MoreOptionsMenu->Close();
+				}
+				});
+		}
 	}
 }
 
@@ -233,10 +245,12 @@ void UModioFeaturedMod::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 
 void UModioFeaturedMod::NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) 
 {
+	TileActiveFrame->GetRenderOpacity() > 0.0f ? bShouldPlayAnimation = true : bShouldPlayAnimation = false;
+	MoreOptionsMenu->Close();
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 }
 
-void UModioFeaturedMod::NativeOnMouseLeave(const FPointerEvent& InMouseEvent) 
+void UModioFeaturedMod::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
 }

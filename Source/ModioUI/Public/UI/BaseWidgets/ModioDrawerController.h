@@ -12,7 +12,7 @@
 
 #include "CoreMinimal.h"
 #include "UI/BaseWidgets/ModioOverlay.h"
-
+#include "UI/Interfaces/IModioUIActionHandler.h"
 #include "ModioDrawerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDrawerClosed);
@@ -23,7 +23,7 @@ struct EVisibility;
  *
  */
 UCLASS()
-class MODIOUI_API UModioDrawerController : public UModioOverlay
+class MODIOUI_API UModioDrawerController : public UModioOverlay, public IModioUIActionHandler
 {
 	GENERATED_BODY()
 
@@ -41,12 +41,16 @@ protected:
 	UFUNCTION()
 	void DrawerAnimatedOut();
 
+	virtual void NativeOnMenuAction(EMenuAction Action, UObject* OptionalData) override;
+
 public:
 	FOnDrawerClosed OnDrawerClosed;
 	FOnDrawerAnimatedOut_WithIndex OnDrawerAnimatedOut;
 
 	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	bool ToggleDrawerExpanded(int32 SlotIndex, bool bCloseOtherDrawers = true);
+	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
+	bool IsDrawerExpanded(int32 SlotIndex);
 	UFUNCTION(BlueprintCallable, Category = "ModioDrawerController")
 	void SetDrawerExpanded(int32 SlotIndex, bool bExpandedState, bool bCloseOtherDrawers = true);
 

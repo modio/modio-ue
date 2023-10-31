@@ -154,5 +154,5 @@ public:
 	virtual void OnModSubscriptionStatusChanged(FModioModID ID, bool Subscribed);
 
 	UFUNCTION()
-	void NativeSubscribeClicked();
+	virtual void NativeSubscribeClicked();
 };

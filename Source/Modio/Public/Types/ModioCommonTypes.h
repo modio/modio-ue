@@ -20,6 +20,7 @@ namespace Modio
 	struct GameID;
 	struct FileMetadataID;
 	struct UserID;
+	struct EntitlementParams;
 } // namespace Modio
 
 /**
@@ -738,6 +739,32 @@ struct MODIO_API FModioEmailAuthCode
 
 private:
 	FString EmailAuthCode;
+};
+
+/**
+ * Simple struct to encapsulate portal-specific data required when consuming entitlements
+ **/
+USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeEntitlementParams"))
+struct MODIO_API FModioEntitlementParams
+{
+	GENERATED_BODY()
+
+	/**
+	 * Default constructor without parameters
+	 **/
+	FModioEntitlementParams() = default;
+
+	/**
+	 * Preferred constructor with ExtendedParameters initialization parameter
+	 * @param InExtendedParameters Base ExtendedParameters to create this struct
+	 **/
+	explicit FModioEntitlementParams(const TMap<FString, FString>& InExtendedParameters) : ExtendedParameters(InExtendedParameters) {}
+
+private:
+	friend struct Modio::EntitlementParams ToModio(const FModioEntitlementParams& In);
+	/// @brief ExtendedParameters A map to store extended parameters required by some portals.
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
+	TMap<FString, FString> ExtendedParameters;
 };
 
 #pragma endregion

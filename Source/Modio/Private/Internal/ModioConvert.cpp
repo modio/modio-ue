@@ -303,6 +303,13 @@ Modio::Language ToModio(EModioLanguage Language)
 	return Modio::Language::English;
 }
 
+Modio::EntitlementParams ToModio(const FModioEntitlementParams& InParams)
+{
+	Modio::EntitlementParams Params;
+	Params.ExtendedParameters = ToModio(InParams.ExtendedParameters);
+	return Params;
+}
+
 FModioModID ToUnreal(Modio::ModID Value)
 {
 	return FModioModID(Value);

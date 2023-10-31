@@ -80,6 +80,8 @@ void UModioModDetailsView::NativeOnInitialized()
 			Subsystem->OnSubscriptionStatusChanged.AddUObject(this, &UModioModDetailsView::OnModSubscriptionStatusChanged);
 			MenuInstance->OnDownloadQueueClosed.AddDynamic(this, &UModioModDetailsView::OnDownloadQueueClosed);
 			MenuInstance->GetDialogController()->OnDialogClosed.AddDynamic(this, &UModioModDetailsView::OnDialogClosed);
+			Subsystem->OnModSubscribeFailed.AddUObject(this, &UModioModDetailsView::OnModSubscribeFailed);
+			Subsystem->OnModUnsubscribeFailed.AddUObject(this, &UModioModDetailsView::OnModUnsubscribeFailed);
 		}
 	}
 }
@@ -104,6 +106,36 @@ void UModioModDetailsView::OnModSubscriptionStatusChanged(FModioModID ID, bool S
 																: ESlateVisibility::Collapsed);
 				}
 				bCachedSubscriptionState = Subscribed;
+			}
+		}
+	}
+}
+
+void UModioModDetailsView::OnModSubscribeFailed(FModioModID ID)
+{
+	if (DataSource)
+	{
+		UModioModInfoUI* Data = Cast<UModioModInfoUI>(DataSource);
+		if (Data)
+		{
+			if (Data->Underlying.ModId == ID)
+			{
+				EnableSubscribeButton();
+			}
+		}
+	}
+}
+
+void UModioModDetailsView::OnModUnsubscribeFailed(FModioModID ID)
+{
+	if (DataSource)
+	{
+		UModioModInfoUI* Data = Cast<UModioModInfoUI>(DataSource);
+		if (Data)
+		{
+			if (Data->Underlying.ModId == ID)
+			{
+				EnableSubscribeButton();
 			}
 		}
 	}
@@ -212,15 +244,33 @@ FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		return FReply::Handled();
 	}
 
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::RateUp))
+	{
+		RateUpClicked();
+		return FReply::Handled();
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::RateDown))
+	{
+		RateDownClicked();
+		return FReply::Handled();
+	}
+
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Report))
+	{
+		ReportClicked();
+		return FReply::Handled();
+	}
+
 	if (ImageGallery->bIsFocused)
 	{
-		if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down)
+		if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down))
 		{
 			CurrentIndex = FMath::Clamp(CurrentIndex+=ControllerScrollingMultiplier, 0, FMath::CeilToInt(ScrollBox->GetScrollOffsetOfEnd()));
 			bIsScrolling = true;
 			return FReply::Handled();
 		}
-		else if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up)
+		else if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Up))
 		{
 			CurrentIndex = FMath::Clamp(CurrentIndex -= ControllerScrollingMultiplier, 0, FMath::CeilToInt(ScrollBox->GetScrollOffsetOfEnd()));
 			bIsScrolling = true;
@@ -228,29 +278,29 @@ FReply UModioModDetailsView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		}
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Next)
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Next))
 	{
 		ImageGallery->ChangeImage(FModioInputKeys::Next);
 		return FReply::Handled();
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Previous)
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Previous))
 	{
 		ImageGallery->ChangeImage(FModioInputKeys::Previous);
 		return FReply::Handled();
 	}
 
-	if (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Subscribe && !InKeyEvent.IsRepeat() && SubscribeButton && SubscribeButton->GetIsEnabled())
+	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Subscribe) && !InKeyEvent.IsRepeat() && SubscribeButton && SubscribeButton->GetIsEnabled())
 	{
 		NativeSubscribeClicked();
 		return FReply::Handled();
 	}
 
 	// if user changes from mouse to keyboard, this is to make sure these buttons actually do something:
-	if (HasAnyUserFocus() && (GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Up ||
-		GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Down ||
-		GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Left ||
-		GetCommandKeyForEvent(InKeyEvent) == FModioInputKeys::Right))
+	if (HasAnyUserFocus() && (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Up) ||
+		GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down) ||
+		GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Left) ||
+		GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Right)))
 	{
 		SubscribeButton->SetKeyboardFocus();
 		return FReply::Handled();
@@ -517,7 +567,7 @@ void UModioModDetailsView::NativeOnModInfoRequestCompleted(FModioModID ModID, FM
 void UModioModDetailsView::SetInitialFocus()
 {
 	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
-	if (IsValid(Subsystem) && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+	if (IsValid(Subsystem) && Subsystem->GetLastInputDevice() != EModioUIInputMode::Mouse)
 	{
 		if (SubscribeButton->GetIsEnabled())
 		{
@@ -541,7 +591,7 @@ void UModioModDetailsView::OnDialogClosed()
 	UModioUI4Subsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
 	if (IsValid(Subsystem))
 	{
-		if (Subsystem->GetCurrentFocusTarget() != SubscribeButton && !(Subsystem->GetLastInputDevice() == EModioUIInputMode::Mouse))
+		if (Subsystem->GetCurrentFocusTarget() != SubscribeButton && Subsystem->GetLastInputDevice() != EModioUIInputMode::Mouse)
 		{
 			SubscribeButton->SetKeyboardFocus();
 		}

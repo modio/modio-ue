@@ -187,4 +187,11 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
 			  meta = (CompactNodeTitle = "!=", Keywords = "!= not equal", DisplayName = "ModioModID != ModioModID"))
 	static bool NotEqualTo(const FModioModID& A, const FModioModID& B);
+
+	/**
+	 * @brief Create entitlement parameters
+	 * @param ExtendedParameters A map to store extended parameters required by some portals
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
+	static FModioEntitlementParams MakeEntitlementParams(const TMap<FString, FString>& ExtendedParameters);
 };

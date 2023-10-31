@@ -27,5 +27,8 @@ class MODIOUI5_API UModioCommonModGalleryEntryStyle : public UObject
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonDynamicImageStyle> ModImageStyle;
+	TSubclassOf<UModioCommonDynamicImageStyle> ModImageNormalStyle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
+	TSubclassOf<UModioCommonDynamicImageStyle> ModImageSelectedStyle;
 };

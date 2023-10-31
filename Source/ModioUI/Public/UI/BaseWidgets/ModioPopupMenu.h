@@ -69,6 +69,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	FKey KeyForInputHint;
 
+	// In case there are clipping issues enable this
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	bool bPaintOverCurrentUI = false;
+
 	bool GetIsMenuOpen();
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")

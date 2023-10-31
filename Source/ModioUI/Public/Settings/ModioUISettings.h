@@ -54,6 +54,7 @@ struct MODIOUI_API FModioInputMapping
 	TArray<FName> MappedProjectInputs;
 };
 
+
 /**
 * Class definition for UI Modio settings that keeps references to navigation, authentication, 
 * and background image provider
@@ -127,6 +128,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
 	bool bOverridePlatformMaterials = false;
 
+	// Enables a user interface for enabling and disabling mods.
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "ModioUISettings")
+	bool bEnableCollectionModDisableUI = false;
 	/**
 	* Enable for a centered mod browser in case you want the aspect ratio to be the same for all screen types
 	**/
@@ -147,6 +151,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Config, Category = "ModioLocalization")
 	TMap<FString, FText> LocalizedTags;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Config, Category = "ModioUISettings")
+	bool bUnsubscribeShortcutInDownloadQueue = true;
 
 	#if WITH_EDITOR
 	void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override

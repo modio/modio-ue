@@ -29,6 +29,7 @@ class UCommonActivatableWidgetStack;
 class UModioCommonQuickAccessViewBase;
 class UModioCommonModDetailsViewBase;
 class UModioCommonActionBar;
+class UModioCommonDialogInfo;
 struct FModioModInfo;
 
 /**
@@ -145,12 +146,17 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Tab")
 	bool GetViewFromTabNameID(FName TabNameID, UModioCommonActivatableWidget*& OutView) const;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mod.io Common UI|Tab")
+	bool bShowSearchViewOnSearchResults = true;
+
 	//~ Begin IModioModBrowserInterface Interface
 	virtual void ShowDetailsForMod_Implementation(FModioModID ModID) override;
 	virtual void ShowSearchResults_Implementation(const FModioFilterParams& FilterParams) override;
 	virtual void ShowUserAuth_Implementation() override;
 	virtual void LogOut_Implementation() override;
 	virtual void ShowReportMod_Implementation(UObject* DialogDataSource) override;
-	virtual void ShowDialog_Implementation(FModioModInfo ModInfo) override;
+	virtual bool GetIsCollectionModDisableUIEnabled_Implementation() override;
+public:
+	void ShowDialog(UModioCommonDialogInfo* DialogInfo);
 	//~ End IModioModBrowserInterface Interface
 };

@@ -45,6 +45,9 @@ public:
 	int64 PreviewPageSize = 100;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Preview")
+	bool bPreviewShowInitialScreen = false;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Preview")
 	bool bPreviewShowNoResults = false;
 
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Preview")
@@ -71,10 +74,13 @@ protected:
 	TObjectPtr<UListView> ModList;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
-	TObjectPtr<UPanelWidget> LoadingContainer;
+	TObjectPtr<UPanelWidget> InitialScreenContainer;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
 	TObjectPtr<UPanelWidget> NoResultsContainer;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
+	TObjectPtr<UPanelWidget> LoadingContainer;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
 	TObjectPtr<UPanelWidget> PageNavigationContainer;
@@ -94,6 +100,30 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonTextBlock> TotalModsTextBlock;
 
+public:
+	DECLARE_MULTICAST_DELEGATE(FOnSetModsFromModInfoListStarted);
+	/** @brief Executed when the mod list is about to be populated */
+	FOnSetModsFromModInfoListStarted OnSetModsFromModInfoListStarted;
+
+	DECLARE_MULTICAST_DELEGATE(FOnSetModsFromModInfoListFinished);
+	/** @brief Executed when the mod list has been populated */
+	FOnSetModsFromModInfoListFinished OnSetModsFromModInfoListFinished;
+
+public:
+	/**
+	 * @brief Gets the number of items selected in the list
+	 * @return The number of items selected in the list
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	int32 GetNumItemsSelected() const;
+
+	/**
+	 * @brief Gets the number of items in the list
+	 * @return The number of items in the list
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	int32 GetNumItems() const;
+
 protected:
 	//~ Begin UModioCommonActivatableWidget Interface
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
@@ -110,6 +140,7 @@ public:
 
 protected:
 	//~ Begin IModioCommonModListViewInterface Interface
+	virtual UListView* GetListView() const override { return ModList; }
 	virtual void SetFocusOnceListIsPopulated_Implementation(bool bFocus) override;
 	virtual void RequestFullClearSelection_Implementation() override;
 	virtual void NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting) override;
@@ -132,12 +163,18 @@ protected:
 	void HandleNextPageClicked();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void SetInitialScreenVisibility(bool bVisible);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void SetNoResultsVisibility(bool bVisible);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void SetLoadingVisibility(bool bVisible);
 
 protected:
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Properties")
+	bool bHasSearchedBefore = false;
+
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Properties")
 	int64 CurrentPageIndex = 0;
 

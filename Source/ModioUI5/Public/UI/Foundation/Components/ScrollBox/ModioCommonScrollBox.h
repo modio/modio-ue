@@ -41,5 +41,34 @@ protected:
 public:
 	//~ Begin UScrollBox Interface
 	virtual void SynchronizeProperties() override;
+protected:
+	virtual TSharedRef<SWidget> RebuildWidget() override;
 	//~ End UScrollBox Interface
+
+protected:
+	/**
+	 * @brief Called when the user scrolls the scroll box
+	 * @param CurrentOffset The current scroll offset
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI|Scroll Box")
+	void OnUserScrolledHandle(float CurrentOffset);
+
+	/**
+	 * @brief Updates navigation data based on the pending scroll offset
+	 * @param PendingScrollOffset The pending scroll offset (may differ from the actual current scroll offset due to ongoing scrolling animation, if any)
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI|Scroll Box")
+	void UpdateNavigationData(int32 PendingScrollOffset);
+
+	/**
+	 * @brief Handles custom navigation when the scroll box reaches its boundary during navigation
+	 * @param InNavigation The navigation being handled
+	 * @return The widget to navigate to
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	UWidget* HandleCustomBoundaryNavigation(EUINavigation InNavigation);
+
+	/** @brief User-defined navigation data to apply when the scroll box can no longer scroll. Relevant only if bScrollByNavigationInput is true */
+	UPROPERTY(Instanced, BlueprintReadOnly, Category="Navigation")
+	TObjectPtr<class UWidgetNavigation> UserDefinedNavigation;
 };

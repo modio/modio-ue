@@ -23,7 +23,7 @@
 #include "UI/Styles/ModioUIStyleRef.h"
 #include "UI/Dialogs/ModioDialogInfo.h"
 #include "UI/Interfaces/IModioUIAuthenticationDataProvider.h"
-
+#include "UI/Interfaces/IModioUIActionHandler.h"
 #include "ModioDialogController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDialogClosed);
@@ -49,7 +49,7 @@ enum class EModioDialogReply : uint8
  * subscriptions, and mod report operations
  **/
 UCLASS()
-class MODIOUI_API UModioDialogController : public UModioWidgetBase
+class MODIOUI_API UModioDialogController : public UModioWidgetBase, public IModioUIActionHandler
 {
 	GENERATED_BODY()
 protected:
@@ -153,6 +153,10 @@ public:
 	// Invoked by ShowTermsOfUseDialog(). Sets Terms text field and displays the dialog.
 	void HandleTermsOfUseReceived(FModioErrorCode ec, TOptional<FModioTerms> Terms,
 								  TSharedPtr<FModioUIAuthenticationProviderInfo> ProviderInfo);
+
+	virtual void NativeOnMenuAction(EMenuAction Action, UObject* OptionalData) override;
+
+	virtual void NativeOnErrorCodeReceived(FModioErrorCode ec) override;
 
 	// Does this require a destination parameter?
 	void BeginExternalAuthentication(EModioAuthenticationProvider Provider);

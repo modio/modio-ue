@@ -48,13 +48,13 @@ public:
 	void ShowModUnsubscribeDialog(UObject* DialogDataSource);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
-	void ShowDialog(FModioModInfo ModInfo);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
 	void RequestExternalAuthentication(EModioAuthenticationProvider Provider);
 
 	virtual void RequestExternalAuthenticationNative(EModioAuthenticationProvider Provider, FOnErrorOnlyDelegateFast DedicatedCallback){}
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
 	bool IsDownloadDrawerOpen();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
+	bool GetIsCollectionModDisableUIEnabled();
 };

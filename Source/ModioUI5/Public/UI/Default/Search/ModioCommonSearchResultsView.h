@@ -19,6 +19,7 @@ class UModioCommonSearchResultsViewStyle;
 class UModioCommonModTagList;
 class UModioCommonTextBlock;
 class UModioCommonFilteredModListView;
+enum class EModioSortFieldType : uint8;
 enum class EModioSortDirection : uint8;
 
 /**
@@ -77,13 +78,15 @@ protected:
 	void ShowSearchView();
 
 protected:
-	virtual void NativeOnActivated() override;
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 public:
 	virtual void SynchronizeProperties() override;
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeOnSetDataSource() override;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Data")
+	EModioSortFieldType SortField;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Data")
 	EModioSortDirection Direction;

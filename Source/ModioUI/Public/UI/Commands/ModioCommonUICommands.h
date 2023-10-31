@@ -36,6 +36,10 @@ public:
 	TSharedPtr<FUICommandInfo> Subscribe; // X-button
 	TSharedPtr<FUICommandInfo> EnableDisableMod; // Left trigger
 	TSharedPtr<FUICommandInfo> Collapse; // L-Trigger
+	TSharedPtr<FUICommandInfo> LogOut; // Y-Button
+	TSharedPtr<FUICommandInfo> RateUp; // Up Axis
+	TSharedPtr<FUICommandInfo> RateDown; // Down Axis
+	TSharedPtr<FUICommandInfo> Report; // Y-Button
 	FModioCommonUICommands()
 		: TCommands<FModioCommonUICommands>("ModioUI", FText::FromString("Modio UI"), NAME_None,
 											FName("ModioUIStyleSet")) {};
@@ -67,4 +71,12 @@ public:
 	static FModioUIMenuEntry DownloadQueueCommand();
 	UFUNCTION(BlueprintCallable, Category = "ModioCommonUICommands")
 	static FModioUIMenuEntry CollapseCommand();
+	UFUNCTION(BlueprintCallable, Category = "ModioCommonUICommands")
+	static FModioUIMenuEntry LogOutCommand();
+	UFUNCTION(BlueprintCallable, Category = "ModioCommonUICommands")
+	static FModioUIMenuEntry RateUpCommand();
+	UFUNCTION(BlueprintCallable, Category = "ModioCommonUICommands")
+	static FModioUIMenuEntry RateDownCommand();
+	UFUNCTION(BlueprintCallable, Category = "ModioCommonUICommands")
+	static FModioUIMenuEntry ReportCommand();
 };

@@ -63,12 +63,9 @@ void UModioCommonDialogView::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
 
-	UModioModInfoUI* ModInfoUI = Cast<UModioModInfoUI>(DataSource);
-	UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
-	if (ModInfoUI) 
+	UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DataSource);
+	if (DialogInfo) 
 	{
-		DialogInfo->TitleText = FText::FromString(ModInfoUI->Underlying.ProfileName);
-		DialogInfo->DialogText = FText::FromString("Failed to make too many requests because mod management is busy at the moment.");
 		if (DialogMessageView)
 		{
 			DialogMessageView->SetDataSource(DialogInfo);

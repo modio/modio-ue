@@ -39,6 +39,7 @@ public:
 
 protected:
 	float truncateDivider = 1.0f;
+	bool bAllowUnsubscribeShortcut = false;
 
 	FModioUnsigned64 PreviousProgressValue = FModioUnsigned64(0);
 	FDateTime PreviousUpdateTime;
@@ -47,10 +48,10 @@ protected:
 	void NativeOnSetDataSource() override;
 	void NativeOnInitialized() override;
 
+	void SetPercent(float InPercent);
+
 	UFUNCTION()
 	void OnUnsubscribeClicked();
-
-	void SetPercent(float InPercent);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))
 	UModioProgressBar* ProgressBar;
@@ -77,4 +78,6 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "ModioDownloadQueueOpProgress")
 	virtual FOnDownloadOpComplete& OperationCompletedDelegate();
+
+	void OnUnsubscribeShortcutClicked();
 };

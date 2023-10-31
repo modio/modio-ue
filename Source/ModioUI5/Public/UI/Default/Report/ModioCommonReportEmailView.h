@@ -50,7 +50,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void SetValidationTextVisibility(ESlateVisibility Visbility);
+	void SetValidationTextVisibility(ESlateVisibility EVisbility);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	bool IsEmailValid(const FString& Email);

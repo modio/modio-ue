@@ -91,10 +91,10 @@ class MODIOUI5_API UModioCommonFeaturedAdditionalParamsSettings : public UDevelo
 public:
 	UModioCommonFeaturedAdditionalParamsSettings()
 	{
-		PreviousTabInputAction.RowName = "LeftTabSecondary";
+		PreviousTabInputAction.RowName = "LeftTabTertiary";
 		PreviousTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		NextTabInputAction.RowName = "RightTabSecondary";
+		NextTabInputAction.RowName = "RightTabTertiary";
 		NextTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 	
