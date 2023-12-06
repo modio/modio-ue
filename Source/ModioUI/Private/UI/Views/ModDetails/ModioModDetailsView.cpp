@@ -75,7 +75,7 @@ void UModioModDetailsView::NativeOnInitialized()
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	if (Subsystem)
 	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(Subsystem->ModBrowserInstance))
+		if (UModioMenu* MenuInstance = Cast<UModioMenu>(Subsystem->GetModBrowserInstance()))
 		{
 			Subsystem->OnSubscriptionStatusChanged.AddUObject(this, &UModioModDetailsView::OnModSubscriptionStatusChanged);
 			MenuInstance->OnDownloadQueueClosed.AddDynamic(this, &UModioModDetailsView::OnDownloadQueueClosed);

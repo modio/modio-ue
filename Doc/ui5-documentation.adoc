@@ -1,6 +1,34 @@
 == mod.io Mod Browser UE5 UI
 
-Mod.io UE5 UI is built upon the concepts outlined in the link:https://docs.unrealengine.com/5.0/en-US/common-ui-plugin-for-advanced-user-interfaces-in-unreal-engine/[Common UI approach].
+Mod.io UE5 UI is built upon the concepts outlined in the link:https://docs.unrealengine.com/5.0/en-US/common-ui-plugin-for-advanced-user-interfaces-in-unreal-engine/[Common UI].
+
+=== How to Set Up Common UI for Project to Use Mod.io UE5 UI
+
+==== Enable Common UI plugin
+
+Open the **Edit -> Plugins** window, and enable the `Common UI` plugin.
+
+image::img/UE5/plugin_ui_enable_plugin.png[]
+
+==== Game Viewport Client Class
+
+Navigate to **Project Settings -> Engine -> General Settings**, and set the `Game Viewport Client Class` to `CommonGameViewportClient`.
+
+image::img/UE5/plugin_ui_game_viewport_client_class.png[]
+
+==== Input Data
+
+Go to **Project Settings -> Game -> Common Input Settings**, and set the `Input Data` to `ModioInputData`.
+
+Alternatively, you can create your own `Input Data` class that inherits from `CommonInputData` and set that instead. However, you will need to reassign all the Input Actions to your custom ones in **Project Settings -> Modio UI -> Modio Common UI Settings**.
+
+image::img/UE5/plugin_ui_input_data.png[]
+
+==== Platform Input
+
+Within the same section (**Project Settings -> Game -> Common Input Settings**), locate the `Platform Input` property to specify the per-platform settings.
+
+image::img/UE5/plugin_ui_platform_input.png[]
 
 === Organization
 
@@ -34,7 +62,7 @@ For example, take a look at the **Collection View (W_ModioCommonCollectionView)*
 
 === Customizing Text and Input Actions
 
-For most of the default widgets where the text and actions are available, they can be customized in the project settings. There are different Params sections for most of the widgets where you can specify your own text and input action details.
+For most of the default widgets where the text and actions are available, they can be customized in the project settings. There are different sections for most of the widgets where you can specify your own text and input action details.
 
 image::img/UE5/plugin_ui_settings_params.png[]
 
@@ -72,7 +100,7 @@ Here's a code snippet to demonstrate the typical use case that is intended to be
 // Listen for input actions and execute the OnSubmitClicked delegate when the action is triggered
 if (SubmitButton)
 {
-	ListenForInputAction(SubmitButton, AuthSettings->SubmitInputAction, AuthCodeSettings->SubmitButtonText, [this]() {
+	ListenForInputAction(SubmitButton, AuthSettings->SubmitInputAction, AuthCodeSettings->SubmitButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 		if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(GetInputText());
 	});
 }

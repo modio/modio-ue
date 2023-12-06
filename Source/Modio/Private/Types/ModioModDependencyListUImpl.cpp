@@ -14,3 +14,11 @@
 FModioOptionalModDependencyList::FModioOptionalModDependencyList(TOptional<FModioModDependencyList>&& ModDependencies)
 	: Internal(MoveTemp(ModDependencies))
 {}
+
+FModioMapPreview::FModioMapPreview(PreviewMapDef&& ModPreview)
+	: Internal(MoveTemp(ModPreview))
+{}
+
+FModioOptionalMapPreview::FModioOptionalMapPreview(TOptional<FModioMapPreview>&& MapPreview) 
+: Internal(MoveTemp(MapPreview)) 
+{}

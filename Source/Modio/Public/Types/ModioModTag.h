@@ -27,4 +27,14 @@ struct MODIO_API FModioModTag
 	**/
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModTag")
 	FString Tag;
+
+	bool operator==(const FModioModTag& Other) const
+	{
+		return Tag == Other.Tag;
+	}
+
+	friend uint32 GetTypeHash(const FModioModTag& Other)
+	{
+		return GetTypeHash(Other.Tag);
+	}
 };

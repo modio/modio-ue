@@ -30,16 +30,24 @@ void UModioCollectionTileStatus::NativeOnSetDataSource()
 	}
 
 	TMap<FModioModID, FModioModCollectionEntry> UserMods = Subsystem->QueryUserSubscriptions();
+	TMap<FModioModID, FModioModCollectionEntry> SystemMods = Subsystem->QuerySystemInstallations();
+	bool IsSystemMod = false;
+
 	if (!UserMods.Contains(CollectionEntry->Underlying.GetID()))
 	{
-		SetVisibility(ESlateVisibility::Collapsed);
-		return;
+		if (!SystemMods.Contains(CollectionEntry->Underlying.GetID()))
+		{
+			SetVisibility(ESlateVisibility::Collapsed);
+			return;
+		}
+		IsSystemMod = true;
 	}
 
 	ProgressBarSizeBox->SetVisibility(ESlateVisibility::Collapsed);
 	StatusPercent->SetVisibility(ESlateVisibility::Collapsed);
 
-	FModioErrorCode ec = UserMods[CollectionEntry->Underlying.GetID()].GetLastError();
+	FModioModCollectionEntry Mod = !IsSystemMod ? UserMods[CollectionEntry->Underlying.GetID()] : SystemMods[CollectionEntry->Underlying.GetID()];
+	FModioErrorCode ec = Mod.GetLastError();
 
 	if (ec)
 	{
@@ -62,7 +70,7 @@ void UModioCollectionTileStatus::NativeOnSetDataSource()
 	{
 		StatusText->SetDefaultStyleName("default");
 		StatusText->SynchronizeProperties();
-		switch (UserMods[CollectionEntry->Underlying.GetID()].GetModState())
+		switch (Mod.GetModState())
 		{
 			case EModioModState::InstallationPending:
 				StatusText->SetText(PendingLabelText);
@@ -81,7 +89,7 @@ void UModioCollectionTileStatus::NativeOnSetDataSource()
 				BeginTickIfNeeded(true);
 				break;
 			case EModioModState::Installed:
-				StatusText->SetText(InstalledLabelText);
+				StatusText->SetText(!IsSystemMod ? InstalledLabelText : InstalledByOthersLabelText);
 				break;
 			default:
 				SetPercent(0.0f);

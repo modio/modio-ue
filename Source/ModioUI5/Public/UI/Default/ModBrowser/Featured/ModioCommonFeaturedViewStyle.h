@@ -16,49 +16,8 @@
 #include "Templates/SharedPointer.h"
 #include "ModioCommonFeaturedViewStyle.generated.h"
 
-class UModioCommonGenericModEntryStyle;
-class UModioCommonListViewStyle;
-class UModioCommonFilteredModListViewStyle;
-class UModioCommonTabButtonStyle;
+class UModioCommonSearchResultsViewStyle;
 class UModioCommonButtonStyle;
-class UModioCommonTextStyle;
-class UModioCommonTabButtonBase;
-class UModioCommonDynamicImageStyle;
-
-/**
- * @brief The style of the Featured Additional View within the Mod.io Common UI styling system
- */
-UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
-class MODIOUI5_API UModioCommonFeaturedAdditionalViewStyle : public UObject
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonFilteredModListViewStyle> FilteredModListViewStyle;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Tab")
-	TSubclassOf<UModioCommonTabButtonBase> CategoryTabButtonClass;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Tab")
-	TSubclassOf<UModioCommonTabButtonStyle> CategoryTabButtonStyle;
-};
-
-/**
- * @brief The style of the Featured Primary View within the Mod.io Common UI styling system
- */
-UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
-class MODIOUI5_API UModioCommonFeaturedPrimaryViewStyle : public UObject
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonGenericModEntryStyle> LargeModEntryStyle;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonListViewStyle> ModListStyle;
-};
 
 /**
  * @brief The style of the Featured View within the Mod.io Common UI styling system
@@ -70,8 +29,5 @@ class MODIOUI5_API UModioCommonFeaturedViewStyle : public UObject
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonFeaturedPrimaryViewStyle> FeaturedPrimaryViewStyle;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonFeaturedAdditionalViewStyle> FeaturedAdditionalViewStyle;
+	TSubclassOf<UModioCommonSearchResultsViewStyle> SearchResultsViewStyle;
 };

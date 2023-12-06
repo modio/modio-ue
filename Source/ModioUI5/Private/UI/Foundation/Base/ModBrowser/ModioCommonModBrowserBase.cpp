@@ -11,11 +11,15 @@
 
 #include "UI/Foundation/Base/ModBrowser/ModioCommonModBrowserBase.h"
 #include "Core/ModioModInfoUI.h"
+#include "UI/Foundation/Base/ModBrowser/ModioCommonModBrowserBaseStyle.h"
 
 void UModioCommonModBrowserBase::SetStyle(TSubclassOf<UModioCommonModBrowserBaseStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonModBrowserBase::NativeOnInitialized()

@@ -19,13 +19,12 @@
 /**
  * Project Settings customization for ModioCommonFilteredModListView
  */
-UCLASS(Config = "ModioCommonFilteredModListParams", DefaultConfig, meta = (DisplayName = "Filtered Mod List Params"))
-class MODIOUI5_API UModioCommonFilteredModListParams : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonFilteredModListParams
 {
 	GENERATED_BODY()
 
-public:
-	UModioCommonFilteredModListParams()
+	FModioCommonFilteredModListParams()
 	{
 		PreviousPageInputAction.RowName = "LeftTabSecondary";
 		PreviousPageInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -47,15 +46,14 @@ public:
 	FText TotalPagesTextFormat = NSLOCTEXT("Modio", "TotalPagesTextFormat", " of {0}");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText TotalModsTextFormat = NSLOCTEXT("Modio", "CurrentPageTextFormat", "Total of {0} mods found");
+	FText TotalModsTextFormat = NSLOCTEXT("Modio", "CurrentPageTextFormat", "{0} mods found");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText TotalSingleModTextFormat = NSLOCTEXT("Modio", "CurrentPageTextFormat", "{0} mod found");
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle PreviousPageInputAction;
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle NextPageInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

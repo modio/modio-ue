@@ -27,13 +27,13 @@ struct MODIO_API FModioGamePlatform
 
 	/** @brief A platform supported by a title */
 	UPROPERTY(BlueprintReadOnly, Category="mod.io|GamePlatform")
-	EModioModfilePlatform Platform;
+	EModioModfilePlatform Platform = EModioModfilePlatform::Windows;
 
 	/** @brief Whether ot not this platform is locked from having files submitted to it by players */
 	UPROPERTY(BlueprintReadOnly, Category="mod.io|GamePlatform")
-	bool Locked;
+	bool Locked = false;
 
 	/** @brief Whether or not this platform's file submissions are moderated or not */
 	UPROPERTY(BlueprintReadOnly, Category="mod.io|GamePlatform")
-	bool Moderated;
+	bool Moderated = false;
 };

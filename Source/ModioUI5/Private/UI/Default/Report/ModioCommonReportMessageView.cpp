@@ -14,6 +14,8 @@
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "UI/Foundation/Components/Text/MultiLineEditableTextBox/ModioCommonMultiLineEditableTextBox.h"
 #include "Core/ModioModInfoUI.h"
+#include "UI/Settings/ModioCommonUISettings.h"
+
 #include <Containers/UnrealString.h>
 
 void UModioCommonReportMessageView::SetValidationTextVisibility(ESlateVisibility EVisibility)
@@ -37,32 +39,32 @@ void UModioCommonReportMessageView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonReportMessageParamsSettings* Settings = GetDefault<UModioCommonReportMessageParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (DescriptionTextBlock)
 		{
-			DescriptionTextBlock->SetText(Settings->DescriptionText);
+			DescriptionTextBlock->SetText(UISettings->ReportMessageParams.DescriptionText);
 		}
 
 		if (ValidationTextBlock)
 		{
-			ValidationTextBlock->SetText(Settings->ValidationText);
-			CharactersTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d characters remaining"), Settings->MessageLength)));
+			ValidationTextBlock->SetText(UISettings->ReportMessageParams.ValidationText);
+			CharactersTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d characters remaining"), UISettings->ReportMessageParams.MessageLength)));
 		}
 
 		if (BackButton)
 		{
-			BackButton->SetLabel(Settings->BackButtonText);
+			BackButton->SetLabel(UISettings->ReportMessageParams.BackButtonText);
 		}
 
 		if (SubmitButton)
 		{
-			SubmitButton->SetLabel(Settings->SubmitButtonText);
+			SubmitButton->SetLabel(UISettings->ReportMessageParams.SubmitButtonText);
 		}
 
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelButtonText);
+			CancelButton->SetLabel(UISettings->ReportMessageParams.CancelButtonText);
 		}
 	}
 }
@@ -71,46 +73,42 @@ void UModioCommonReportMessageView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	const UModioCommonReportParamsSettings* ReportSettings = GetDefault<UModioCommonReportParamsSettings>();
-	const UModioCommonReportMessageParamsSettings* ReportMessageSettings = GetDefault<UModioCommonReportMessageParamsSettings>();
-	if (!ReportSettings || !ReportMessageSettings)
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		return;
-	}
-
-	if (BackButton)
-	{
-		ListenForInputAction(BackButton, ReportSettings->BackInputAction, ReportMessageSettings->BackButtonText, [this]() 
+		if (BackButton)
 		{
-			if (OnBackClicked.IsBound()) OnBackClicked.Execute();
-		});
-	}
-
-	if (SubmitButton)
-	{
-		ListenForInputAction(SubmitButton, ReportSettings->SubmitInputAction, ReportMessageSettings->SubmitButtonText, [this]() 
-		{
-			if (MessageTextBox)
+			ListenForInputAction(BackButton, UISettings->ReportParams.BackInputAction, UISettings->ReportMessageParams.BackButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
 			{
-				if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(MessageTextBox->GetText().ToString());
-			}
-		});
-	}
+				if (OnBackClicked.IsBound()) OnBackClicked.Execute();
+			}));
+		}
 
-	if (CancelButton)
-	{
-		ListenForInputAction(CancelButton, ReportSettings->CancelInputAction, ReportMessageSettings->CancelButtonText, [this]() 
+		if (SubmitButton)
 		{
-			if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
-		});
-	}
+			ListenForInputAction(SubmitButton, UISettings->ReportParams.SubmitInputAction, UISettings->ReportMessageParams.SubmitButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (MessageTextBox)
+				{
+					if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(MessageTextBox->GetText().ToString());
+				}
+			}));
+		}
 
-	if (MessageTextBox)
-	{
-		MessageTextBox->OnMultiLineEditableTextChanged.AddDynamic(this, &UModioCommonReportMessageView::OnMultiLineTextBoxTextChanged);
-	}
+		if (CancelButton)
+		{
+			ListenForInputAction(CancelButton, UISettings->ReportParams.CancelInputAction, UISettings->ReportMessageParams.CancelButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
+			}));
+		}
 
-	SetValidationTextVisibility(ESlateVisibility::Hidden);
+		if (MessageTextBox)
+		{
+			MessageTextBox->OnMultiLineEditableTextChanged.AddDynamic(this, &UModioCommonReportMessageView::OnMultiLineTextBoxTextChanged);
+		}
+
+		SetValidationTextVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UModioCommonReportMessageView::NativeOnSetDataSource()
@@ -138,13 +136,12 @@ UWidget* UModioCommonReportMessageView::NativeGetDesiredFocusTarget() const
 
 bool UModioCommonReportMessageView::IsMessageValid(const FString& Message)
 {
-	const UModioCommonReportMessageParamsSettings* Settings = GetDefault<UModioCommonReportMessageParamsSettings>();
-	if (Settings)
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{	
 		FString TempString = FString(Message);
 		TempString.RemoveSpacesInline();
 		
-		if (Message.IsEmpty() || TempString.IsEmpty() || Message.Len() > Settings->MessageLength)
+		if (Message.IsEmpty() || TempString.IsEmpty() || Message.Len() > UISettings->ReportMessageParams.MessageLength)
 		{
 			SetErrorMessage(ESlateVisibility::Visible);
 			return false;
@@ -158,17 +155,19 @@ void UModioCommonReportMessageView::OnMultiLineTextBoxTextChanged(const FText& T
 {
 	SetErrorMessage(ESlateVisibility::Hidden);
 
-	const UModioCommonReportMessageParamsSettings* Settings = GetDefault<UModioCommonReportMessageParamsSettings>();
-	int remaining = Settings->MessageLength - Text.ToString().Len();
-	int exceeded = Text.ToString().Len() - Settings->MessageLength;
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
+	{
+		int32 Remaining = UISettings->ReportMessageParams.MessageLength - Text.ToString().Len();
+		int32 Exceeded = Text.ToString().Len() - UISettings->ReportMessageParams.MessageLength;
 	
-	if (Text.ToString().Len() < Settings->MessageLength) 
-	{
-		SetValidationTextVisibility(ESlateVisibility::Hidden);
-	}
-	else
-	{
-		CharactersTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d characters exceeded."), exceeded)));
-		SetValidationTextVisibility(ESlateVisibility::SelfHitTestInvisible);
+		if (Text.ToString().Len() < UISettings->ReportMessageParams.MessageLength) 
+		{
+			SetValidationTextVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			CharactersTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d characters exceeded."), Exceeded)));
+			SetValidationTextVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
 	}
 }

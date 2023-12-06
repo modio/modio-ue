@@ -60,6 +60,9 @@ protected:
 	FText InstalledLabelText;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
+	FText InstalledByOthersLabelText;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	FText ErrorLabelText;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets", meta = (BindWidget))

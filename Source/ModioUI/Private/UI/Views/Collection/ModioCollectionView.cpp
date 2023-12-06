@@ -220,9 +220,9 @@ void UModioCollectionView::OnFetchUpdatesClicked()
 	// TODO: @modio-ue4 Currently nothing to display an error to the user, can investigate that possibility later
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		Subsystem->FetchExternalUpdatesAsync(
-			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCollectionView::OnFetchExternalCompleted));
-		FetchButton->SetLabel(SearchingButtonLabel);
+			Subsystem->FetchExternalUpdatesAsync(
+				FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCollectionView::OnFetchExternalCompleted));
+			FetchButton->SetLabel(SearchingButtonLabel);
 	}
 }
 
@@ -237,6 +237,15 @@ void UModioCollectionView::ApplyFiltersToCollection()
 			if (ModGroupSelection->GetSelectedItemIndex() == 0)
 			{
 				if (CurrentEntry->bCachedSubscriptionStatus == false)
+				{
+					return false;
+				}
+			}
+			// When System Mods filter is selected from the collection view, we want to generate correct amount of FilteredCollection to be added to CollectionList,
+			// so that system mod count text is displayed correctly and also visible mods in the collection itself are displayed correctly to that amount.
+			else if (ModGroupSelection->GetSelectedItemIndex() == 1) 
+			{
+				if (CurrentEntry->Underlying.GetModState() != EModioModState::Installed && !CurrentEntry->bCachedSubscriptionStatus)
 				{
 					return false;
 				}
@@ -281,6 +290,11 @@ void UModioCollectionView::NativeUserChanged(TOptional<FModioUser> NewUser)
 	RefreshCachedCollection();
 	ApplyFiltersToCollection();
 	ValidateAndSetFocus();
+
+	if (FetchButton)
+	{
+		FetchButton->SetVisibility(NewUser.IsSet() ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	}
 }
 
 void UModioCollectionView::NativeOnModManagementEvent(FModioModManagementEvent Event)
@@ -462,7 +476,7 @@ void UModioCollectionView::UpdateModCount()
 		CollectionCount->SetText(FText::FromString(Count));
 		if (numberOfVisibleMods <= 0)
 		{
-			InfoRichTextBlock->SetVisibility(ESlateVisibility::Visible);
+			InfoRichTextBlock->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 			InfoRichTextBlock->SetText(numberOfVisibleMods > 0 ? NoModsFoundText : NoSubscribedModsText);
 		}
 		else
@@ -526,6 +540,7 @@ FReply UModioCollectionView::NativeOnFocusReceived(const FGeometry& InGeometry, 
 
 	return FReply::Handled();
 }
+
 bool UModioCollectionView::ValidateSearchInput(const FKeyEvent& InKeyEvent)
 {
 	return InKeyEvent.GetKey() != EKeys::Up && InKeyEvent.GetKey() != EKeys::Down &&
@@ -554,7 +569,7 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 		return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
 	}
 
-	UModioMenu* Menu = Cast<UModioMenu>(Subsystem->ModBrowserInstance);
+	UModioMenu* Menu = Cast<UModioMenu>(Subsystem->GetModBrowserInstance());
 
 	if (IsValid(Menu) && Menu->IsAnyDrawerExpanded())
 	{
@@ -615,9 +630,10 @@ FReply UModioCollectionView::NativeOnPreviewKeyDown(const FGeometry& InGeometry,
 				{
 					return FReply::Unhandled();
 				}
-				else if ((SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()) ||
+				else if (((SortBy->HasFocusedDescendants() && !SortBy->IsComboBoxOpen()) ||
 						 (ModGroupSelection->HasFocusedDescendants() && !ModGroupSelection->IsComboBoxOpen()) ||
-						 SearchInput->HasFocusedDescendants() || FetchButton->HasKeyboardFocus())
+						 SearchInput->HasFocusedDescendants() || FetchButton->HasKeyboardFocus()) &&
+						 CollectionList->GetNumItems() > 0)
 				{
 					CurrentNavIndex = 0;
 					ValidateAndSetFocus();

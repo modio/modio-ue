@@ -23,7 +23,7 @@
 #include "ModioCommonModOperationTrackerWidget.generated.h"
 
 /**
- * @brief This widget is used to track the progress of a mod operation, such as downloading, installing, or enabling a mod
+ * This widget is used to track the progress of a mod operation, such as downloading, installing, or enabling a mod
  */
 UCLASS(ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
 class MODIOUI5_API UModioCommonModOperationTrackerWidget
@@ -89,26 +89,68 @@ public:
 	bool bPreviewHasModErrors = false;
 #endif
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI")
+	int64 GetPreviewTotal() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI")
+	int64 GetPreviewCurrent() const;
+
 protected:
+	//~ Begin UWidget Interface
 	virtual void OnWidgetRebuilt() override;
-	virtual void Tick(float DeltaTime) override;
 public:
 	virtual void SynchronizeProperties() override;
+	//~ End UWidget Interface
+
 protected:
+	//~ Begin UModioCommonModOperationTrackerWidget Interface
+	virtual void Tick(float DeltaTime) override;
+	//~ End UModioCommonModOperationTrackerWidget Interface
+	
+protected:
+	/**
+	 * Updates the progress of the mod operation tracker
+	 * @param ProgressInfo The progress info to update with
+	 */
+	virtual void UpdateProgress(const FModioModProgressInfo& ProgressInfo);
 
-	void UpdateProgress(const FModioModProgressInfo& ProgressInfo);
-	void HideProgress();
+	/**
+	 * Hide the progress
+	 */
+	virtual void HideProgress();
 
-	void BroadcastProgress(const FModioUnsigned64& Current, const FModioUnsigned64& Total);
-	void BroadcastSpeed(const FModioUnsigned64& DeltaBytes, double DeltaTime);
+	/**
+	 * Broadcasts the progress
+	 * @param Current The current progress
+	 * @param Total The total progress
+	 */
+	virtual void BroadcastProgress(const FModioUnsigned64& Current, const FModioUnsigned64& Total);
 
+	/**
+	 * Broadcasts the speed
+	 * @param DeltaBytes The delta bytes
+	 * @param DeltaTime The delta time
+	 */
+	virtual void BroadcastSpeed(const FModioUnsigned64& DeltaBytes, double DeltaTime);
+
+	/** Previously broadcasted progress value */
 	FModioUnsigned64 PreviousProgressValue = FModioUnsigned64(0);
+
+	/** The previous update time */
 	FDateTime PreviousUpdateTime;
 
+	//~ Begin IModioUIModManagementEventReceiver Interface
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
+	//~ End IModioUIModManagementEventReceiver Interface
 
 private:
+	/** The mod we are tracking */
 	TOptional<FModioModID> TrackingModID;
+
+	/** Whether we are tracking any mods */
 	bool bTrackAnyMods = false;
+
+	/** Whether there are any errors */
 	bool bHasErrors = false;
 };

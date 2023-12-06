@@ -14,8 +14,11 @@
 #include "ModioUI5.h"
 #include "TimerManager.h"
 #include "Components/ListView.h"
+#include "Core/ModioModCollectionEntryUI.h"
 #include "Core/ModioModInfoUI.h"
 #include "Libraries/ModioSDKLibrary.h"
+#include "UI/Default/Dialog/ModioCommonDialogInfo.h"
+#include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
 #include "UI/Foundation/Components/Image/ModioCommonDynamicImage.h"
 #include "UI/Foundation/Components/Image/ModioCommonDynamicImageStyle.h"
 #include "UI/Default/ModEntry/ModioCommonGenericModEntryStyle.h"
@@ -32,12 +35,16 @@
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerUserWidgetStyle.h"
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerWidget.h"
 #include "UI/Interfaces/IModioModBrowser.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonModEntryParams.h"
 
 void UModioCommonGenericModEntry::SetStyle(TSubclassOf<UModioCommonGenericModEntryStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 bool UModioCommonGenericModEntry::Initialize()
@@ -100,7 +107,7 @@ void UModioCommonGenericModEntry::NativeOnMouseLeave(const FPointerEvent& InMous
 	Super::NativeOnMouseLeave(InMouseEvent);
 	if (IsModListItemValid())
 	{
-		if (const UModioCommonModEntryParamsSettings* Settings = GetDefault<UModioCommonModEntryParamsSettings>())
+		if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 		{
 			if (UWorld* World = GetWorld()) 
 			{
@@ -108,7 +115,7 @@ void UModioCommonGenericModEntry::NativeOnMouseLeave(const FPointerEvent& InMous
 				World->GetTimerManager().SetTimer(DelesectTimerHandle, FTimerDelegate::CreateWeakLambda(this, [this]() 
 				{ 
 					DeselectModListItem();								
-				}), Settings->DeselectionDelay, false);
+				}), UISettings->ModEntryParams.DeselectionDelay, false);
 			}
 		}
 	}
@@ -118,37 +125,37 @@ void UModioCommonGenericModEntry::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonModEntryParamsSettings* Settings = GetDefault<UModioCommonModEntryParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 	{
 		if (SpeedLabelTextBlock)
 		{
-			SpeedLabelTextBlock->SetText(Settings->SpeedLabel);
+			SpeedLabelTextBlock->SetText(UISettings->ModEntryParams.SpeedLabel);
 			SwitchSpeedVisibility(false);
 		}
 
 		if (SizeLabelTextBlock)
 		{
-			SizeLabelTextBlock->SetText(Settings->SizeLabel);
+			SizeLabelTextBlock->SetText(UISettings->ModEntryParams.SizeLabel);
 		}
 
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelLabel);
+			CancelButton->SetLabel(UISettings->ModEntryParams.CancelLabel);
 		}
 
 		if (EnableButton)
 		{
-			EnableButton->SetLabel(Settings->EnableLabel);
+			EnableButton->SetLabel(UISettings->ModEntryParams.EnableLabel);
 		}
 
 		if (DisableButton)
 		{
-			DisableButton->SetLabel(Settings->DisableLabel);
+			DisableButton->SetLabel(UISettings->ModEntryParams.DisableLabel);
 		}
 
 		if (OpenModDetailsButton)
 		{
-			OpenModDetailsButton->SetLabel(Settings->OpenModDetailsLabel);
+			OpenModDetailsButton->SetLabel(UISettings->ModEntryParams.OpenModDetailsLabel);
 		}
 	}
 	else
@@ -364,8 +371,8 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 
 	const FModioModInfo ModInfo = Execute_GetFullModInfo(this);
 
-	const UModioCommonModEntryParamsSettings* Settings = GetDefault<UModioCommonModEntryParamsSettings>();
-	if (!Settings)
+	const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>();
+	if (!UISettings)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to set data source for mod entry '%s': Settings are invalid"), *GetName());
 		return;
@@ -399,7 +406,7 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 	
 	if (OperationLabelTextBlock)
 	{
-		OperationLabelTextBlock->SetText(bModDownloading ? Settings->DownloadingLabel : bModExtracting ? Settings->ExtractingLabel : bModInQueue ? Settings->QueuedLabel : FText::GetEmpty());
+		OperationLabelTextBlock->SetText(bModDownloading ? UISettings->ModEntryParams.DownloadingLabel : bModExtracting ? UISettings->ModEntryParams.ExtractingLabel : bModInQueue ? UISettings->ModEntryParams.QueuedLabel : FText::GetEmpty());
 	}
 
 #if WITH_EDITOR
@@ -447,7 +454,12 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 	
 	if (SubscribeButton)
 	{
-		SubscribeButton->SetLabel(Execute_IsModSubscribed(this) ? Settings->UnsubscribeLabel : Settings->SubscribeLabel);
+		SubscribeButton->SetLabel(Execute_IsModSubscribed(this) ? UISettings->ModEntryParams.UnsubscribeLabel : UISettings->ModEntryParams.SubscribeLabel);
+	}
+
+	if (ForceUninstallButton)
+	{
+		ForceUninstallButton->SetLabel(UISettings->ModEntryParams.ForceUninstallLabel);
 	}
 	
 	if (bModInstalled && Subsystem->GetIsCollectionModDisableUIEnabled())
@@ -458,9 +470,9 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 		UModioCommonButtonBase* EnableDisableButton = bModEnabled ? DisableButton : EnableButton;
 		if (EnableDisableButton)
 		{
-			ListenForInputAction(EnableDisableButton, Settings->SwitchEnabledInputAction, bModEnabled ? Settings->DisableLabel : Settings->EnableLabel, [this]() {
+			ListenForInputAction(EnableDisableButton, UISettings->ModEntryParams.SwitchEnabledInputAction, bModEnabled ? UISettings->ModEntryParams.DisableLabel : UISettings->ModEntryParams.EnableLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 				HandleSwitchEnabledClicked();
-			});
+			}));
 		}
 	}
 	else
@@ -471,9 +483,9 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 
 	if (SubscribeButton)
 	{
-		ListenForInputAction(SubscribeButton, Settings->SubscribeInputAction, Execute_IsModSubscribed(this) ? Settings->UnsubscribeLabel : Settings->SubscribeLabel, [this]() {
+		ListenForInputAction(SubscribeButton, UISettings->ModEntryParams.SubscribeInputAction, Execute_IsModSubscribed(this) ? UISettings->ModEntryParams.UnsubscribeLabel : UISettings->ModEntryParams.SubscribeLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 			HandleSubscribeClicked();
-		});
+		}));
 	}
 
 	if (bModDownloading || bModExtracting || bModInQueue)
@@ -481,9 +493,9 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 		SwitchCancelButtonVisibility(true);
 		if (CancelButton)
 		{
-			ListenForInputAction(CancelButton, Settings->CancelInputAction, Settings->CancelLabel, [this]() {
+			ListenForInputAction(CancelButton, UISettings->ModEntryParams.CancelInputAction, UISettings->ModEntryParams.CancelLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 				HandleCancelClicked();
-			});
+			}));
 		}
 	}
 	else
@@ -499,9 +511,26 @@ void UModioCommonGenericModEntry::NativeOnSetDataSource()
 	
 	if (OpenModDetailsButton)
 	{
-		ListenForInputAction(OpenModDetailsButton, Settings->OpenModDetailsInputAction, Settings->OpenModDetailsLabel, [this]() {
+		ListenForInputAction(OpenModDetailsButton, UISettings->ModEntryParams.OpenModDetailsInputAction, UISettings->ModEntryParams.OpenModDetailsLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 			HandleOpenModDetailsClicked();
-		});
+		}));
+	}
+
+	UModioModCollectionEntryUI* CollectionEntry = Cast<UModioModCollectionEntryUI>(DataSource);
+	if (CollectionEntry && CollectionEntry->bCachedSubscriptionStatus == false)
+	{
+		SwitchForceUninstallButtonVisibility(true);
+
+		if (ForceUninstallButton)
+		{
+			ListenForInputAction(ForceUninstallButton, UISettings->ModEntryParams.ForceUninstallInputAction, UISettings->ModEntryParams.ForceUninstallLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				HandleForceUninstallClicked();
+			}));
+		}
+	}
+	else
+	{
+		SwitchForceUninstallButtonVisibility(false);
 	}
 }
 
@@ -524,6 +553,14 @@ void UModioCommonGenericModEntry::NativeOnModLogoDownloadCompleted(FModioModID M
 		{
 			ModImage->LoadImageFromFileAsync(Image.GetValue());
 		}
+	}
+}
+
+void UModioCommonGenericModEntry::SwitchForceUninstallButtonVisibility_Implementation(bool bIsVisible)
+{
+	if (ForceUninstallButton)
+	{
+		ForceUninstallButton->SetVisibility(bIsVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 
@@ -626,10 +663,7 @@ void UModioCommonGenericModEntry::HandleSubscribeClicked_Implementation()
 	if (!IsUserAuthenticated())
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Unable to subscribe/unsubscribe for mod entry '%s' since user is not authenticated. Showing user auth dialog"), *GetName());
-		if (Subsystem->ModBrowserInstance->Implements<UModioModBrowserInterface>())
-		{
-			IModioModBrowserInterface::Execute_ShowUserAuth(Subsystem->ModBrowserInstance);
-		}
+		Subsystem->ShowUserAuth();
 		return;
 	}
 
@@ -666,10 +700,7 @@ void UModioCommonGenericModEntry::HandleCancelClicked_Implementation()
 	if (!IsUserAuthenticated())
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Unable to cancel subscription for mod entry '%s' since user is not authenticated. Showing user auth dialog"), *GetName());
-		if (Subsystem->ModBrowserInstance->Implements<UModioModBrowserInterface>())
-		{
-			IModioModBrowserInterface::Execute_ShowUserAuth(Subsystem->ModBrowserInstance);
-		}
+		Subsystem->ShowUserAuth();
 		return;
 	}
 	if (Execute_IsModSubscribed(this))
@@ -694,8 +725,51 @@ void UModioCommonGenericModEntry::HandleOpenModDetailsClicked_Implementation()
 	}
 
 	const FModioModID CurrentModID = Execute_GetModID(this);
-	if (Subsystem->ModBrowserInstance->Implements<UModioModBrowserInterface>())
+	Subsystem->ShowDetailsForMod(CurrentModID);
+}
+
+void UModioCommonGenericModEntry::HandleForceUninstallClicked_Implementation()
+{
+	SelectModListItem();
+
+	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (!Subsystem)
 	{
-		IModioModBrowserInterface::Execute_ShowDetailsForMod(Subsystem->ModBrowserInstance, CurrentModID);
+		UE_LOG(ModioUI5, Error, TEXT("Unable to force uninstall for mod entry '%s': Modio UI Subsystem is invalid"), *GetName());
+		return;
+	}
+
+	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		const FModioModInfo CurrentModInfo = Execute_GetFullModInfo(this);
+		UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
+		DialogInfo->TitleText = NSLOCTEXT("Modio", "ForceUninstallTitle", "Are you sure you would like to uninstall?");
+		DialogInfo->DialogText = FText::Format(NSLOCTEXT("Modio", "ForceUninstallText", "This will uninstall {0} from your game. This cannot be undone."), FText::FromString(CurrentModInfo.ProfileName));
+		DialogInfo->ButtonsToDisplay = static_cast<uint8>(EModioCommonDialogButtonType::Confirm);
+		DialogInfo->ButtonsToDisplay |= static_cast<uint8>(EModioCommonDialogButtonType::Cancel);
+		DialogInfo->OnDialogButtonClickedFast.AddWeakLambda(this, [this, DialogInfoPtr = TWeakObjectPtr<UModioCommonDialogInfo>(DialogInfo)](EModioCommonDialogButtonType ButtonType) {
+			if (ButtonType == EModioCommonDialogButtonType::Confirm)
+			{
+				if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+				{
+					const FModioModID CurrentModID = Execute_GetModID(this);
+					ModioUISubsystem->RequestUninstallForModID(CurrentModID, FOnErrorOnlyDelegateFast::CreateWeakLambda(this, [this](FModioErrorCode ec) {
+						if (ec)
+						{
+							UE_LOG(ModioUI5, Error, TEXT("Unable to force uninstall for mod entry '%s': %s"), *GetName(), *ec.GetErrorMessage());
+						}
+					}));
+				}
+			}
+
+			if (DialogInfoPtr.IsValid() && DialogInfoPtr->Owner)
+			{
+				if (UModioCommonActivatableWidget* DialogWidget = Cast<UModioCommonActivatableWidget>(DialogInfoPtr->Owner.Get()))
+				{
+					DialogWidget->DeactivateWidget();
+				}
+			}
+		});
+		ModioUISubsystem->ShowDialog(DialogInfo);
 	}
 }

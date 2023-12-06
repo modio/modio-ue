@@ -18,12 +18,16 @@
 #include "UI/Foundation/Components/List/ModioCommonListView.h"
 #include "UI/Foundation/Components/List/ModioCommonModTileView.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonFilteredModListParams.h"
 
 void UModioCommonFilteredModListView::SetStyle(TSubclassOf<UModioCommonFilteredModListViewStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 int32 UModioCommonFilteredModListView::GetNumItemsSelected_Implementation() const
@@ -56,7 +60,7 @@ UWidget* UModioCommonFilteredModListView::NativeGetDesiredFocusTarget() const
 	{
 		if (ModList->Implements<UModioCommonModListViewInterface>())
 		{
-			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(ModList);
+			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(ModList, true, true);
 		}
 		return ModList;
 	}
@@ -86,7 +90,7 @@ void UModioCommonFilteredModListView::NativeOnSetDataSource()
 	const bool bFocusOnceListIsPopulated = GetNumItemsSelected() > 0;
 	if (Implements<UModioCommonModListViewInterface>())
 	{
-		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(this);
+		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(this, true);
 		if (bFocusOnceListIsPopulated)
 		{
 			IModioCommonModListViewInterface::Execute_SetFocusOnceListIsPopulated(this, bFocusOnceListIsPopulated);
@@ -94,6 +98,8 @@ void UModioCommonFilteredModListView::NativeOnSetDataSource()
 	}
 	if (ModList)
 	{
+		ModList->ClearSelection();
+		ModList->RequestRefresh();
 		ModList->ClearListItems();
 	}
 	
@@ -103,6 +109,7 @@ void UModioCommonFilteredModListView::NativeOnSetDataSource()
 	SetLoadingVisibility(true);
 
 	OnSetModsFromModInfoListStarted.Broadcast();
+	OnSetModsFromModInfoListDynamicStarted.Broadcast();
 
 	const FModioFilterParams& FilterParams = FilterParamsPtr->Underlying;
 	Subsystem->RequestListAllMods(FilterParams, GetRequestIdentifier());
@@ -113,7 +120,6 @@ FString UModioCommonFilteredModListView::GetRequestIdentifier_Implementation()
 	UModioFilterParamsUI* FilterParamsPtr = Cast<UModioFilterParamsUI>(DataSource);
 	if (!FilterParamsPtr)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to get request identifier for '%s': Filter params are invalid"), *GetName());
 		return Super::GetRequestIdentifier_Implementation();
 	}
 
@@ -153,33 +159,33 @@ void UModioCommonFilteredModListView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 	
-	TotalPages = TotalMods <= 0 ? 0 : TotalMods / PageSize + 1;
+	TotalPages = PageSize > 0 ? (TotalMods + PageSize - 1) / PageSize : 0;
 	
-	if (const UModioCommonFilteredModListParams* Settings = GetDefault<UModioCommonFilteredModListParams>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (PreviousPageButton)
 		{
-			PreviousPageButton->SetLabel(Settings->PreviousPageLabel);
+			PreviousPageButton->SetLabel(UISettings->FilteredModListParams.PreviousPageLabel);
 		}
 
 		if (NextPageButton)
 		{
-			NextPageButton->SetLabel(Settings->NextPageLabel);
+			NextPageButton->SetLabel(UISettings->FilteredModListParams.NextPageLabel);
 		}
 
 		if (CurrentPageTextBlock)
 		{
-			CurrentPageTextBlock->SetText(FText::Format(Settings->CurrentPageTextFormat, FText::AsNumber(CurrentPageIndex + 1)));
+			CurrentPageTextBlock->SetText(FText::Format(UISettings->FilteredModListParams.CurrentPageTextFormat, FText::AsNumber(CurrentPageIndex + 1)));
 		}
 
 		if (TotalPagesTextBlock)
 		{
-			TotalPagesTextBlock->SetText(FText::Format(Settings->TotalPagesTextFormat, FText::AsNumber(TotalPages)));
+			TotalPagesTextBlock->SetText(FText::Format(UISettings->FilteredModListParams.TotalPagesTextFormat, FText::AsNumber(TotalPages)));
 		}
 
 		if (TotalModsTextBlock)
 		{
-			TotalModsTextBlock->SetText(FText::Format(Settings->TotalModsTextFormat, FText::AsNumber(TotalMods)));
+			TotalModsTextBlock->SetText(FText::Format(TotalMods == 1 ? UISettings->FilteredModListParams.TotalSingleModTextFormat : UISettings->FilteredModListParams.TotalModsTextFormat, FText::AsNumber(TotalMods)));
 		}
 	}
 	else
@@ -231,6 +237,19 @@ void UModioCommonFilteredModListView::SynchronizeProperties()
 	UpdateInputActions();
 }
 
+void UModioCommonFilteredModListView::SetModSelectionByID_Implementation(FModioModID ModID)
+{
+	IModioCommonModListViewInterface::SetModSelectionByID_Implementation(ModID);
+	if (ModList && ModList->Implements<UModioCommonModListViewInterface>())
+	{
+		IModioCommonModListViewInterface::Execute_SetModSelectionByID(ModList, ModID);
+	}
+	else
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to set selection for ModsView in '%s': ModsView either not bound or does not implement IModioCommonModListViewInterface"), *GetName());
+	}
+}
+
 void UModioCommonFilteredModListView::SetFocusOnceListIsPopulated_Implementation(bool bFocus)
 {
 	IModioCommonModListViewInterface::SetFocusOnceListIsPopulated_Implementation(bFocus);
@@ -244,12 +263,12 @@ void UModioCommonFilteredModListView::SetFocusOnceListIsPopulated_Implementation
 	}
 }
 
-void UModioCommonFilteredModListView::RequestFullClearSelection_Implementation()
+void UModioCommonFilteredModListView::RequestFullClearSelection_Implementation(bool bResetPreviouslySelected)
 {
-	IModioCommonModListViewInterface::RequestFullClearSelection_Implementation();
+	IModioCommonModListViewInterface::RequestFullClearSelection_Implementation(bResetPreviouslySelected);
 	if (ModList && ModList->Implements<UModioCommonModListViewInterface>())
 	{
-		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(ModList);
+		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(ModList, bResetPreviouslySelected);
 	}
 	else
 	{
@@ -264,6 +283,7 @@ void UModioCommonFilteredModListView::NativeSetListItems(const TArray<UObject*>&
 	{
 		Cast<IModioCommonModListViewInterface>(ModList)->NativeSetListItems(InListItems, bAddToExisting);
 		OnSetModsFromModInfoListFinished.Broadcast();
+		OnSetModsFromModInfoListDynamicFinished.Broadcast();
 	}
 	else
 	{
@@ -283,12 +303,15 @@ void UModioCommonFilteredModListView::NativeOnListAllModsRequestCompleted(FStrin
 	UModioFilterParamsUI* FilterParamsPtr = Cast<UModioFilterParamsUI>(DataSource);
 	if (!FilterParamsPtr)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to get requested filtered mod list in '%s': Filter params are invalid"), *GetName());
+		SetInitialScreenVisibility(false);
+		SetNoResultsVisibility(true);
 		return;
 	}
 	
 	if (ErrorCode)
 	{
+		SetInitialScreenVisibility(false);
+		SetNoResultsVisibility(true);
 		UE_LOG(ModioUI5, Error, TEXT("Unable to get requested filtered mod list in '%s': %s"), *GetName(), *ErrorCode.GetErrorMessage());
 		return;
 	}
@@ -306,6 +329,10 @@ void UModioCommonFilteredModListView::NativeOnListAllModsRequestCompleted(FStrin
 	if (Implements<UModioCommonModListViewInterface>())
 	{
 		Execute_SetModsFromModInfoList(this, List.GetValue(), false);
+		if (ModInfoList.GetRawList().Num() > 0)
+		{
+			Execute_SetModSelectionByID(this, List->GetRawList()[0].ModId);
+		}
 	}
 
 	if (TotalMods > 0)
@@ -357,28 +384,28 @@ void UModioCommonFilteredModListView::SetLoadingVisibility_Implementation(bool b
 
 void UModioCommonFilteredModListView::UpdateInputActions_Implementation()
 {
-	if (const UModioCommonFilteredModListParams* Settings = GetDefault<UModioCommonFilteredModListParams>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		ClearListeningInputActions();
 
-		if (CurrentPageIndex > 0)
+		if (PreviousPageButton && CurrentPageIndex > 0)
 		{
-			if (PreviousPageButton) PreviousPageButton->SetVisibility(ESlateVisibility::Visible);
-			ListenForInputAction(PreviousPageButton, Settings->PreviousPageInputAction, Settings->PreviousPageLabel, [this]() {
+			PreviousPageButton->SetVisibility(ESlateVisibility::Visible);
+			ListenForInputAction(PreviousPageButton, UISettings->FilteredModListParams.PreviousPageInputAction, UISettings->FilteredModListParams.PreviousPageLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 				HandlePreviousPageClicked();
-			});
+			}));
 		}
 		else
 		{
 			if (PreviousPageButton) PreviousPageButton->SetVisibility(ESlateVisibility::Collapsed);
 		}
 
-		if (CurrentPageIndex < TotalPages - 1 && TotalPages > 1)
+		if (NextPageButton && CurrentPageIndex < TotalPages - 1 && TotalPages > 1)
 		{
-			if (NextPageButton) NextPageButton->SetVisibility(ESlateVisibility::Visible);
-			ListenForInputAction(NextPageButton, Settings->NextPageInputAction, Settings->NextPageLabel, [this]() {
+			NextPageButton->SetVisibility(ESlateVisibility::Visible);
+			ListenForInputAction(NextPageButton, UISettings->FilteredModListParams.NextPageInputAction, UISettings->FilteredModListParams.NextPageLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 				HandleNextPageClicked();
-			});
+			}));
 		}
 		else
 		{
@@ -398,7 +425,7 @@ void UModioCommonFilteredModListView::SetPageNavigationVisibility_Implementation
 {
 	if (PageNavigationContainer)
 	{
-		PageNavigationContainer->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+		PageNavigationContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 

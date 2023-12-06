@@ -16,8 +16,11 @@
 
 void UModioCommonComboBoxString::SetStyle(TSubclassOf<UModioCommonComboBoxStringStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonComboBoxString::SynchronizeProperties()

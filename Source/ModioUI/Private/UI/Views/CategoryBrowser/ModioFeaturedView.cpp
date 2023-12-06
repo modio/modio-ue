@@ -88,7 +88,7 @@ void UModioFeaturedView::NativeOnInitialized()
 	}
 
 	FetchPrimaryCategoryMods();
-	bShouldShowBackButton = false;
+	bShouldShowBackButton = true;
 }
 
 void UModioFeaturedView::NativeRequestOperationRetry()

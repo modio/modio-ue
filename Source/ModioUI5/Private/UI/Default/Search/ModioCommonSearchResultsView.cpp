@@ -19,21 +19,26 @@
 #include "UI/Foundation/Components/List/ModioCommonFilteredModListView.h"
 #include "UI/Foundation/Components/Tag/ModioCommonModTagList.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonSearchParams.h"
 
 void UModioCommonSearchResultsView::SetStyle(TSubclassOf<UModioCommonSearchResultsViewStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonSearchResultsView::ShowSearchView_Implementation()
 {
+	UModioFilterParamsUI* FilterParamsPtr = Cast<UModioFilterParamsUI>(DataSource);
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(Subsystem->ModBrowserInstance))
+		if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(Subsystem->GetModBrowserInstance()))
 		{
-			ModBrowser->ShowSearchView();
+			ModBrowser->ShowSearchView(EModioCommonSearchViewType::SearchResults, FilterParamsPtr ? FilterParamsPtr->Underlying : FModioFilterParams());
 		}
 	}
 }
@@ -70,26 +75,26 @@ void UModioCommonSearchResultsView::SynchronizeProperties()
 	}
 #endif
 
-	if (const UModioCommonSearchParamsSettings* Settings = GetDefault<UModioCommonSearchParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (KeywordsLabelTextBlock)
 		{
-			KeywordsLabelTextBlock->SetText(Settings->KeywordsLabel);
+			KeywordsLabelTextBlock->SetText(UISettings->SearchParams.KeywordsLabel);
 		}
 
 		if (CategoriesLabelTextBlock)
 		{
-			CategoriesLabelTextBlock->SetText(Settings->CategoriesLabel);
+			CategoriesLabelTextBlock->SetText(UISettings->SearchParams.CategoriesLabel);
 		}
 
 		if (EditSearchButton)
 		{
-			EditSearchButton->SetLabel(Settings->EditSearchButtonLabel);
+			EditSearchButton->SetLabel(UISettings->SearchParams.EditSearchButtonLabel);
 		}
 
 		if (KeywordsDetailsTextBlock)
 		{
-			const FText KeywordsDetailsText = Keywords.IsEmpty() ? (Tags.IsEmpty() && DataSource ? Settings->ShowingAllModsLabel : FText::GetEmpty()) : FText::FromString(Keywords);
+			const FText KeywordsDetailsText = Keywords.IsEmpty() ? (Tags.IsEmpty() && DataSource ? UISettings->SearchParams.ShowingAllModsLabel : FText::GetEmpty()) : FText::FromString(Keywords);
 			KeywordsDetailsTextBlock->SetText(KeywordsDetailsText);
 			KeywordsDetailsTextBlock->SetVisibility(KeywordsDetailsText.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
 			if (KeywordsLabelTextBlock)
@@ -150,11 +155,14 @@ void UModioCommonSearchResultsView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	if (const UModioCommonSearchParamsSettings* Settings = GetDefault<UModioCommonSearchParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		ListenForInputAction(EditSearchButton, Settings->EditSearchInputAction, Settings->EditSearchButtonLabel, [this]() {
-			ShowSearchView();
-		});
+		if (EditSearchButton)
+		{
+			ListenForInputAction(EditSearchButton, UISettings->SearchParams.EditSearchInputAction, UISettings->SearchParams.EditSearchButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				ShowSearchView();
+			}));
+		}
 	}
 	else
 	{
@@ -165,13 +173,6 @@ void UModioCommonSearchResultsView::NativeOnInitialized()
 void UModioCommonSearchResultsView::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
-
-	const UModioCommonSearchParamsSettings* Settings = GetDefault<UModioCommonSearchParamsSettings>();
-	if (!Settings)
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to set data source for '%s': Settings are invalid"), *GetName());
-		return;
-	}
 
 	UModioFilterParamsUI* FilterParamsPtr = Cast<UModioFilterParamsUI>(DataSource);
 	if (!FilterParamsPtr)
@@ -192,7 +193,8 @@ void UModioCommonSearchResultsView::NativeOnSetDataSource()
 		}
 	}
 
-	if (SortField == FilterParams.SortField && Direction == FilterParams.Direction && Tags == FilterParams.Tags && Keywords == NewKeywords && bWasEverPopulated)
+	if (SortField == FilterParams.SortField && Direction == FilterParams.Direction && Tags == FilterParams.Tags &&
+	    Keywords == NewKeywords && bWasEverPopulated && Count == FilterParams.Count)
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Skipping data source update for '%s': Data source is already up to date"), *GetName());
 		return;
@@ -203,6 +205,7 @@ void UModioCommonSearchResultsView::NativeOnSetDataSource()
 	Direction = FilterParams.Direction;
 	Tags = FilterParams.Tags;
 	Keywords = MoveTemp(NewKeywords);
+	Count = FilterParams.Count;
 
 	SynchronizeProperties();
 

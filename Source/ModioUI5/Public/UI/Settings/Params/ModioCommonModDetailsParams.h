@@ -19,13 +19,12 @@
 /**
  * Project Settings customization for ModioCommonModDetailsView
  */
-UCLASS(Config = "ModioCommonModDetailsParams", DefaultConfig, meta = (DisplayName = "Mod Details Params"))
-class MODIOUI5_API UModioCommonModDetailsParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonModDetailsParamsSettings
 {
 	GENERATED_BODY()
 
-public:
-	UModioCommonModDetailsParamsSettings()
+	FModioCommonModDetailsParamsSettings()
 	{
 		SubscribeInputAction.RowName = "Primary";
 		SubscribeInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -105,8 +104,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle OpenReportInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

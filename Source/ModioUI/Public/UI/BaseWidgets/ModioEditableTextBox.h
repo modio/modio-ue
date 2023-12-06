@@ -74,6 +74,7 @@ protected:
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 	virtual void NativeSetHintText(FText InHintText) override;
+	virtual void NativeSetInput(const FString& Input) override;
 	virtual FString NativeGatherInput() override;
 	const FSlateBrush* GetHintGlyph() const;
 	bool SupportsKeyboardFocus() const{return true;};

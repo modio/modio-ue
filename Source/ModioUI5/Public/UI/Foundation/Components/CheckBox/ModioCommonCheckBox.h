@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Text")
 	void SetLabel(const FText& InLabelText);
 
+	UFUNCTION(BlueprintCallable, Category = "Text")
+	FText GetLabel() const;
+
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnModioCommonCheckBoxStateChanged, bool);
 	FOnModioCommonCheckBoxStateChanged OnModioCommonCheckBoxStateChanged;
 

@@ -47,7 +47,4 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Search")
 	TSubclassOf<UModioCommonSearchViewBase> SearchViewClass;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Search")
-	TSubclassOf<UModioCommonModListBase> SearchResultsViewClass;
 };

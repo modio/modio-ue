@@ -14,6 +14,7 @@
 #include "UI/Foundation/Base/Report/ModioCommonReportSummaryViewBase.h"
 #include "ModioCommonReportSummaryView.generated.h"
 
+class UModioCommonMultiLineEditableTextBox;
 class UModioCommonTextBlock;
 class UModioCommonButtonBase;
 
@@ -48,7 +49,7 @@ protected:
 	TObjectPtr<UModioCommonTextBlock> DetailsLabelTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonTextBlock> DetailsContentTextBlock;
+	TObjectPtr<UModioCommonMultiLineEditableTextBox> DetailsContentTextBlock;
 	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonButtonBase> BackButton;
@@ -69,4 +70,5 @@ public:
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeOnSetDataSource() override;
+	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 };

@@ -69,6 +69,8 @@ protected:
 	/// not transitioning at all; positive, we are transitioning from collapsed ->visible
 	int32 AnimationDirection;
 
+	bool CanSubmitReport = true;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (StyleClass = "ModioButtonStyle", DesignerRebuild), Category = "Appearance")
 	FModioUIStyleRef InvisibleButtonStyleRef = FModioUIStyleRef {"InvisibleButtonStyle"};
 

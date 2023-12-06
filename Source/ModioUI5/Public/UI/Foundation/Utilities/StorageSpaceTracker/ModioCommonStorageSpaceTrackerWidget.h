@@ -17,7 +17,7 @@
 #include "ModioCommonStorageSpaceTrackerWidget.generated.h"
 
 /**
- * @brief This widget is used to track the storage space
+ * This widget is used to track the storage space
  */
 UCLASS(ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
 class MODIOUI5_API UModioCommonStorageSpaceTrackerWidget : public UTickableModioCommonWidget
@@ -43,9 +43,13 @@ public:
 #endif
 
 protected:
+	//~ Begin UTickableModioCommonWidget Interface
 	virtual void Tick(float DeltaTime) override;
+	//~ End UTickableModioCommonWidget Interface
 public:
+	//~ Begin UWidget Interface
 	virtual void SynchronizeProperties() override;
+	//~ End UWidget Interface
 protected:
 	virtual void Update(uint64 FreeSpace, uint64 TotalSpace);
 };

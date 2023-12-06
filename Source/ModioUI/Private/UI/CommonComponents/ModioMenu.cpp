@@ -33,6 +33,11 @@
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Components/OverlaySlot.h"
 
+void UModioMenu::HandleDialogClosed()
+{
+	TrySetFocus();
+}
+
 bool UModioMenu::CanExecutePageChange()
 {
 	if (IsValid(DialogController) && DialogController->DialogStack.Num() > 0)
@@ -398,6 +403,11 @@ void UModioMenu::NativeConstruct()
 void UModioMenu::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
+	if (DialogController)
+	{
+		DialogController->OnDialogClosed.AddDynamic(this, &UModioMenu::HandleDialogClosed);
+	}
 
 	// Listen for UserChanged events to reset view on log in/out
 	IModioUIUserChangedReceiver::Register<UModioMenu>();

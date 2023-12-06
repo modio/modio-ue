@@ -26,7 +26,7 @@ class MODIOUI5_API UModioCommonModListView : public UModioCommonListView, public
 
 public:
 	virtual UListView* GetListView() const override { return const_cast<UModioCommonModListView*>(this); }
-	virtual void NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting = false) override;
+	virtual void NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting) override;
 	virtual void SetFocusOnceListIsPopulated_Implementation(bool bFocus) override;
     virtual void OnSelectionChangedInternal(NullableItemType FirstSelectedItem) override;
 

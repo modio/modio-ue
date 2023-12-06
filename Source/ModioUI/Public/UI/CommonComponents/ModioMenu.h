@@ -101,6 +101,9 @@ private:
 	EMouseCursor::Type CachedBacgroundCursorType;
 
 protected:
+	UFUNCTION()
+	void HandleDialogClosed();
+
 	// Action Delegates
 	// Can the user change which page is visible?
 	bool CanExecutePageChange();

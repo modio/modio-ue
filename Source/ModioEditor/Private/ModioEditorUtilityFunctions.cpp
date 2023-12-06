@@ -4,10 +4,11 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "CoreGlobals.h"
 #include "Editor.h"
+#include "LevelEditor.h"
+#include "Misc/EngineVersionComparison.h"
+#include "ModioEditorSettings.h"
 #include "Modules/ModuleManager.h"
 #include "Templates/UnrealTemplate.h"
-#include "ModioEditorSettings.h"
-#include "LevelEditor.h"
 
 void UModioEditorUtilityFunctions::SelectAssetsInContentBrowser(const TArray<FString>& AssetPaths)
 {
@@ -21,7 +22,11 @@ void UModioEditorUtilityFunctions::SelectAssetsInContentBrowser(const TArray<FSt
 			FString FailureReason;
 			FAssetRegistryModule& AssetRegistryModule =
 				FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+#if UE_VERSION_OLDER_THAN(5, 1, 0)
 			FAssetData Asset = AssetRegistryModule.Get().GetAssetByObjectPath(*AssetPath);
+#else
+			FAssetData Asset = AssetRegistryModule.Get().GetAssetByObjectPath(FSoftObjectPath(AssetPath));
+#endif
 			if (Asset.IsValid())
 			{
 				Assets.Add(Asset);
@@ -34,7 +39,7 @@ void UModioEditorUtilityFunctions::SelectAssetsInContentBrowser(const TArray<FSt
 	}
 }
 
-void UModioEditorUtilityFunctions::SetDisplayGettingStartedWidgetOnStartup(bool bNewValue) 
+void UModioEditorUtilityFunctions::SetDisplayGettingStartedWidgetOnStartup(bool bNewValue)
 {
 	if (UModioEditorSettings* EditorSettings = GetMutableDefault<UModioEditorSettings>())
 	{

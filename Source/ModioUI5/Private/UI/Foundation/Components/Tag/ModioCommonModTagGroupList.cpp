@@ -15,6 +15,26 @@
 #include "UI/Foundation/Components/Tag/ModioCommonModTagEntry.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 
+bool UModioCommonModTagGroupList::SetSelectedTagGroupValues_Implementation(const TArray<FString>& TagGroupValues, bool bSelect)
+{
+	TSet<FString> TagGroupValuesToSelectSet(TagGroupValues);
+	if (TagsContainer)
+	{
+		for (UWidget* Child : TagsContainer->GetAllChildren())
+		{
+			if (UModioCommonModTagEntry* ModTagEntry = Cast<UModioCommonModTagEntry>(Child))
+			{
+				if (TagGroupValuesToSelectSet.Find(ModTagEntry->GetTag()))
+				{
+					ModTagEntry->SetSelected(bSelect);
+				}
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
 bool UModioCommonModTagGroupList::GetSelectedTagGroupValues_Implementation(TArray<FString>& OutSelectedTagGroupValues) const
 {
 	if (TagsContainer)

@@ -47,7 +47,7 @@ void UModioCommonAuthView::NativeOnActivated()
 			{
 				CurrentLanguage = Subsystem->ConvertLanguageCodeToModio(FInternationalization::Get().GetCurrentLanguage()->GetTwoLetterISOLanguageName());
 			}
-			Subsystem->GetTermsOfUseAsync(AuthenticationProvider, CurrentLanguage, FOnGetTermsOfUseDelegateFast::CreateWeakLambda(this, [this](FModioErrorCode ErrorCode, TOptional<FModioTerms> Terms) {
+			Subsystem->GetTermsOfUseAsync(CurrentLanguage, FOnGetTermsOfUseDelegateFast::CreateWeakLambda(this, [this](FModioErrorCode ErrorCode, TOptional<FModioTerms> Terms) {
 				if (!AuthSwitcher)
 				{
 					return;

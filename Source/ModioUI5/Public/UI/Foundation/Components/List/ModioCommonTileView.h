@@ -10,30 +10,49 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "CommonTileView.h"
+#include "CoreMinimal.h"
+#include "Misc/EngineVersionComparison.h"
 #include "SCommonButtonTableRow.h"
+
 #include "ModioCommonTileView.generated.h"
 
-template <typename ItemType>
+template<typename ItemType>
 class SModioCommonTileView : public STileView<ItemType>
 {
 public:
 	virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent) override
 	{
-		if (bScrollToSelectedOnFocus && (InFocusEvent.GetCause() == EFocusCause::Navigation || InFocusEvent.GetCause() == EFocusCause::SetDirectly))
+		if (bScrollToSelectedOnFocus &&
+			(InFocusEvent.GetCause() == EFocusCause::Navigation || InFocusEvent.GetCause() == EFocusCause::SetDirectly))
 		{
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 			if (this->ItemsSource && this->ItemsSource->Num() > 0)
+#else
+			if (this->HasValidItemsSource() && this->GetItems().Num() > 0)
+#endif
 			{
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 				if (LastSelectedIndex != INDEX_NONE && this->ItemsSource->IsValidIndex(LastSelectedIndex))
-                {
-                	ItemType LastSelectedItem = (*this->ItemsSource)[LastSelectedIndex];
-                	this->SetSelection(LastSelectedItem, ESelectInfo::OnNavigation);
-                	this->RequestNavigateToItem(LastSelectedItem, InFocusEvent.GetUser());
-                }
+#else
+				if (LastSelectedIndex != INDEX_NONE && this->GetItems().IsValidIndex(LastSelectedIndex))
+#endif
+				{
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
+					ItemType LastSelectedItem = (*this->ItemsSource)[LastSelectedIndex];
+#else
+					ItemType LastSelectedItem = (this->GetItems())[LastSelectedIndex];
+#endif
+					this->SetSelection(LastSelectedItem, ESelectInfo::OnNavigation);
+					this->RequestNavigateToItem(LastSelectedItem, InFocusEvent.GetUser());
+				}
 				else if (this->GetNumItemsSelected() == 0)
 				{
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 					ItemType FirstItem = (*this->ItemsSource)[0];
+#else
+					ItemType FirstItem = (this->GetItems())[0];
+#endif
 					this->SetSelection(FirstItem, ESelectInfo::OnNavigation);
 					this->RequestNavigateToItem(FirstItem, InFocusEvent.GetUser());
 				}
@@ -67,7 +86,7 @@ public:
 	virtual FReply OnTouchMoved(const FGeometry& MyGeometry, const FPointerEvent& InTouchEvent) override
 	{
 		FReply Reply = STileView<ItemType>::OnTouchMoved(MyGeometry, InTouchEvent);
-		
+
 		if (Reply.IsEventHandled() && this->HasMouseCapture())
 		{
 			bScrollToSelectedOnFocus = false;
@@ -83,15 +102,19 @@ public:
 
 protected:
 	virtual void Private_SignalSelectionChanged(ESelectInfo::Type SelectInfo) override
-    {
+	{
 		TArray<ItemType> ItemArray;
 		this->GetSelectedItems(ItemArray);
 		if (ItemArray.IsValidIndex(0))
 		{
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 			(*this->ItemsSource).Find(ItemArray[0], LastSelectedIndex);
+#else
+			(this->GetItems()).Find(ItemArray[0], LastSelectedIndex);
+#endif
 		}
 		STileView<ItemType>::Private_SignalSelectionChanged(SelectInfo);
-    }
+	}
 
 private:
 	int32 LastSelectedIndex = INDEX_NONE;
@@ -119,7 +142,8 @@ public:
 
 protected:
 	/** @brief The style of the tile view within the Mod.io Common UI styling system */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style", Category = "Mod.io Common UI")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style",
+			  Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonListViewStyle> ModioStyle;
 
 public:
@@ -127,5 +151,6 @@ public:
 
 protected:
 	virtual TSharedRef<STableViewBase> RebuildListWidget() override;
-	virtual UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass, const TSharedRef<STableViewBase>& OwnerTable) override;
+	virtual UUserWidget& OnGenerateEntryWidgetInternal(UObject* Item, TSubclassOf<UUserWidget> DesiredEntryClass,
+													   const TSharedRef<STableViewBase>& OwnerTable) override;
 };

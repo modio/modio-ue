@@ -22,6 +22,12 @@ class MODIOUI5_API UModioCommonWidgetSwitcher : public UCommonActivatableWidgetS
 {
 	GENERATED_BODY()
 
+public:
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActiveIndexChanged_BP, UWidget*, InActiveWidget, int32, InActiveWidgetIndex);
+	/** Fires when the active widget displayed by the switcher changes */
+	UPROPERTY(BlueprintAssignable, Category = "Mod.io Common UI|Widget Switcher")
+	FOnActiveIndexChanged_BP OnActiveWidgetIndexChanged_BP;
+
 protected:
 	virtual void HandleSlateActiveIndexChanged(int32 ActiveIndex) override;
 };

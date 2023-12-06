@@ -12,6 +12,7 @@
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerUserWidget.h"
 
 #include "ModioSubsystem.h"
+#include "Algo/Count.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Types/ModioModCollectionEntry.h"
 #include "UI/Foundation/Components/Image/ModioCommonImage.h"
@@ -19,12 +20,16 @@
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerUserWidgetStyle.h"
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerWidget.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonModOperationTrackerParams.h"
 
 void UModioCommonModOperationTrackerUserWidget::SetStyle(TSubclassOf<UModioCommonModOperationTrackerUserWidgetStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonModOperationTrackerUserWidget::SetTrackingModID(FModioModID ModID)
@@ -44,17 +49,15 @@ int32 UModioCommonModOperationTrackerUserWidget::GetNumOfQueuedMods() const
 		return 0;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
-	TArray<FModioModCollectionEntry> Entries;
-	UserSubscriptions.GenerateValueArray(Entries);
-	Entries.RemoveAll([](const FModioModCollectionEntry& Entry) {
-		return Entry.GetModState() != EModioModState::UpdatePending
-		&& Entry.GetModState() != EModioModState::Downloading
-		&& Entry.GetModState() != EModioModState::Extracting
-		&& Entry.GetModState() != EModioModState::InstallationPending;
-	});
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
 
-	return Entries.Num();
+	return Algo::CountIf(UserSubscriptions, [](const TPair<FModioModID, FModioModCollectionEntry>& Entry) {
+		const FModioModCollectionEntry& ModEntry = Entry.Value;
+		return ModEntry.GetModState() == EModioModState::UpdatePending
+		|| ModEntry.GetModState() == EModioModState::Downloading
+		|| ModEntry.GetModState() == EModioModState::Extracting
+		|| ModEntry.GetModState() == EModioModState::InstallationPending;
+	});
 }
 
 void UModioCommonModOperationTrackerUserWidget::NativeOnModManagementEvent(FModioModManagementEvent Event)
@@ -179,21 +182,21 @@ void UModioCommonModOperationTrackerUserWidget::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonModOperationTrackerParamsSettings* Settings = GetDefault<UModioCommonModOperationTrackerParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (OverallOperationPercentageLabelTextBlock)
 		{
-			OverallOperationPercentageLabelTextBlock->SetText(Settings->OverallOperationPercentageLabelText);
+			OverallOperationPercentageLabelTextBlock->SetText(UISettings->ModOperationTrackerParams.OverallOperationPercentageLabelText);
 		}
 
 		if (QueuedOperationNumberLabelTextBlock)
 		{
-			QueuedOperationNumberLabelTextBlock->SetText(Settings->QueuedOperationNumberLabelText);
+			QueuedOperationNumberLabelTextBlock->SetText(UISettings->ModOperationTrackerParams.QueuedOperationNumberLabelText);
 		}
 
 		if (SpeedLabelTextBlock)
 		{
-			SpeedLabelTextBlock->SetText(Settings->SpeedLabelText);
+			SpeedLabelTextBlock->SetText(UISettings->ModOperationTrackerParams.SpeedLabelText);
 		}
 	}
 

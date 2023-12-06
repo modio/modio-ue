@@ -16,6 +16,7 @@
 #include "UI/EventHandlers/IModioUIModManagementEventReceiver.h"
 #include "UI/EventHandlers/IModioUISubscriptionsChangedReceiver.h"
 #include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
+#include "Core/ModioFilterParamsUI.h"
 #include "ModioCommonCollectionView.generated.h"
 
 class UModioCommonCollectionViewStyle;
@@ -24,13 +25,6 @@ class UModioCommonModListView;
 class UListView;
 class UModioCommonButtonBase;
 class UModioCommonTabListWidgetBase;
-
-UENUM(BlueprintType)
-enum class EModioCommonCollectionViewTabType : uint8
-{
-	AllInstalled,
-	SystemMods
-};
 
 /**
  * @brief Collection View that displays a list of downloading, installed or subscribed mods
@@ -59,9 +53,6 @@ protected:
 	TSubclassOf<UModioCommonCollectionViewStyle> ModioStyle;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")
-	TObjectPtr<UModioCommonTabListWidgetBase> TabList;
-
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")
 	TObjectPtr<UModioCommonTextBlock> DownloadingModsLabelTextBlock;
 
@@ -95,9 +86,27 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")
 	TObjectPtr<UModioCommonButtonBase> FetchUpdateButton;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")
+	TObjectPtr<UModioCommonButtonBase> FilterButton;
+
 protected:
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
-	void RefreshListByTabId(FName TabId);
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	void SortAToZ(TArray<FModioModCollectionEntry>& ModList);
+
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	void SortZToA(TArray<FModioModCollectionEntry>& ModList);
+
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	void SortSizeOnDisk(TArray<FModioModCollectionEntry>& ModList);
+
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	void SortRecentlyUpdated(TArray<FModioModCollectionEntry>& ModList);
+
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	void ApplySortingAndFiltering(TArray<FModioModCollectionEntry>& ModList);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void ShowSearchView();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
 	void UpdateDownloadingMods();
@@ -117,6 +126,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
 	void OnFetchExternalCompleted(FModioErrorCode ErrorCode);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
 	void UpdateInputBindings();
 
 	//~ Begin UCommonActivatableWidget Implementation
@@ -139,6 +149,9 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Collection View")
 	TSet<FModioModID> ModIDsWithErrors;
 
-	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Collection View")
-	EModioCommonCollectionViewTabType ViewTabType = EModioCommonCollectionViewTabType::AllInstalled;
+	FModioModCategoryParams LastAppliedDownloadingFilterParams;
+	FModioModCategoryParams LastAppliedInstalledFilterParams;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Mod.io Common UI|Collection View")
+	TObjectPtr<UListView> LastFocusedModList;
 };

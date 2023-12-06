@@ -13,15 +13,15 @@
 
 #include "ModioUI5.h"
 #include "ModioUISubsystem.h"
+#include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
 #include "UI/Default/Search/ModioCommonFilteringView.h"
 #include "UI/Default/Search/ModioCommonSearchTabViewStyle.h"
-#include "UI/Default/Search/ModioCommonSortingView.h"
 #include "UI/Foundation/Base/ModioCommonWidgetSwitcher.h"
 #include "UI/Foundation/Components/Border/ModioCommonBorder.h"
 #include "UI/Foundation/Components/Tab/ModioCommonTabListWidgetBase.h"
 #include "UI/Foundation/Components/Text/EditableTextBox/ModioCommonEditableTextBox.h"
-#include "UI/Foundation/Components/Text/EditableTextBox/ModioCommonEditableTextBox.h"
-#include "UI/Interfaces/IModioModBrowser.h"
+#include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonSearchParams.h"
 
 const FName SortingTabId = FName(TEXT("Sorting"));
@@ -29,8 +29,11 @@ const FName FilteringTabId = FName(TEXT("Filtering"));
 
 void UModioCommonSearchTabView::SetStyle(TSubclassOf<UModioCommonSearchTabViewStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 UWidget* UModioCommonSearchTabView::NativeGetDesiredFocusTarget() const
@@ -57,48 +60,28 @@ void UModioCommonSearchTabView::NativeOnInitialized()
 		});
 	}
 
-	if (const UModioCommonSearchParamsSettings* Settings = GetDefault<UModioCommonSearchParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		ListenForInputAction(CloseButton, Settings->CloseInputAction, Settings->CloseButtonLabel, [this]() {
-			DeactivateWidget();
-		});
+		if (CloseButton)
+		{
+			ListenForInputAction(CloseButton, UISettings->SearchParams.CloseInputAction, UISettings->SearchParams.CloseButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				DeactivateWidget();
+			}));
+		}
 
-		ListenForInputAction(SearchButton, Settings->SearchInputAction, Settings->SearchButtonLabel, [this]() {
-			ShowSearchResults();
-		});
+		if (SearchButton)
+		{
+			ListenForInputAction(SearchButton, UISettings->SearchParams.SearchInputAction, UISettings->SearchParams.SearchButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				ShowSearchResults();
+			}));
+		}
 
-		ListenForInputAction(ClearAllButton, Settings->ClearAllInputAction, Settings->ClearAllButtonLabel, [this]() {
-			ClearAllFilters();
-		});
-	}
-
-	if (SortingFilteringTabList)
-	{
-		SortingFilteringTabList->OnTabSelectedFast.AddWeakLambda(this, [this](FName TabNameID) {
-			if (!IsActivated())
-			{
-				return;
-			}
-
-			UModioCommonActivatableWidget* SelectedView;
-			if (!GetViewFromTabNameID(TabNameID, SelectedView))
-			{
-				UE_LOG(ModioUI5, Error, TEXT("Unable to process tab selection in '%s' for tab '%s': no associated view found"), *GetName(), *TabNameID.ToString());
-				return;
-			}
-
-			SelectedTabID = TabNameID;
-
-			if (SortingFilteringContentSwitcher)
-			{
-				SortingFilteringContentSwitcher->SetActiveWidget(SelectedView);
-			}
-
-			if (SortingFilteringContentSwitcher->HasFocusedDescendants())
-			{
-				FocusOnDesiredWidget();
-			}
-		});
+		if (ResetButton)
+		{
+			ListenForInputAction(ResetButton, UISettings->SearchParams.ResetInputAction, UISettings->SearchParams.ResetButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				Reset();
+			}));
+		}
 	}
 
 	if (SearchTextBox)
@@ -107,13 +90,24 @@ void UModioCommonSearchTabView::NativeOnInitialized()
 	}
 }
 
-void UModioCommonSearchTabView::NativeConstruct()
+void UModioCommonSearchTabView::NativeOnSetDataSource()
 {
-	Super::NativeConstruct();
-
-	if (SortingFilteringTabList)
+	Super::NativeOnSetDataSource();
+	if (FilteringView)
 	{
-		SortingFilteringTabList->SetListeningForInput(true);
+		FilteringView->SetDataSource(DataSource);
+	}
+
+	if (SearchTextBox)
+	{
+		UModioSearchResultsParamsUI* SearchResultsParamsUI = Cast<UModioSearchResultsParamsUI>(DataSource);
+		if (!SearchResultsParamsUI)
+		{
+			UE_LOG(ModioUI5, Error, TEXT("Unable to set search results params UI on search text box in '%s', data source is either null or not of type UModioSearchResultsParamsUI"), *GetName());
+			return;
+		}
+
+		SearchTextBox->SetText(FText::FromString(SearchResultsParamsUI->CurrentFilterParams.SearchKeywords));
 	}
 }
 
@@ -121,83 +115,34 @@ void UModioCommonSearchTabView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonSearchParamsSettings* Settings = GetDefault<UModioCommonSearchParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (CloseButton)
 		{
-			CloseButton->SetLabel(Settings->CloseButtonLabel);
+			CloseButton->SetLabel(UISettings->SearchParams.CloseButtonLabel);
 		}
 
 		if (SearchButton)
 		{
-			SearchButton->SetLabel(Settings->SearchButtonLabel);
+			SearchButton->SetLabel(UISettings->SearchParams.SearchButtonLabel);
 		}
 
-		if (ClearAllButton)
+		if (ResetButton)
 		{
-			ClearAllButton->SetLabel(Settings->ClearAllButtonLabel);
+			ResetButton->SetLabel(UISettings->SearchParams.ResetButtonLabel);
+		}
+
+		if (SearchTabTitleTextBlock)
+		{
+			SearchTabTitleTextBlock->SetText(UISettings->SearchParams.SearchTabTitle);
 		}
 	}
 
 	if (UModioCommonSearchTabViewStyle* StyleCDO = Cast<UModioCommonSearchTabViewStyle>(ModioStyle.GetDefaultObject()))
 	{
-		if (SortingFilteringContentSwitcher
-			&& ((SortingView && !SortingView->IsA(StyleCDO->SortingViewClass)) || !SortingView)
-			&& ((FilteringView && !FilteringView->IsA(StyleCDO->FilteringViewClass)) || !FilteringView))
+		if (SearchTabTitleTextBlock)
 		{
-			SortingFilteringContentSwitcher->ClearChildren();
-			if (StyleCDO->SortingViewClass)
-			{
-				SortingView = CreateWidget<UModioCommonSortingView>(this, StyleCDO->SortingViewClass);
-				SortingFilteringContentSwitcher->AddChild(SortingView);
-			}
-			
-			if (StyleCDO->FilteringViewClass)
-			{
-				FilteringView = CreateWidget<UModioCommonFilteringView>(this, StyleCDO->FilteringViewClass);
-				SortingFilteringContentSwitcher->AddChild(FilteringView);
-			}
-
-#if WITH_EDITOR
-			SortingFilteringContentSwitcher->SetActiveWidget(bPreviewDisplaySortingOrFiltering ? Cast<UWidget>(SortingView) : Cast<UWidget>(FilteringView));
-#endif
-		}
-
-		if (const UModioCommonSearchParamsSettings* Settings = GetDefault<UModioCommonSearchParamsSettings>())
-		{
-			if (SortingFilteringTabList)
-			{
-				SortingFilteringTabList->RemoveAllDynamicTabs();
-				SortingFilteringTabList->SetPreviousTabInputActionData(Settings->PreviousTabInputAction);
-				SortingFilteringTabList->SetNextTabInputActionData(Settings->NextTabInputAction);
-				
-				// Sorting
-				if (StyleCDO->SortingTabButtonClass)
-				{
-					FModioCommonTabDescriptor SortingTabInfo;
-					SortingTabInfo.TabId = SortingTabId;
-					SortingTabInfo.TabText = Settings->SortingTabLabel;
-					SortingTabInfo.TabButtonType = StyleCDO->SortingTabButtonClass;
-					SortingTabInfo.TabButtonStyle = StyleCDO->SortingTabButtonStyle;
-					SortingFilteringTabList->RegisterDynamicTab(SortingTabInfo);
-				}
-
-				// Filtering
-				if (StyleCDO->FilteringTabButtonClass)
-				{
-					FModioCommonTabDescriptor FilteringTabInfo;
-					FilteringTabInfo.TabId = FilteringTabId;
-					FilteringTabInfo.TabText = Settings->FilteringTabLabel;
-					FilteringTabInfo.TabButtonType = StyleCDO->FilteringTabButtonClass;
-					FilteringTabInfo.TabButtonStyle = StyleCDO->FilteringTabButtonStyle;
-					SortingFilteringTabList->RegisterDynamicTab(FilteringTabInfo);
-				}
-
-				if (!SortingFilteringTabList->SelectTabByID(SelectedTabID))
-				{
-					SortingFilteringTabList->SelectTabByID(SortingTabId);
-				}
-			}
+			SearchTabTitleTextBlock->SetStyle(StyleCDO->SearchTabTitleTextStyle);
 		}
 		
 		if (InternalBackgroundBorder)
@@ -225,9 +170,9 @@ void UModioCommonSearchTabView::SynchronizeProperties()
 			SearchButton->SetStyle(StyleCDO->SearchButtonStyle);
 		}
 
-		if (ClearAllButton)
+		if (ResetButton)
 		{
-			ClearAllButton->SetStyle(StyleCDO->ClearAllButtonStyle);
+			ResetButton->SetStyle(StyleCDO->ResetButtonStyle);
 		}
 	}
 }
@@ -245,37 +190,12 @@ void UModioCommonSearchTabView::ShowSearchResults_Implementation()
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		DeactivateWidget();
-		if (Subsystem->ModBrowserInstance->Implements<UModioModBrowserInterface>())
-		{
-			IModioModBrowserInterface::Execute_ShowSearchResults(Subsystem->ModBrowserInstance, GetFilterParams());
-		}
+		Subsystem->ShowSearchResults(GetFilterParamsWrapper());
 	}
 }
 
-bool UModioCommonSearchTabView::GetViewFromTabNameID_Implementation(FName TabNameID, UModioCommonActivatableWidget*& OutView) const
+void UModioCommonSearchTabView::Reset_Implementation()
 {
-	if (SortingView && TabNameID.IsEqual(SortingTabId))
-	{
-		OutView = SortingView;
-		return true;
-	}
-	if (FilteringView && TabNameID.IsEqual(FilteringTabId))
-	{
-		OutView = FilteringView;
-		return true;
-	}
-
-	UE_LOG(ModioUI5, Error, TEXT("Unable to get view from tab name ID '%s' in '%s': no associated view found"), *TabNameID.ToString(), *GetName());
-	return false;
-}
-
-void UModioCommonSearchTabView::ClearAllFilters_Implementation()
-{
-	if (SortingView)
-	{
-		SortingView->ResetSorting();
-	}
-
 	if (FilteringView)
 	{
 		FilteringView->ResetFiltering();
@@ -289,30 +209,21 @@ void UModioCommonSearchTabView::ClearAllFilters_Implementation()
 
 FModioFilterParams UModioCommonSearchTabView::GetFilterParams_Implementation() const
 {
-	FModioFilterParams FilterParams;
+	return GetFilterParamsWrapper().ToFilterParams();
+}
 
-	if (SearchTextBox)
-	{
-		FilterParams.NameContains(SearchTextBox->GetText().ToString());
-	}
-
-	if (SortingView)
-	{
-		EModioSortFieldType SortFieldType;
-		EModioSortDirection SortDirection;
-		if (SortingView->GetSortFieldTypeAndDirection(SortFieldType, SortDirection))
-		{
-			FilterParams.SortBy(SortFieldType, SortDirection);
-		}
-	}
+FModioModCategoryParams UModioCommonSearchTabView::GetFilterParamsWrapper_Implementation() const
+{
+	FModioModCategoryParams FilterParams;
 
 	if (FilteringView)
 	{
-		TArray<FString> SelectedTagGroupValues;
-		if (FilteringView->GetSelectedTagGroupValues(SelectedTagGroupValues))
-		{
-			FilterParams.WithTags(SelectedTagGroupValues);
-		}
+		FilterParams = FilteringView->GetFilterParamsWrapper();
+	}
+
+	if (SearchTextBox)
+	{
+		FilterParams.SearchKeywords = SearchTextBox->GetText().ToString();
 	}
 
 	return FilterParams;

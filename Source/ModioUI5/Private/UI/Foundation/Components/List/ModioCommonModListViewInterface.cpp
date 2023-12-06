@@ -24,21 +24,14 @@ void IModioCommonModListViewInterface::SetModSelectionByID_Implementation(FModio
 {
 	if (UListView* ListView = GetListView())
 	{
-		const TArray<UObject*> ModListItems = ListView->GetListItems();
+		const TArray<UObject*>& ModListItems = ListView->GetListItems();
 		for (UObject* CurrentItem : ModListItems)
 		{
-			if (CurrentItem->Implements<UModioModInfoUIDetails>())
+			if (CurrentItem && CurrentItem->Implements<UModioModInfoUIDetails>() && IModioModInfoUIDetails::Execute_GetModID(CurrentItem) == ModID)
 			{
-				if (IModioModInfoUIDetails::Execute_GetModID(CurrentItem) == ModID)
-				{
-					ListView->SetSelectedItem(CurrentItem);
-					if (UWidget* WidgetToFocus = Execute_GetDesiredListFocusTarget(Cast<UObject>(this)))
-					{
-						WidgetToFocus->SetFocus();
-					}
-					ListView->RequestRefresh();
-					return;
-				}
+				ListView->SetSelectedItem(CurrentItem);
+				ListView->RequestRefresh();
+				return;
 			}
 		}
 	}
@@ -47,8 +40,16 @@ void IModioCommonModListViewInterface::SetModSelectionByID_Implementation(FModio
 void IModioCommonModListViewInterface::SetModsFromModInfoList_Implementation(const FModioModInfoList& InList, bool bAddToExisting)
 {
 	TArray<UObject*> WrappedModList;
-	Algo::Transform(InList.GetRawList(), WrappedModList, [](const FModioModInfo& In) {
-		UModioModInfoUI* WrappedMod = NewObject<UModioModInfoUI>();
+	Algo::Transform(InList.GetRawList(), WrappedModList, [this](const FModioModInfo& In) {
+		UModioModInfoUI* WrappedMod = [this, &In]() {
+			if (TStrongObjectPtr<UModioModInfoUI>* ExistingItem = CachedModInfos.Find(In.ModId))
+			{
+				return ExistingItem->Get();
+			}
+			UModioModInfoUI* NewWrappedMod = NewObject<UModioModInfoUI>();
+			CachedModInfos.Add(In.ModId, TStrongObjectPtr<UModioModInfoUI>(NewWrappedMod));
+			return NewWrappedMod;
+		}();
 		WrappedMod->Underlying = In;
 		return WrappedMod;
 	});
@@ -58,8 +59,16 @@ void IModioCommonModListViewInterface::SetModsFromModInfoList_Implementation(con
 void IModioCommonModListViewInterface::SetModsFromModInfoArray_Implementation(const TArray<FModioModInfo>& InArray, bool bAddToExisting)
 {
 	TArray<UObject*> WrappedModList;
-	Algo::Transform(InArray, WrappedModList, [](const FModioModInfo& In) {
-		UModioModInfoUI* WrappedMod = NewObject<UModioModInfoUI>();
+	Algo::Transform(InArray, WrappedModList, [this](const FModioModInfo& In) {
+		UModioModInfoUI* WrappedMod = [this, &In]() {
+			if (TStrongObjectPtr<UModioModInfoUI>* ExistingItem = CachedModInfos.Find(In.ModId))
+			{
+				return ExistingItem->Get();
+			}
+			UModioModInfoUI* NewWrappedMod = NewObject<UModioModInfoUI>();
+			CachedModInfos.Add(In.ModId, TStrongObjectPtr<UModioModInfoUI>(NewWrappedMod));
+			return NewWrappedMod;
+		}();
 		WrappedMod->Underlying = In;
 		return WrappedMod;
 	});
@@ -73,14 +82,21 @@ void IModioCommonModListViewInterface::SetModsFromModCollectionEntryArray_Implem
 	{
 		return;
 	}
-	
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
-		
+
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
 	TArray<UObject*> CachedCollection;
 	Algo::Transform(InArray, CachedCollection,
-					[&UserSubscriptions](const FModioModCollectionEntry& In) {
-						UModioModCollectionEntryUI* WrappedModCollectionEntry =
-							NewObject<UModioModCollectionEntryUI>();
+					[this, &UserSubscriptions](const FModioModCollectionEntry& In) {
+						UModioModCollectionEntryUI* WrappedModCollectionEntry = [this, &In]() mutable
+						{
+							if (TStrongObjectPtr<UModioModCollectionEntryUI>* ExistingItem = CachedCollectionEntries.Find(In.GetID()))
+							{
+								return ExistingItem->Get();
+							}
+							UModioModCollectionEntryUI* NewEntryUI = NewObject<UModioModCollectionEntryUI>();
+							CachedCollectionEntries.Add(In.GetID(), TStrongObjectPtr<UModioModCollectionEntryUI>(NewEntryUI));
+							return NewEntryUI;
+						}();
 						WrappedModCollectionEntry->Underlying = In;
 						WrappedModCollectionEntry->bCachedSubscriptionStatus = UserSubscriptions.Contains(In.GetID());
 						return WrappedModCollectionEntry;
@@ -88,16 +104,21 @@ void IModioCommonModListViewInterface::SetModsFromModCollectionEntryArray_Implem
 	NativeSetListItems(CachedCollection, bAddToExisting);
 }
 
-void IModioCommonModListViewInterface::RequestFullClearSelection_Implementation()
+void IModioCommonModListViewInterface::RequestFullClearSelection_Implementation(bool bResetPreviouslySelected)
 {
+	if (bResetPreviouslySelected)
+	{
+		PreviouslySelectedModID.Reset();
+	}
 	if (UListView* ListView = GetListView())
 	{
 		ListView->ClearSelection();
-		for (UUserWidget* CurrentWidget : ListView->GetDisplayedEntryWidgets())
+		// This causes a lot of lags when clearing a large list
+		/*for (UUserWidget* CurrentWidget : ListView->GetDisplayedEntryWidgets())
 		{
 			IUserListEntry::UpdateItemSelection(*CurrentWidget, false);
-		}
-		ListView->RequestRefresh();
+		}*/
+		//ListView->RequestRefresh();
 	}
 }
 
@@ -110,8 +131,8 @@ bool IModioCommonModListViewInterface::GetSelectedModItem_Implementation(bool bI
 			OutModItem = SelectedItem;
 			return true;
 		}
-		const TArray<UObject*> ModListItems = ListView->GetListItems();
-		if (PreviouslySelectedModID.IsSet())
+		const TArray<UObject*>& ModListItems = ListView->GetListItems();
+		if (bIncludePreviouslySelected && PreviouslySelectedModID.IsSet())
 		{
 			for (UObject* CurrentItem : ModListItems)
 			{
@@ -124,11 +145,6 @@ bool IModioCommonModListViewInterface::GetSelectedModItem_Implementation(bool bI
 					}
 				}
 			}
-		}
-		if (ModListItems.Num() > 0)
-		{
-			OutModItem = ModListItems[0];
-			return true;
 		}
 	}
 	return false;
@@ -148,17 +164,29 @@ bool IModioCommonModListViewInterface::GetEntryWidgetFromItem_Implementation(UOb
 	return false;
 }
 
-UWidget* IModioCommonModListViewInterface::GetDesiredListFocusTarget_Implementation()
+UWidget* IModioCommonModListViewInterface::GetDesiredListFocusTarget_Implementation(bool bIncludePreviouslySelected, bool bIncludeFirstItem)
 {
 	if (UListView* ListView = GetListView())
 	{
 		UObject* SelectedModItem;
-		if (IModioCommonModListViewInterface::Execute_GetSelectedModItem(ListView, true, SelectedModItem))
+		if (IModioCommonModListViewInterface::Execute_GetSelectedModItem(ListView, bIncludePreviouslySelected, SelectedModItem))
 		{
 			if (UWidget* WidgetToFocus = ListView->GetEntryWidgetFromItem(SelectedModItem))
 			{
 				ListView->SetSelectedItem(SelectedModItem);
 				return WidgetToFocus;
+			}
+		}
+		if (bIncludeFirstItem)
+		{
+			const TArray<UObject*>& ModListItems = ListView->GetListItems();
+			if (ModListItems.Num() > 0)
+			{
+				if (UWidget* WidgetToFocus = ListView->GetEntryWidgetFromItem(ModListItems[0]))
+				{
+					ListView->SetSelectedItem(ModListItems[0]);
+					return WidgetToFocus;
+				}
 			}
 		}
 		return ListView;

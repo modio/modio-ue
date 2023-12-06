@@ -14,26 +14,27 @@
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "UI/Foundation/Components/CheckBox/ModioCommonCheckBox.h"
 #include "Core/ModioModInfoUI.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 
 void UModioCommonReportReasonView::SynchronizeProperties() 
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonReportReasonParamsSettings* Settings = GetDefault<UModioCommonReportReasonParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (DescriptionTextBlock)
 		{
-			DescriptionTextBlock->SetText(Settings->DescriptionText);
+			DescriptionTextBlock->SetText(UISettings->ReportReasonParams.DescriptionText);
 		}
 
 		if (ProceedButton)
 		{
-			ProceedButton->SetLabel(Settings->ProceedButtonText);
+			ProceedButton->SetLabel(UISettings->ReportReasonParams.ProceedButtonText);
 		}
 
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelButtonText);
+			CancelButton->SetLabel(UISettings->ReportReasonParams.CancelButtonText);
 		}
 	}
 }
@@ -42,27 +43,23 @@ void UModioCommonReportReasonView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	
-	const UModioCommonReportParamsSettings* ReportSettings = GetDefault<UModioCommonReportParamsSettings>();
-	const UModioCommonReportReasonParamsSettings* ReportReasonSettings = GetDefault<UModioCommonReportReasonParamsSettings>();
-	if (!ReportSettings || !ReportReasonSettings)
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		return;
-	}
-
-	if (ProceedButton)
-	{
-		ListenForInputAction(ProceedButton, ReportSettings->ProceedInputAction, ReportReasonSettings->ProceedButtonText, [this]() 
+		if (ProceedButton)
 		{
-			if (OnProceedClicked.IsBound()) OnProceedClicked.Execute(ReportType);
-		});
-	}
+			ListenForInputAction(ProceedButton, UISettings->ReportParams.ProceedInputAction, UISettings->ReportReasonParams.ProceedButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnProceedClicked.IsBound()) OnProceedClicked.Execute(ReportType);
+			}));
+		}
 
-	if (CancelButton)
-	{
-		ListenForInputAction(CancelButton, ReportSettings->CancelInputAction, ReportReasonSettings->CancelButtonText, [this]() 
+		if (CancelButton)
 		{
-			if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
-		});
+			ListenForInputAction(CancelButton, UISettings->ReportParams.CancelInputAction, UISettings->ReportReasonParams.CancelButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
+			}));
+		}
 	}
 	
 	SetReportType(EModioReportType::DMCA);

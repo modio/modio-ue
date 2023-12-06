@@ -9,12 +9,13 @@
  */
 
 #include "UI/Foundation/Components/Tag/ModioCommonModTagList.h"
+#include "Algo/Transform.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Types/ModioModInfo.h"
-#include "UI/Foundation/Components/Tag/ModioCommonModTagEntry.h"
 #include "UI/Foundation/Components/List/ModioCommonListView.h"
 #include "UI/Foundation/Components/List/ModioCommonTileView.h"
+#include "UI/Foundation/Components/Tag/ModioCommonModTagEntry.h"
 #include "UI/Foundation/Components/WrapBox/ModioCommonWrapBox.h"
-#include "Algo/Transform.h"
 
 void UModioCommonModTagList::SetTags_Implementation(const TArray<FModioModTag>& ModTags)
 {
@@ -31,7 +32,7 @@ void UModioCommonModTagList::SetTagsString_Implementation(const TArray<FString>&
 		for (const FString& Tag : Tags)
 		{
 			UModioCommonModTagEntry* Entry = CreateWidget<UModioCommonModTagEntry>(TagsContainer.Get(), TagEntryClass);
-			if (Entry) 
+			if (Entry)
 			{
 				Entry->SetTag(Tag);
 				TagsContainer->AddChild(Entry);
@@ -64,7 +65,11 @@ UWidget* UModioCommonModTagList::NativeGetDesiredFocusTarget() const
 		{
 			if (UUserWidget* UserWidget = Cast<UUserWidget>(Child))
 			{
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 				if (UserWidget->bIsFocusable)
+#else
+				if (UserWidget->IsFocusable())
+#endif
 				{
 					return UserWidget;
 				}

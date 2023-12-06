@@ -19,7 +19,7 @@ These modules are optional - you can remove them, the UI folder in the Plugin Co
 
 === Displaying the Mod Browser
 
-The main Mod Browser widget is located at /Modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget. Once the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem, `UModioUISubsystem`.
+The main Mod Browser widget is located at `/Modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget`. After the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem `UModioUISubsystem` using the function `ShowModBrowserUIForPlayer()`.
 Currently the mod browser does not support being embedded inside your own UI hierarchy, so you must load it directly (for instance, from a button on your main menu).
 
 .Blueprint Example

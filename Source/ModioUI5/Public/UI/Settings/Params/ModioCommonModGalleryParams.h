@@ -19,13 +19,12 @@
 /**
  * Project Settings customization for ModioCommonModGalleryView
  */
-UCLASS(Config = "ModioCommonModGalleryParams", DefaultConfig, meta = (DisplayName = "Mod Gallery Params"))
-class MODIOUI5_API UModioCommonModGalleryParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonModGalleryParamsSettings
 {
 	GENERATED_BODY()
 
-public:
-	UModioCommonModGalleryParamsSettings()
+	FModioCommonModGalleryParamsSettings()
 	{
 		PreviousImageInputAction.RowName = "LeftTabSecondary";
 		PreviousImageInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -45,8 +44,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle SubscribeInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

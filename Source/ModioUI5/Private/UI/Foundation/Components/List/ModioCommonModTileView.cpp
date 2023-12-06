@@ -21,28 +21,41 @@ void UModioCommonModTileView::NativeSetListItems(const TArray<UObject*>& InListI
 	{
 		for (UObject* Item : InListItems)
 		{
+			if (Item->Implements<UModioModInfoUIDetails>()) 
+			{
+				if(ListItems.ContainsByPredicate([Item](UObject* Obj) 
+					{
+						if (Obj->Implements<UModioModInfoUIDetails>())
+						{
+							return UModioModCollectionEntryUI::Execute_GetModID(Item) == UModioModCollectionEntryUI::Execute_GetModID(Obj);
+						}
+						return false;
+					}))
+				{
+					continue;
+				}
+			}
 			AddItem(Item);
 		}
 	}
 	else
 	{
+		UObject* ModItem;
+		TOptional<FModioModID> SelectedModID;
+		if (Execute_GetSelectedModItem(Cast<UObject>(this), true, ModItem))
+		{
+			if (ModItem->Implements<UModioModInfoUIDetails>())
+			{
+				SelectedModID = IModioModInfoUIDetails::Execute_GetModID(ModItem);
+			}
+		}
+		
 		SetListItems(InListItems);
 		if (UWorld* World = Cast<UObject>(this)->GetWorld())
 		{
-			World->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(Cast<UObject>(this), [this]() mutable {
-				UObject* ModItem;
-				TOptional<FModioModID> SelectedModID;
-				if (Execute_GetSelectedModItem(Cast<UObject>(this), true, ModItem))
+			World->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(Cast<UObject>(this), [this, SelectedModID]() mutable {
+				if (SelectedModID.IsSet() && GetOwningPlayer() && bFocusOnceListIsPopulatedRequested)
 				{
-					if (ModItem->Implements<UModioModInfoUIDetails>())
-					{
-						SelectedModID = IModioModInfoUIDetails::Execute_GetModID(ModItem);
-					}
-				}
-				
-				if (SelectedModID.IsSet() && GetOwningPlayer() && (bFocusOnceListIsPopulatedRequested || HasAnyUserFocus() || HasFocusedDescendants()))
-				{
-					UE_LOG(LogTemp, Error, TEXT("Setting mod selection to bFocusOnceListIsPopulatedRequested: %d, HasAnyUserFocus: %d, HasFocusedDescendants: %d"), bFocusOnceListIsPopulatedRequested, HasAnyUserFocus(), HasFocusedDescendants());
 					Execute_SetModSelectionByID(this, SelectedModID.GetValue());
 					bFocusOnceListIsPopulatedRequested = false;
 				}

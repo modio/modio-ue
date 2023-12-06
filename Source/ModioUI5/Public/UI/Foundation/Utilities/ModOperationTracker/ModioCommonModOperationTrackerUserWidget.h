@@ -28,7 +28,7 @@ class UModioCommonProgressBar;
 class UModioCommonModOperationTrackerWidget;
 
 /**
- * @brief This widget is used to display the progress of a mod operation
+ * This widget is used to display the progress of a mod operation
  * It supports styling through the Mod.io Common UI styling system
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
@@ -45,14 +45,14 @@ class MODIOUI5_API UModioCommonModOperationTrackerUserWidget
 
 public:
 	/**
-	 * @brief Sets the style of the Mod Operation Tracker within the Mod.io Common UI styling system
+	 * Sets the style of the Mod Operation Tracker within the Mod.io Common UI styling system
 	 * @param InStyle The style to set
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Style")
 	void SetStyle(UPARAM(DisplayName = "Style") TSubclassOf<UModioCommonModOperationTrackerUserWidgetStyle> InStyle);
 
 protected:
-	/** @brief The style of the Mod Operation Tracker within the Mod.io Common UI styling system */
+	/** The style of the Mod Operation Tracker within the Mod.io Common UI styling system */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style", Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonModOperationTrackerUserWidgetStyle> ModioStyle;
 
@@ -99,13 +99,23 @@ protected:
 	bool bTrackAnyMods;
 
 public:
+	/**
+	 * Sets the mod to track
+	 * @param ModID The ID of the mod to track
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mod Operation Tracker")
 	void SetTrackingModID(FModioModID ModID);
 
+	/**
+	 * Gets the number of queued mods
+	 * @return The number of queued mods
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mod Operation Tracker")
 	int32 GetNumOfQueuedMods() const;
 
+	//~ Begin IModioUIModManagementEventReceiver Interface
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
+	//~ End IModioUIModManagementEventReceiver Interface
 
 	//~ Begin IModioModInfoUIDetails Interface
 	virtual FModioModID GetModID_Implementation() override;
@@ -131,12 +141,25 @@ public:
 protected:
 	//~ End UWidget Interface
 
+	/**
+	 * Called when the progress of the mod operation has been updated
+	 * @param Current The current progress in bytes
+	 * @param Total The total progress in bytes
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Mod Operation Tracker")
 	void OnModOperationTrackerProgressUpdated(FModioUnsigned64 Current, FModioUnsigned64 Total);
 
+	/**
+	 * Called when the speed of the mod operation has been updated
+	 * @param DeltaBytes The delta bytes
+	 * @param DeltaTime The delta time
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Mod Operation Tracker")
 	void OnModOperationTrackerSpeedUpdated(FModioUnsigned64 DeltaBytes, double DeltaTime);
 
+	/**
+	 * Called when the overall progress of the mod operation has been updated
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Mod Operation Tracker")
 	void UpdateQueuedOperationNumber();
 };

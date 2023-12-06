@@ -50,6 +50,7 @@ protected:
 	FReply NativeOnPreviewMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	void SetTileFrameColor(bool bEnabledState);
 	void UpdateDiskSize();
+	bool IsSystemMod();
 	UFUNCTION()
 	void OnRatingSubmissionComplete(FModioErrorCode ec, EModioRating Rating);
 	UFUNCTION()

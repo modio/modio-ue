@@ -54,10 +54,13 @@ UModioCommonCheckBox::UModioCommonCheckBox()
 
 void UModioCommonCheckBox::SetStyle(TSubclassOf<UModioCommonCheckBoxStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	if (IsConstructed())
+	if (InStyle && InStyle != ModioStyle)
 	{
-		SynchronizeProperties();
+		ModioStyle = InStyle;
+		if (IsConstructed())
+		{
+			SynchronizeProperties();
+		}
 	}
 }
 
@@ -68,6 +71,11 @@ void UModioCommonCheckBox::SetLabel(const FText& InLabelText)
 	{
 		MyCheckbox->Invalidate(EInvalidateWidgetReason::Layout);
 	}
+}
+
+FText UModioCommonCheckBox::GetLabel() const
+{
+	return LabelText;
 }
 
 void UModioCommonCheckBox::SynchronizeProperties()

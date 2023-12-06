@@ -177,13 +177,9 @@ struct MODIO_API FModioFilterParams
 	 */
 	FString ToString() const;
 
-private:
+public:
 	
 	friend class Modio::FilterParams ToModio(const FModioFilterParams& In );
-	friend class UModioSearchResultsView;
-	friend class UModioCommonSearchResultsViewBase;
-	friend class UModioCommonSearchResultsView;
-	friend class UModioCommonFilteredModListView;
 
 	EModioSortDirection Direction = EModioSortDirection::Ascending;
 	EModioSortFieldType SortField = EModioSortFieldType::ID;

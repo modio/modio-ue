@@ -30,6 +30,7 @@
 #include "UI/Default/Dialog/ModioCommonDialogInfo.h"
 #include <TimerManager.h>
 #include "Libraries/ModioErrorConditionLibrary.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 
 UModioCommonModDetailsView::UModioCommonModDetailsView()
 {
@@ -38,8 +39,11 @@ UModioCommonModDetailsView::UModioCommonModDetailsView()
 
 void UModioCommonModDetailsView::SetStyle(TSubclassOf<UModioCommonModDetailsViewStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonModDetailsView::NativePreConstruct()
@@ -185,41 +189,41 @@ void UModioCommonModDetailsView::SynchronizeProperties()
 		}
 	}
 
-	if (const UModioCommonModDetailsParamsSettings* Settings = GetDefault<UModioCommonModDetailsParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 	{
 		if (FileSizeLabelTextBlock)
 		{
-			FileSizeLabelTextBlock->SetText(Settings->FileSizeLabel);
+			FileSizeLabelTextBlock->SetText(UISettings->ModDetailsParams.FileSizeLabel);
 		}
 
 		if (LastUpdatedLabelTextBlock)
 		{
-			LastUpdatedLabelTextBlock->SetText(Settings->LastUpdatedLabel);
+			LastUpdatedLabelTextBlock->SetText(UISettings->ModDetailsParams.LastUpdatedLabel);
 		}
 
 		if (ReleaseDateLabelTextBlock)
 		{
-			ReleaseDateLabelTextBlock->SetText(Settings->ReleaseDateLabel);
+			ReleaseDateLabelTextBlock->SetText(UISettings->ModDetailsParams.ReleaseDateLabel);
 		}
 
 		if (SubscribersLabelTextBlock)
 		{
-			SubscribersLabelTextBlock->SetText(Settings->SubscribersLabel);
+			SubscribersLabelTextBlock->SetText(UISettings->ModDetailsParams.SubscribersLabel);
 		}
 
 		if (CreatedByLabelTextBlock)
 		{
-			CreatedByLabelTextBlock->SetText(Settings->CreatedByLabel);
+			CreatedByLabelTextBlock->SetText(UISettings->ModDetailsParams.CreatedByLabel);
 		}
 
 		if (TagsLabelTextBlock)
 		{
-			TagsLabelTextBlock->SetText(Settings->TagsLabel);
+			TagsLabelTextBlock->SetText(UISettings->ModDetailsParams.TagsLabel);
 		}
 
 		if (ModFullDescriptionLabelTextBlock)
 		{
-			ModFullDescriptionLabelTextBlock->SetText(Settings->ModDescriptionLabel);
+			ModFullDescriptionLabelTextBlock->SetText(UISettings->ModDetailsParams.ModDescriptionLabel);
 		}
 	}
 }
@@ -281,6 +285,22 @@ void UModioCommonModDetailsView::NativeOnInitialized()
 		});
 	}
 
+	if (CollectionButton) 
+	{
+		CollectionButton->OnClicked.AddDynamic(this, &UModioCommonModDetailsView::HandleCollectionClicked);
+	}
+
+	if (TagsWidget)
+	{
+		TagsWidget->OnFocusChangedFast.AddWeakLambda(this, [this](bool bIsFocused)
+		{
+			if (bIsFocused)
+			{
+				ActivateTagsInputBindings();
+			}
+		});
+	}
+
 	if (Execute_IsModDownloading(this) || Execute_IsModExtracting(this))
 	{
 		ShowProgress();
@@ -322,6 +342,11 @@ void UModioCommonModDetailsView::NativeOnModManagementEvent(FModioModManagementE
 			case EModioModManagementEventType::Uninstalled:
 			{
 				HideProgress();
+				if (Event.Event == EModioModManagementEventType::Installed) 
+				{ 
+					ShowStatus(); 
+				}
+				
 				UpdateInputActions();
 				FocusOnDesiredWidget();
 				if (UWorld* World = GetWorld()) 
@@ -387,24 +412,32 @@ UWidget* UModioCommonModDetailsView::NativeGetDesiredFocusTarget() const
 	return SubscribeButton;
 }
 
-void UModioCommonModDetailsView::ActivateTopButtonsInputBindings()
+void UModioCommonModDetailsView::ActivateTopButtonsInputBindings_Implementation()
 {
 	ClearListeningInputActions();
-	if (const UModioCommonModDetailsParamsSettings* Settings = GetDefault<UModioCommonModDetailsParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 	{
 		if (SubscribeButton && SubscribeButton->IsVisible())
 		{
-			ListenForInputAction(SubscribeButton, Settings->SubscribeInputAction, Execute_IsModSubscribed(this) ? Settings->UnsubscribeLabel : Settings->SubscribeLabel, [this]()
+			ListenForInputAction(SubscribeButton, UISettings->ModDetailsParams.SubscribeInputAction, Execute_IsModSubscribed(this) ? UISettings->ModDetailsParams.UnsubscribeLabel : UISettings->ModDetailsParams.SubscribeLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
 			{
 				HandleSubscribeClicked();
-			});
+			}));
 		}
 		else if (CancelButton && CancelButton->IsVisible())
 		{
-			ListenForInputAction(CancelButton, Settings->CancelInputAction, Settings->CancelLabel, [this]()
+			ListenForInputAction(CancelButton, UISettings->ModDetailsParams.CancelInputAction, UISettings->ModDetailsParams.CancelLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
 			{
 				HandleCancelClicked();
-			});
+			}));
+		}
+
+		if (ReportButton)
+		{
+			ListenForInputAction(ReportButton, UISettings->ModDetailsParams.OpenReportInputAction, UISettings->ModDetailsParams.ReportLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
+			{
+				HandleReportClicked();
+			}));
 		}
 	}
 	else
@@ -415,23 +448,23 @@ void UModioCommonModDetailsView::ActivateTopButtonsInputBindings()
 	BindInputActions();
 }
 
-void UModioCommonModDetailsView::ActivateBottomButtonsInputBindings()
+void UModioCommonModDetailsView::ActivateBottomButtonsInputBindings_Implementation()
 {
 	ClearListeningInputActions();
-	if (const UModioCommonModDetailsParamsSettings* Settings = GetDefault<UModioCommonModDetailsParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 	{
-		ListenForInputAction(RateUpButton, Settings->RateUpInputAction, Settings->RateUpLabel, [this]()
+		ListenForInputAction(RateUpButton, UISettings->ModDetailsParams.RateUpInputAction, UISettings->ModDetailsParams.RateUpLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
 		{
 			HandleRateUpClicked();
-		});
-		ListenForInputAction(RateDownButton, Settings->RateDownInputAction, Settings->RateDownLabel, [this]()
+		}));
+		ListenForInputAction(RateDownButton, UISettings->ModDetailsParams.RateDownInputAction, UISettings->ModDetailsParams.RateDownLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
 		{
 			HandleRateDownClicked();
-		});
-		ListenForInputAction(ReportButton, Settings->OpenReportInputAction, Settings->ReportLabel, [this]()
+		}));
+		ListenForInputAction(ReportButton, UISettings->ModDetailsParams.OpenReportInputAction, UISettings->ModDetailsParams.ReportLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
 		{
 			HandleReportClicked();
-		});
+		}));
 	}
 	else
 	{
@@ -441,9 +474,20 @@ void UModioCommonModDetailsView::ActivateBottomButtonsInputBindings()
 	BindInputActions();
 }
 
+void UModioCommonModDetailsView::ActivateTagsInputBindings_Implementation()
+{
+	ClearListeningInputActions();
+	UnbindInputActions();
+	BindInputActions();
+}
+
 void UModioCommonModDetailsView::UpdateInputActions_Implementation()
 {
-	if ((RateUpButton && RateUpButton->IsButtonFocused())
+	if (TagsWidget->HasFocusedDescendants())
+	{
+		ClearListeningInputActions();
+	}
+	else if ((RateUpButton && RateUpButton->IsButtonFocused())
 		|| (RateDownButton && RateDownButton->IsButtonFocused())
 		|| (ReportButton && ReportButton->IsButtonFocused()))
 	{
@@ -468,12 +512,12 @@ void UModioCommonModDetailsView::UpdateOperationProgressPercent_Implementation(f
 		OperationProgressTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d%%"), Percentage)));
 	}
 
-	if (const UModioCommonModDetailsParamsSettings* Settings = GetDefault<UModioCommonModDetailsParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 	{
 #if WITH_EDITOR
 		if (IsDesignTime())
 		{
-			OperationProgressLabelTextBlock->SetText(Settings->DownloadingLabel);
+			OperationProgressLabelTextBlock->SetText(UISettings->ModDetailsParams.DownloadingLabel);
 		}
 #endif
 
@@ -481,11 +525,11 @@ void UModioCommonModDetailsView::UpdateOperationProgressPercent_Implementation(f
 		{
 			if (Execute_IsModDownloading(this))
 			{
-				OperationProgressLabelTextBlock->SetText(Settings->DownloadingLabel);
+				OperationProgressLabelTextBlock->SetText(UISettings->ModDetailsParams.DownloadingLabel);
 			}
 			else if (Execute_IsModExtracting(this))
 			{
-				OperationProgressLabelTextBlock->SetText(Settings->ExtractingLabel);
+				OperationProgressLabelTextBlock->SetText(UISettings->ModDetailsParams.ExtractingLabel);
 			}
 			else
 			{
@@ -506,7 +550,14 @@ void UModioCommonModDetailsView::UpdateOperationProgressBytes_Implementation(FMo
 
 void UModioCommonModDetailsView::UpdateSpeed_Implementation(FModioUnsigned64 DeltaBytes, double DeltaTime)
 {
+	SpeedDetailsTextBlock->SetVisibility(Execute_IsModDownloading(this) ? ESlateVisibility::Visible :  ESlateVisibility::Hidden);
 	
+	if (SpeedDetailsTextBlock)
+	{
+		const int64 BytesPerSecond = DeltaBytes.Underlying <= 0 ? 0 : DeltaBytes / DeltaTime / 8;
+		const FText TotalText = UModioSDKLibrary::Filesize_ToString(BytesPerSecond, 1, 1);
+		SpeedDetailsTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%s/s"), *TotalText.ToString())));
+	}
 }
 
 void UModioCommonModDetailsView::OnRatingSubmissionComplete_Implementation(FModioErrorCode ErrorCode, EModioRating SubmittedRating)
@@ -523,7 +574,8 @@ void UModioCommonModDetailsView::OnRatingSubmissionComplete_Implementation(FModi
 			Subsystem->DisplayNotificationParams(UModioNotificationParamsLibrary::CreateRatingNotification(ErrorCode, DataSource.Get()));
 		}
 	}
-	AllowRating(true);
+	AllowRatingUp(true);
+	AllowRatingDown(true);
 }
 
 void UModioCommonModDetailsView::NativeOnSetDataSource()
@@ -534,7 +586,7 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 
 	if (ModGalleryView)
 	{
-		ModGalleryView->LoadGallery(ModInfo);
+		ModGalleryView->SetDataSource(DataSource);
 	}
 
 	if (ModNameTextBlock)
@@ -597,6 +649,16 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 		TagsWidget->SetTags(ModInfo.Tags);
 	}
 
+	if (InstalledCheckBox) 
+	{
+		InstalledCheckBox->SetCheckedState(Execute_IsModInstalled(this) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+	}
+
+	if (EnabledCheckBox) 
+	{
+		EnabledCheckBox->SetCheckedState(Execute_IsModEnabled(this) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+	}
+
 	if (!LastModID.ToString().Equals(ModInfo.ModId.ToString())) 
 	{
 		if (Execute_IsModDownloading(this) || Execute_IsModExtracting(this))
@@ -607,17 +669,20 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 		else
 		{
 			HideProgress();
+			if (Execute_IsModSubscribed(this)) 
+			{
+				ShowStatus();
+			}
 			AllowSubscription(true);
 		}
 		LastModID = ModInfo.ModId;
-		EndTrackingSubscription();
 	}
 
-	if (const UModioCommonModDetailsParamsSettings* Settings = GetDefault<UModioCommonModDetailsParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 	{
 		if (SubscribeButton)
 		{
-			SubscribeButton->SetLabel(Execute_IsModSubscribed(this) ? Settings->UnsubscribeLabel : Settings->SubscribeLabel);
+			SubscribeButton->SetLabel(Execute_IsModSubscribed(this) ? UISettings->ModDetailsParams.UnsubscribeLabel : UISettings->ModDetailsParams.SubscribeLabel);
 		}
 	}
 }
@@ -665,14 +730,99 @@ void UModioCommonModDetailsView::ShowProgress_Implementation()
 #endif
 	}
 
-	if (OperationProgressBarContainer)
+	if (StatusContainer)
 	{
-		OperationProgressBarContainer->SetVisibility(ESlateVisibility::Visible);
+		StatusContainer->SetVisibility(ESlateVisibility::Collapsed);
 
 #if WITH_EDITOR
 		if (IsDesignTime())
 		{
-			OperationProgressBarContainer->SetRenderOpacity(1);
+			StatusContainer->SetRenderOpacity(0);
+		}
+#endif
+	}
+
+	if (ProgressBarContainer)
+	{
+		ProgressBarContainer->SetVisibility(ESlateVisibility::Visible);
+
+#if WITH_EDITOR
+		if (IsDesignTime())
+		{
+			ProgressBarContainer->SetRenderOpacity(1);
+		}
+#endif
+	}
+
+	if (OperationContainer)
+	{
+		OperationContainer->SetVisibility(ESlateVisibility::Visible);
+
+#if WITH_EDITOR
+		if (IsDesignTime())
+		{
+			OperationContainer->SetRenderOpacity(1);
+		}
+#endif
+	}
+
+	if (CancelButton) 
+	{
+		CancelButton->SetVisibility(ESlateVisibility::Visible);
+
+		#if WITH_EDITOR
+		if (IsDesignTime())
+		{
+			CancelButton->SetRenderOpacity(1);
+		}
+#endif
+	}
+}
+
+void UModioCommonModDetailsView::ShowStatus_Implementation()
+{
+	if (ProgressBarContainer)
+	{
+		ProgressBarContainer->SetVisibility(ESlateVisibility::Collapsed);
+
+#if WITH_EDITOR
+		if (IsDesignTime())
+		{
+			ProgressBarContainer->SetRenderOpacity(0);
+		}
+#endif
+	}
+
+	if (InstalledCheckBox) 
+	{
+		InstalledCheckBox->SetCheckedState(Execute_IsModInstalled(this) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+	}
+
+	if (EnabledCheckBox) 
+	{
+		EnabledCheckBox->SetCheckedState(Execute_IsModEnabled(this) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+	}
+
+	if (StatusContainer)
+	{
+		StatusContainer->SetVisibility(ESlateVisibility::Visible);
+
+#if WITH_EDITOR
+		if (IsDesignTime())
+		{
+			StatusContainer->SetRenderOpacity(1);
+		}
+#endif
+	}
+
+	if (OperationContainer)
+	{
+		OperationContainer->SetVisibility(ESlateVisibility::Visible);
+
+#if WITH_EDITOR
+		if (IsDesignTime())
+		{
+			OperationContainer->SetRenderOpacity(1);
 		}
 #endif
 	}
@@ -692,14 +842,26 @@ void UModioCommonModDetailsView::HideProgress_Implementation()
 #endif
 	}
 
-	if (OperationProgressBarContainer)
+	if (OperationContainer)
 	{
-		OperationProgressBarContainer->SetVisibility(ESlateVisibility::Collapsed);
+		OperationContainer->SetVisibility(ESlateVisibility::Collapsed);
 
 #if WITH_EDITOR
 		if (IsDesignTime())
 		{
-			OperationProgressBarContainer->SetRenderOpacity(0);
+			OperationContainer->SetRenderOpacity(0);
+		}
+#endif
+	}
+
+	if (CancelButton)
+	{
+		CancelButton->SetVisibility(ESlateVisibility::Collapsed);
+
+#if WITH_EDITOR
+		if (IsDesignTime())
+		{
+			CancelButton->SetRenderOpacity(0);
 		}
 #endif
 	}
@@ -717,16 +879,13 @@ void UModioCommonModDetailsView::HandleSubscribeClicked_Implementation()
 	if (!IsUserAuthenticated())
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Unable to subscribe/unsubscribe for mod details '%s' since user is not authenticated. Showing user auth dialog"), *GetName());
-		if (Subsystem->ModBrowserInstance->Implements<UModioModBrowserInterface>())
-		{
-			IModioModBrowserInterface::Execute_ShowUserAuth(Subsystem->ModBrowserInstance);
-		}
+		Subsystem->ShowUserAuth();
 		return;
 	}
 
 	const FModioModID ModID = Execute_GetModID(this);
 	AllowSubscription(false);
-	StartTrackingSubscription();
+	
 	if (!Execute_IsModSubscribed(this))
 	{
 		Subsystem->RequestSubscriptionForModID(ModID);
@@ -755,17 +914,14 @@ void UModioCommonModDetailsView::HandleCancelClicked_Implementation()
 	if (!IsUserAuthenticated())
 	{
 		UE_LOG(ModioUI5, Warning, TEXT("Unable to cancel subscription for mod entry '%s' since user is not authenticated. Showing user auth dialog"), *GetName());
-		if (Subsystem->ModBrowserInstance->Implements<UModioModBrowserInterface>())
-		{
-			IModioModBrowserInterface::Execute_ShowUserAuth(Subsystem->ModBrowserInstance);
-		}
+		Subsystem->ShowUserAuth();
 		return;
 	}
 	const FModioModID ModID = Execute_GetModID(this);
 	if (Execute_IsModSubscribed(this))
 	{
 		AllowSubscription(false);
-		StartTrackingSubscription();
+		
 		Subsystem->RequestRemoveSubscriptionForModID(ModID);
 	}
 	else
@@ -784,7 +940,10 @@ void UModioCommonModDetailsView::HandleRateUpClicked_Implementation()
 		return;
 	}
 
-	AllowRating(false);
+	if (IsUserAuthenticated()) 
+	{
+		AllowRatingUp(false);
+	}
 	const FModioModID CurrentModID = Execute_GetModID(this);
 	Subsystem->RequestRateUpForModId(CurrentModID, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCommonModDetailsView::OnRatingSubmissionComplete, EModioRating::Positive));
 }
@@ -798,7 +957,10 @@ void UModioCommonModDetailsView::HandleRateDownClicked_Implementation()
 		return;
 	}
 
-	AllowRating(false);
+	if (IsUserAuthenticated())
+	{
+		AllowRatingDown(false);
+	}
 	const FModioModID CurrentModID = Execute_GetModID(this);
 	Subsystem->RequestRateDownForModId(CurrentModID, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCommonModDetailsView::OnRatingSubmissionComplete, EModioRating::Negative));
 }
@@ -818,6 +980,17 @@ void UModioCommonModDetailsView::HandleReportClicked_Implementation()
 	Subsystem->ShowModReportDialog(ModInfoObj);
 }
 
+void UModioCommonModDetailsView::HandleCollectionClicked_Implementation() 
+{
+	if(UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(UISubsystem->GetModBrowserInstance()))
+		{
+			ModBrowser->ShowCollectionView();
+		}
+	}
+}
+
 void UModioCommonModDetailsView::AllowSubscription(bool allow)
 {
 	if (SubscribeButton) 
@@ -826,13 +999,17 @@ void UModioCommonModDetailsView::AllowSubscription(bool allow)
 	}
 }
 
-void UModioCommonModDetailsView::AllowRating(bool allow) 
+void UModioCommonModDetailsView::AllowRatingUp(bool allow) 
 {
 	if (RateUpButton) 
 	{
 		RateUpButton->SetIsEnabled(allow);
 	}
-	if (RateDownButton) 
+}
+
+void UModioCommonModDetailsView::AllowRatingDown(bool allow)
+{
+	if (RateDownButton)
 	{
 		RateDownButton->SetIsEnabled(allow);
 	}
@@ -849,41 +1026,19 @@ bool UModioCommonModDetailsView::IsRateLimited(FModioErrorCode ErrorCode)
 			UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
 			DialogInfo->TitleText = FText::FromString(CurrentModInfo.ProfileName);
 			DialogInfo->DialogText = FText::FromString(FString::Printf(TEXT("%s"), *ErrorCode.GetErrorMessage()));
-			if (!DialogInfo->IsValid()) 
-			{
-				return false;
-			}
-			Cast<UModioCommonModBrowser>(ModioUISubsystem->ModBrowserInstance)->ShowDialog(DialogInfo);
+			DialogInfo->ButtonsToDisplay = static_cast<uint8>(EModioCommonDialogButtonType::Confirm);
+			DialogInfo->OnDialogButtonClickedFast.AddWeakLambda(this, [this, DialogInfoPtr = TWeakObjectPtr<UModioCommonDialogInfo>(DialogInfo)](EModioCommonDialogButtonType ButtonType) {
+				if (DialogInfoPtr.IsValid() && DialogInfoPtr->Owner)
+				{
+					if (UModioCommonActivatableWidget* DialogWidget = Cast<UModioCommonActivatableWidget>(DialogInfoPtr->Owner.Get()))
+					{
+						DialogWidget->DeactivateWidget();
+					}
+				}
+			});
+			ModioUISubsystem->ShowDialog(DialogInfo);
 			return true;
 		}
 	}
 	return false;
-}
-
-void UModioCommonModDetailsView::StartTrackingSubscription()
-{
-	if (UWorld* World = GetWorld())
-	{
-		World->GetTimerManager().ClearTimer(SubscriptionTrackTimer);
-		World->GetTimerManager().SetTimer(SubscriptionTrackTimer, [this]()
-		{
-			if(UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-			{
-				const FModioModID ModID = Execute_GetModID(this);
-				if (Execute_IsModSubscribed(this) && Execute_IsModInQueue(this))
-				{
-					Subsystem->RequestRemoveSubscriptionForModID(ModID);
-					AllowSubscription(true);
-				}
-			}
-		}, 10, false);
-	}
-}
-
-void UModioCommonModDetailsView::EndTrackingSubscription() 
-{
-	if (UWorld* World = GetWorld()) 
-	{
-		World->GetTimerManager().ClearTimer(SubscriptionTrackTimer);
-	}
 }

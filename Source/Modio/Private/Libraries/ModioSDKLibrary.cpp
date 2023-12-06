@@ -10,6 +10,7 @@
 
 #include "Libraries/ModioSDKLibrary.h"
 #include "Internationalization/Regex.h"
+#include "Internal/Convert/InitializeOptions.h"
 #include "Modio.h"
 #include "ModioSettings.h"
 
@@ -261,4 +262,13 @@ FString UModioSDKLibrary::GetShortenedNumberAsString(int64 Number)
 	}
 
 	return FString::FromInt(Number);
+}
+
+FString UModioSDKLibrary::GetDefaultSessionIdWindows()
+{
+#if PLATFORM_WINDOWS
+	return FString(GetUserSidString().c_str());
+#else
+	return FString(TEXT(""));
+#endif
 }

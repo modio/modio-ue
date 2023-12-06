@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "Misc/EngineVersionComparison.h"
 #include "CoreMinimal.h"
 #include "Delegates/Delegate.h"
 #include "Engine/Engine.h"
+#include "Misc/EngineVersionComparison.h"
 #include "ModioSubsystem.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "Types/ModioCommonTypes.h"
@@ -22,6 +22,7 @@
 #include "Types/ModioModTagOptions.h"
 #include "UI/Interfaces/IModioModInfoUIDetails.h"
 #include "UI/Interfaces/IModioUINotification.h"
+#include "Core/ModioFilterParamsUI.h"
 
 #include "ModioUISubsystem.generated.h"
 
@@ -32,7 +33,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnModSubscribeFailed, FModioModID);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnModUnsubscribeFailed, FModioModID);
 
 DECLARE_MULTICAST_DELEGATE_FourParams(FOnModLogoDownloadCompleted, FModioModID, FModioErrorCode,
-									   TOptional<FModioImageWrapper>, EModioLogoSize);
+									  TOptional<FModioImageWrapper>, EModioLogoSize);
 
 DECLARE_MULTICAST_DELEGATE_FourParams(FOnModGalleryImageDownloadCompleted, FModioModID, FModioErrorCode, int32,
 									  TOptional<FModioImageWrapper>);
@@ -54,7 +55,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnModManagementEventUI, FModioModManagement
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayNotificationWidget, TScriptInterface<IModioUINotification>&);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayNotificationParams, const FModioNotificationParams&);
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnDisplayErrorManualParams,const FText&,const FText&, bool);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnDisplayErrorManualParams, const FText&, const FText&, bool);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetails, TScriptInterface<IModioModInfoUIDetails>&);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetailsForID, const FModioModID&);
@@ -67,6 +68,7 @@ DECLARE_DYNAMIC_DELEGATE(FOnModBrowserClosed);
 DECLARE_MULTICAST_DELEGATE(FOnAuthenticationChangeStarted);
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnDisplaySearchResults, FModioFilterParams, Params);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRetryAllAsyncLoaders);
 
 /**
  *
@@ -123,7 +125,6 @@ public:
 	void OnAuthenticationComplete(FModioErrorCode ec);
 
 protected:
-
 	FOnModInfoRequestCompleted OnModInfoRequestCompleted;
 	void ModInfoRequestCompletedHandler(FModioErrorCode ec, TOptional<FModioModInfoList> ModInfos,
 										TArray<FModioModID> IDs);
@@ -149,19 +150,22 @@ public:
 	FOnDisplayModDetails OnDisplayModDetails;
 	FOnDisplayModDetailsForID OnDisplayModDetailsForID;
 	FOnDisplaySearchResults OnDisplaySearchResults;
+	FOnRetryAllAsyncLoaders OnRetryAllAsyncLoaders;
 
 protected:
-	
-
 	TOptional<FModioModTagOptions> CachedModTags;
 
 	FVector2D CachedMouseCursorLocation;
 
+	UPROPERTY()
+	class UUserWidget* ModBrowserInstance;
+
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	UPROPERTY()
-	class UUserWidget* ModBrowserInstance;
+	UUserWidget* GetModBrowserInstance();
+
+	void RetryAllAsyncLoaders();
 
 	void EnableModManagement();
 	void DisableModManagement();
@@ -169,11 +173,15 @@ public:
 	void ShowModReportDialog(UObject* DialogDataSource);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void ShowDialog(UObject* DialogDataSource);
+
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestExternalAuthentication(EModioAuthenticationProvider Provider);
 
 	/// @brief Special native-only overload for when we want direct notification of success or failure but still want to
 	/// broadcast UI events
-	void RequestExternalAuthentication(EModioAuthenticationProvider Provider, FOnErrorOnlyDelegateFast DedicatedCallback);
+	void RequestExternalAuthentication(EModioAuthenticationProvider Provider,
+									   FOnErrorOnlyDelegateFast DedicatedCallback);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestSubscriptionForModID(FModioModID ID);
@@ -199,7 +207,7 @@ public:
 	void ShowLogoutDialog();
 	void OnLogoutComplete(FModioErrorCode ModioErrorCode);
 	void LogOut(FOnErrorOnlyDelegateFast DedicatedCallback);
-	
+
 	// Delegate for the subscription success or fail
 	FOnSubscriptionCompleted OnSubscriptionRequestCompleted;
 
@@ -211,7 +219,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "ModioUISubsystem")
 	FOnModEnabledChanged OnModEnabledChanged;
-	
+
 	// RetVal delegates can be accessed only by setting them BlueprintReadOnly
 	// Overriding or binding this delegate will disable the default enabled mod lookup
 	UPROPERTY(BlueprintReadWrite, Category = "ModioUISubsystem")
@@ -252,7 +260,8 @@ public:
 	FText FormatText(FText Input);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	UUserWidget* ShowModBrowserUIForPlayer(TSubclassOf<UUserWidget> MenuClass, APlayerController* Controller, FOnModBrowserClosed BrowserClosedDelegate);
+	UUserWidget* ShowModBrowserUIForPlayer(TSubclassOf<UUserWidget> MenuClass, APlayerController* Controller,
+										   FOnModBrowserClosed BrowserClosedDelegate);
 
 	/// Sets the browser visibility to collapsed, does not free resources and is generally more stable
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
@@ -265,7 +274,7 @@ public:
 	void ShowDetailsForMod(FModioModID ID);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	bool ShowSearchResults(FModioFilterParams SearchParameters);
+	bool ShowSearchResults(const FModioModCategoryParams& SearchParameters);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayNotification(UPARAM(ref) TScriptInterface<IModioUINotification>& Notification);

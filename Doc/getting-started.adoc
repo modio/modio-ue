@@ -16,7 +16,7 @@ Once this is done, you can configure the plugin and get started.
 
 The plugin requires some configuration information to behave correctly. You can access the configuration settings in the Project Settings window:
 
-image::img/plugin_settings.png[]
+image::img/UE4/plugin_settings.png[]
 
 The settings have the following parameters:
 
@@ -192,7 +192,7 @@ When you are ready to initialize the plugin for the current user, you'll need to
 
 image::img/initasync_customoptions.png[]
 
-If you have configured your game's API Key, ID and environment via the Plugin Settings window as in <<Configuration>>, you can use the convenience function <<Get Project Initialize Options>>:
+If you have configured your game's API Key, ID and environment via the Plugin Settings window as in <<Configuration>>, you can use the convenience function <<Get Project Initialize Options For Session Id>>:
 
 image::img/initasync_getoptions.png[]
 
@@ -212,7 +212,9 @@ void UModioManager::Init()
 {
 	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		GEngine->GetEngineSubsystem<UModioSubsystem>()->InitializeAsync(UModioSDKLibrary::GetProjectInitializeOptions(), FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::OnInitCallback));
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->InitializeAsync(
+			UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(UModioSDKLibrary::GetDefaultSessionIdWindows()), 
+			FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::OnInitCallback));
 	}
 	
 	UE_LOG(LogModioGame, Log, TEXT("Initializing Modio SDK"));
@@ -231,6 +233,9 @@ void UModioManager::Tick(float DeltaTime)
 	}
 }
 ----
+
+.Notes
+* You need to provide a default Session Id to initialize the SDK, for Windows we provide a method : <<GetDefaultSessionIdWindows>>.
 
 ====
 
@@ -597,6 +602,28 @@ void UModioManager::OnFetchExternalUpdatesCallback(FModioErrorCode ErrorCode)
 ====
 
 NOTE: You should call <<K2_FetchExternalUpdatesAsync>> sparingly, at times you want to ensure that the state is up-to-date. Alternatively, we recommend calling it based on user input such as a button in your UI, so you don't make spurious update checks. 
+
+In case you need to prepare for changes happening beforehand, call <<K2_PreviewExternalUpdates>>. This function retrieves a list of updates between the users local mod state, and the server-side state. It allows you to identify which mods will be modified when you call <<K2_FetchExternalUpdatesAsync>> next in order to perform any content management (such as unloading files) that might be required. Its use is very similar:
+
+.C++ Example
+[%collapsible]
+====
+[source,c++]
+----
+void UModioManager::PreviewExternalUpdates()
+{
+    if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->PreviewExternalUpdates(FOnPreviewExternalUpdatesDelegateFast::CreateUObject(this, &UModioManager::OnFetchExternalUpdatesCallback));
+	}
+};
+
+void UModioManager::OnPreviewExternalUpdatesCallback(FModioErrorCode ErrorCode, TMap<FModioModID, EModioModChangeType> PreviewMap)
+{
+
+}
+
+----
 
 ===== Checking the user subscription list
 

@@ -19,13 +19,13 @@
 /**
  * Project Settings customization for ModioCommonQuickAccessTabView
  */
-UCLASS(Config = "ModioCommonModCollectionParams", DefaultConfig, meta = (DisplayName = "Quick Access Params"))
-class MODIOUI5_API UModioCommonQuickAccessParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonQuickAccessParamsSettings
 {
 	GENERATED_BODY()
 
 public:
-	UModioCommonQuickAccessParamsSettings()
+	FModioCommonQuickAccessParamsSettings()
 	{
 		CloseInputAction.RowName = "Primary";
 		CloseInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -81,8 +81,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Bool")
 	bool bShowMainGameMenu = true;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

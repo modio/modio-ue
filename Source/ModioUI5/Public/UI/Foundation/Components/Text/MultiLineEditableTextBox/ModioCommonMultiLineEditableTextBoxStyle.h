@@ -69,7 +69,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Properties")
 	FSlateBrush ErrorBorderBrush;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Properties")
 	bool bShowHintIcon = true;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = bShowHintIcon), Category = "Properties")
@@ -77,4 +77,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (EditCondition = bShowHintIcon), Category = "Properties")
 	FMargin HintIconPadding;
+
+	/** Whether to apply the focused style when the text box is read only */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Properties")
+	bool bApplyFocusedStyleInReadOnlyMode = false;
 };

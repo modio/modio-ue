@@ -14,7 +14,7 @@
 UModioPopupContainer::UModioPopupContainer(const FObjectInitializer& ObjectInitializer) :
 	UUserWidget(ObjectInitializer)
 {
-	Visibility = ESlateVisibility::Collapsed;
+	SetVisibility(ESlateVisibility::Collapsed);
 }
 
 UModioPopupBase* UModioPopupContainer::PushPopup_Implementation(TSubclassOf<UModioPopupBase> PopupClass)

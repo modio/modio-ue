@@ -16,8 +16,11 @@
 
 void UModioCommonImage::SetStyle(TSubclassOf<UModioCommonImageStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonImage::NativeOnInitialized()

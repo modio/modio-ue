@@ -17,8 +17,11 @@
 
 void UModioCommonScrollBox::SetStyle(TSubclassOf<UModioCommonScrollBoxStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonScrollBox::SynchronizeProperties()
@@ -50,6 +53,7 @@ void UModioCommonScrollBox::SynchronizeProperties()
 		{
 			InitNavigationScrollPadding(StyleCDO->NavigationScrollPadding);
 		}
+		SetScrollWhenFocusChanges(StyleCDO->ScrollWhenFocusChanges);
 		SetAllowRightClickDragScrolling(StyleCDO->bAllowRightClickDragScrolling);
 		SetWheelScrollMultiplier(StyleCDO->WheelScrollMultiplier);
 #else
@@ -90,6 +94,7 @@ TSharedRef<SWidget> UModioCommonScrollBox::RebuildWidget()
 
 void UModioCommonScrollBox::OnUserScrolledHandle_Implementation(float CurrentOffset)
 {
+	bWasScrolledEverBefore = true;
 	UpdateNavigationData(CurrentOffset);
 }
 
@@ -114,12 +119,21 @@ void UModioCommonScrollBox::UpdateNavigationData_Implementation(int32 PendingScr
 		FCustomWidgetNavigationDelegate NavigationDelegate;
 		NavigationDelegate.BindUFunction(this, "HandleCustomBoundaryNavigation");
 
+
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 		if (Orientation == EOrientation::Orient_Vertical)
+#else
+		if (GetOrientation() == EOrientation::Orient_Vertical)
+#endif
 		{
 			SetNavigationRuleCustomBoundary(EUINavigation::Down, NavigationDelegate);
 			SetNavigationRuleCustomBoundary(EUINavigation::Up, NavigationDelegate);
 		}
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 		else if (Orientation == EOrientation::Orient_Horizontal)
+#else
+		else if (GetOrientation() == EOrientation::Orient_Horizontal)
+#endif
 		{
 			SetNavigationRuleCustomBoundary(EUINavigation::Right, NavigationDelegate);
 			SetNavigationRuleCustomBoundary(EUINavigation::Left, NavigationDelegate);
@@ -137,10 +151,13 @@ void UModioCommonScrollBox::UpdateNavigationData_Implementation(int32 PendingScr
 				Navigation->Up = UserDefinedNavigation->Up;
 				Navigation->Left = UserDefinedNavigation->Left;
 			}
-			if (PendingScrollOffset >= GetScrollOffsetOfEnd())
+			if (bWasScrolledEverBefore || GetScrollOffsetOfEnd() > 0)
 			{
-				Navigation->Right = UserDefinedNavigation->Right;
-				Navigation->Down = UserDefinedNavigation->Down;
+				if (PendingScrollOffset >= GetScrollOffsetOfEnd())
+				{
+					Navigation->Right = UserDefinedNavigation->Right;
+					Navigation->Down = UserDefinedNavigation->Down;
+				}
 			}
 			BuildNavigation();
 		}

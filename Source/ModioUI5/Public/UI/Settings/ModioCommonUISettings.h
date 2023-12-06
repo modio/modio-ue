@@ -12,14 +12,26 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
+#include "Params/ModioCommonAuthParams.h"
+#include "Params/ModioCommonFilteredModListParams.h"
+#include "Params/ModioCommonModBrowserParams.h"
+#include "Params/ModioCommonModDetailsParams.h"
+#include "Params/ModioCommonModEntryParams.h"
+#include "Params/ModioCommonModGalleryParams.h"
+#include "Params/ModioCommonModOperationTrackerParams.h"
+#include "Params/ModioCommonQuickAccessParams.h"
+#include "Params/ModioCommonReportParams.h"
+#include "Params/ModioCommonSearchParams.h"
+#include "Params/ModioCommonStorageSpaceTrackerParams.h"
+#include "Params/ModioCommonUserProfileWidgetParams.h"
 #include "UI/Settings/ModioCommonDefines.h"
 
 #include "ModioCommonUISettings.generated.h"
 
 /**
- * General settings for Mod.io Common UI
+ * Settings for Mod.io Common UI
  */
-UCLASS(Config = "ModioCommonUISettings", DefaultConfig)
+UCLASS(Config = "ModioCommonUISettings", DefaultConfig, meta = (DisplayName = "Modio Common UI Settings"))
 class MODIOUI5_API UModioCommonUISettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
@@ -28,6 +40,72 @@ public:
 	/** Enables a user interface for enabling and disabling mods  */
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings")
 	bool bEnableCollectionModDisableUI = false;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Auth")
+	FModioCommonAuthParamsSettings AuthParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Auth")
+	FModioCommonEmailAuthCodeParamsSettings EmailAuthCodeParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Auth")
+	FModioCommonEmailAuthLoadingParamsSettings EmailAuthLoadingParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Auth")
+	FModioCommonEmailAuthParamsSettings EmailAuthParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Auth")
+	FModioCommonTermsOfUseParamsSettings TermsOfUseParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|FilteredModList")
+	FModioCommonFilteredModListParams FilteredModListParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModBrowser")
+	FModioCommonCollectionParamsSettings CollectionParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModBrowser")
+	FModioCommonFeaturedParamsSettings FeaturedParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModBrowser")
+	FModioCommonModBrowserParamsSettings ModBrowserParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModDetails")
+	FModioCommonModDetailsParamsSettings ModDetailsParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModEntry")
+	FModioCommonModEntryParamsSettings ModEntryParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModGallery")
+	FModioCommonModGalleryParamsSettings ModGalleryParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModOperationTracker")
+	FModioCommonModOperationTrackerParamsSettings ModOperationTrackerParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|QuickAccess")
+	FModioCommonQuickAccessParamsSettings QuickAccessParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Report")
+	FModioCommonReportParamsSettings ReportParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Report")
+	FModioCommonReportReasonParamsSettings ReportReasonParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Report")
+	FModioCommonReportEmailParamsSettings ReportEmailParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Report")
+	FModioCommonReportMessageParamsSettings ReportMessageParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Report")
+	FModioCommonReportSummaryParamsSettings ReportSummaryParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Search")
+	FModioCommonSearchParamsSettings SearchParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|StorageSpaceTracker")
+	FModioCommonStorageSpaceTrackerParamsSettings StorageSpaceTrackerParams;
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|UserProfile")
+	FModioCommonUserProfileWidgetParamsSettings UserProfileParams;
 	
 	// Begin UDeveloperSettings Interface
 	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }

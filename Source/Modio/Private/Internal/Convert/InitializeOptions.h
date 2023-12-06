@@ -70,16 +70,24 @@ FORCEINLINE Modio::InitializeOptions ToModio(const FModioInitializeOptions& In)
 	Options.GameID = ToModio(In.GameId);
 	Options.APIKey = ToModio(In.ApiKey);
 	Options.GameEnvironment = ToModio(In.GameEnvironment);
+
 #if PLATFORM_WINDOWS
 
 	Options.User =
 		In.LocalSessionIdentifier.IsSet() ? ToModio(In.LocalSessionIdentifier.GetValue()) : GetUserSidString();
 
 #else
-	checkf(In.LocalSessionIdentifier.IsSet(),
-		   TEXT("Please set LocalSessionIdentifier on your InitializeOptions before passing them to InitializeAsync"))
+
+	if (In.LocalSessionIdentifier.IsSet())
+	{
 		Options.User = ToModio(In.LocalSessionIdentifier.GetValue());
+	}
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Please set LocalSessionIdentifier on your InitializeOptions before passing them to InitializeAsync"));
+	}	
+
 #endif
+
 	Options.PortalInUse = ToModio(In.PortalInUse);
 
 	for (const TPair<FString, FString>& Element : In.ExtendedInitializationParameters)

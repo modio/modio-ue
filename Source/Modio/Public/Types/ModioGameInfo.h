@@ -122,7 +122,7 @@ struct MODIO_API FModioGameInfo
 
 	/** @brief Monetization options for the game */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
-	EGameMonetizationFlags GameMonetizationOptions;
+	EGameMonetizationFlags GameMonetizationOptions = EGameMonetizationFlags::None;
 
 	/** @brief Name of the Virtual Tokens for this game */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")

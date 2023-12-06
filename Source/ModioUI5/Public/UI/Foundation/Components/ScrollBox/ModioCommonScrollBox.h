@@ -71,4 +71,8 @@ protected:
 	/** @brief User-defined navigation data to apply when the scroll box can no longer scroll. Relevant only if bScrollByNavigationInput is true */
 	UPROPERTY(Instanced, BlueprintReadOnly, Category="Navigation")
 	TObjectPtr<class UWidgetNavigation> UserDefinedNavigation;
+
+protected:
+	/** Whether the scroll box was scrolled ever before */
+	bool bWasScrolledEverBefore = false;
 };

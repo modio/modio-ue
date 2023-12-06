@@ -19,13 +19,12 @@
 /**
  * Project Settings customization for ModioCommonAuthView
  */
-UCLASS(Config = "ModioCommonAuthParams", DefaultConfig, meta = (DisplayName = "Auth Params"))
-class MODIOUI5_API UModioCommonAuthParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonAuthParamsSettings
 {
 	GENERATED_BODY()
 
-public:
-	UModioCommonAuthParamsSettings()
+	FModioCommonAuthParamsSettings()
 	{
 		BackInputAction.RowName = "Back";
 		BackInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -57,21 +56,16 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle PrivacyInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonEmailAuthCodeView
  */
-UCLASS(Config = "ModioCommonEmailAuthCodeParams", DefaultConfig, meta = (DisplayName = "Email Auth Code Params"))
-class MODIOUI5_API UModioCommonEmailAuthCodeParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonEmailAuthCodeParamsSettings
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText TitleText = NSLOCTEXT("Modio", "EmailAuthTitle", "Email Authenticating");
 
@@ -89,21 +83,16 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonEmailAuthLoadingView
  */
-UCLASS(Config = "ModioCommonEmailAuthLoadingParams", DefaultConfig, meta = (DisplayName = "Email Auth Loading Params"))
-class MODIOUI5_API UModioCommonEmailAuthLoadingParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonEmailAuthLoadingParamsSettings
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText TitleText = NSLOCTEXT("Modio", "EmailAuthLoadingTitle", "Email Authenticating");
 
@@ -112,21 +101,16 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonEmailAuthView
  */
-UCLASS(Config = "ModioCommonEmailAuthParams", DefaultConfig, meta = (DisplayName = "Email Auth Params"))
-class MODIOUI5_API UModioCommonEmailAuthParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonEmailAuthParamsSettings
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText TitleText = NSLOCTEXT("Modio", "EmailAuthTitle", "Email Authenticating");
 
@@ -147,21 +131,16 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonTermsOfUseView
  */
-UCLASS(Config = "ModioCommonTermsOfUseParams", DefaultConfig, meta = (DisplayName = "Terms Of Use Params"))
-class MODIOUI5_API UModioCommonTermsOfUseParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonTermsOfUseParamsSettings
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText TitleText = NSLOCTEXT("Modio", "TermsOfUseTitle", "Terms Of Use");
 
@@ -179,8 +158,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText PrivacyButtonText = NSLOCTEXT("Modio", "TermsOfUseTitle", "Privacy Policy");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

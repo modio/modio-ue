@@ -16,8 +16,11 @@
 
 void UModioCommonScrollBar::SetStyle(TSubclassOf<UModioCommonScrollBarStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonScrollBar::SynchronizeProperties()

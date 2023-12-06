@@ -52,10 +52,12 @@ protected:
 	/** @brief The style of the Search Results View within the Mod.io Common UI styling system */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style", Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonSearchResultsViewStyle> ModioStyle;
-	
+
+public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonFilteredModListView> FilteredModListView;
 
+protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonTextBlock> KeywordsLabelTextBlock;
 
@@ -73,7 +75,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonButtonBase> EditSearchButton;
 
-protected:
+public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void ShowSearchView();
 
@@ -84,6 +86,9 @@ public:
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeOnSetDataSource() override;
+
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Data")
+	int32 Count;
 
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Data")
 	EModioSortFieldType SortField;
@@ -97,6 +102,7 @@ protected:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Data")
 	TArray<FString> Tags;
 
+public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Data")
 	bool bWasEverPopulated = false;
 };

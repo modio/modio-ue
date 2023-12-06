@@ -17,8 +17,11 @@
 
 void UModioCommonTileView::SetStyle(TSubclassOf<UModioCommonListViewStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonTileView::SynchronizeProperties()

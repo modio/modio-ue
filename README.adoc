@@ -17,15 +17,15 @@ Welcome to the mod.io Unreal Engine plugin repository. It allows game developers
 ## Platform Support
 
 |===
-|Platform       | UE4.26 | UE4.27 | UE5.0 | UE5.1 | 
-|Windows        | ✔ | ✔ | ✔ | ✔ |
-|Windows (GDK)  | - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
-|XBox (GDK)     | - | ✔ | ✔ | - |<<contact-us,(Contact Us)>>
-|PlayStation 4  | - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
-|PlayStation 5  | - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
-|Nintendo Switch| - | ✔ | ✔ | ✔ |<<contact-us,(Contact Us)>>
-|Linux          | ✔ | ✔ | ✔ | ✔ |
-|macOS          | ✔ | ✔ | ✔ | ✔ |
+|Platform       | UE4.26 | UE4.27 | UE5.0 | UE5.1 | UE 5.2 |
+|Windows        | ✔ | ✔ | ✔ | ✔ |  ✔ | 
+|Windows (GDK)  | - | ✔ | ✔ | ✔ | ✔ | <<contact-us,(Contact Us)>>
+|XBox (GDK)     | - | ✔ | ✔ | ✔ | ✔ | <<contact-us,(Contact Us)>>
+|PlayStation 4  | - | ✔ | ✔ | ✔ | ✔ | <<contact-us,(Contact Us)>>
+|PlayStation 5  | - | ✔ | ✔ | ✔ | ✔ | <<contact-us,(Contact Us)>>
+|Nintendo Switch| - | ✔ | ✔ | ✔ | ✔ | <<contact-us,(Contact Us)>>
+|Linux          | ✔ | ✔ | ✔ | ✔ | ✔ |
+|macOS          | ✔ | ✔ | ✔ | ✔ | ✔ |
 |===
 
 ## Features
@@ -68,7 +68,7 @@ Once this is done, you can configure the plugin and get started.
 
 The plugin requires some configuration information to behave correctly. You can access the configuration settings in the Project Settings window:
 
-image::Doc/img/plugin_settings.png[]
+image::Doc/img/UE4/plugin_settings.png[]
 
 The settings have the following parameters:
 

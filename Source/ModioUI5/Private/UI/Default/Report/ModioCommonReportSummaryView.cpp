@@ -14,6 +14,8 @@
 #include "Core/ModioModInfoUI.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
+#include "UI/Foundation/Components/Text/MultiLineEditableTextBox/ModioCommonMultiLineEditableTextBox.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonReportParams.h"
 
 void UModioCommonReportSummaryView::SetIsBusy(bool Busy)
@@ -83,41 +85,41 @@ void UModioCommonReportSummaryView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonReportSummaryParamsSettings* Settings = GetDefault<UModioCommonReportSummaryParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (DescriptionTextBlock)
 		{
-			DescriptionTextBlock->SetText(Settings->DescriptionText);
+			DescriptionTextBlock->SetText(UISettings->ReportSummaryParams.DescriptionText);
 		}
 
 		if (ReasonLabelTextBlock)
 		{
-			ReasonLabelTextBlock->SetText(Settings->ReasonLabelText);
+			ReasonLabelTextBlock->SetText(UISettings->ReportSummaryParams.ReasonLabelText);
 		}
 
 		if (EmailLabelTextBlock)
 		{
-			EmailLabelTextBlock->SetText(Settings->EmailLabelText);
+			EmailLabelTextBlock->SetText(UISettings->ReportSummaryParams.EmailLabelText);
 		}
 
 		if (DetailsLabelTextBlock)
 		{
-			DetailsLabelTextBlock->SetText(Settings->DetailsLabelText);
+			DetailsLabelTextBlock->SetText(UISettings->ReportSummaryParams.DetailsLabelText);
 		}
 
 		if (BackButton)
 		{
-			BackButton->SetLabel(Settings->BackButtonText);
+			BackButton->SetLabel(UISettings->ReportSummaryParams.BackButtonText);
 		}
 
 		if (SubmitButton)
 		{
-			SubmitButton->SetLabel(Settings->SubmitButtonText);
+			SubmitButton->SetLabel(UISettings->ReportSummaryParams.SubmitButtonText);
 		}
 
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelButtonText);
+			CancelButton->SetLabel(UISettings->ReportSummaryParams.CancelButtonText);
 		}
 	}
 }
@@ -126,35 +128,36 @@ void UModioCommonReportSummaryView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	const UModioCommonReportParamsSettings* ReportSettings = GetDefault<UModioCommonReportParamsSettings>();
-	const UModioCommonReportSummaryParamsSettings* ReportSummarySettings = GetDefault<UModioCommonReportSummaryParamsSettings>();
-	if (!ReportSettings || !ReportSummarySettings)
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		return;
+		if (BackButton)
+		{
+			ListenForInputAction(BackButton, UISettings->ReportParams.BackInputAction, UISettings->ReportSummaryParams.BackButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnBackClicked.IsBound()) OnBackClicked.Execute();
+			}));
+		}
+
+		if (SubmitButton)
+		{
+			ListenForInputAction(SubmitButton, UISettings->ReportParams.SubmitInputAction, UISettings->ReportSummaryParams.SubmitButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute();
+			}));
+		}
+
+		if (CancelButton)
+		{
+			ListenForInputAction(CancelButton, UISettings->ReportParams.CancelInputAction, UISettings->ReportSummaryParams.CancelButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
+			}));
+		}
 	}
 
-	if (BackButton)
+	if (DetailsContentTextBlock)
 	{
-		ListenForInputAction(BackButton, ReportSettings->BackInputAction, ReportSummarySettings->BackButtonText, [this]() 
-		{
-			if (OnBackClicked.IsBound()) OnBackClicked.Execute();
-		});
-	}
-
-	if (SubmitButton)
-	{
-		ListenForInputAction(SubmitButton, ReportSettings->SubmitInputAction, ReportSummarySettings->SubmitButtonText, [this]() 
-		{
-			if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute();
-		});
-	}
-
-	if (CancelButton)
-	{
-		ListenForInputAction(CancelButton, ReportSettings->CancelInputAction, ReportSummarySettings->CancelButtonText, [this]() 
-		{
-			if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
-		});
+		DetailsContentTextBlock->SetIsReadOnly(true);
 	}
 }
 
@@ -168,4 +171,13 @@ void UModioCommonReportSummaryView::NativeOnSetDataSource()
 			TitleTextBlock->SetText(FText::FromString(ModInfoUI->Underlying.ProfileName));
 		}
 	}
+}
+
+UWidget* UModioCommonReportSummaryView::NativeGetDesiredFocusTarget() const
+{
+	if (UWidget* WidgetToFocus = BP_GetDesiredFocusTarget())
+	{
+		return WidgetToFocus;
+	}
+	return BackButton;
 }

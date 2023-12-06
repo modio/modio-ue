@@ -14,9 +14,10 @@
 #include "ModioSDK.h"
 #include "Types/ModioCreateModParams.h"
 #include "Templates/EnableIf.h"
+#include <type_traits>
 
 template<typename DestinationType, typename SourceType>
-FORCEINLINE typename TEnableIf<TNot<TIsSame<SourceType,DestinationType>>::Value, typename Modio::Optional<DestinationType>>::Type ToModioOptional(const TOptional<SourceType>& In)
+FORCEINLINE typename TEnableIf<!std::is_same<SourceType,DestinationType>::value, typename Modio::Optional<DestinationType>>::Type ToModioOptional(const TOptional<SourceType>& In)
 {
 	if (In.IsSet())
 	{
@@ -29,7 +30,7 @@ FORCEINLINE typename TEnableIf<TNot<TIsSame<SourceType,DestinationType>>::Value,
 }
 
 template<typename DestinationType, typename SourceType>
-FORCEINLINE typename TEnableIf<TIsSame<SourceType,DestinationType>::Value, typename Modio::Optional<DestinationType>>::Type ToModioOptional(const TOptional<SourceType>& In)
+FORCEINLINE typename TEnableIf<std::is_same<SourceType,DestinationType>::value, typename Modio::Optional<DestinationType>>::Type ToModioOptional(const TOptional<SourceType>& In)
 {
     if (In.IsSet())
     {

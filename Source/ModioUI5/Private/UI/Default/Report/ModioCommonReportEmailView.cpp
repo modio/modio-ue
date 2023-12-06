@@ -15,6 +15,7 @@
 #include "UI/Foundation/Components/Text/EditableTextBox/ModioCommonEditableTextBox.h"
 #include "Core/ModioModInfoUI.h"
 #include "Libraries/ModioSDKLibrary.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 
 void UModioCommonReportEmailView::SetValidationTextVisibility_Implementation(ESlateVisibility EVisbility) 
 {
@@ -28,31 +29,31 @@ void UModioCommonReportEmailView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonReportEmailParamsSettings* Settings = GetDefault<UModioCommonReportEmailParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (DescriptionTextBlock)
 		{
-			DescriptionTextBlock->SetText(Settings->DescriptionText);
+			DescriptionTextBlock->SetText(UISettings->ReportEmailParams.DescriptionText);
 		}
 
 		if (ValidationTextBlock)
 		{
-			ValidationTextBlock->SetText(Settings->ValidationText);
+			ValidationTextBlock->SetText(UISettings->ReportEmailParams.ValidationText);
 		}
 
 		if (BackButton)
 		{
-			BackButton->SetLabel(Settings->BackButtonText);
+			BackButton->SetLabel(UISettings->ReportEmailParams.BackButtonText);
 		}
 
 		if (SubmitButton)
 		{
-			SubmitButton->SetLabel(Settings->SubmitButtonText);
+			SubmitButton->SetLabel(UISettings->ReportEmailParams.SubmitButtonText);
 		}
 
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelButtonText);
+			CancelButton->SetLabel(UISettings->ReportEmailParams.CancelButtonText);
 		}
 	}
 }
@@ -61,41 +62,37 @@ void UModioCommonReportEmailView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	
-	const UModioCommonReportParamsSettings* ReportSettings = GetDefault<UModioCommonReportParamsSettings>();
-	const UModioCommonReportEmailParamsSettings* ReportEmailSettings = GetDefault<UModioCommonReportEmailParamsSettings>();
-	if (!ReportSettings || !ReportEmailSettings)
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		return;
-	}
-
-	if (BackButton)
-	{
-		ListenForInputAction(BackButton, ReportSettings->BackInputAction, ReportEmailSettings->BackButtonText, [this]() 
+		if (BackButton)
 		{
-			if (OnBackClicked.IsBound()) OnBackClicked.Execute();
-		});
-	}
+			ListenForInputAction(BackButton, UISettings->ReportParams.BackInputAction, UISettings->ReportEmailParams.BackButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnBackClicked.IsBound()) OnBackClicked.Execute();
+			}));
+		}
 
-	if (SubmitButton)
-	{
-		ListenForInputAction(SubmitButton, ReportSettings->SubmitInputAction, ReportEmailSettings->SubmitButtonText, [this]() 
+		if (SubmitButton)
 		{
-			if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(EmailTextBox->GetText().ToString());
-		});
-	}
+			ListenForInputAction(SubmitButton,  UISettings->ReportParams.SubmitInputAction, UISettings->ReportEmailParams.SubmitButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(EmailTextBox->GetText().ToString());
+			}));
+		}
 
-	if (CancelButton)
-	{
-		ListenForInputAction(CancelButton, ReportSettings->CancelInputAction, ReportEmailSettings->CancelButtonText, [this]() 
+		if (CancelButton)
 		{
-			if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
-		});
-	}
+			ListenForInputAction(CancelButton,  UISettings->ReportParams.CancelInputAction, UISettings->ReportEmailParams.CancelButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{
+				if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
+			}));
+		}
 
-	if (EmailTextBox)
-	{
-		EmailTextBox->OnEditableTextChanged.AddDynamic(this, &UModioCommonReportEmailView::OnEditableTextBoxTextChanged);
-		SetValidationTextVisibility(ESlateVisibility::Hidden);
+		if (EmailTextBox)
+		{
+			EmailTextBox->OnEditableTextChanged.AddDynamic(this, &UModioCommonReportEmailView::OnEditableTextBoxTextChanged);
+			SetValidationTextVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 

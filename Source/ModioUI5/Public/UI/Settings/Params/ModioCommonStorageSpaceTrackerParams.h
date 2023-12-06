@@ -18,12 +18,11 @@
 /**
  * Project Settings customization for ModioCommonStorageSpaceTrackerUserWidget
  */
-UCLASS(Config = "ModioCommonStorageSpaceTrackerParams", DefaultConfig, meta = (DisplayName = "Storage Space Tracker Params"))
-class MODIOUI5_API UModioCommonStorageSpaceTrackerParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonStorageSpaceTrackerParamsSettings
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText UsedSpaceLabelText = NSLOCTEXT("Modio", "UsedSpace", "Used space");
 
@@ -32,8 +31,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText TotalSpaceLabelText = NSLOCTEXT("Modio", "TotalSpace", "Total space");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

@@ -15,10 +15,8 @@
 #include "Templates/SubclassOf.h"
 #include "ModioCommonSearchTabViewStyle.generated.h"
 
+class UModioCommonTextStyle;
 class UModioCommonFilteringView;
-class UModioCommonSortingView;
-class UModioCommonTabButtonBase;
-class UModioCommonTabButtonStyle;
 class UModioCommonBorderStyle;
 class UModioCommonButtonStyle;
 class UModioCommonEditableTextBoxStyle;
@@ -32,29 +30,14 @@ class MODIOUI5_API UModioCommonSearchTabViewStyle : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class|View")
-	TSubclassOf<UModioCommonSortingView> SortingViewClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class|View")
-	TSubclassOf<UModioCommonFilteringView> FilteringViewClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class|Tab")
-	TSubclassOf<UModioCommonTabButtonBase> SortingTabButtonClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class|Tab")
-	TSubclassOf<UModioCommonTabButtonBase> FilteringTabButtonClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Tab")
-	TSubclassOf<UModioCommonTabButtonStyle> SortingTabButtonStyle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Tab")
-	TSubclassOf<UModioCommonTabButtonStyle> FilteringTabButtonStyle;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Background")
 	TSubclassOf<UModioCommonBorderStyle> InternalBackgroundBorderStyle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Background")
 	TSubclassOf<UModioCommonBorderStyle> OverlayBackgroundBorderStyle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Background")
+	TSubclassOf<UModioCommonTextStyle> SearchTabTitleTextStyle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Text")
 	TSubclassOf<UModioCommonEditableTextBoxStyle> SearchTextBoxStyle;
@@ -63,7 +46,7 @@ public:
 	TSubclassOf<UModioCommonButtonStyle> CloseButtonStyle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Button")
-	TSubclassOf<UModioCommonButtonStyle> ClearAllButtonStyle;
+	TSubclassOf<UModioCommonButtonStyle> ResetButtonStyle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Style|Button")
 	TSubclassOf<UModioCommonButtonStyle> SearchButtonStyle;

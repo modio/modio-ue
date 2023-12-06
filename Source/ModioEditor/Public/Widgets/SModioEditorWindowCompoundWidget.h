@@ -247,4 +247,8 @@ public:
 	void DownloadGameLogo(FString URL);
 
 	FString ToNonPlural(const FString& String);
+
+	EModioModfilePlatform ToPlatformEnum(FString Platform);
+	FString ToPlatformString(EModioModfilePlatform Platform);
+	bool DoesGameSupportThisPlatform(FModioGameInfo GameInfo, FModioGamePlatform& GamePlatform);
 };

@@ -90,7 +90,7 @@ void UModioCommonTabListWidgetBase::SynchronizeProperties()
 		return;
 	}
 
-	UpdateBindings();
+	//UpdateBindings();
 	
 	const bool bShowNextAndPrevious = bIsListeningForInput && GetTabCount() > 1;
 	if (PreviousTabAction)
@@ -156,7 +156,6 @@ void UModioCommonTabListWidgetBase::HandleTabRemoval_Implementation(FName TabNam
 
 void UModioCommonTabListWidgetBase::SetListeningForInput(bool bShouldListen)
 {
-	bIsListeningForInput = bShouldListen;
 	Super::SetListeningForInput(bShouldListen);
 	SynchronizeProperties();
 }

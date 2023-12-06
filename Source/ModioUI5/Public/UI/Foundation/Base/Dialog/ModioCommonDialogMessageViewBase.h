@@ -21,9 +21,4 @@ UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Co
 class MODIOUI5_API UModioCommonDialogMessageViewBase : public UModioCommonActivatableWidget
 {
 	GENERATED_BODY()
-
-public:
-
-	DECLARE_DELEGATE(FOnModioCommonDialogMessageViewSubmitClicked);
-	FOnModioCommonDialogMessageViewSubmitClicked OnSubmitClicked;
 };

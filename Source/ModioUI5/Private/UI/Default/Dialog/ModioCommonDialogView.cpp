@@ -30,7 +30,6 @@ void UModioCommonDialogView::NativeOnActivated()
 		if (DialogMessageViewClass)
 		{
 			DialogMessageView = CreateWidget<UModioCommonDialogMessageViewBase>(this, DialogMessageViewClass);
-			DialogMessageView->OnSubmitClicked.BindUObject(this, &UModioCommonDialogView::OnDialogMessageViewSubmitClicked);
 			SwitcherSlots.Add(Cast<UWidgetSwitcherSlot>(DialogSwitcher->AddChild(DialogMessageView)));
 		}
 

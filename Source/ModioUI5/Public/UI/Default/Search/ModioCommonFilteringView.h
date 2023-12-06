@@ -11,6 +11,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/ModioFilterParamsUI.h"
 #include "UI/Foundation/Base/ModioCommonActivatableWidget.h"
 #include "Types/ModioModTagInfo.h"
 #include "ModioCommonFilteringView.generated.h"
@@ -45,14 +46,22 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
 	void ResetFiltering();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Mod.io Common UI")
+	bool SetSelectedTagGroupValues(const TArray<FString>& TagGroupValues, bool bSelect);
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
 	bool GetSelectedTagGroupValues(UPARAM(ref) TArray<FString>& OutSelectedTagGroupValues) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	FModioModCategoryParams GetFilterParamsWrapper() const;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void AddModTagInfo(const FModioModTagInfo& ModTagInfo);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void SynchronizeFilterParams(const TArray<FString>& PreviouslySelectedTagGroupValues);
 protected:
-	virtual void NativeOnInitialized() override;
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 public:
 	virtual void SynchronizeProperties() override;

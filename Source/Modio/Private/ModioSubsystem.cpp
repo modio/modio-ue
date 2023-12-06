@@ -43,7 +43,13 @@
 #include <map>
 
 template<typename DestKey, typename DestValue, typename SourceKey, typename SourceValue>
-TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>&& OriginalMap);
+TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>& OriginalMap);
+
+template <typename DestKey, typename DestValue, typename SourceKey, typename SourceValue>
+TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>&& OriginalMap)
+{
+	return ToUnreal<DestKey, DestValue, SourceKey, SourceValue>(OriginalMap);
+}
 
 template<typename Dest, typename Source>
 TOptional<Dest> ToUnrealOptional(Source Original);
@@ -293,6 +299,27 @@ void UModioSubsystem::FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetch
 		});
 }
 
+void UModioSubsystem::PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegateFast OnPreviewDone)
+{
+	Modio::PreviewExternalUpdatesAsync(
+		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnPreviewDone](Modio::ErrorCode ec, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> PreviewMap) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnPreviewDone, ec, PreviewMap = MoveTemp(PreviewMap)]() mutable {
+						  if (WeakThis.IsValid())
+						  {
+							  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+							  WeakThis->InvalidateUserSubscriptionCache();
+
+							  TOptional<FModioMapPreview> Result(ToUnreal<FModioModID, EModioModChangeType>(PreviewMap));
+							  OnPreviewDone.ExecuteIfBound(ToUnreal(ec), Result);
+						  }
+					  }));
+		});
+}
+
 FModioErrorCode UModioSubsystem::EnableModManagement(FOnModManagementDelegateFast Callback)
 {
 	return Modio::EnableModManagement(
@@ -341,6 +368,15 @@ void UModioSubsystem::K2_FetchExternalUpdatesAsync(FOnErrorOnlyDelegate OnFetchD
 {
 	FetchExternalUpdatesAsync(
 		FOnErrorOnlyDelegateFast::CreateLambda([OnFetchDone](FModioErrorCode ec) { OnFetchDone.ExecuteIfBound(ec); }));
+}
+
+void UModioSubsystem::K2_PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegate OnPreviewDone)
+{
+	PreviewExternalUpdatesAsync(
+		FOnPreviewExternalUpdatesDelegateFast::CreateLambda([this, OnPreviewDone](FModioErrorCode ec, TOptional<FModioMapPreview> PreviewMap) 
+		{ 
+			OnPreviewDone.ExecuteIfBound(ec, ToBP<FModioOptionalMapPreview>(PreviewMap)); 
+		}));
 }
 
 FModioErrorCode UModioSubsystem::K2_EnableModManagement(FOnModManagementDelegate Callback)
@@ -551,16 +587,16 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize Avata
 void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 									   FOnGetMediaDelegateFast Callback)
 {
-	const TTuple<FModioModID, EModioGallerySize> ModIdAndSizePair = MakeTuple(ModId, GallerySize);
-	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingModMediaGalleryRequests.Find(ModIdAndSizePair))
+	const TTuple<FModioModID, EModioGallerySize, int32> ModIdSizeIndexTuple = MakeTuple(ModId, GallerySize, Index);
+	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingModMediaGalleryRequests.Find(ModIdSizeIndexTuple))
 	{
 		MulticastCallbackPtr->Add(Callback);
 		return;
 	}
-	PendingModMediaGalleryRequests.Add(ModIdAndSizePair).Add(Callback);
+	PendingModMediaGalleryRequests.Add(ModIdSizeIndexTuple).Add(Callback);
 	Modio::GetModMediaAsync(
 		ToModio(ModId), ToModio(GallerySize), Index,
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdAndSizePair](Modio::ErrorCode ec,
+		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdSizeIndexTuple](Modio::ErrorCode ec,
 																			 Modio::Optional<std::string> Path) {
 			if (!WeakThis.IsValid())
 			{
@@ -575,22 +611,22 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize Gall
 				FModioImageWrapper Out;
 				Out.ImagePath = ToUnreal(Path.value());
 
-				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec, Out]() {
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdSizeIndexTuple, ec, Out]() {
 							  if (WeakThis.IsValid())
 							  {
 								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-								  WeakThis->PendingModMediaGalleryRequests.FindAndRemoveChecked(ModIdAndSizePair)
+								  WeakThis->PendingModMediaGalleryRequests.FindAndRemoveChecked(ModIdSizeIndexTuple)
 									  .Broadcast(ec, Out);
 							  }
 						  }));
 			}
 			else
 			{
-				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdAndSizePair, ec]() {
+				AsyncTask(ENamedThreads::GameThread, ([WeakThis, ModIdSizeIndexTuple, ec]() {
 							  if (WeakThis.IsValid())
 							  {
 								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-								  WeakThis->PendingModMediaGalleryRequests.FindAndRemoveChecked(ModIdAndSizePair)
+								  WeakThis->PendingModMediaGalleryRequests.FindAndRemoveChecked(ModIdSizeIndexTuple)
 									  .Broadcast(ec, {});
 							  }
 						  }));
@@ -1145,7 +1181,7 @@ EModioLanguage UModioSubsystem::ConvertLanguageCodeToModio(FString LanguageCode)
 
 #pragma region Implementation
 template<typename DestKey, typename DestValue, typename SourceKey, typename SourceValue>
-TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>&& OriginalMap)
+TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>& OriginalMap)
 {
 	TMap<DestKey, DestValue> Result;
 

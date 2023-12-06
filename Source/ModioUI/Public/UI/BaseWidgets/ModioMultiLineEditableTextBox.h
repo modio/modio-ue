@@ -26,12 +26,29 @@
 class MODIOUI_API SModioMultiLineEditableTextBox : public SMultiLineEditableTextBox
 {
 public:
+	virtual void SetApplyFocusedStyleInReadOnlyMode(bool bInApplyFocusedStyleInReadOnlyMode) { bApplyFocusedStyleInReadOnlyMode = bInApplyFocusedStyleInReadOnlyMode; }
+
 	virtual bool SupportsKeyboardFocus() const override { return true; }
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply HandleNavigation(const FGeometry& MyGeometry, EUINavigation Navigation);
 	virtual void HandleOnTextCursorMoved(const FTextLocation& NewCursorPosition);
 
+	virtual void OnFocusChanging(const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath, const FFocusEvent& InFocusEvent) override;
+
 protected:
+	/** Whether we should ignore the next OnKeyDown event */
+	bool bIgnoreOnKeyDown = false;
+
 	FTextLocation LastCursorPosition;
+
+	/** Whether the text box is currently focused */
+	bool bIsTextBoxFocused = false;
+
+	/** Editable text box style. Used for intermediary storage */
+	FEditableTextBoxStyle EditableTextBoxStyle;
+
+	/** Whether to apply the focused style when the text box is read only */
+	bool bApplyFocusedStyleInReadOnlyMode = false;
 };
 
 /**
@@ -56,6 +73,7 @@ protected:
 	virtual FString NativeGatherInput() override;
 
 	virtual void NativeSetHintText(FText InHintText) override;
+	virtual void NativeSetInput(const FString& Input) override;
 
 	virtual void SynchronizeProperties() override;
 
@@ -91,4 +109,8 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (StyleClass = "ModioMultiLineEditableTextBoxStyle"),
 			  Category = "Widgets")
 	FModioUIStyleRef TextBoxStyle = FModioUIStyleRef {"DefaultMultiLineEditableTextBoxStyle"};
+
+	/** Whether to apply the focused style when the text box is read only */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widgets")
+	bool bApplyFocusedStyleInReadOnlyMode = false;
 };

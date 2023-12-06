@@ -26,15 +26,21 @@ class MODIOUI5_API UModioCommonDialogMessageView : public UModioCommonDialogMess
 {
 	GENERATED_BODY()
 
-public:
+protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonTextBlock> TitleTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonTextBlock> DescriptionTextBlock;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonButtonBase> SubmitButton;
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
+	TObjectPtr<UModioCommonButtonBase> BackButton;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
+	TObjectPtr<UModioCommonButtonBase> CancelButton;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
+	TObjectPtr<UModioCommonButtonBase> ConfirmButton;
 
 public:
 	virtual void SynchronizeProperties() override;
@@ -42,4 +48,10 @@ protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeOnSetDataSource() override;
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	TArray<UModioCommonButtonBase*> GetButtonsToDisplay() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void SetButtonEnabledState(UModioCommonButtonBase* Button, bool bEnabled);
 };

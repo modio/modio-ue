@@ -23,7 +23,7 @@ class UModioCommonImage;
 class UModioCommonQuickAccessTabViewStyle;
 
 /**
- * @brief Displays the amount of storage space used and free
+ * Displays the amount of storage space used and free
  * It supports styling through the Mod.io Common UI styling system
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
@@ -32,10 +32,15 @@ class MODIOUI5_API UModioCommonStorageSpaceTrackerUserWidget : public UModioComm
 	GENERATED_BODY()
 
 public:
+	/**
+	 * Sets the style of the Storage Space Tracker within the Mod.io Common UI styling system
+	 * @param InStyle The style to set
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Style")
 	void SetStyle(UPARAM(DisplayName = "Style") TSubclassOf<UModioCommonStorageSpaceTrackerUserWidgetStyle> InStyle);
 
 protected:
+	/** The style of the Storage Space Tracker within the Mod.io Common UI styling system */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style", Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonStorageSpaceTrackerUserWidgetStyle> ModioStyle;
 
@@ -73,9 +78,12 @@ protected:
 	int32 MaxDecimals = 0;
 
 protected:
+	//~ Begin UWidget Interface
 	virtual bool Initialize() override;
 public:
 	virtual void SynchronizeProperties() override;
+	//~ End UWidget Interface
 protected:
-	virtual void OnStorageSpaceTrackerUpdated(FModioUnsigned64 UsedSpace, FModioUnsigned64 FreeSpace, FModioUnsigned64 TotalSpace);
+	UFUNCTION(BlueprintNativeEvent, Category = "Storage Space Tracker")
+	void OnStorageSpaceTrackerUpdated(FModioUnsigned64 UsedSpace, FModioUnsigned64 FreeSpace, FModioUnsigned64 TotalSpace);
 };

@@ -19,8 +19,11 @@
 
 void UModioCommonModGalleryEntry::SetStyle(TSubclassOf<UModioCommonModGalleryEntryStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonModGalleryEntry::SynchronizeProperties()

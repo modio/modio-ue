@@ -13,27 +13,28 @@
 
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonAuthParams.h"
 
 void UModioCommonEmailAuthLoadingView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonEmailAuthLoadingParamsSettings* Settings = GetDefault<UModioCommonEmailAuthLoadingParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (TitleTextBlock)
 		{
-			TitleTextBlock->SetText(Settings->TitleText);
+			TitleTextBlock->SetText(UISettings->EmailAuthLoadingParams.TitleText);
 		}
 
 		if (DescriptionTextBlock)
 		{
-			DescriptionTextBlock->SetText(Settings->DescriptionText);
+			DescriptionTextBlock->SetText(UISettings->EmailAuthLoadingParams.DescriptionText);
 		}
 
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelButtonText);
+			CancelButton->SetLabel(UISettings->EmailAuthLoadingParams.CancelButtonText);
 		}
 	}
 }
@@ -42,19 +43,14 @@ void UModioCommonEmailAuthLoadingView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	const UModioCommonAuthParamsSettings* AuthSettings = GetDefault<UModioCommonAuthParamsSettings>();
-	const UModioCommonEmailAuthLoadingParamsSettings* AuthLoadingSettings = GetDefault<UModioCommonEmailAuthLoadingParamsSettings>();
-	
-	if (!AuthSettings || !AuthLoadingSettings)
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		return;
-	}
-
-	if (CancelButton)
-	{
-		ListenForInputAction(CancelButton, AuthSettings->CancelInputAction, AuthLoadingSettings->CancelButtonText, [this]() {
-			if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
-		});
+		if (CancelButton)
+		{
+			ListenForInputAction(CancelButton, UISettings->AuthParams.CancelInputAction, UISettings->EmailAuthLoadingParams.CancelButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
+			}));
+		}
 	}
 }
 

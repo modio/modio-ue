@@ -16,7 +16,7 @@
 
 void UModioCommonProgressBar::SetStyle(TSubclassOf<UModioCommonProgressBarStyle> InStyle)
 {
-	if (InStyle)
+	if (InStyle && InStyle != ModioStyle)
 	{
 		ModioStyle = InStyle;
 		if (MyProgressBar)

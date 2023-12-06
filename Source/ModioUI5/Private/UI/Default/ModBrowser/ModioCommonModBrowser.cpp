@@ -28,12 +28,16 @@
 #include "UI/Foundation/Base/Dialog/ModioCommonDialogViewBase.h"
 #include "Loc/BeginModioLocNamespace.h"
 #include "UI/Default/Dialog/ModioCommonDialogInfo.h"
+#include "UI/Default/ModBrowser/Featured/ModioCommonFeaturedView.h"
 #include "UI/Settings/ModioCommonUISettings.h"
+#include "Algo/Find.h"
+#include "UI/Default/ModBrowser/Collection/ModioCommonCollectionView.h"
+#include "UI/Foundation/Base/ModioCommonActivatableWidgetStack.h"
 
 // These are only for the internal identification of the tabs
 const FName FeaturedTabId = FName(TEXT("Featured"));
 const FName CollectionTabId = FName(TEXT("Collection"));
-const FName SearchResultsTabId = FName(TEXT("SearchResults"));
+const FName ModDetailsTabId = FName(TEXT("ModDetails"));
 
 void UModioCommonModBrowser::NativeOnInitialized()
 {
@@ -56,8 +60,15 @@ void UModioCommonModBrowser::NativeOnInitialized()
 				return;
 			}
 
-			UModioCommonActivatableWidget* SelectedView;
-			if (!GetViewFromTabNameID(TabNameID, SelectedView))
+			const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>();
+			if (!UISettings)
+			{
+				UE_LOG(ModioUI5, Error, TEXT("Unable to process tab selection in '%s' for tab '%s': Settings are invalid"), *GetName(), *TabNameID.ToString());
+				return;
+			}
+
+			TSubclassOf<UModioCommonActivatableWidget> SelectedViewClass;
+			if (!GetViewFromTabNameID(TabNameID, SelectedViewClass))
 			{
 				UE_LOG(ModioUI5, Error, TEXT("Unable to process tab selection in '%s' for tab '%s': no associated view found"), *GetName(), *TabNameID.ToString());
 				return;
@@ -68,21 +79,47 @@ void UModioCommonModBrowser::NativeOnInitialized()
 			HideReportMod();
 			HideModDetailsView();
 
-			if (!ContentSwitcher)
+			if (!ContentStack)
 			{
 				UE_LOG(ModioUI5, Error, TEXT("Unable to process tab selection in '%s' for tab '%s': content switcher is invalid"), *GetName(), *TabNameID.ToString());
 				return;
 			}
-			
-			ContentSwitcher->SetActiveWidget(SelectedView);
-			UE_LOG(ModioUI5, Log, TEXT("Tab '%s' with view '%s' selected"), *TabNameID.ToString(), *SelectedView->GetName());
 
-			// If we open the search results tab explicitly, by the tab selection, we want to show the search view
-			if (bShowSearchViewOnSearchResults && TabNameID == SearchResultsTabId)
+			UModioCommonActivatableWidget* SelectedView = ContentStack->AddWidgetSmart<UModioCommonActivatableWidget>(SelectedViewClass);
+			UE_LOG(ModioUI5, Log, TEXT("Tab '%s' with view '%s' selected"), *TabNameID.ToString(), *SelectedViewClass->GetName());
+
+			const FModioModCategoryParams* SelectedAdditionalCategoryParamsPtr = Algo::FindByPredicate(UISettings->FeaturedParams.CategoryParams,
+			[this, TabNameID](const FModioModCategoryParams& Params) {
+				return TabNameID == FName(*Params.CategoryName.ToString());
+			});
+
+			if (SelectedAdditionalCategoryParamsPtr)
 			{
-				ShowSearchView();
+				if (UModioCommonFeaturedView* CastedFeaturedView = Cast<UModioCommonFeaturedView>(SelectedView))
+				{
+					UModioFilterParamsUI* FilterParamsUI = NewObject<UModioFilterParamsUI>();
+					if (!FilterParamsUI)
+					{
+						UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': failed to create filter params UI"), *GetName());
+						return;
+					}
+					FilterParamsUI->Underlying = SelectedAdditionalCategoryParamsPtr->ToFilterParams();
+					CastedFeaturedView->SetDataSource(FilterParamsUI);
+				}
 			}
 		});
+
+		auto CallHandleViewChanged = [this](UCommonActivatableWidgetContainerBase* Widget, bool bIsTransitioning) {
+			if (!bIsTransitioning)
+			{
+				HandleViewChanged();
+			}
+		};
+
+		ContentStack->OnTransitioningChanged.AddWeakLambda(this, CallHandleViewChanged);
+		AuthStack->OnTransitioningChanged.AddWeakLambda(this, CallHandleViewChanged);
+		RightTabStack->OnTransitioningChanged.AddWeakLambda(this, CallHandleViewChanged);
+		DialogStack->OnTransitioningChanged.AddWeakLambda(this, CallHandleViewChanged);
 	}
 	else
 	{
@@ -116,8 +153,8 @@ void UModioCommonModBrowser::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 	
-	const UModioCommonModBrowserParamsSettings* Settings = GetDefault<UModioCommonModBrowserParamsSettings>();
-	if (!Settings)
+	const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>();
+	if (!UISettings)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to synchronize properties for '%s': Settings are invalid"), *GetName());
 		return;
@@ -130,60 +167,29 @@ void UModioCommonModBrowser::SynchronizeProperties()
 		return;
 	}
 
-	if (ContentSwitcher)
+	if (ContentStack)
 	{
-		ContentSwitcher->ClearChildren();
+		ContentStack->ClearWidgets();
 	}
 
 	ClearTabs();
 
-	TabList->SetPreviousTabInputActionData(Settings->PreviousTabInputAction);
-	TabList->SetNextTabInputActionData(Settings->NextTabInputAction);
-
-	if (ContentSwitcher && StyleCDO->ModDetailsClass)
+	if (TabList)
 	{
-		ModDetailsView = CreateWidget<UModioCommonModDetailsViewBase>(this, StyleCDO->ModDetailsClass);
-	}
-	else
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to synchronize some properties for '%s': unable to create ModDetailsView"), *GetName());
+		TabList->SetPreviousTabInputActionData(UISettings->ModBrowserParams.PreviousTabInputAction);
+		TabList->SetNextTabInputActionData(UISettings->ModBrowserParams.NextTabInputAction);
 	}
 
-	UModioCommonActivatableWidget* FeaturedViewWidget;
-	if (!AddTab(FeaturedTabId, Settings->FeaturedViewTabText, StyleCDO->FeaturedViewClass, FeaturedViewWidget))
+	for (const FModioModCategoryParams& Params : UISettings->FeaturedParams.CategoryParams)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to synchronize some properties for '%s': unable to add Featured tab"), *GetName());
+		AddEmptyTab(FName(*Params.CategoryName.ToString()), Params.CategoryName);
+	}
+
+	if (!AddTab(CollectionTabId, UISettings->ModBrowserParams.CollectionViewTabText, StyleCDO->CollectionViewClass))
+	{
+		UE_LOG(ModioUI5, Warning, TEXT("Unable to synchronize some properties for '%s': unable to add Collection tab"), *GetName());
 		return;
 	}
-	FeaturedView = Cast<UModioCommonModListBase>(FeaturedViewWidget);
-
-	if (ContentSwitcher)
-	{
-		ContentSwitcher->AddChild(ModDetailsView);
-	}
-
-	UModioCommonActivatableWidget* CollectionViewWidget;
-	if (!AddTab(CollectionTabId, Settings->CollectionViewTabText, StyleCDO->CollectionViewClass, CollectionViewWidget))
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to synchronize some properties for '%s': unable to add Collection tab"), *GetName());
-		return;
-	}
-	CollectionView = Cast<UModioCommonModListBase>(CollectionViewWidget);
-
-	UModioCommonActivatableWidget* SearchResultsViewWidget;
-	if (!AddTab(SearchResultsTabId, Settings->SearchResultsViewTabText, StyleCDO->SearchResultsViewClass, SearchResultsViewWidget))
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': Failed to add tab '%s'"), *GetName(), *SearchResultsTabId.ToString());
-		return;
-	}
-	SearchResultsView = Cast<UModioCommonModListBase>(SearchResultsViewWidget);
-
-#if WITH_EDITOR
-	if (IsDesignTime())
-	{
-		ContentSwitcher->SetActiveWidget(bPreviewDisplayFeaturedOrCollection ? Cast<UWidget>(FeaturedView) : Cast<UWidget>(CollectionView));
-	}
-#endif
 }
 
 UWidget* UModioCommonModBrowser::NativeGetDesiredFocusTarget() const
@@ -199,14 +205,12 @@ UWidget* UModioCommonModBrowser::NativeGetDesiredFocusTarget() const
 		return nullptr;
 	}
 
-	UModioCommonActivatableWidget* SelectedView;
-	if (!GetViewFromTabNameID(TabList->GetActiveTab(), SelectedView))
+	if (UCommonActivatableWidget* ActiveWidget = ContentStack->GetActiveWidget())
 	{
-		UE_LOG(ModioUI5, Warning, TEXT("Unable to get desired focus target for '%s': no associated view with tab '%s' found"), *GetName(), *TabList->GetActiveTab().ToString());
-		return nullptr;
+		return ActiveWidget->GetDesiredFocusTarget();
 	}
 
-	return SelectedView->GetDesiredFocusTarget();
+	return nullptr;
 }
 
 bool UModioCommonModBrowser::ShowFeaturedView_Implementation()
@@ -217,13 +221,27 @@ bool UModioCommonModBrowser::ShowFeaturedView_Implementation()
 		return false;
 	}
 
-	if (!TabList->SelectTabByID(FeaturedTabId))
+	const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>();
+	if (!UISettings)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show featured view in '%s': TabList failed to select tab '%s'"), *GetName(), *FeaturedTabId.ToString());
+		UE_LOG(ModioUI5, Error, TEXT("Unable to show featured view in '%s': Settings are invalid"), *GetName());
 		return false;
 	}
 
-	return true;
+	// Selecting the first featured category tab
+	for (const FModioModCategoryParams& Params : UISettings->FeaturedParams.CategoryParams)
+	{
+		FName TabName = FName(*Params.CategoryName.ToString());
+		if (!TabList->SelectTabByID(TabName))
+		{
+			UE_LOG(ModioUI5, Error, TEXT("Unable to show featured view in '%s': TabList failed to select tab '%s'"), *GetName(), *TabName.ToString());
+			return false;
+		}
+		return true;
+	}
+
+	UE_LOG(ModioUI5, Error, TEXT("Unable to show featured view in '%s': no featured category tabs found"), *GetName());
+	return false;
 }
 
 bool UModioCommonModBrowser::HideFeaturedView_Implementation()
@@ -284,7 +302,7 @@ bool UModioCommonModBrowser::ShowQuickAccessView_Implementation()
 	}
 
 	RightTabStack->ClearWidgets();
-	if (!RightTabStack->AddWidget<UModioCommonQuickAccessViewBase>(StyleCDO->QuickAccessViewClass))
+	if (!RightTabStack->AddWidgetSmart<UModioCommonQuickAccessViewBase>(StyleCDO->QuickAccessViewClass))
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to show quick access view in '%s': Unable to add '%s' to RightTabStack"), *GetName(), *StyleCDO->QuickAccessViewClass->GetName());
 		return false;
@@ -302,10 +320,11 @@ bool UModioCommonModBrowser::HideQuickAccessView_Implementation()
 	}
 
 	RightTabStack->ClearWidgets();
+	HandleViewChanged();
 	return true;
 }
 
-bool UModioCommonModBrowser::ShowSearchView_Implementation()
+bool UModioCommonModBrowser::ShowSearchView_Implementation(EModioCommonSearchViewType SearchType, const FModioModCategoryParams& CurrentFilterParams)
 {
 	if (!RightTabStack)
 	{
@@ -327,13 +346,23 @@ bool UModioCommonModBrowser::ShowSearchView_Implementation()
 	}
 
 	RightTabStack->ClearWidgets();
-	if (!RightTabStack->AddWidget<UModioCommonSearchViewBase>(StyleCDO->SearchViewClass))
+	UModioCommonSearchViewBase* SearchView = RightTabStack->AddWidgetSmart<UModioCommonSearchViewBase>(StyleCDO->SearchViewClass);
+	if (!SearchView)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to show search view in '%s': Unable to add '%s' to RightTabStack"), *GetName(), *StyleCDO->SearchViewClass->GetName());
 		return false;
 	}
 
-	return true;
+	if (UModioSearchResultsParamsUI* SearchResultsParams = NewObject<UModioSearchResultsParamsUI>(this))
+	{
+		SearchResultsParams->SearchType = SearchType;
+		SearchResultsParams->CurrentFilterParams = CurrentFilterParams;
+		SearchView->SetDataSource(SearchResultsParams);
+		return true;
+	}
+
+	UE_LOG(ModioUI5, Error, TEXT("Unable to show search view in '%s': Unable to create SearchResultsParams"), *GetName());
+	return false;
 }
 
 bool UModioCommonModBrowser::HideSearchView_Implementation()
@@ -350,7 +379,7 @@ bool UModioCommonModBrowser::HideSearchView_Implementation()
 
 bool UModioCommonModBrowser::HideModDetailsView_Implementation()
 {
-	if (!ContentSwitcher)
+	if (!ContentStack)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable hide mod details: ContentSwitcher is not bound"));
 		return false;
@@ -361,25 +390,33 @@ bool UModioCommonModBrowser::HideModDetailsView_Implementation()
 		UE_LOG(ModioUI5, Warning, TEXT("Unable hide mod details: TabList is not bound"));
 		return false;
 	}
-
-	UModioCommonActivatableWidget* SelectedView;
-	if (!GetViewFromTabNameID(TabList->GetActiveTab(), SelectedView))
+	
+	if (UModioCommonModDetailsViewBase* ModDetailsView = Cast<UModioCommonModDetailsViewBase>(ContentStack->GetActiveWidget()))
 	{
-		UE_LOG(ModioUI5, Warning, TEXT("Unable hide mod details: no associated view found"));
-		return false;
+		ModDetailsView->DeactivateWidget();
 	}
-	ContentSwitcher->SetActiveWidget(SelectedView);
 	return true;
 }
 
-bool UModioCommonModBrowser::AddTab_Implementation(FName TabNameID, const FText& TabText, TSubclassOf<UModioCommonActivatableWidget> ContentClass, UModioCommonActivatableWidget*& OutContent)
+bool UModioCommonModBrowser::AddTab_Implementation(FName TabNameID, const FText& TabText, TSubclassOf<UModioCommonActivatableWidget> ContentClass)
 {
-	if (!ContentSwitcher)
+	if (!AddEmptyTab(TabNameID, TabText))
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to add tab '%s' (%s) in '%s': ContentSwitcher is not bound"), *TabNameID.ToString(), *TabText.ToString(), *GetName());
+		UE_LOG(ModioUI5, Error, TEXT("Unable to add tab '%s' (%s) in '%s': AddEmptyTab failed"), *TabNameID.ToString(), *TabText.ToString(), *GetName());
 		return false;
 	}
 
+	UModioCommonActivatableWidget* AddedContent;
+	if (!AddContentForTab(TabNameID, ContentClass, AddedContent))
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to add tab '%s' (%s) in '%s': AddContentForTab failed"), *TabNameID.ToString(), *TabText.ToString(), *GetName());
+		return false;
+	}
+	return true;
+}
+
+bool UModioCommonModBrowser::AddEmptyTab_Implementation(FName TabNameID, const FText& TabText)
+{
 	if (!TabList)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Unable to add tab '%s' (%s) in '%s': TabList is not bound"), *TabNameID.ToString(), *TabText.ToString(), *GetName());
@@ -410,8 +447,20 @@ bool UModioCommonModBrowser::AddTab_Implementation(FName TabNameID, const FText&
 		return false;
 	}
 
-	OutContent = CreateWidget<UModioCommonActivatableWidget>(this, ContentClass);
-	ContentSwitcher->AddChild(OutContent);
+	return true;
+}
+
+bool UModioCommonModBrowser::AddContentForTab_Implementation(FName TabNameID, TSubclassOf<UModioCommonActivatableWidget> ContentClass, UModioCommonActivatableWidget*& OutContent)
+{
+	/*if (ContentClass)
+	{
+		OutContent = CreateWidget<UModioCommonActivatableWidget>(this, ContentClass);
+		if (OutContent)
+		{
+			ContentStack->AddChild(OutContent);
+			return true;
+		}
+	}*/
 	return true;
 }
 
@@ -439,22 +488,42 @@ void UModioCommonModBrowser::ClearTabs_Implementation()
 	}
 }
 
-bool UModioCommonModBrowser::GetViewFromTabNameID_Implementation(FName TabNameID, UModioCommonActivatableWidget*& OutView) const
+bool UModioCommonModBrowser::GetViewFromTabNameID_Implementation(FName TabNameID, TSubclassOf<UModioCommonActivatableWidget>& OutView) const
 {
-	if (FeaturedView && TabNameID.IsEqual(FeaturedTabId))
+	const UModioCommonModBrowserStyle* StyleCDO = Cast<UModioCommonModBrowserStyle>(ModioStyle.GetDefaultObject());
+	if (!StyleCDO)
 	{
-		OutView = FeaturedView;
+		UE_LOG(ModioUI5, Error, TEXT("Unable to synchronize properties for '%s': Style is invalid"), *GetName());
+		return false;
+	}
+	
+	if (TabNameID.IsEqual(FeaturedTabId))
+	{
+		OutView = StyleCDO->FeaturedViewClass;
 		return true;
 	}
-	if (CollectionView && TabNameID.IsEqual(CollectionTabId))
+	if (TabNameID.IsEqual(CollectionTabId))
 	{
-		OutView = CollectionView;
+		OutView = StyleCDO->CollectionViewClass;
 		return true;
 	}
-	if (SearchResultsView && TabNameID.IsEqual(SearchResultsTabId))
+	if (TabNameID.IsEqual(ModDetailsTabId))
 	{
-		OutView = SearchResultsView;
+		OutView = StyleCDO->ModDetailsClass;
 		return true;
+	}
+
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
+	{
+		for (const FModioModCategoryParams& Params : UISettings->FeaturedParams.CategoryParams)
+		{
+			FName TabName = FName(*Params.CategoryName.ToString());
+			if (TabNameID.IsEqual(TabName))
+			{
+				OutView = StyleCDO->FeaturedViewClass;
+				return true;
+			}
+		}
 	}
 
 	UE_LOG(ModioUI5, Error, TEXT("Unable to get view from tab name ID '%s' in '%s': no associated view found"), *TabNameID.ToString(), *GetName());
@@ -463,22 +532,29 @@ bool UModioCommonModBrowser::GetViewFromTabNameID_Implementation(FName TabNameID
 
 bool UModioCommonModBrowser::ShowModDetailsView_Implementation(const FModioModInfo& ModInfo)
 {
-	if (!ContentSwitcher)
+	if (!ContentStack)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to show mod details: content switcher is invalid"));
 		return false;
 	}
 
-	if (!ModDetailsView)
+	const UModioCommonModBrowserStyle* StyleCDO = Cast<UModioCommonModBrowserStyle>(ModioStyle.GetDefaultObject());
+	if (!StyleCDO)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show mod details: ModDetailsView is invalid"));
+		UE_LOG(ModioUI5, Error, TEXT("Unable to show mod details: Style is invalid"));
 		return false;
 	}
-			
+
+	UModioCommonModDetailsViewBase* ModDetailsView = ContentStack->AddWidgetSmart<UModioCommonModDetailsViewBase>(StyleCDO->ModDetailsClass);
+	if (!ModDetailsView)
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to show mod details: failed to create mod details view"));
+		return false;
+	}
+	
 	UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
 	ModInfoObj->Underlying = ModInfo;
 	ModDetailsView->SetDataSource(ModInfoObj);
-	ContentSwitcher->SetActiveWidget(ModDetailsView);
 
 	ModDetailsView->OnDeactivated().AddWeakLambda(this, [this]() {
 		HideModDetailsView();
@@ -501,6 +577,11 @@ bool UModioCommonModBrowser::HideReportMod_Implementation()
 
 	ReportStack->ClearWidgets();
 	return true;
+}
+
+void UModioCommonModBrowser::HandleViewChanged_Implementation()
+{
+	
 }
 
 void UModioCommonModBrowser::ShowDetailsForMod_Implementation(FModioModID ModID)
@@ -560,58 +641,38 @@ void UModioCommonModBrowser::LogOut_Implementation()
 	}
 }
 
-void UModioCommonModBrowser::ShowSearchResults_Implementation(const FModioFilterParams& FilterParams)
+void UModioCommonModBrowser::ShowSearchResults_Implementation(const FModioModCategoryParams& FilterParams)
 {
 	Super::ShowSearchResults_Implementation(FilterParams);
 
-	const UModioCommonModBrowserParamsSettings* Settings = GetDefault<UModioCommonModBrowserParamsSettings>();
-	if (!Settings)
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': Settings are invalid"), *GetName());
-		return;
-	}
-	
-	const UModioCommonModBrowserStyle* StyleCDO = Cast<UModioCommonModBrowserStyle>(ModioStyle.GetDefaultObject());
-	if (!StyleCDO)
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': Style is invalid"), *GetName());
-		return;
-	}
-
-	if (!StyleCDO->SearchResultsViewClass)
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': SearchResultsViewClass in Style '%s' is invalid"), *GetName(), *ModioStyle->GetName());
-		return;
-	}
-
-	HideModDetailsView();
-
-	UModioCommonActivatableWidget* SearchResultsViewWidget;
-	if (!GetViewFromTabNameID(SearchResultsTabId, SearchResultsViewWidget))
-	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s' from tab '%s': no associated view found"), *GetName(), *SearchResultsTabId.ToString());
-		return;
-	}
-
-	if (UModioCommonModListBase* SearchResultsModListView = Cast<UModioCommonModListBase>(SearchResultsViewWidget))
+	if (UModioCommonFeaturedView* FeaturedWidget = Cast<UModioCommonFeaturedView>(ContentStack->GetActiveWidget()))
 	{
 		UModioFilterParamsUI* FilterParamsUI = NewObject<UModioFilterParamsUI>();
-		FilterParamsUI->Underlying = FilterParams;
-		SearchResultsModListView->SetDataSource(FilterParamsUI);
+		if (!FilterParamsUI)
+		{
+			UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': failed to create filter params UI"), *GetName());
+			return;
+		}
+		FilterParamsUI->Underlying = FilterParams.ToFilterParams();
+		FeaturedWidget->SetDataSource(FilterParamsUI);
+	}
+	else if (UModioCommonCollectionView* CollectionWidget = Cast<UModioCommonCollectionView>(ContentStack->GetActiveWidget()))
+	{
+		UModioModCategoryParamsUI* ModCategoryParamsUI = NewObject<UModioModCategoryParamsUI>();
+		if (!ModCategoryParamsUI)
+		{
+			UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': failed to create mod category params UI"), *GetName());
+			return;
+		}
+		ModCategoryParamsUI->Underlying = FilterParams;
+		CollectionWidget->SetDataSource(ModCategoryParamsUI);
 	}
 	else
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s' from tab '%s': associated view ('%s') is not a mod list"), *GetName(), *SearchResultsTabId.ToString(), *SearchResultsViewWidget->GetName());
-		return;
+		UE_LOG(ModioUI5, Error, TEXT("Unable to show search results in '%s': active widget is not a collection or featured view"), *GetName());
 	}
 
-	if (TabList)
-	{
-		const bool bPreviousShowSearchViewOnSearchResults = bShowSearchViewOnSearchResults;
-		bShowSearchViewOnSearchResults = false;
-		TabList->SelectTabByID(SearchResultsTabId);
-		bShowSearchViewOnSearchResults = bPreviousShowSearchViewOnSearchResults;
-	}
+	HideModDetailsView();
 }
 
 void UModioCommonModBrowser::ShowReportMod_Implementation(UObject* DialogDataSource)
@@ -646,15 +707,22 @@ void UModioCommonModBrowser::ShowReportMod_Implementation(UObject* DialogDataSou
 
 bool UModioCommonModBrowser::GetIsCollectionModDisableUIEnabled_Implementation()
 {
-	if (const UModioCommonUISettings* Settings = GetDefault<UModioCommonUISettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		return Settings->bEnableCollectionModDisableUI;
+		return UISettings->bEnableCollectionModDisableUI;
 	}
 	return Super::GetIsCollectionModDisableUIEnabled_Implementation();
 }
 
-void UModioCommonModBrowser::ShowDialog(UModioCommonDialogInfo* DialogInfo)
+void UModioCommonModBrowser::ShowDialog_Implementation(UObject* DialogDataSource)
 {
+	UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DialogDataSource);
+	if (!DialogInfo)
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog: DialogDataSource is not a DialogInfo"));
+		return;
+	}
+
 	if (!DialogStack)
 	{
 		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog: DialogStack is not bound"));
@@ -670,13 +738,17 @@ void UModioCommonModBrowser::ShowDialog(UModioCommonDialogInfo* DialogInfo)
 
 	if (!StyleCDO->DialogClass)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog for mod '%s': DialogClass in Style '%s' is invalid"),
-			   *DialogInfo->TitleText.ToString(), *ModioStyle->GetName());
+		UE_LOG(ModioUI5, Error, TEXT("Unable to show dialog for mod '%s': DialogClass in Style '%s' is invalid"), *DialogInfo->TitleText.ToString(), *ModioStyle->GetName());
 		return;
 	}
 
-	UModioCommonDialogViewBase* DialogView = DialogStack->AddWidget<UModioCommonDialogViewBase>(StyleCDO->DialogClass);
-	DialogView->SetDataSource(DialogInfo);
+	DialogStack->ClearWidgets();
+
+	if (UModioCommonDialogViewBase* DialogView = DialogStack->AddWidget<UModioCommonDialogViewBase>(StyleCDO->DialogClass))
+	{
+		DialogInfo->Owner = DialogView;
+		DialogView->SetDataSource(DialogInfo);
+	}
 
 	HideQuickAccessView();
 	HideSearchView();

@@ -21,7 +21,7 @@ class UModioCommonTextStyle;
 class UModioCommonProgressBarStyle;
 
 /**
- * @brief The style of the Storage Space Tracker User Widget within the Mod.io Common UI styling system
+ * The style of the Storage Space Tracker User Widget within the Mod.io Common UI styling system
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
 class MODIOUI5_API UModioCommonStorageSpaceTrackerUserWidgetStyle : public UObject

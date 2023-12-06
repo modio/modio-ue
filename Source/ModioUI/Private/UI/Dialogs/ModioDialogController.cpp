@@ -9,6 +9,7 @@
  */
 
 #include "UI/Dialogs/ModioDialogController.h"
+#include "Core/Input/ModioInputKeys.h"
 #include "Core/ModioAuthenticationContextUI.h"
 #include "Internationalization/Culture.h"
 #include "Internationalization/Internationalization.h"
@@ -23,7 +24,6 @@
 #include "UI/Styles/ModioUIStyleRef.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBackgroundBlur.h"
-#include "Core/Input/ModioInputKeys.h"
 
 void UModioDialogController::SynchronizeProperties()
 {
@@ -216,6 +216,10 @@ void UModioDialogController::HandleAuthCodeRequestSent(FModioErrorCode ec)
 						}
 					}
 				}
+				else if (UModioErrorConditionLibrary::ErrorCodeMatches(ec, EModioErrorCondition::EmailLoginCodeInvalid))
+				{
+					Error = NSLOCTEXT("Modio", "VerificationCodeInvalid", "The verification code is invalid or has expired.");
+				}
 				else
 				{
 					Error = FText::FromString(ec.GetErrorMessage());
@@ -290,9 +294,9 @@ void UModioDialogController::PopDialog()
 	{
 		UISubsystem4->GetCurrentFocusTarget()->SetKeyboardFocus();
 	}
-	else if (UISubsystem && UISubsystem->ModBrowserInstance)
+	else if (UISubsystem && UISubsystem->GetModBrowserInstance())
 	{
-		UISubsystem->ModBrowserInstance->SetFocus();
+		UISubsystem->GetModBrowserInstance()->SetFocus();
 	}
 }
 
@@ -450,8 +454,13 @@ void UModioDialogController::ReportContentAsync(const FModioReportParams& Report
 {
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		Subsystem->ReportContentAsync(ReportData, FOnErrorOnlyDelegateFast::CreateUObject(
-													  this, &UModioDialogController::HandleReportContent, Destination));
+		if (CanSubmitReport)
+		{
+			CanSubmitReport = false;
+			Subsystem->ReportContentAsync(
+				ReportData, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioDialogController::HandleReportContent,
+																	Destination));
+		}
 	}
 }
 
@@ -465,6 +474,7 @@ void UModioDialogController::HandleReportContent(FModioErrorCode ec, UModioDialo
 	{
 		ShowErrorDialog(ec);
 	}
+	CanSubmitReport = true;
 }
 
 void UModioDialogController::HandleUnsubscribe(FModioModID ec, bool IsSubscribe)

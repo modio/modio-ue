@@ -115,17 +115,22 @@ void FModioImageWrapper::LoadAsync(FOnLoadImageDelegateFast Callback) const
 			AsyncTask(ENamedThreads::GameThread, [Callback, TextureData, ImagePath]() mutable {
 				TArray<uint8> RawTextureData;
 				UTexture2DDynamic* Texture = nullptr;
-				if (TextureData)
-				{
-					Texture = UTexture2DDynamic::Create(TextureData->Width, TextureData->Height);
 
-					if (Texture)
+				// If we are not in the process of shutting down, create the texture
+				if (!GExitPurge && !IsGarbageCollecting())
+				{
+					if (TextureData)
 					{
-						// Ensure that the texture won't get garbage collected until the client has been able to grab a
-						// reference to it as we are doing async calls
-						Texture->AddToRoot();
-						Texture->SRGB = true;
-						RawTextureData = MoveTemp(TextureData->RawData);
+						Texture = UTexture2DDynamic::Create(TextureData->Width, TextureData->Height);
+
+						if (Texture)
+						{
+							// Ensure that the texture won't get garbage collected until the client has been able to grab a
+							// reference to it as we are doing async calls
+							Texture->AddToRoot();
+							Texture->SRGB = true;
+							RawTextureData = MoveTemp(TextureData->RawData);
+						}
 					}
 				}
 				if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())

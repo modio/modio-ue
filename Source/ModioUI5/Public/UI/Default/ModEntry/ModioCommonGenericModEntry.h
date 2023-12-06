@@ -113,6 +113,9 @@ protected:
 	TObjectPtr<UModioCommonButtonBase> OpenModDetailsButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
+	TObjectPtr<UModioCommonButtonBase> ForceUninstallButton;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
 	TObjectPtr<UModioCommonRichTextBlock> PercentProgressTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
@@ -178,6 +181,14 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Visibility")
 	void SwitchDisableButtonVisibility(bool bIsVisible);
 
+	/**
+	 * Called to switch the visibility of the enable button
+	 *
+	 * @param bIsVisible Whether the enable button should be visible
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Visibility")
+	void SwitchForceUninstallButtonVisibility(bool bIsVisible);
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
 	void HandleSubscribeClicked();
@@ -190,6 +201,9 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
 	void HandleOpenModDetailsClicked();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
+	void HandleForceUninstallClicked();
 
 private:
 	bool bObtainedModImage = false;

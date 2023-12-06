@@ -18,12 +18,16 @@
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Foundation/Utilities/StorageSpaceTracker/ModioCommonStorageSpaceTrackerWidget.h"
 #include "UI/Foundation/Utilities/StorageSpaceTracker/ModioCommonStorageSpaceTrackerUserWidgetStyle.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonStorageSpaceTrackerParams.h"
 
 void UModioCommonStorageSpaceTrackerUserWidget::SetStyle(TSubclassOf<UModioCommonStorageSpaceTrackerUserWidgetStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 bool UModioCommonStorageSpaceTrackerUserWidget::Initialize()
@@ -41,21 +45,21 @@ void UModioCommonStorageSpaceTrackerUserWidget::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonStorageSpaceTrackerParamsSettings* Settings = GetDefault<UModioCommonStorageSpaceTrackerParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (UsedSpaceLabelTextBlock)
 		{
-			UsedSpaceLabelTextBlock->SetText(Settings->UsedSpaceLabelText);
+			UsedSpaceLabelTextBlock->SetText(UISettings->StorageSpaceTrackerParams.UsedSpaceLabelText);
 		}
 
 		if (FreeSpaceLabelTextBlock)
 		{
-			FreeSpaceLabelTextBlock->SetText(Settings->FreeSpaceLabelText);
+			FreeSpaceLabelTextBlock->SetText(UISettings->StorageSpaceTrackerParams.FreeSpaceLabelText);
 		}
 
 		if (TotalSpaceLabelTextBlock)
 		{
-			TotalSpaceLabelTextBlock->SetText(Settings->TotalSpaceLabelText);
+			TotalSpaceLabelTextBlock->SetText(UISettings->StorageSpaceTrackerParams.TotalSpaceLabelText);
 		}
 	}
 
@@ -103,7 +107,7 @@ void UModioCommonStorageSpaceTrackerUserWidget::SynchronizeProperties()
 	}
 }
 
-void UModioCommonStorageSpaceTrackerUserWidget::OnStorageSpaceTrackerUpdated(FModioUnsigned64 UsedSpace, FModioUnsigned64 FreeSpace, FModioUnsigned64 TotalSpace)
+void UModioCommonStorageSpaceTrackerUserWidget::OnStorageSpaceTrackerUpdated_Implementation(FModioUnsigned64 UsedSpace, FModioUnsigned64 FreeSpace, FModioUnsigned64 TotalSpace)
 {
 	if (UsedSpaceTextBlock)
 	{

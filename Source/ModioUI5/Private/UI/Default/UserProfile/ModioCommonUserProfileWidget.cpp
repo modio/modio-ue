@@ -13,6 +13,7 @@
 
 #include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
 #include "UI/Foundation/Base/ModBrowser/ModioCommonModBrowserBase.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonUserProfileWidgetParams.h"
 
 UModioCommonUserProfileWidget::UModioCommonUserProfileWidget()
@@ -23,17 +24,20 @@ UModioCommonUserProfileWidget::UModioCommonUserProfileWidget()
 
 void UModioCommonUserProfileWidget::NativeOnInitialized()
 {
-	if (const UModioCommonUserProfileWidgetParamsSettings* Settings = GetDefault<UModioCommonUserProfileWidgetParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		ListenForInputAction(ProfileButton, Settings->ProfileInputAction, Settings->ProfileButtonLabel, [this]() {
-			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
-			{
-				if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(Subsystem->ModBrowserInstance))
+		if (ProfileButton)
+		{
+			ListenForInputAction(ProfileButton, UISettings->UserProfileParams.ProfileInputAction, UISettings->UserProfileParams.ProfileButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 				{
-					ModBrowser->ShowQuickAccessView();
+					if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(Subsystem->GetModBrowserInstance()))
+					{
+						ModBrowser->ShowQuickAccessView();
+					}
 				}
-			}
-		});
+			}));
+		}
 	}
 	Super::NativeOnInitialized();
 }

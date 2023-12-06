@@ -45,6 +45,7 @@ class MODIOUI5_API UModioCommonModGalleryEntry : public UModioCommonActivatableW
 {
 	GENERATED_BODY()
 
+public:
 	/**
 	 * @brief Sets the style of the Mod Gallery Entry within the Mod.io Common UI styling system
 	 * @param InStyle The style to set

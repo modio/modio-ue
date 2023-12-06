@@ -21,8 +21,11 @@
 
 void UModioCommonExpandableArea::SetStyle(TSubclassOf<UModioCommonExpandableAreaStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonExpandableArea::HandleOnFocusReceived()

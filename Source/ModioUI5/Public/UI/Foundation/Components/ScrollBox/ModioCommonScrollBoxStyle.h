@@ -90,4 +90,7 @@ public:
 	/** @brief The amount to scroll by the controller/keyboard input when there's no visible/focusable widget in the navigated direction but there's room to scroll. Only relevant if bScrollByNavigationInput is true */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "bScrollByNavigationInput"), Category = "Mod.io Common UI|Style|Scroll|Navigation")
 	int32 NavigationScrollOffsetStep = 100;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (UIMin = 0.0, UIMax = 1.0), Category = "Mod.io Common UI|Style|Scroll|Navigation")
+	float NavigationScrollOffsetSpeed = 0.1f;
 };

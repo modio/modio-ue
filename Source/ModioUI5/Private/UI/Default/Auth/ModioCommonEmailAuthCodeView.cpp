@@ -16,6 +16,7 @@
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Settings/Params/ModioCommonAuthParams.h"
 #include "Libraries/ModioSDKLibrary.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 
 void UModioCommonEmailAuthCodeView::SetValidationTextVisibility(ESlateVisibility Visbility)
 {
@@ -38,33 +39,31 @@ void UModioCommonEmailAuthCodeView::NativeOnInitialized()
 		DigitTextBox4->OnTextChanged.AddDynamic(this, &UModioCommonEmailAuthCodeView::OnTextBox4Changed);
 		DigitTextBox5->OnTextChanged.AddDynamic(this, &UModioCommonEmailAuthCodeView::OnTextBox5Changed);
 	}
-
-	const UModioCommonAuthParamsSettings* AuthSettings = GetDefault<UModioCommonAuthParamsSettings>();
-	const UModioCommonEmailAuthCodeParamsSettings* AuthCodeSettings = GetDefault<UModioCommonEmailAuthCodeParamsSettings>();
-	if (!AuthSettings || !AuthCodeSettings)
+	const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>();
+	if (!UISettings)
 	{
 		return;
 	}
 
 	if (BackButton)
 	{
-		ListenForInputAction(BackButton, AuthSettings->BackInputAction, AuthCodeSettings->BackButtonText, [this]() {
+		ListenForInputAction(BackButton, UISettings->AuthParams.BackInputAction, UISettings->EmailAuthCodeParams.BackButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 			if (OnBackClicked.IsBound()) OnBackClicked.Execute();
-		});
+		}));
 	}
 
 	if (SubmitButton)
 	{
-		ListenForInputAction(SubmitButton, AuthSettings->SubmitInputAction, AuthCodeSettings->SubmitButtonText, [this]() {
+		ListenForInputAction(SubmitButton, UISettings->AuthParams.SubmitInputAction, UISettings->EmailAuthCodeParams.SubmitButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 			if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(GetInputText());
-		});
+		}));
 	}
 
 	if (CancelButton)
 	{
-		ListenForInputAction(CancelButton, AuthSettings->CancelInputAction, AuthCodeSettings->CancelButtonText, [this]() {
+		ListenForInputAction(CancelButton, UISettings->AuthParams.CancelInputAction, UISettings->EmailAuthCodeParams.CancelButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 			if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
-		});
+		}));
 	}
 }
 
@@ -72,31 +71,31 @@ void UModioCommonEmailAuthCodeView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonEmailAuthCodeParamsSettings* Settings = GetDefault<UModioCommonEmailAuthCodeParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (TitleTextBlock)
 		{
-			TitleTextBlock->SetText(Settings->TitleText);
+			TitleTextBlock->SetText(UISettings->EmailAuthCodeParams.TitleText);
 		}
 		if (DescriptionTextBlock)
 		{
-			DescriptionTextBlock->SetText(Settings->DescriptionText);
+			DescriptionTextBlock->SetText(UISettings->EmailAuthCodeParams.DescriptionText);
 		}
 		if (ValidationTextBlock)
 		{
-			ValidationTextBlock->SetText(Settings->ValidationText);
+			ValidationTextBlock->SetText(UISettings->EmailAuthCodeParams.ValidationText);
 		}
 		if (BackButton)
 		{
-			BackButton->SetLabel(Settings->BackButtonText);
+			BackButton->SetLabel(UISettings->EmailAuthCodeParams.BackButtonText);
 		}
 		if (SubmitButton)
 		{
-			SubmitButton->SetLabel(Settings->SubmitButtonText);
+			SubmitButton->SetLabel(UISettings->EmailAuthCodeParams.SubmitButtonText);
 		}
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelButtonText);
+			CancelButton->SetLabel(UISettings->EmailAuthCodeParams.CancelButtonText);
 		}
 	}
 }
@@ -200,23 +199,46 @@ void UModioCommonEmailAuthCodeView::HandleInputText(const FText& Text, UModioCom
 		if (Text.ToString().Len() >= 1)
 		{
 			TextBox->SetText(FText::FromString(Text.ToString().Mid(0, 1)));
+
+			if (TextBox->GetText().IsEmptyOrWhitespace()) 
+			{
+				TextBox->SetText(FText::GetEmpty());
+				TextBox->SetKeyboardFocus();
+				return;
+			}
 		}
 
 		// Transfer the focus to the next box to make it easier for the user to input quickly.
 		if (TextBox == DigitTextBox1)
 		{
+			if (DigitTextBox2->GetText().IsEmptyOrWhitespace()) 
+			{
+				DigitTextBox2->SetText(FText::GetEmpty());
+			}
 			DigitTextBox2->SetKeyboardFocus();
 		}
 		else if (TextBox == DigitTextBox2)
 		{
+			if (DigitTextBox3->GetText().IsEmptyOrWhitespace())
+			{
+				DigitTextBox3->SetText(FText::GetEmpty());
+			}
 			DigitTextBox3->SetKeyboardFocus();
 		}
 		else if (TextBox == DigitTextBox3)
 		{
+			if (DigitTextBox4->GetText().IsEmptyOrWhitespace())
+			{
+				DigitTextBox4->SetText(FText::GetEmpty());
+			}
 			DigitTextBox4->SetKeyboardFocus();
 		}
 		else if (TextBox == DigitTextBox4)
 		{
+			if (DigitTextBox5->GetText().IsEmptyOrWhitespace())
+			{
+				DigitTextBox5->SetText(FText::GetEmpty());
+			}
 			DigitTextBox5->SetKeyboardFocus();
 		}
 	}

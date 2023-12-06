@@ -15,6 +15,9 @@
 #include "Types/ModioModInfo.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModCollectionEntry.h"
+#include "UObject/StrongObjectPtr.h"
+#include "Core/ModioModInfoUI.h"
+#include "Core/ModioModCollectionEntryUI.h"
 #include "ModioCommonModListViewInterface.generated.h"
 
 class UListView;
@@ -38,10 +41,10 @@ protected:
 	virtual void SetModsFromModInfoList_Implementation(const FModioModInfoList& InList, bool bAddToExisting);
 	virtual void SetModsFromModInfoArray_Implementation(const TArray<FModioModInfo>& InArray, bool bAddToExisting);
 	virtual void SetModsFromModCollectionEntryArray_Implementation(const TArray<FModioModCollectionEntry>& InArray, bool bAddToExisting);
-	virtual void RequestFullClearSelection_Implementation();
+	virtual void RequestFullClearSelection_Implementation(bool bResetPreviouslySelected);
 	virtual bool GetSelectedModItem_Implementation(bool bIncludePreviouslySelected, UObject*& OutModItem);
 	virtual bool GetEntryWidgetFromItem_Implementation(UObject* InItem, UWidget*& OutEntryWidget);
-	virtual UWidget* GetDesiredListFocusTarget_Implementation();
+	virtual UWidget* GetDesiredListFocusTarget_Implementation(bool bIncludePreviouslySelected, bool bIncludeFirstItem);
 
 public:
 	virtual UListView* GetListView() const = 0;
@@ -62,7 +65,7 @@ public:
 	void SetModsFromModCollectionEntryArray(const TArray<FModioModCollectionEntry>& InArray, bool bAddToExisting);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
-	void RequestFullClearSelection();
+	void RequestFullClearSelection(bool bResetPreviouslySelected);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
 	bool GetSelectedModItem(bool bIncludePreviouslySelected, UObject*& OutModItem);
@@ -71,11 +74,14 @@ public:
 	bool GetEntryWidgetFromItem(UObject* InItem, UWidget*& OutEntryWidget);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Modio Common UI|Mod List Interface")
-	UWidget* GetDesiredListFocusTarget();
+	UWidget* GetDesiredListFocusTarget(bool bIncludePreviouslySelected, bool bIncludeFirstItem);
 
 	TOptional<FModioModID> PreviouslySelectedModID;
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting) {}
+
+	TMap<FModioModID, TStrongObjectPtr<UModioModCollectionEntryUI>> CachedCollectionEntries;
+	TMap<FModioModID, TStrongObjectPtr<UModioModInfoUI>> CachedModInfos;
 };

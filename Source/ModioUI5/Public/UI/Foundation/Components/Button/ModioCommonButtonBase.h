@@ -32,6 +32,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Mod.io Common UI")
 	FText OverrideActionDisplayName;
 
+	/**
+	 * Whether the button should trigger a click when the user presses enter or gamepad accept (Gamepad_FaceButton_Bottom) after the button has been focused
+	 */
+	UPROPERTY(EditAnywhere, Category = "Mod.io Common UI")
+	bool bShouldTriggerButtonClickOnEnterOrGamepadAccept = true;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Mod.io Common UI")
 	FText ButtonText;
@@ -80,9 +86,13 @@ protected:
 	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnHovered() override;
 	virtual void NativeOnUnhovered() override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 public:
 	virtual void SynchronizeProperties() override;
 	// UUserWidget interface
+
+protected:
+	virtual void RefreshIconStyle();
 
 private:
 	/**

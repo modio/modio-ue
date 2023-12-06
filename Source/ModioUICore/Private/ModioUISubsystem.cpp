@@ -10,19 +10,19 @@
 
 #include "ModioUISubsystem.h"
 #include "Blueprint/UserWidget.h"
+#include "Core/ModioModInfoUI.h"
 #include "Delegates/DelegateCombinations.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/UserInterfaceSettings.h"
 #include "GenericPlatform/GenericPlatformMath.h"
 #include "Libraries/ModioErrorConditionLibrary.h"
+#include "Loc/BeginModioLocNamespace.h"
 #include "Math/IntPoint.h"
 #include "ModioErrorCondition.h"
 #include "ModioSubsystem.h"
 #include "ModioUICore.h"
-#include "Core/ModioModInfoUI.h"
 #include "UI/Interfaces/IModioModBrowser.h"
-#include "Loc/BeginModioLocNamespace.h"
 
 void UModioUISubsystem::GetPreloadDependencies(TArray<UObject*>& OutDeps)
 {
@@ -51,9 +51,10 @@ void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ErrorCode, FModioMod
 {
 	if (ErrorCode)
 	{
-		UE_LOG(ModioUICore, Warning, TEXT("Failed to subscribe to mod %s. Received error code %d: %s"), *(ID.ToString()), ErrorCode.GetValue(), *(ErrorCode.GetErrorMessage()));
+		UE_LOG(ModioUICore, Warning, TEXT("Failed to subscribe to mod %s. Received error code %d: %s"),
+			   *(ID.ToString()), ErrorCode.GetValue(), *(ErrorCode.GetErrorMessage()));
 	}
-	
+
 	OnSubscriptionRequestCompleted.Broadcast(ErrorCode, ID);
 	if (!ErrorCode)
 	{
@@ -63,11 +64,14 @@ void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ErrorCode, FModioMod
 
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		Subsystem->GetModInfoAsync(ID, FOnGetModInfoDelegateFast::CreateWeakLambda(this, [this, ErrorCode](FModioErrorCode InternalErrorCode, TOptional<FModioModInfo> ModInfo) {
-			UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
-			ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
-			DisplayNotificationParams(UModioNotificationParamsLibrary::CreateSubscriptionNotification(ErrorCode, ModInfoObj));
-		}));
+		Subsystem->GetModInfoAsync(
+			ID, FOnGetModInfoDelegateFast::CreateWeakLambda(
+					this, [this, ErrorCode](FModioErrorCode InternalErrorCode, TOptional<FModioModInfo> ModInfo) {
+						UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
+						ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
+						DisplayNotificationParams(
+							UModioNotificationParamsLibrary::CreateSubscriptionNotification(ErrorCode, ModInfoObj));
+					}));
 
 		OnModSubscribeFailed.Broadcast(ID);
 	}
@@ -80,11 +84,14 @@ void UModioUISubsystem::UnsubscribeHandler(FModioErrorCode ErrorCode, FModioModI
 		OnSubscriptionStatusChanged.Broadcast(ID, false);
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
-			Subsystem->GetModInfoAsync(ID, FOnGetModInfoDelegateFast::CreateWeakLambda(this, [this, ErrorCode](FModioErrorCode InternalErrorCode, TOptional<FModioModInfo> ModInfo) {
-				UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
-				ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
-				DisplayNotificationParams(UModioNotificationParamsLibrary::CreateUninstallNotification(ErrorCode, ModInfoObj));
-			}));
+			Subsystem->GetModInfoAsync(
+				ID, FOnGetModInfoDelegateFast::CreateWeakLambda(
+						this, [this, ErrorCode](FModioErrorCode InternalErrorCode, TOptional<FModioModInfo> ModInfo) {
+							UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
+							ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
+							DisplayNotificationParams(
+								UModioNotificationParamsLibrary::CreateUninstallNotification(ErrorCode, ModInfoObj));
+						}));
 		}
 	}
 	else
@@ -110,6 +117,22 @@ void UModioUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	Collection.InitializeDependency(UModioSubsystem::StaticClass());
+}
+
+UUserWidget* UModioUISubsystem::GetModBrowserInstance()
+{
+	if (IsValid(ModBrowserInstance))
+	{
+		return ModBrowserInstance;
+	}
+	UE_LOG(ModioUICore, Error,
+		   TEXT("ModBrowserInstance is null. Call ShowModBrowserUIForPlayer() to ensure ModBrowserInstance is valid."));
+	return nullptr;
+}
+
+void UModioUISubsystem::RetryAllAsyncLoaders()
+{
+	OnRetryAllAsyncLoaders.Broadcast();
 }
 
 void UModioUISubsystem::EnableModManagement()
@@ -139,6 +162,14 @@ void UModioUISubsystem::ShowModReportDialog(UObject* DialogDataSource)
 	}
 }
 
+void UModioUISubsystem::ShowDialog(UObject* DialogDataSource)
+{
+	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
+	{
+		IModioModBrowserInterface::Execute_ShowDialog(ModBrowserInstance, DialogDataSource);
+	}
+}
+
 void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvider Provider)
 {
 	OnAuthenticationChangeStarted.Broadcast();
@@ -149,13 +180,15 @@ void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvid
 	}
 }
 
-void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvider Provider, FOnErrorOnlyDelegateFast DedicatedCallback)
+void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvider Provider,
+													  FOnErrorOnlyDelegateFast DedicatedCallback)
 {
 	OnAuthenticationChangeStarted.Broadcast();
 
 	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
 	{
-		Cast<IModioModBrowserInterface>(ModBrowserInstance)->RequestExternalAuthenticationNative(Provider, DedicatedCallback);
+		Cast<IModioModBrowserInterface>(ModBrowserInstance)
+			->RequestExternalAuthenticationNative(Provider, DedicatedCallback);
 	}
 }
 
@@ -176,7 +209,8 @@ void UModioUISubsystem::RequestSubscriptionForModID(FModioModID ID)
 
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		Subsystem->SubscribeToModAsync(ID, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioUISubsystem::SubscriptionHandler, ID));
+		Subsystem->SubscribeToModAsync(
+			ID, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioUISubsystem::SubscriptionHandler, ID));
 	}
 }
 
@@ -286,13 +320,9 @@ void UModioUISubsystem::RequestRateDownForModId(FModioModID ModId, FOnErrorOnlyD
 	}
 }
 
-void UModioUISubsystem::OnRatingSubmissionComplete(FModioErrorCode ErrorCode, EModioRating Rating)
-{
-}
+void UModioUISubsystem::OnRatingSubmissionComplete(FModioErrorCode ErrorCode, EModioRating Rating) {}
 
-void UModioUISubsystem::OnExternalUpdatesFetched(FModioErrorCode ErrorCode)
-{
-}
+void UModioUISubsystem::OnExternalUpdatesFetched(FModioErrorCode ErrorCode) {}
 
 void UModioUISubsystem::RequestRemoveSubscriptionForModID(FModioModID ID)
 {
@@ -309,7 +339,8 @@ void UModioUISubsystem::RequestLogoDownloadForModID(FModioModID ID,
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
 		Subsystem->GetModMediaAsync(
-			ID, LogoSize, FOnGetMediaDelegateFast::CreateUObject(this, &UModioUISubsystem::LogoDownloadHandler, ID, LogoSize));
+			ID, LogoSize,
+			FOnGetMediaDelegateFast::CreateUObject(this, &UModioUISubsystem::LogoDownloadHandler, ID, LogoSize));
 	}
 }
 
@@ -358,7 +389,9 @@ FText UModioUISubsystem::FormatText(FText Input)
 	return Input;
 }
 
-UUserWidget* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UUserWidget> MenuClass, APlayerController* Controller, FOnModBrowserClosed BrowserClosedDelegate)
+UUserWidget* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UUserWidget> MenuClass,
+														  APlayerController* Controller,
+														  FOnModBrowserClosed BrowserClosedDelegate)
 {
 	if (!MenuClass)
 	{
@@ -384,7 +417,7 @@ UUserWidget* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UUserWidge
 	return ModBrowserInstance;
 }
 
-void UModioUISubsystem::HideModBrowserUI() 
+void UModioUISubsystem::HideModBrowserUI()
 {
 	if (IsValid(ModBrowserInstance))
 	{
@@ -440,11 +473,11 @@ void UModioUISubsystem::ShowDetailsForMod(FModioModID ID)
 	}
 }
 
-bool UModioUISubsystem::ShowSearchResults(FModioFilterParams SearchParameters)
+bool UModioUISubsystem::ShowSearchResults(const FModioModCategoryParams& SearchParameters)
 {
 	if (OnDisplaySearchResults.IsBound())
 	{
-		return OnDisplaySearchResults.Execute(SearchParameters);
+		return OnDisplaySearchResults.Execute(SearchParameters.ToFilterParams());
 	}
 
 	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
@@ -471,11 +504,14 @@ void UModioUISubsystem::DisplayNotificationManual(FText Title, FText Message, bo
 
 void UModioUISubsystem::DisplayErrorDialog(FModioErrorCode ErrorCode)
 {
-	DisplayNotificationManual(LOCTEXT("Error", "Error"), FText::Format(LOCTEXT("ErrorCode", "{0}: {1}"), FText::FromString(ErrorCode.GetErrorMessage()), FText::AsNumber(ErrorCode)), true);
+	DisplayNotificationManual(LOCTEXT("Error", "Error"),
+							  FText::Format(LOCTEXT("ErrorCode", "{0}: {1}"),
+											FText::FromString(ErrorCode.GetErrorMessage()), FText::AsNumber(ErrorCode)),
+							  true);
 }
 
 void UModioUISubsystem::LogoDownloadHandler(FModioErrorCode ec, TOptional<FModioImageWrapper> Image, FModioModID ID,
-                                            EModioLogoSize LogoSize)
+											EModioLogoSize LogoSize)
 {
 	OnModLogoDownloadCompleted.Broadcast(ID, ec, Image, LogoSize);
 }
@@ -552,6 +588,10 @@ void UModioUISubsystem::OnAuthenticationComplete(FModioErrorCode ec)
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
 			TOptional<FModioUser> NewUser = Subsystem->QueryUserProfile();
+			if (NewUser.IsSet())
+			{
+				EnableModManagement();
+			}
 			OnUserChanged.Broadcast(NewUser);
 		}
 	}
@@ -622,18 +662,21 @@ void UModioUISubsystem::GetTagOptionsListAsync()
 
 void UModioUISubsystem::ModManagementEventHandler(FModioModManagementEvent Event)
 {
-
 	// If we've installed a mod, add it to the session downloads for the download queue panel
 	if (Event.Event == EModioModManagementEventType::Installed)
 	{
 		ModsDownloadedThisSession.Add(Event.ID);
 		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 		{
-			Subsystem->GetModInfoAsync(Event.ID, FOnGetModInfoDelegateFast::CreateWeakLambda(this, [this, Event](FModioErrorCode ErrorCode, TOptional<FModioModInfo> ModInfo) {
-				UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
-				ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
-				DisplayNotificationParams(UModioNotificationParamsLibrary::CreateInstallationNotification(Event.Status, ModInfoObj));
-			}));
+			Subsystem->GetModInfoAsync(
+				Event.ID,
+				FOnGetModInfoDelegateFast::CreateWeakLambda(
+					this, [this, Event](FModioErrorCode ErrorCode, TOptional<FModioModInfo> ModInfo) {
+						UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
+						ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
+						DisplayNotificationParams(
+							UModioNotificationParamsLibrary::CreateInstallationNotification(Event.Status, ModInfoObj));
+					}));
 		}
 	}
 

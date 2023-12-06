@@ -161,4 +161,11 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
 	static MODIO_API FString GetShortenedNumberAsString(int64 Number);
+
+	/**
+	* @brief Get Session Id for Windows  for initialization of the SDK
+	*  return empty string if you are not on Windows
+	*/
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
+	static MODIO_API FString GetDefaultSessionIdWindows();
 };

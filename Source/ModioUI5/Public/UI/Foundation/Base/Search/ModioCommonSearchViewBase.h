@@ -11,8 +11,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/ModioFilterParamsUI.h"
+#include "Types/ModioFilterParams.h"
 #include "UI/Foundation/Base/ModioCommonActivatableWidget.h"
 #include "ModioCommonSearchViewBase.generated.h"
+
+enum class EModioCommonSearchViewType : uint8;
+
+UCLASS(BlueprintType)
+class MODIOUI5_API UModioSearchResultsParamsUI : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFilterParamsUI")
+	FModioModCategoryParams CurrentFilterParams;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFilterParamsUI")
+	EModioCommonSearchViewType SearchType;
+};
 
 /**
  * @brief Search View Base class that allows the user to search for mods
@@ -21,4 +38,7 @@ UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Co
 class MODIOUI5_API UModioCommonSearchViewBase : public UModioCommonActivatableWidget
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void NativeOnSetDataSource() override;
 };

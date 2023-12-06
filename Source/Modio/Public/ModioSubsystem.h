@@ -59,6 +59,7 @@ DECLARE_DELEGATE_TwoParams(FOnGetModDependenciesDelegateFast, FModioErrorCode, T
 DECLARE_DELEGATE_TwoParams(FOnSubmitNewModDelegateFast, FModioErrorCode, TOptional<FModioModID>);
 DECLARE_DELEGATE_TwoParams(FOnMuteUsersDelegateFast, FModioErrorCode, TOptional<FModioUserList>);
 DECLARE_DELEGATE_TwoParams(FOnListUserCreatedModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
+DECLARE_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegateFast, FModioErrorCode, TOptional<FModioMapPreview>);
 
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 
@@ -93,6 +94,8 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnMuteUsersDelegate, FModioErrorCode, ErrorC
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCode, ErrorCode,
 								   FModioOptionalModInfoList, Result);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErrorCode, ErrorCode, FModioOptionalMapPreview, ModioPreviewMap);
 
 class ARunnableThread;
 
@@ -162,11 +165,11 @@ public:
 	 * set of mods the specified user has installed on this device
 	 * @param InitializeOptions Parameters to the function packed as a struct where all members needs to be initialized
 	 * for the call to succeed
-	 * @errorcategory NetworkError|Couldn't connect to the mod.io servers
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @errorcategory FilesystemError|Couldn't create the user data or common data folders
-	 * @errorcategory ConfigurationError|InitOptions contains an invalid value - inspect ec.value() to determine what
-	 * was incorrect
-	 * @error GenericError::SDKAlreadyInitialized|SDK already initialized
+	 * @errorcategory ConfigurationError|InitializeOptions contains an invalid value - inspect ec.value() to determine
+	 * what was incorrect
+	 * @errorcategory SDKAlreadyInitialized|SDK already initialized
 	 */
 	MODIO_API void InitializeAsync(const FModioInitializeOptions& InitializeOptions,
 								   FOnErrorOnlyDelegateFast OnInitComplete);
@@ -190,19 +193,18 @@ public:
 	MODIO_API void RunPendingHandlers();
 
 	/**
-	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
-	 * Modio::GenericError::OperationCanceled . This function will NOT block while the deinitialization occurs.
+	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with an OperationCanceled error category. This function will NOT block while the deinitialization occurs.
 	 * @param OnShutdownComplete Callback invoked when the plugin is shut down and calling <<RunPendingHandlers>> is no
 	 * longer required
 	 * @requires initialized-sdk
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 **/
 	MODIO_API void ShutdownAsync(FOnErrorOnlyDelegateFast OnShutdownComplete);
 
 	/**
 	 * @brief If the last request to the mod.io servers returned a validation failure, this function returns extended
 	 * information describing the fields that failed validation.
-	 * @return Collection of Modio::FieldError objects, or empty collection if there was no validation failures
+	 * @return Collection of FModioValidationError objects, or empty collection if there were no validation failures
 	 * @requires initialized-sdk
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io")
@@ -217,10 +219,10 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	MODIO_API void SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegateFast OnSubscribeComplete);
 
@@ -234,10 +236,10 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	MODIO_API void UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 										   FOnErrorOnlyDelegateFast OnUnsubscribeComplete);
@@ -251,19 +253,34 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 **/
 	MODIO_API void FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetchDone);
+
+	/**
+	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows you to
+	 * identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to perform any content 
+	 * management (such as unloading files) that might be required.
+	 * @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with ModID
+	 * as keys and changes as values. Empty when there are no differences between local and the mod.io API service
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 **/
+	MODIO_API void PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegateFast OnPreviewDone);
 
 	/**
 	 * @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
 	 * @param Callback This callback handler will be invoked with a ModManagementEvent for each mod operation performed
 	 * by the SDK
-	 * @return Modio::ErrorCode indicating if mod management was enabled successfully
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error ModManagementError::ModManagementAlreadyEnabled|Mod management was already enabled. The mod management
-	 * callback has not been changed
+	 * @return FModioErrorCode indicating if mod management was enabled successfully
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementAlreadyEnabled|Mod management was already enabled. The mod management callback has
+	 * not been changed.
 	 */
 	MODIO_API FModioErrorCode EnableModManagement(FOnModManagementDelegateFast Callback);
 
@@ -289,7 +306,7 @@ public:
 	 * successful or if the mod was already being processed
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid or not present in the list of pending operations
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid or not present in the list of pending operations
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Mod Management")
 	MODIO_API FModioErrorCode PrioritizeTransferForMod(FModioModID ModToPrioritize);
@@ -323,14 +340,14 @@ public:
 	/**
 	 * @brief Fetches the currently authenticated mod.io user profile if there is one associated with the current
 	 * platform user
-	 * @return Optional Modio::User object containing profile information
+	 * @return Optional FModioUser object containing profile information
 	 **/
 	MODIO_API TOptional<FModioUser> QueryUserProfile();
 
 	/**
 	 * @brief Fetches all mods installed on the system such that a consuming application can present the information in
 	 * a UI in order to free up space by uninstalling mods
-	 * @return std::map using Mod IDs as keys and ModCollectionEntry objects providing information about mods installed
+	 * @return TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods installed
 	 * on the system regardless of which user installed them
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Mod Management")
@@ -338,26 +355,26 @@ public:
 
 	/**
 	 * @brief Provides a list of mods for the current game, that match the parameters specified in the filter
-	 * @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	 * @param Filter FModioFilterParams object containing any filters that should be applied to the query
 	 * @param Callback Callback invoked with a status code and an optional ModInfoList providing mod profiles
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 */
 	MODIO_API void ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegateFast Callback);
 
 	/**
 	 * @brief Fetches detailed information about the specified game
 	 * @param GameID Game ID of the game data to fetch
-	 * @param Callback Callback providing a status code and an optional Modio::GameInfo object with the game's extended
+	 * @param Callback Callback providing a status code and an optional FModioGameInfo object with the game's extended
 	 * information
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @errorcategory EntityNotFoundError|Specified game does not exist
-	 * @error GenericError::BadParameter|The supplied game ID is invalid
+	 * @errorcategory EntityNotFoundError|Specified game does not exist or was deleted
+	 * @errorcategory InvalidArgsError|The supplied game ID is invalid
 	 **/
 	MODIO_API void GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegateFast Callback);
 
@@ -365,14 +382,14 @@ public:
 	 * @brief Fetches detailed information about the specified mod, including description and file metadata for the
 	 * most recent release
 	 * @param ModId Mod ID of the mod to fetch data
-	 * @param Callback Callback providing a status code and an optional Modio::ModInfo object with the mod's extended
+	 * @param Callback Callback providing a status code and an optional FModioModInfo object with the mod's extended
 	 * information
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 *  @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	MODIO_API void GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegateFast Callback);
 
@@ -385,10 +402,10 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
-	 * @error FilesystemError::InsufficientSpace|Not enough space for the file
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InsufficientSpace|Not enough space for the file
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSize, FOnGetMediaDelegateFast Callback);
 
@@ -406,16 +423,16 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
-	 * @error FilesystemError::InsufficientSpace|Not enough space for the file
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InsufficientSpace|Not enough space for the file
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 									FOnGetMediaDelegateFast Callback);
 
 private:
-	TMap<TTuple<FModioModID, EModioGallerySize>, FOnGetMediaMulticastDelegateFast> PendingModMediaGalleryRequests;
+	TMap<TTuple<FModioModID, EModioGallerySize, int32>, FOnGetMediaMulticastDelegateFast> PendingModMediaGalleryRequests;
 
 public:
 	/**
@@ -428,10 +445,10 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
-	 * @error FilesystemError::InsufficientSpace|Not enough space for the file
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InsufficientSpace|Not enough space for the file
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
 
@@ -448,7 +465,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 **/
 	MODIO_API void GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Callback);
 
@@ -460,8 +477,8 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 * @experimental
 	 **/
 	MODIO_API void GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback);
@@ -485,9 +502,9 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 */
 	MODIO_API void SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
 									 FOnSubmitNewModDelegateFast Callback);
@@ -503,8 +520,8 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	MODIO_API void SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
 
@@ -519,10 +536,10 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	MODIO_API void SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
 										 FOnGetModInfoDelegateFast Callback);
@@ -536,9 +553,7 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires no-authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error Authenticated user already signed-in. Call ClearUserDataAsync() to
-	 * de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 **/
 	MODIO_API void RequestEmailAuthCodeAsync(const FModioEmailAddress& EmailAddress, FOnErrorOnlyDelegateFast Callback);
 
@@ -551,9 +566,9 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires no-authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync() to
-	 * de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserAlreadyAuthenticatedError|Authenticated user already signed-in. De-authenticate the current
+	 * user with ClearUserDataAsync(), and re-initialize the SDK by calling ShutdownAsync() then InitializeAsync().
 	 **/
 	MODIO_API void AuthenticateUserEmailAsync(const FModioEmailAuthCode& AuthenticationCode,
 											  FOnErrorOnlyDelegateFast Callback);
@@ -570,9 +585,9 @@ public:
 	 * @errorcategory ConfigurationError|The SDK's configuration is not valid
 	 * @errorcategory InvalidArgsError|The arguments passed to the function have failed validation
 	 * @errorcategory UserTermsOfUseError|The user has not yet accepted the mod.io Terms of Use
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync() to
-	 * de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserAlreadyAuthenticatedError|Authenticated user already signed-in. De-authenticate the current
+	 * user with ClearUserDataAsync(), and re-initialize the SDK by calling ShutdownAsync() then InitializeAsync().
 	 **/
 	MODIO_API void AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
 												 EModioAuthenticationProvider Provider,
@@ -587,8 +602,8 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 */
 	MODIO_API void VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast Callback);
 
@@ -601,7 +616,7 @@ public:
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @deprecated Deprecated as of 2023.10. Call GetTermsOfUseAsync() without an EModioAuthenticationProvider instead.
 	 **/
 	UE_DEPRECATED(
@@ -617,7 +632,7 @@ public:
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 **/
 	MODIO_API void GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegateFast Callback);
 
@@ -653,10 +668,10 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @errorcategory EntityNotFoundError|Specified mod could not be found
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	MODIO_API void SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegateFast Callback);
 
@@ -670,7 +685,7 @@ public:
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't Connect to mod.io servers
 	 * @errorcategory InvalidArgsError|Required information in the report did not pass validation
-	 * @error GenericError::BadParameter|The mod ID, game ID, or user ID supplied to Report is invalid
+	 * @errorcategory InvalidArgsError|The mod ID, game ID, or user ID supplied to Report is invalid
 	 */
 	MODIO_API void ReportContentAsync(FModioReportParams Report, FOnErrorOnlyDelegateFast Callback);
 
@@ -686,12 +701,12 @@ public:
 	@requires authenticated-user
 	@requires initialized-sdk
 	@requires no-rate-limiting
-	@error ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod. This
+	@errorcategory InsufficientPermissions|The authenticated user does not have permission to archive this mod. This
 	action is restricted to team managers and administrators only.
 	@errorcategory NetworkError|Couldn't connect to mod.io servers
-	@error GenericError::SDKNotInitialized|SDK not initialized
+	@errorcategory SDKNotInitialized|SDK not initialized
 	@errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	@error GenericError::BadParameter|The supplied mod ID is invalid
+	@errorcategory InvalidArgsError|The supplied mod ID is invalid
 	*/
 	MODIO_API void ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegateFast Callback);
 
@@ -702,10 +717,10 @@ public:
 	 * different user on the same system remaining subscribed), ForceUninstallModAsync can be called next.
 	 * @param ModToRemove The mod ID to force uninstall.
 	 * @param Callback Callback indicating success or failure of the uninstallation.
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory ApiErrorRefSuccess|User is still subscribed to the specified mod
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	MODIO_API void ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegateFast Callback);
 
@@ -717,9 +732,9 @@ public:
 	 * @requires initialized-sdk
 	 * @param UserID ID of the User to mute
 	 * @param Callback Callback providing a status code indicating success or failure of muting the user.
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied user ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied user ID is invalid
 	 */
 	MODIO_API void MuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegateFast Callback);
 
@@ -731,9 +746,9 @@ public:
 	 * @requires initialized-sdk
 	 * @param UserID ID of the User to unmute
 	 * @param Callback Callback providing a status code indicating success or failure of unmuting the user.
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied user ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied user ID is invalid
 	 */
 	MODIO_API void UnmuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegateFast Callback);
 
@@ -744,8 +759,8 @@ public:
 	 * containing a list of muted users if successful.
 	 * @requires authenticated-user
 	 * @requires initialized-sdk
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 */
 	MODIO_API void GetMutedUsersAsync(FOnMuteUsersDelegateFast Callback);
 
@@ -758,8 +773,8 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	 */
 	MODIO_API void ListUserCreatedModsAsync(FModioFilterParams Filter, FOnListUserCreatedModsDelegateFast Callback);
 
@@ -804,11 +819,11 @@ public:
 	 * @param InitializeOptions Parameters to the function packed as a struct where all members needs to be initialized
 	 * for the call to succeed
 	 * @param OnInitComplete Callback which will be invoked with the result of initialization
-	 * @errorcategory NetworkError|Couldn't connect to the mod.io servers
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @errorcategory FilesystemError|Couldn't create the user data or common data folders
-	 * @errorcategory ConfigurationError|InitOptions contains an invalid value - inspect ec.value() to determine what
-	 * was incorrect
-	 * @error GenericError::SDKAlreadyInitialized|SDK already initialized
+	 * @errorcategory ConfigurationError|InitializeOptions contains an invalid value - inspect ec.value() to determine
+	 * what was incorrect
+	 * @errorcategory SDKAlreadyInitialized|SDK already initialized
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "InitializeAsync", Category = "mod.io")
 	MODIO_API void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions,
@@ -823,17 +838,17 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "SubscribeToModAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegate OnSubscribeComplete);
 
 	/**
 	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
-	 * Modio::GenericError::OperationCanceled. This function will NOT block while the deinitialization occurs.
+	 * an OperationCanceled error category. This function will NOT block while the deinitialization occurs.
 	 * @param OnShutdownComplete Callback invoked when the plugin is shut down and calling <<RunPendingHandlers>> is no
 	 * longer required
 	 **/
@@ -850,10 +865,10 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "UnsubscribeFromModAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
@@ -867,6 +882,16 @@ public:
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "FetchExternalUpdatesAsync", Category = "mod.io|Mod Management")
 	MODIO_API void K2_FetchExternalUpdatesAsync(FOnErrorOnlyDelegate OnFetchDone);
+
+	/**
+	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows 
+	 * you to identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to 
+	 * perform any content management (such as unloading files) that might be required.
+	 * @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with ModID
+	 * as keys and changes as values. Empty when there are no differences between local and the mod.io API service
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "PreviewExternalUpdatesAsync", Category = "mod.io|Mod Management")
+	MODIO_API void K2_PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegate OnPreviewDone);
 
 	/**
 	 * @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
@@ -891,10 +916,10 @@ public:
 	 * different user on the same system remaining subscribed), ForceUninstallModAsync can be called next.
 	 * @param ModToRemove The mod ID to force uninstall.
 	 * @param Callback Callback invoked indicating success or failure of the uninstallation.
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error ModManagementError::AlreadySubscribed|User is still subscribed to the specified mod
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory ApiErrorRefSuccess|User is still subscribed to the specified mod
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ForceUninstallModAsync", Category = "mod.io|Mod Management")
 	MODIO_API void K2_ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegate Callback);
@@ -902,19 +927,19 @@ public:
 	/**
 	 * @brief Fetches the currently authenticated mod.io user profile if there is one associated with the current
 	 * platform user
-	 * @return Optional Modio::User object containing profile information
+	 * @return FModioOptionalUser object containing profile information
 	 **/
 	UFUNCTION(BlueprintPure, DisplayName = "QueryUserProfile", Category = "mod.io|User")
 	MODIO_API FModioOptionalUser K2_QueryUserProfile();
 
 	/**
 	 * @brief Provides a list of mods for the current game, that match the parameters specified in the filter
-	 * @param Filter Modio::FilterParams object containing any filters that should be applied to the query
+	 * @param Filter FModioFilterParams object containing any filters that should be applied to the query
 	 * @param Callback Callback invoked with a status code and an optional ModInfoList providing mod profiles
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ListAllModsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegate Callback);
@@ -922,14 +947,14 @@ public:
 	/**
 	 * @brief Fetches detailed information about the specified game
 	 * @param GameID Game ID of the game data to fetch
-	 * @param Callback Callback providing a status code and an optional Modio::GameInfo object with the game's extended
+	 * @param Callback Callback providing a status code and an optional FModioGameInfo object with the game's extended
 	 * information
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @errorcategory EntityNotFoundError|Specified game does not exist
-	 * @error GenericError::BadParameter|The supplied game ID is invalid
+	 * @errorcategory InvalidArgsError|The supplied game ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetGameInfoAsync", Category = "mod.io|Game")
 	MODIO_API void K2_GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegate Callback);
@@ -938,14 +963,14 @@ public:
 	 * @brief Fetches detailed information about the specified mod, including description and file metadata for the
 	 * most recent release
 	 * @param ModId Mod ID of the mod to fetch data
-	 * @param Callback Callback providing a status code and an optional Modio::ModInfo object with the mod's
-	 *extended information
+	 * @param Callback Callback providing a status code and an optional FModioModInfo object with the mod's
+	 * extended information
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModInfoAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegate Callback);
@@ -959,10 +984,10 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
-	 * @error FilesystemError::InsufficientSpace|Not enough space for the file
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InsufficientSpace|Not enough space for the file
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Logo)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaLogoAsync(FModioModID ModId, EModioLogoSize LogoSize, FOnGetMediaDelegate Callback);
@@ -977,10 +1002,10 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
-	 * @error FilesystemError::InsufficientSpace|Not enough space for the file
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InsufficientSpace|Not enough space for the file
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Gallery Image)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaGalleryImageAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
@@ -996,10 +1021,10 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod media does not exist or was deleted
-	 * @error FilesystemError::InsufficientSpace|Not enough space for the file
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InsufficientSpace|Not enough space for the file
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Avatar)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaAvatarAsync(FModioModID ModId, EModioAvatarSize AvatarSize,
@@ -1014,7 +1039,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModTagOptionsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModTagOptionsAsync(FOnGetModTagOptionsDelegate Callback);
@@ -1027,8 +1052,8 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 * @experimental
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModDependenciesAsync", Category = "mod.io|Mods")
@@ -1043,9 +1068,9 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires no-authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync() to
-	 * de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserAlreadyAuthenticatedError|Authenticated user already signed-in. De-authenticate the current
+	 * user with ClearUserDataAsync(), and re-initialize the SDK by calling ShutdownAsync() then InitializeAsync().
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "RequestEmailAuthCodeAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_RequestEmailAuthCodeAsync(const FModioEmailAddress& EmailAddress, FOnErrorOnlyDelegate Callback);
@@ -1059,9 +1084,9 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires no-authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync() to
-	 * de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserAlreadyAuthenticatedError|Authenticated user already signed-in. De-authenticate the current
+	 * user with ClearUserDataAsync(), and re-initialize the SDK by calling ShutdownAsync() then InitializeAsync().
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "AuthenticateUserEmailAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AuthenticateUserEmailAsync(const FModioEmailAuthCode& AuthenticationCode,
@@ -1076,9 +1101,9 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires no-authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserAuthError::AlreadyAuthenticated|Authenticated user already signed-in. Call ClearUserDataAsync() to
-	 * de-authenticate the old user, then ShutdownAsync() and reinitialize the SDK first.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserAlreadyAuthenticatedError|Authenticated user already signed-in. De-authenticate the current
+	 * user with ClearUserDataAsync(), and re-initialize the SDK by calling ShutdownAsync() then InitializeAsync().
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "AuthenticateUserExternalAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
@@ -1095,8 +1120,8 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "VerifyUserAuthenticationAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_VerifyUserAuthenticationAsync(FOnErrorOnlyDelegate Callback);
@@ -1109,7 +1134,7 @@ public:
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @deprecated Deprecated as of 2023.10. Call K2_GetTermsOfUseAsync() without an EModioAuthenticationProvider
 	 *instead
 	 **/
@@ -1127,7 +1152,7 @@ public:
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetTermsOfUseAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegate Callback);
@@ -1141,8 +1166,8 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @requires authenticated-user
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "ClearUserDataAsync", Category = "mod.io|User")
 	MODIO_API void K2_ClearUserDataAsync(FOnErrorOnlyDelegate Callback);
@@ -1156,8 +1181,8 @@ public:
 	 * @requires no-rate-limiting
 	 * @requires authenticated-user
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetUserMediaAsync (Avatar)", Category = "mod.io|User")
 	MODIO_API void K2_GetUserMediaAvatarAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegate Callback);
@@ -1173,10 +1198,10 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @errorcategory EntityNotFoundError|Specified mod could not be found
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModRatingAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegate Callback);
@@ -1201,9 +1226,9 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModAsync", Category = "mod.io|Mods|Submission")
 	MODIO_API void K2_SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
@@ -1220,8 +1245,8 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModFileForMod", Category = "mod.io|Mods|Submission")
 	MODIO_API void K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
@@ -1237,10 +1262,10 @@ public:
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory InvalidArgsError|Some fields in Params did not pass validation
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModChangesAsync", Category = "mod.io|Mods|Editing")
 	MODIO_API void K2_SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
@@ -1256,7 +1281,7 @@ public:
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't Connect to mod.io servers
 	 * @errorcategory InvalidArgsError|Required information in the report did not pass validation
-	 * @error GenericError::BadParameter|The mod ID, game ID, or user ID supplied to Report is invalid
+	 * @errorcategory InvalidArgsError|The mod ID, game ID, or user ID supplied to Report is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ReportContentAsync", Category = "mod.io")
 	MODIO_API void K2_ReportContentAsync(FModioReportParams Report, FOnErrorOnlyDelegate Callback);
@@ -1270,12 +1295,12 @@ public:
 	 * @requires authenticated-user
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
-	 * @error ApiError::InsufficientPermission|The authenticated user does not have permission to archive this mod.This
+	 * @errorcategory InsufficientPermissions|The authenticated user does not have permission to archive this mod. This
 	 * action is restricted to team managers and administrators only.
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ArchiveModAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegate Callback);
@@ -1288,9 +1313,9 @@ public:
 	 * @requires initialized-sdk
 	 * @param UserID ID of the User to mute
 	 * @param Callback Callback providing a status code indicating success or failure of muting the user.
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied user ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied user ID is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "MuteUserAsync", Category = "mod.io|User")
 	MODIO_API void K2_MuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegate Callback);
@@ -1303,9 +1328,9 @@ public:
 	 * @requires initialized-sdk
 	 * @param UserID ID of the User to unmute
 	 * @param Callback Callback providing a status code indicating success or failure of unmuting the user.
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
-	 * @error GenericError::BadParameter|The supplied user ID is invalid
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied user ID is invalid
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "UnmuteUserAsync", Category = "mod.io|User")
 	MODIO_API void K2_UnmuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegate Callback);
@@ -1317,8 +1342,8 @@ public:
 	 * containing a list of muted users if successful.
 	 * @requires authenticated-user
 	 * @requires initialized-sdk
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetMutedUsersAsync", Category = "mod.io|User")
 	MODIO_API void K2_GetMutedUsersAsync(FOnMuteUsersDelegate Callback);
@@ -1332,8 +1357,8 @@ public:
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @error GenericError::SDKNotInitialized|SDK not initialized
-	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory RateLimited|Too many frequent calls to the API. Wait some time and try again.
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ListUserCreatedModsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_ListUserCreatedModsAsync(const FModioFilterParams& Filter,

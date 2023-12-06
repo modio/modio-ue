@@ -19,13 +19,13 @@
 /**
  * Project Settings customization for ModioCommonUserProfileWidget
  */
-UCLASS(Config = "ModioCommonUserProfileWidgetParams", DefaultConfig, meta = (DisplayName = "User Profile Widget Params"))
-class MODIOUI5_API UModioCommonUserProfileWidgetParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonUserProfileWidgetParamsSettings
 {
 	GENERATED_BODY()
 
 public:
-	UModioCommonUserProfileWidgetParamsSettings()
+	FModioCommonUserProfileWidgetParamsSettings()
 	{
 		ProfileInputAction.RowName = "Secondary";
 		ProfileInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -36,8 +36,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle ProfileInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

@@ -298,9 +298,5 @@ bool UModioUI4Subsystem::IsAnyDialogOpen()
 	return false;
 }
 
-void UModioUI4Subsystem::RetryAllAsyncLoaders()
-{
-	OnRetryAllAsyncLoaders.Broadcast();
-}
 
 #include "Loc/EndModioLocNamespace.h"

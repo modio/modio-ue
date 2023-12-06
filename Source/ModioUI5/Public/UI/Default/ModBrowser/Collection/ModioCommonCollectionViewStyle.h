@@ -33,12 +33,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonListViewStyle> ModListStyle;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Mod.io Common UI|Style|Tab")
-	TSubclassOf<UModioCommonTabButtonBase> CategoryTabButtonClass;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Mod.io Common UI|Style|Tab")
-	TSubclassOf<UModioCommonTabButtonStyle> CategoryTabButtonStyle;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonTextStyle> DownloadingModsLabelTextStyle;
 
@@ -65,4 +59,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonButtonStyle> FetchUpdateButtonStyle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
+	TSubclassOf<UModioCommonButtonStyle> FilterButtonStyle;
 };

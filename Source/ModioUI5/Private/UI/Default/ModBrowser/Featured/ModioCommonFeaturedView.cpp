@@ -10,14 +10,29 @@
 
 #include "UI/Default/ModBrowser/Featured/ModioCommonFeaturedView.h"
 
+#include "ModioUI5.h"
+#include "Core/ModioFilterParamsUI.h"
 #include "UI/Default/ModBrowser/Featured/ModioCommonFeaturedViewStyle.h"
-#include "UI/Default/ModBrowser/Featured/Additional/ModioCommonFeaturedAdditionalView.h"
-#include "UI/Default/ModBrowser/Featured/Primary/ModioCommonFeaturedPrimaryView.h"
+#include "UI/Foundation/Components/List/ModioCommonFilteredModListView.h"
+#include "UI/Foundation/Components/Tab/ModioCommonTabListWidgetBase.h"
+#include "UI/Settings/ModioCommonUISettings.h"
+#include "UI/Settings/Params/ModioCommonModBrowserParams.h"
+#include "Algo/Find.h"
+#include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
+#include "UI/Default/Search/ModioCommonSearchResultsView.h"
+
+UModioCommonFeaturedView::UModioCommonFeaturedView()
+{
+	//bAutoFocusOnActivation = false;
+}
 
 void UModioCommonFeaturedView::SetStyle(TSubclassOf<UModioCommonFeaturedViewStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonFeaturedView::SynchronizeProperties()
@@ -26,33 +41,53 @@ void UModioCommonFeaturedView::SynchronizeProperties()
 
 	if (const UModioCommonFeaturedViewStyle* StyleCDO = Cast<UModioCommonFeaturedViewStyle>(ModioStyle.GetDefaultObject()))
 	{
-		if (PrimaryView)
+		if (SearchResultsView)
 		{
-			PrimaryView->SetStyle(StyleCDO->FeaturedPrimaryViewStyle);
-		}
-
-		if (AdditionalView)
-		{
-			AdditionalView->SetStyle(StyleCDO->FeaturedAdditionalViewStyle);
+			SearchResultsView->SetStyle(StyleCDO->SearchResultsViewStyle);
 		}
 	}
 }
 
-void UModioCommonFeaturedView::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UModioCommonFeaturedView::NativeOnSetDataSource()
 {
-	Super::NativeTick(MyGeometry, InDeltaTime);
+	Super::NativeOnSetDataSource();
 
-	if (PrimaryView && AdditionalView)
+	UModioFilterParamsUI* FilterParamsPtr = Cast<UModioFilterParamsUI>(DataSource);
+	if (!FilterParamsPtr)
 	{
-		if (PrimaryView->IsAnyModSelected() && !PrimaryView->HasFocusedDescendants() && AdditionalView->HasFocusedDescendants())
+		UE_LOG(ModioUI5, Error, TEXT("Unable to set data source for '%s': DataSource is not of type UModioFilterParamsUI"), *GetName());
+		return;
+	}
+
+	FModioFilterParams& FilterParams = FilterParamsPtr->Underlying;
+
+	if (bWasFilterAppliedAtLeastOnce)
+	{
+		if (PreviouslyAppliedFilter.ToString() == FilterParams.ToString() && FilterParams.Count == PreviouslyAppliedFilter.Count == OverriddenModsCount)
 		{
-			PrimaryView->ClearModSelection();
-		}
-		else if (AdditionalView->IsAnyModSelected() && !AdditionalView->HasFocusedDescendants() && PrimaryView->HasFocusedDescendants())
-		{
-			AdditionalView->ClearModSelection();
+			UE_LOG(ModioUI5, Warning, TEXT("Filter is the same as the current filter, skipping refresh"));
+			return;
 		}
 	}
+
+	if (OverriddenModsCount > 0)
+	{
+		FilterParams.Count = OverriddenModsCount;
+	}
+	PreviouslyAppliedFilter = FilterParams;
+
+	SynchronizeProperties();
+
+	if (SearchResultsView)
+	{
+		SearchResultsView->SetDataSource(FilterParamsPtr);
+	}
+	else
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to set data source for '%s': FilteredModListView is not bound"), *GetName());
+	}
+
+	bWasFilterAppliedAtLeastOnce = true;
 }
 
 UWidget* UModioCommonFeaturedView::NativeGetDesiredFocusTarget() const
@@ -61,34 +96,72 @@ UWidget* UModioCommonFeaturedView::NativeGetDesiredFocusTarget() const
 	{
 		return WidgetToFocus;
 	}
-	if (PrimaryView && (PrimaryView->HasAnyUserFocus() || PrimaryView->HasFocusedDescendants()))
+	if (SearchResultsView)
 	{
-		return PrimaryView->GetDesiredFocusTarget();
+		if (UWidget* WidgetToFocus = SearchResultsView->GetDesiredFocusTarget())
+		{
+			return WidgetToFocus;
+		}
 	}
-	if (AdditionalView && (AdditionalView->HasAnyUserFocus() || AdditionalView->HasFocusedDescendants()))
-	{
-		return AdditionalView->GetDesiredFocusTarget();
-	}
-	if (LastFocusedView)
-	{
-		return LastFocusedView->GetDesiredFocusTarget();
-	}
-	if (PrimaryView)
-	{
-		return PrimaryView->GetDesiredFocusTarget();
-	}
-	return nullptr;
+	return Super::NativeGetDesiredFocusTarget();
 }
 
-void UModioCommonFeaturedView::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
+void UModioCommonFeaturedView::NativeOnInitialized()
 {
-	if (PrimaryView && (PrimaryView->HasAnyUserFocus() || PrimaryView->HasFocusedDescendants()))
+	Super::NativeOnInitialized();
+
+	IModioUIUserChangedReceiver::Register<UModioCommonFeaturedView>();
+	IModioUISubscriptionsChangedReceiver::Register<UModioCommonFeaturedView>();
+	IModioUIModManagementEventReceiver::Register<UModioCommonFeaturedView>();
+}
+
+void UModioCommonFeaturedView::RefreshList_Implementation()
+{
+	if (UModioFilterParamsUI* FilterParamsUI = Cast<UModioFilterParamsUI>(DataSource))
 	{
-		LastFocusedView = PrimaryView;
+		SetDataSource(FilterParamsUI);
 	}
-	if (AdditionalView && (AdditionalView->HasAnyUserFocus() || AdditionalView->HasFocusedDescendants()))
+}
+
+void UModioCommonFeaturedView::RefreshListByFilter_Implementation(const FModioFilterParams& Filter)
+{
+	if (UModioFilterParamsUI* FilterParamsUI = Cast<UModioFilterParamsUI>(DataSource))
 	{
-		LastFocusedView = AdditionalView;
+		FilterParamsUI->Underlying = Filter;
+		SetDataSource(FilterParamsUI);
 	}
-	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
+}
+
+void UModioCommonFeaturedView::RefreshListByCategoryName_Implementation(FName InCategoryName)
+{
+	if (!SearchResultsView)
+	{
+		return;
+	}
+
+#if WITH_EDITOR
+	if (!IsDesignTime())
+#endif
+	{
+		const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>();
+		if (!UISettings)
+		{
+			return;
+		}
+
+		const FModioModCategoryParams* SelectedCategoryParamsPtr = Algo::FindByPredicate(UISettings->FeaturedParams.CategoryParams,
+			[this, InCategoryName](const FModioModCategoryParams& Params) {
+				return InCategoryName == FName(*Params.CategoryName.ToString());
+			});
+
+		if (SelectedCategoryParamsPtr)
+		{
+			FModioModCategoryParams SelectedCategoryParams = *SelectedCategoryParamsPtr;
+			RefreshListByFilter(SelectedCategoryParams.ToFilterParams());
+		}
+		else
+		{
+			UE_LOG(ModioUI5, Error, TEXT("Unable to find category '%s' in settings"), *InCategoryName.ToString());
+		}
+	}
 }

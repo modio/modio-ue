@@ -12,6 +12,11 @@
 
 #include "CoreMinimal.h"
 #include "UI/Foundation/Base/ModDetails/ModioCommonModDetailsViewBase.h"
+#include <Components/VerticalBox.h>
+#include "UI/Foundation/Components/CheckBox/ModioCommonCheckBox.h"
+#include <Components/Button.h>
+#include "UI/Foundation/Components/ScrollBox/ModioCommonScrollBox.h"
+#include "UI/Foundation/Utilities/ModioCommonTickableWidget.h"
 
 #include "ModioCommonModDetailsView.generated.h"
 
@@ -70,6 +75,9 @@ protected:
 	TObjectPtr<UModioCommonButtonBase> ReportButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UButton> CollectionButton;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonTextBlock> ModSummaryTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
@@ -79,7 +87,19 @@ protected:
 	TObjectPtr<UModioCommonTextBlock> ModFullDescriptionTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
-	TObjectPtr<UHorizontalBox> OperationProgressBarContainer;
+	TObjectPtr<UHorizontalBox> OperationContainer;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UVerticalBox> ProgressBarContainer;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UHorizontalBox> StatusContainer;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UModioCommonCheckBox> InstalledCheckBox;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UModioCommonCheckBox> EnabledCheckBox;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonTextBlock> OperationProgressLabelTextBlock;
@@ -129,6 +149,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonModGalleryView> ModGalleryView;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UModioCommonScrollBox> ModioCommonDescriptionScrollBox;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UModioCommonTextBlock> SpeedDetailsTextBlock;
+
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Properties")
 	FModioModInfo PreviewModInfo;
@@ -155,10 +181,16 @@ protected:
 	void OnRatingSubmissionComplete(FModioErrorCode ErrorCode, EModioRating SubmittedRating);
 
 	/** Activates Subscription/Cancel button */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void ActivateTopButtonsInputBindings();
 
 	/** Activates RateUp, RateDown and Report buttons */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void ActivateBottomButtonsInputBindings();
+
+	/** Activates the tags input bindings */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void ActivateTagsInputBindings();
 
 	/** Activates input actions */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
@@ -172,6 +204,10 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Update")
 	void UpdateSpeed(FModioUnsigned64 DeltaBytes, double DeltaTime);
+
+	/** Shows the mod status information */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Update")
+	void ShowStatus();
 
 	/** Shows the progress bar information */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Update")
@@ -200,12 +236,12 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
 	void HandleReportClicked();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
+	void HandleCollectionClicked();
+
 public:
 	/** Timer to put a delay between subscribe and unsubscribe */
 	FTimerHandle SubscriptionDelayTimer;
-
-	/** Timer to check if mod is about to rate limit */
-	FTimerHandle SubscriptionTrackTimer;
 
 	/** The mod details that was shown recently */
 	FModioModID LastModID;
@@ -213,13 +249,12 @@ public:
 	/** Enables Subscribe button */
 	void AllowSubscription(bool allow);
 
-	/** Enables Rate Up and Rate Down button */
-	void AllowRating(bool allow);
+	/** Enables Rate Up button */
+	void AllowRatingUp(bool allow);
+
+	/** Enables Rate Down button */
+	void AllowRatingDown(bool allow);
 
 	/** The mod details that was shown recently */
 	bool IsRateLimited(FModioErrorCode ErrorCode);
-
-	/** Starts to track subscription whether it was successfully downloaded and extracted */
-	void StartTrackingSubscription();
-	void EndTrackingSubscription();
 };

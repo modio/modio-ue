@@ -16,11 +16,11 @@
 #include "UI/EventHandlers/IModioUIModInfoReceiver.h"
 #include "ModioCommonSearchTabView.generated.h"
 
+class UModioCommonTextBlock;
 class UModioCommonSearchTabViewStyle;
 class UModioCommonBorder;
 class UModioCommonTabButtonBase;
 class UModioCommonFilteringView;
-class UModioCommonSortingView;
 class UModioCommonEditableTextBox;
 class UModioCommonTabListWidgetBase;
 class UModioCommonWidgetSwitcher;
@@ -34,12 +34,6 @@ UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Co
 class MODIOUI5_API UModioCommonSearchTabView : public UModioCommonSearchViewBase
 {
 	GENERATED_BODY()
-
-public:
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Transient, Category = "Mod.io Common UI|Preview")
-	bool bPreviewDisplaySortingOrFiltering = true;
-#endif
 
 public:
 	/**
@@ -59,12 +53,12 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonBorder> OverlayBackgroundBorder;
-	
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI|Widgets")
-	TObjectPtr<UModioCommonTabListWidgetBase> SortingFilteringTabList;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
+	TObjectPtr<UModioCommonTextBlock> SearchTabTitleTextBlock;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI|Widgets")
-	TObjectPtr<UModioCommonWidgetSwitcher> SortingFilteringContentSwitcher;
+	TObjectPtr<UModioCommonFilteringView> FilteringView;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Search Tab View|Widgets")
 	TObjectPtr<UModioCommonEditableTextBox> SearchTextBox;
@@ -76,25 +70,15 @@ protected:
 	TObjectPtr<UModioCommonButtonBase> SearchButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Search Tab View|Widgets")
-	TObjectPtr<UModioCommonButtonBase> ClearAllButton;
-
-protected:
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Mod.io Common UI|Search Tab View|Widgets")
-	TObjectPtr<UModioCommonSortingView> SortingView;
-
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Mod.io Common UI|Search Tab View|Widgets")
-	TObjectPtr<UModioCommonFilteringView> FilteringView;
+	TObjectPtr<UModioCommonButtonBase> ResetButton;
 
 protected:
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 	virtual void NativeOnInitialized() override;
-	virtual void NativeConstruct() override;
+	virtual void NativeOnSetDataSource() override;
 public:
 	virtual void SynchronizeProperties() override;
 protected:
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search Tab View")
-	bool GetViewFromTabNameID(FName TabNameID, UModioCommonActivatableWidget*& OutView) const;
 
 	UFUNCTION()
 	void OnSearchTextCommitted(const FText& Text, ETextCommit::Type CommitMethod);
@@ -104,12 +88,11 @@ protected:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search Tab View")
-	void ClearAllFilters();
+	void Reset();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search Tab View")
 	FModioFilterParams GetFilterParams() const;
 
-private:
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Mod.io Common UI|Search Tab View", meta = (AllowPrivateAccess = true))
-	FName SelectedTabID;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search Tab View")
+	FModioModCategoryParams GetFilterParamsWrapper() const;
 };

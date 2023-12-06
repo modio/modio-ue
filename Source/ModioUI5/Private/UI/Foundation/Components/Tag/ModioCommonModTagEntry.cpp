@@ -21,17 +21,14 @@ void UModioCommonModTagEntry::SetTag_Implementation(const FString& InTag)
 	if (TagButton)
 	{
 		TagButton->SetLabel(FText::FromString(Tag));
-		TagButton->OnClicked().AddLambda([this]() 
+		TagButton->OnClicked().AddWeakLambda(this, [this]() 
 		{
 			if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 			{
-				if (Subsystem->ModBrowserInstance->Implements<UModioModBrowserInterface>())
-				{
-					FModioFilterParams FilterParams;
-					FilterParams.WithTags({Tag});
-					IModioModBrowserInterface::Execute_ShowSearchResults(Subsystem->ModBrowserInstance, FilterParams);
-					DeactivateWidget();
-				}
+				FModioModCategoryParams FilterParams;
+				FilterParams.Tags = {Tag};
+				Subsystem->ShowSearchResults(FilterParams);
+				DeactivateWidget();
 			}
 		});
 	}
@@ -78,7 +75,7 @@ void UModioCommonModTagEntry::NativeOnInitialized()
 	Super::NativeOnInitialized();
 	if (TagCheckbox)
 	{
-		TagCheckbox->OnModioCommonCheckBoxStateChanged.AddLambda([this](bool bIsChecked) {
+		TagCheckbox->OnModioCommonCheckBoxStateChanged.AddWeakLambda(this, [this](bool bIsChecked) {
 			OnModTagEntrySelectionStateChanged.Broadcast(this, bIsChecked);
 		});
 	}

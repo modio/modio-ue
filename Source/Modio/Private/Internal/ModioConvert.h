@@ -46,6 +46,7 @@ struct FModioIcon ToUnreal(const Modio::Detail::Icon& In);
 struct FModioGameStats ToUnreal(const Modio::GameStats& In);
 EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& In);
 struct FModioGamePlatform ToUnreal(const Modio::GamePlatform& In);
+EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);

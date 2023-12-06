@@ -104,10 +104,20 @@ public:
 	DECLARE_MULTICAST_DELEGATE(FOnSetModsFromModInfoListStarted);
 	/** @brief Executed when the mod list is about to be populated */
 	FOnSetModsFromModInfoListStarted OnSetModsFromModInfoListStarted;
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSetModsFromModInfoListDynamicStarted);
+	/** @brief Executed when the mod list is about to be populated */
+	UPROPERTY(BlueprintAssignable, Category = "Mod.io Common UI")
+	FOnSetModsFromModInfoListDynamicStarted OnSetModsFromModInfoListDynamicStarted;
 
 	DECLARE_MULTICAST_DELEGATE(FOnSetModsFromModInfoListFinished);
 	/** @brief Executed when the mod list has been populated */
 	FOnSetModsFromModInfoListFinished OnSetModsFromModInfoListFinished;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSetModsFromModInfoListDynamicFinished);
+	/** @brief Executed when the mod list has been populated */
+	UPROPERTY(BlueprintAssignable, Category = "Mod.io Common UI")
+	FOnSetModsFromModInfoListDynamicFinished OnSetModsFromModInfoListDynamicFinished;
 
 public:
 	/**
@@ -140,9 +150,10 @@ public:
 
 protected:
 	//~ Begin IModioCommonModListViewInterface Interface
+	virtual void SetModSelectionByID_Implementation(FModioModID ModID) override;
 	virtual UListView* GetListView() const override { return ModList; }
 	virtual void SetFocusOnceListIsPopulated_Implementation(bool bFocus) override;
-	virtual void RequestFullClearSelection_Implementation() override;
+	virtual void RequestFullClearSelection_Implementation(bool bResetPreviouslySelected) override;
 	virtual void NativeSetListItems(const TArray<UObject*>& InListItems, bool bAddToExisting) override;
 	//~ End IModioCommonModListViewInterface Interface
 

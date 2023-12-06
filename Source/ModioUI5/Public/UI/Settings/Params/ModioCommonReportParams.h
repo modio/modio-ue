@@ -19,13 +19,15 @@
 /**
  * Project Settings customization for ModioCommonReportView
  */
-UCLASS(Config = "ModioCommonReportParams", DefaultConfig, meta = (DisplayName = "Report Params"))
-class MODIOUI5_API UModioCommonReportParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonReportParamsSettings
 {
 	GENERATED_BODY()
 
 public:
-	UModioCommonReportParamsSettings()
+	virtual ~FModioCommonReportParamsSettings() = default;
+
+	FModioCommonReportParamsSettings()
 	{
 		ProceedInputAction.RowName = "Secondary";
 		ProceedInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -51,17 +53,13 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle CancelInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonReportReasonView
  */
-UCLASS(Config = "ModioCommonReportReasonParams", DefaultConfig, meta = (DisplayName = "Report Reason Params"))
-class MODIOUI5_API UModioCommonReportReasonParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonReportReasonParamsSettings
 {
 	GENERATED_BODY()
 
@@ -75,22 +73,17 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonReportEmailView
  */
-UCLASS(Config = "ModioCommonReportEmailParams", DefaultConfig, meta = (DisplayName = "Report Email Params"))
-class MODIOUI5_API UModioCommonReportEmailParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonReportEmailParamsSettings
 {
 	GENERATED_BODY()
 
 public:
-
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText DescriptionText = NSLOCTEXT("Modio", "ReportEmailDescription", "Your email may be shared with moderators and the person that posted the allegedly infringing content you are reporting.");
 
@@ -108,17 +101,13 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonReportMessageView
  */
-UCLASS(Config = "ModioCommonReportMessageParams", DefaultConfig, meta = (DisplayName = "Report Message Params"))
-class MODIOUI5_API UModioCommonReportMessageParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonReportMessageParamsSettings
 {
 	GENERATED_BODY()
 
@@ -144,17 +133,13 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonReportSummaryView
  */
-UCLASS(Config = "ModioCommonReportSummaryParams", DefaultConfig, meta = (DisplayName = "Report Summary Params"))
-class MODIOUI5_API UModioCommonReportSummaryParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonReportSummaryParamsSettings
 {
 	GENERATED_BODY()
 
@@ -179,8 +164,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

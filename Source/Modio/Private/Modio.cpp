@@ -11,6 +11,7 @@
 #include "Modio.h"
 #include "Containers/Array.h"
 #include "Math/Color.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Stats/Stats.h"
 
 DEFINE_LOG_CATEGORY(LogModio)
@@ -56,8 +57,11 @@ extern "C"
 			return StatIDs[StatName];
 		}
 	}
-
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 	PRAGMA_DISABLE_OPTIMIZATION
+#else
+	UE_DISABLE_OPTIMIZATION
+#endif
 	void modio_profile_scope_start(const char* Name, void** Data)
 	{
 		if (FThreadStats::IsCollectingData())
@@ -102,7 +106,11 @@ extern "C"
 	{
 		FThreadStats::AddMessage(GetOrCreateStat(FName(Name)).GetName(), EStatOperation::Set, int64(Data));
 	}
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 	PRAGMA_ENABLE_OPTIMIZATION
+#else
+	UE_ENABLE_OPTIMIZATION
+#endif
 }
 
 #endif

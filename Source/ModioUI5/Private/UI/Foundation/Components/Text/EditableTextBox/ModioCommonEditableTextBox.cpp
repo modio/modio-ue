@@ -20,8 +20,11 @@
 
 void UModioCommonEditableTextBox::SetStyle(TSubclassOf<UModioCommonEditableTextBoxStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 bool UModioCommonEditableTextBox::IsTextBoxFocused() const

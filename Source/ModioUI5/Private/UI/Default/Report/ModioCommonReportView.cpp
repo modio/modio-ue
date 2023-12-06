@@ -266,10 +266,17 @@ void UModioCommonReportView::HandleReportSubmit(FModioErrorCode ErrorCode)
 				UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
 				DialogInfo->TitleText = FText::FromString(ModInfoUI->Underlying.ProfileName);
 				DialogInfo->DialogText = NSLOCTEXT("Modio", "ReportSubmissionPopupText", "Your report has been submitted successfully.");
-				if (DialogInfo->IsValid())
-				{
-					Cast<UModioCommonModBrowser>(ModioUISubsystem->ModBrowserInstance)->ShowDialog(DialogInfo);
-				}
+				DialogInfo->ButtonsToDisplay = static_cast<uint8>(EModioCommonDialogButtonType::Confirm);
+				DialogInfo->OnDialogButtonClickedFast.AddWeakLambda(this, [this, DialogInfoPtr = TWeakObjectPtr<UModioCommonDialogInfo>(DialogInfo)](EModioCommonDialogButtonType ButtonType) {
+					if (DialogInfoPtr.IsValid() && DialogInfoPtr->Owner)
+					{
+						if (UModioCommonActivatableWidget* DialogWidget = Cast<UModioCommonActivatableWidget>(DialogInfoPtr->Owner.Get()))
+						{
+							DialogWidget->DeactivateWidget();
+						}
+					}
+				});
+				ModioUISubsystem->ShowDialog(DialogInfo);
 			}
 		}
 		else
@@ -286,10 +293,17 @@ void UModioCommonReportView::HandleReportSubmit(FModioErrorCode ErrorCode)
 				UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>();
 				DialogInfo->TitleText = FText::FromString(ModInfoUI->Underlying.ProfileName);
 				DialogInfo->DialogText = NSLOCTEXT("Modio", "ReportSubmissionPopupText", "Failed to report due to unknown circumstances. Make sure to write your message containing correct information.");
-				if (DialogInfo->IsValid())
-				{
-					Cast<UModioCommonModBrowser>(ModioUISubsystem->ModBrowserInstance)->ShowDialog(DialogInfo);
-				}
+				DialogInfo->ButtonsToDisplay = static_cast<uint8>(EModioCommonDialogButtonType::Confirm);
+				DialogInfo->OnDialogButtonClickedFast.AddWeakLambda(this, [this, DialogInfoPtr = TWeakObjectPtr<UModioCommonDialogInfo>(DialogInfo)](EModioCommonDialogButtonType ButtonType) {
+					if (DialogInfoPtr.IsValid() && DialogInfoPtr->Owner)
+					{
+						if (UModioCommonActivatableWidget* DialogWidget = Cast<UModioCommonActivatableWidget>(DialogInfoPtr->Owner.Get()))
+						{
+							DialogWidget->DeactivateWidget();
+						}
+					}
+				});
+				ModioUISubsystem->ShowDialog(DialogInfo);
 			}
 		}
 	}

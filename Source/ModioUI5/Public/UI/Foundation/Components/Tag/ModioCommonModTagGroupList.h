@@ -47,6 +47,9 @@ public:
 	void SetTagsGroup(const FModioModTagInfo& TagInfo);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Tag Widget")
+	bool SetSelectedTagGroupValues(const TArray<FString>& TagGroupValues, bool bSelect);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Tag Widget")
 	bool GetSelectedTagGroupValues(UPARAM(ref) TArray<FString>& OutSelectedTagGroupValues) const;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Tag Widget")

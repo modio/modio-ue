@@ -50,6 +50,7 @@ public:
 	virtual void SynchronizeProperties() override;
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeOnSetDataSource() override;
 
 	virtual void BindInputActions() override;
 	virtual void UnbindInputActions() override;
@@ -81,10 +82,6 @@ protected:
 
 public:
 
-	/** @brief Loads a list of Mod information into the ModList */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void LoadGallery(FModioModInfo InModInfo);
-
 	/** @brief Go to next image */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void GoToNextImage();
@@ -114,6 +111,5 @@ public:
 	void AddGalleryImage(int32 ImageGalleryIndex);
 
 private:
-	FModioModInfo ModInfo;
 	int32 CurrentImageGalleryIndex = 0;
 };

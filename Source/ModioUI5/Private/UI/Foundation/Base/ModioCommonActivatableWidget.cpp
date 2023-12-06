@@ -17,6 +17,7 @@
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "Engine/GameViewportClient.h"
 #include "UnrealClient.h"
+#include "Algo/RemoveIf.h"
 
 #if WITH_EDITOR
 #include "Blueprint/WidgetTree.h"
@@ -66,18 +67,6 @@ void UModioCommonActivatableWidget::BindInputActions()
 			ListeningInputAction.Button->SetTriggeringInputAction(ListeningInputAction.InputAction);
 			BoundInputActions.Add(FBoundInputActionStruct(ListeningInputAction.Button));
 			UE_LOG(ModioUI5, Log, TEXT("Bound input action '%s' to button '%s' ('%s') in widget '%s'"), *ListeningInputAction.Button->GetName(), *ListeningInputAction.Button->GetName(), *ListeningInputAction.DisplayName.ToString(), *GetName());
-		}
-		else
-		{
-			FBindUIActionArgs BindArgs(ListeningInputAction.InputAction, false, FSimpleDelegate::CreateWeakLambda(this, [this, &ListeningInputAction]() { ListeningInputAction.OnActionFired(); }));
-			BindArgs.bDisplayInActionBar = true;
-			if (!ListeningInputAction.DisplayName.IsEmpty())
-			{
-				BindArgs.OverrideDisplayName = ListeningInputAction.DisplayName;
-			}
-			FUIActionBindingHandle ActionHandle = RegisterUIActionBinding(BindArgs);
-			UE_LOG(ModioUI5, Log, TEXT("Bound input action '%s' in widget '%s' (%s)"), *ActionHandle.GetActionName().ToString(), *GetName(), *ListeningInputAction.DisplayName.ToString());
-			BoundInputActions.Add(FBoundInputActionStruct(MoveTemp(ActionHandle)));
 		}
 	}
 }
@@ -142,12 +131,12 @@ void UModioCommonActivatableWidget::SynchronizeProperties()
 
 void UModioCommonActivatableWidget::BP_ListenForInputAction(UModioCommonButtonBase* Button,	FDataTableRowHandle InputAction, const FText& DisplayName, const FOnModioCommonActivatableWidgetActionFired& OnActionFired)
 {
-	ListenForInputAction(Button, InputAction, DisplayName, [OnActionFired]() {
+	ListenForInputAction(Button, InputAction, DisplayName, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [OnActionFired]() {
 		OnActionFired.ExecuteIfBound();
-	});
+	}));
 }
 
-void UModioCommonActivatableWidget::ListenForInputAction(TObjectPtr<UModioCommonButtonBase> Button, FDataTableRowHandle InputAction, const FText& DisplayName, TFunction<void()> OnActionFired)
+void UModioCommonActivatableWidget::ListenForInputAction(TObjectPtr<UModioCommonButtonBase> Button, FDataTableRowHandle InputAction, const FText& DisplayName, const FOnModioCommonActivatableWidgetActionFiredFast& OnActionFired)
 {
 	if (!InputAction.IsNull())
 	{
@@ -157,7 +146,7 @@ void UModioCommonActivatableWidget::ListenForInputAction(TObjectPtr<UModioCommon
 		}
 		else
 		{
-			ListeningInputActions.Add(FListeningInputActionStruct(InputAction, DisplayName, OnActionFired));
+			UE_LOG(ModioUI5, Error, TEXT("Cannot listen for input action with a null button in widget '%s'"), *GetName());
 		}
 	}
 
@@ -176,8 +165,8 @@ void UModioCommonActivatableWidget::ListenForInputAction(TObjectPtr<UModioCommon
 		if (ListeningInputAction.Button.IsValid())
 		{
 			ListeningInputAction.Button->OnClicked().RemoveAll(this);
-			ListeningInputAction.Button->OnClicked().AddWeakLambda(this, [this, &ListeningInputAction]() {
-				ListeningInputAction.OnActionFired();
+			ListeningInputAction.Button->OnClicked().AddWeakLambda(this, [this, ListeningInputAction]() {
+				ListeningInputAction.OnActionFired.ExecuteIfBound();
 			});
 		}
 	}
@@ -187,6 +176,24 @@ void UModioCommonActivatableWidget::ClearListeningInputActions()
 {
 	UnbindInputActions();
 	ListeningInputActions.Empty();
+}
+
+void UModioCommonActivatableWidget::ClearListeningInputAction(UModioCommonButtonBase* Button)
+{
+	for (FBoundInputActionStruct& BoundInputAction : BoundInputActions)
+	{
+		if (BoundInputAction.Button.IsValid() && BoundInputAction.Button.Get() == Button)
+		{
+			UE_LOG(ModioUI5, Log, TEXT("Unbound input action from button '%s' in widget '%s'"), *BoundInputAction.Button->GetName(), *GetName());
+			BoundInputAction.Button->SetTriggeringInputAction(FDataTableRowHandle());
+		}
+	}
+	BoundInputActions.RemoveAll([Button](const FBoundInputActionStruct& BoundInputAction) {
+		return BoundInputAction.Button.IsValid() && BoundInputAction.Button.Get() == Button;
+	});
+	ListeningInputActions.RemoveAll([Button](const FListeningInputActionStruct& ListeningInputAction) {
+		return ListeningInputAction.Button.IsValid() && ListeningInputAction.Button.Get() == Button;
+	});
 }
 
 void UModioCommonActivatableWidget::FocusOnDesiredWidget()

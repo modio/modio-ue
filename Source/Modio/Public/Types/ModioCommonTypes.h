@@ -165,6 +165,14 @@ enum class EModioLanguage : uint8
 	ChineseTraditional
 };
 
+UENUM(BlueprintType)
+enum class EModioModChangeType : uint8
+{
+	Added, // The user's list has a new mod to synchronize
+	Removed, // The user's list must remove a mod to synchronize
+	Updated // The user's list must update a mod to synchronize
+};
+
 /**
  * Strong type struct to wrap a ModID to uniquely identify user generated content
  **/

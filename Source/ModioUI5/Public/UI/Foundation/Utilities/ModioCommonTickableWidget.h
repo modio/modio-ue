@@ -19,7 +19,7 @@
 class UTickableModioCommonWidget;
 
 /**
- * @brief Empty widget that can be used to tick a UTickableModioCommonWidget
+ * Empty widget that can be used to tick a UTickableModioCommonWidget
  */
 class MODIOUI5_API STickableModioCommonWidget : public SSpacer
 {
@@ -38,14 +38,17 @@ public:
 		OwningWidget = InArgs._OwningWidget;
 	}
 
+	//~ Begin SWidget Interface
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
+	//~ End SWidget Interface
 
 private:
+	/** UMG widget that owns this slate widget */
 	UTickableModioCommonWidget* OwningWidget = nullptr;
 };
 
 /**
- * @brief Widget that can be ticked
+ * Widget that can be ticked
  */
 UCLASS(ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
 class MODIOUI5_API UTickableModioCommonWidget : public UWidget
@@ -54,9 +57,15 @@ class MODIOUI5_API UTickableModioCommonWidget : public UWidget
 
 protected:
 	friend class STickableModioCommonWidget;
+
+	/**
+	 * Called every frame
+	 * @param DeltaTime Time since last frame
+	 */
 	virtual void Tick(float DeltaTime) {}
 
 protected:
+	//~ Begin UWidget Interface
 	virtual TSharedRef<SWidget> RebuildWidget() override
 	{
 		MyTickableWidget = SNew(STickableModioCommonWidget)
@@ -69,8 +78,10 @@ protected:
 		Super::ReleaseSlateResources(bReleaseChildren);
 		MyTickableWidget.Reset();
 	}
+	//~ End UWidget Interface
 
 private:
+	/** Underlying slate widget */
 	TSharedPtr<STickableModioCommonWidget> MyTickableWidget;
 };
 

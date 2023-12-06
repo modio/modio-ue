@@ -11,6 +11,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/ModioFilterParamsUI.h"
 #include "Engine/DeveloperSettings.h"
 #include "Types/ModioFilterParams.h"
 #include "UI/Settings/ModioCommonDefines.h"
@@ -18,136 +19,95 @@
 #include "ModioCommonModBrowserParams.generated.h"
 
 /**
- * Struct that stores mod attributes like category name or tags
+ * Project Settings customization for ModioCommonCollectionView
  */
-USTRUCT(BlueprintType)
-struct MODIOUI5_API FModioCommonFeaturedCategoryParams
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonCollectionParamsSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, Category = "Base")
-	FText CategoryName;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Base")
-	TArray<FString> Tags;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Base")
-	TArray<FString> ExcludedTags;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Base")
-	EModioSortDirection Direction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Base")
-	EModioSortFieldType SortField;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Base")
-	int64 Count = 20;
-
-	FModioFilterParams ToFilterParams() const
+	FModioCommonCollectionParamsSettings()
 	{
-		return FModioFilterParams()
-		       .WithTags(Tags)
-		       .WithoutTags(ExcludedTags)
-		       .SortBy(SortField, Direction)
-		       .IndexedResults(0, Count);
+		FilterInputAction.RowName = "LeftTabTertiary";
+		FilterInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		CheckForUpdatesInputAction.RowName = "RightTabTertiary";
+		CheckForUpdatesInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
-};
 
-/**
- * Project Settings customization for ModioCommonFeaturedPrimaryView
- */
-UCLASS(Config = "ModioCommonFeaturedPrimaryParams", DefaultConfig, meta = (DisplayName = "Featured Primary Params"))
-class MODIOUI5_API UModioCommonFeaturedPrimaryParamsSettings : public UDeveloperSettings
-{
-	GENERATED_BODY()
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText DownloadingModsLabel = NSLOCTEXT("Modio", "DownloadingModsLabel", "Downloading");
+	
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText DownloadingModsDescription = NSLOCTEXT("Modio", "DownloadingModsDescription", "Downloading Mods:");
 
-public:
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText ErrorsLabel = NSLOCTEXT("Modio", "Errors", "Errors:");
 
-	UPROPERTY(Config, EditDefaultsOnly, Category = "Featured|Primary")
-	FModioCommonFeaturedCategoryParams PrimaryCategoryParam
-	{
-		[] {
-			FModioCommonFeaturedCategoryParams PrimaryParam;
-			PrimaryParam.Direction = EModioSortDirection::Ascending;
-			PrimaryParam.SortField = EModioSortFieldType::DownloadsToday;
-			PrimaryParam.Count = 20;
-			return PrimaryParam;
-		}()
-	};
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText InstalledModsLabel = NSLOCTEXT("Modio", "InstalledModsLabel", "Installed");
 
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText InstalledModsDescription = NSLOCTEXT("Modio", "InstalledModsDescription", "installed mods");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText DefaultFetchUpdateButtonLabel = NSLOCTEXT("Modio", "DefaultFetchUpdateButtonLabel", "Check for updates");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText SearchingFetchUpdateButtonLabel = NSLOCTEXT("Modio", "SearchingFetchUpdateButtonLabel", "Searching");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText OwnedModsLabel = NSLOCTEXT("Modio", "OwnedModsLabel", "Owned");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText FilterButtonLabel = NSLOCTEXT("Modio", "CollectionFilterButtonLabel", "Filter");
+
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	FDataTableRowHandle CheckForUpdatesInputAction;
+
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	FDataTableRowHandle FilterInputAction;
 };
 
 /**
  * Project Settings customization for ModioCommonFeaturedAdditionalView
  */
-UCLASS(Config = "ModioCommonFeaturedAdditionalParams", DefaultConfig, meta = (DisplayName = "Featured Additional Params"))
-class MODIOUI5_API UModioCommonFeaturedAdditionalParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonFeaturedParamsSettings
 {
 	GENERATED_BODY()
-
-public:
-	UModioCommonFeaturedAdditionalParamsSettings()
-	{
-		PreviousTabInputAction.RowName = "LeftTabTertiary";
-		PreviousTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
-
-		NextTabInputAction.RowName = "RightTabTertiary";
-		NextTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
-	}
 	
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Featured|Additional")
-	TArray<FModioCommonFeaturedCategoryParams> AdditionalCategoryParams
+	TArray<FModioModCategoryParams> CategoryParams
 	{
 		[] {
-			FModioCommonFeaturedCategoryParams MostRecent;
-			MostRecent.CategoryName = NSLOCTEXT("Modio", "MostPopular", "Most Popular");
+			FModioModCategoryParams MostRecent;
+			MostRecent.CategoryName = NSLOCTEXT("Modio", "MostPopular", "Popular");
 			MostRecent.Direction = EModioSortDirection::Descending;
 			MostRecent.SortField = EModioSortFieldType::DownloadsTotal;
 			MostRecent.Count = 20;
 			return MostRecent;
 		}(),
 		[] {
-			FModioCommonFeaturedCategoryParams MostRecommended;
-			MostRecommended.CategoryName = NSLOCTEXT("Modio", "HighestRated", "Highest Rated");
-			MostRecommended.Direction = EModioSortDirection::Descending;
-			MostRecommended.SortField = EModioSortFieldType::Rating;
-			MostRecommended.Count = 20;
-			return MostRecommended;
-		}(),
-		[] {
-			FModioCommonFeaturedCategoryParams MostPopular;
-			MostPopular.CategoryName = NSLOCTEXT("Modio", "RecentlyAdded", "Recently Added");
+			FModioModCategoryParams MostPopular;
+			MostPopular.CategoryName = NSLOCTEXT("Modio", "RecentlyAdded", "Recent");
 			MostPopular.Direction = EModioSortDirection::Descending;
 			MostPopular.SortField = EModioSortFieldType::DateMarkedLive;
 			MostPopular.Count = 20;
 			return MostPopular;
 		}()
 	};
-
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
-	FDataTableRowHandle PreviousTabInputAction;
-
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
-	FDataTableRowHandle NextTabInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };
 
 /**
  * Project Settings customization for ModioCommonModBrowser
  */
-UCLASS(Config = "ModioCommonModBrowserParams", DefaultConfig, meta = (DisplayName = "Mod Browser Params"))
-class MODIOUI5_API UModioCommonModBrowserParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonModBrowserParamsSettings
 {
 	GENERATED_BODY()
 
-public:
-	UModioCommonModBrowserParamsSettings()
+	FModioCommonModBrowserParamsSettings()
 	{
 		PreviousTabInputAction.RowName = "LeftTab";
 		PreviousTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -155,9 +115,6 @@ public:
 		NextTabInputAction.RowName = "RightTab";
 		NextTabInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
-
-	UPROPERTY(Config, EditDefaultsOnly, Category = "Mod Browser")
-	FText FeaturedViewTabText = NSLOCTEXT("Modio", "FeaturedViewTabText", "Featured");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Mod Browser")
 	FText CollectionViewTabText = NSLOCTEXT("Modio", "CollectionViewTabText", "Collection");
@@ -170,8 +127,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle NextTabInputAction;
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

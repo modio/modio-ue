@@ -8,14 +8,14 @@
  *
  */
 
-
 #include "UI/Foundation/Base/ModBrowser/ModioCommonModEntryBase.h"
 
-#include "ModioUI5.h"
 #include "Components/ListView.h"
 #include "Components/ListViewBase.h"
 #include "Core/ModioModCollectionEntryUI.h"
 #include "Core/ModioModInfoUI.h"
+#include "Misc/EngineVersionComparison.h"
+#include "ModioUI5.h"
 #include "UI/Foundation/Components/List/ModioCommonModListViewInterface.h"
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerUserWidget.h"
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerWidget.h"
@@ -23,7 +23,11 @@
 UModioCommonModEntryBase::UModioCommonModEntryBase()
 {
 	bAutoActivate = true;
+#if UE_VERSION_OLDER_THAN(5, 2, 0)
 	bIsFocusable = false;
+#else
+	SetIsFocusable(false);
+#endif
 	bAutoFocusOnActivation = false;
 	bSupportsActivationFocus = false;
 	bAutoBindInputAction = false;
@@ -31,7 +35,8 @@ UModioCommonModEntryBase::UModioCommonModEntryBase()
 
 bool UModioCommonModEntryBase::IsModListItemValid_Implementation() const
 {
-	return bEntrySet && IsValid(GetOwningListView());
+	return bEntrySet && IsValid(GetOwningListView()) && Cast<UListView>(GetOwningListView())
+	       && !Cast<UListView>(GetOwningListView())->IsRefreshPending();
 }
 
 bool UModioCommonModEntryBase::IsModListItemSelected_Implementation() const
@@ -60,7 +65,14 @@ void UModioCommonModEntryBase::DeselectModListItem_Implementation()
 	{
 		if (UListView* ListView = Cast<UListView>(GetOwningListView()))
 		{
-			IModioCommonModListViewInterface::Execute_RequestFullClearSelection(ListView);
+			if (ListView->Implements<UModioCommonModListViewInterface>())
+			{
+				IModioCommonModListViewInterface::Execute_RequestFullClearSelection(ListView, false);
+			}
+			else
+			{
+				ListView->ClearSelection();
+			}
 		}
 	}
 }
@@ -69,13 +81,16 @@ FModioModID UModioCommonModEntryBase::GetModID_Implementation()
 {
 	if (!DataSource)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to get mod ID for mod entry '%s': DataSource is invalid"), *GetName());
+		UE_LOG(ModioUI5, Verbose, TEXT("Unable to get mod ID for mod entry '%s': empty DataSource"), *GetName());
 		return FModioModID();
 	}
-	
+
 	if (!DataSource->Implements<UModioModInfoUIDetails>())
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to get mod ID for mod entry '%s': DataSource '%s' does not implement UModioModInfoUIDetails"), *GetName(), *DataSource->GetName());
+		UE_LOG(
+			ModioUI5, Warning,
+			TEXT("Unable to get mod ID for mod entry '%s': DataSource '%s' does not implement UModioModInfoUIDetails"),
+			*GetName(), *DataSource->GetName());
 		return FModioModID();
 	}
 
@@ -86,13 +101,17 @@ FModioModInfo UModioCommonModEntryBase::GetFullModInfo_Implementation()
 {
 	if (!DataSource)
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to get mod info for mod entry '%s': DataSource is invalid"), *GetName());
+		UE_LOG(ModioUI5, Verbose, TEXT("Unable to get mod info for mod entry '%s': empty DataSource"), *GetName());
 		return FModioModInfo();
 	}
-	
+
 	if (!DataSource->Implements<UModioModInfoUIDetails>())
 	{
-		UE_LOG(ModioUI5, Error, TEXT("Unable to get mod info for mod entry '%s': DataSource '%s' does not implement UModioModInfoUIDetails"), *GetName(), *DataSource->GetName());
+		UE_LOG(
+			ModioUI5, Warning,
+			TEXT(
+				"Unable to get mod info for mod entry '%s': DataSource '%s' does not implement UModioModInfoUIDetails"),
+			*GetName(), *DataSource->GetName());
 		return FModioModInfo();
 	}
 
@@ -101,57 +120,92 @@ FModioModInfo UModioCommonModEntryBase::GetFullModInfo_Implementation()
 
 bool UModioCommonModEntryBase::IsModSubscribed_Implementation() const
 {
-	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModSubscribed(ModOperationTrackerUserWidget);
-	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModSubscribed(ModOperationTrackerWidget);
-	UE_LOG(ModioUI5, Verbose, TEXT("Unable to determine if mod is subscribed for '%s': neither ModOperationTrackerUserWidget nor ModOperationTrackerWidget are bound"), *GetName());
+	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModSubscribed(ModOperationTrackerUserWidget);
+	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModSubscribed(ModOperationTrackerWidget);
+	UE_LOG(ModioUI5, Verbose,
+		   TEXT("Unable to determine if mod is subscribed for '%s': neither ModOperationTrackerUserWidget nor "
+				"ModOperationTrackerWidget are bound"),
+		   *GetName());
 	return false;
 }
 
 bool UModioCommonModEntryBase::IsModDownloading_Implementation() const
 {
-	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModDownloading(ModOperationTrackerUserWidget);
-	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModDownloading(ModOperationTrackerWidget);
-	UE_LOG(ModioUI5, Verbose, TEXT("Unable to determine if mod is downloading for '%s': neither ModOperationTrackerUserWidget nor ModOperationTrackerWidget are bound"), *GetName());
+	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModDownloading(ModOperationTrackerUserWidget);
+	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModDownloading(ModOperationTrackerWidget);
+	UE_LOG(ModioUI5, Verbose,
+		   TEXT("Unable to determine if mod is downloading for '%s': neither ModOperationTrackerUserWidget nor "
+				"ModOperationTrackerWidget are bound"),
+		   *GetName());
 	return false;
 }
 
 bool UModioCommonModEntryBase::IsModExtracting_Implementation() const
 {
-	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModExtracting(ModOperationTrackerUserWidget);
-	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModExtracting(ModOperationTrackerWidget);
-	UE_LOG(ModioUI5, Verbose, TEXT("Unable to determine if mod is extracting for '%s': neither ModOperationTrackerUserWidget nor ModOperationTrackerWidget are bound"), *GetName());
+	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModExtracting(ModOperationTrackerUserWidget);
+	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModExtracting(ModOperationTrackerWidget);
+	UE_LOG(ModioUI5, Verbose,
+		   TEXT("Unable to determine if mod is extracting for '%s': neither ModOperationTrackerUserWidget nor "
+				"ModOperationTrackerWidget are bound"),
+		   *GetName());
 	return false;
 }
 
 bool UModioCommonModEntryBase::IsModInQueue_Implementation() const
 {
-	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModInQueue(ModOperationTrackerUserWidget);
-	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModInQueue(ModOperationTrackerWidget);
-	UE_LOG(ModioUI5, Verbose, TEXT("Unable to determine if mod is in queue for '%s': neither ModOperationTrackerUserWidget nor ModOperationTrackerWidget are bound"), *GetName());
+	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModInQueue(ModOperationTrackerUserWidget);
+	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModInQueue(ModOperationTrackerWidget);
+	UE_LOG(ModioUI5, Verbose,
+		   TEXT("Unable to determine if mod is in queue for '%s': neither ModOperationTrackerUserWidget nor "
+				"ModOperationTrackerWidget are bound"),
+		   *GetName());
 	return false;
 }
 
 bool UModioCommonModEntryBase::IsModEnabled_Implementation()
 {
-	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModEnabled(ModOperationTrackerUserWidget);
-	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModEnabled(ModOperationTrackerWidget);
-	UE_LOG(ModioUI5, Verbose, TEXT("Unable to determine if mod is enabled for '%s': neither ModOperationTrackerUserWidget nor ModOperationTrackerWidget are bound"), *GetName());
+	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModEnabled(ModOperationTrackerUserWidget);
+	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModEnabled(ModOperationTrackerWidget);
+	UE_LOG(ModioUI5, Verbose,
+		   TEXT("Unable to determine if mod is enabled for '%s': neither ModOperationTrackerUserWidget nor "
+				"ModOperationTrackerWidget are bound"),
+		   *GetName());
 	return false;
 }
 
 bool UModioCommonModEntryBase::IsModInstalled_Implementation() const
 {
-	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModInstalled(ModOperationTrackerUserWidget);
-	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_IsModInstalled(ModOperationTrackerWidget);
-	UE_LOG(ModioUI5, Verbose, TEXT("Unable to determine if mod is installed for '%s': neither ModOperationTrackerUserWidget nor ModOperationTrackerWidget are bound"), *GetName());
+	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModInstalled(ModOperationTrackerUserWidget);
+	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_IsModInstalled(ModOperationTrackerWidget);
+	UE_LOG(ModioUI5, Verbose,
+		   TEXT("Unable to determine if mod is installed for '%s': neither ModOperationTrackerUserWidget nor "
+				"ModOperationTrackerWidget are bound"),
+		   *GetName());
 	return false;
 }
 
 bool UModioCommonModEntryBase::HasModErrors_Implementation() const
 {
-	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_HasModErrors(ModOperationTrackerUserWidget);
-	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>()) return Execute_HasModErrors(ModOperationTrackerWidget);
-	UE_LOG(ModioUI5, Verbose, TEXT("Unable to determine if mod has errors for '%s': neither ModOperationTrackerUserWidget nor ModOperationTrackerWidget are bound"), *GetName());
+	if (ModOperationTrackerUserWidget && ModOperationTrackerUserWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_HasModErrors(ModOperationTrackerUserWidget);
+	if (ModOperationTrackerWidget && ModOperationTrackerWidget->Implements<UModioExtendedModInfoUIDetails>())
+		return Execute_HasModErrors(ModOperationTrackerWidget);
+	UE_LOG(ModioUI5, Verbose,
+		   TEXT("Unable to determine if mod has errors for '%s': neither ModOperationTrackerUserWidget nor "
+				"ModOperationTrackerWidget are bound"),
+		   *GetName());
 	return false;
 }
 
@@ -217,7 +271,7 @@ void UModioCommonModEntryBase::NativeOnSetDataSource()
 	{
 		ModOperationTrackerWidget->SetTrackingModID(ModInfo.ModId);
 	}
-	
+
 	NativeUpdateStyling(IsModListItemSelected());
 }
 
@@ -233,7 +287,7 @@ void UModioCommonModEntryBase::NativeOnModManagementEvent(FModioModManagementEve
 
 	const FModioModID ModID = Execute_GetModID(this);
 
-	if (ModID == Event.ID)
+	if (DataSource && ModID == Event.ID)
 	{
 		SetDataSource(DataSource);
 		UpdateInputActions();
@@ -246,7 +300,7 @@ void UModioCommonModEntryBase::NativeOnSubscriptionsChanged(FModioModID ModID, b
 
 	const FModioModID CurrentModID = Execute_GetModID(this);
 
-	if (CurrentModID == ModID)
+	if (DataSource && CurrentModID == ModID)
 	{
 		SetDataSource(DataSource);
 		UpdateInputActions();
@@ -259,7 +313,7 @@ void UModioCommonModEntryBase::NativeOnModEnabledStateChanged(FModioModID ModID,
 
 	const FModioModID CurrentModID = Execute_GetModID(this);
 
-	if (CurrentModID == ModID)
+	if (DataSource && CurrentModID == ModID)
 	{
 		SetDataSource(DataSource);
 		UpdateInputActions();

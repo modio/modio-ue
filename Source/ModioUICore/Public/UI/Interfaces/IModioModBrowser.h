@@ -1,4 +1,12 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿/*
+ *  Copyright (C) 2023 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -9,6 +17,7 @@
 #include "Types/ModioFilterParams.h"
 #include "Types/ModioModInfo.h"
 #include "ModioSubsystem.h"
+#include "Core/ModioFilterParamsUI.h"
 #include "IModioModBrowser.generated.h"
 
 // This class does not need to be modified.
@@ -39,7 +48,7 @@ public:
 	void LogOut();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
-	void ShowSearchResults(const FModioFilterParams& FilterParams);
+	void ShowSearchResults(const FModioModCategoryParams& FilterParams);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
 	void ShowReportMod(UObject* DialogDataSource);
@@ -57,4 +66,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
 	bool GetIsCollectionModDisableUIEnabled();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
+	void ShowDialog(UObject* DialogDataSource);
 };

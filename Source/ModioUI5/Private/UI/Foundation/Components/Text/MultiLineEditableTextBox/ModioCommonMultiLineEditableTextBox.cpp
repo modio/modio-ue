@@ -11,6 +11,7 @@
 
 #include "UI/Foundation/Components/Text/MultiLineEditableTextBox/ModioCommonMultiLineEditableTextBox.h"
 
+#include "ModioUI5.h"
 #include "UI/Foundation/Components/Text/EditableTextBox/ModioCommonEditableTextBox.h"
 #include "UI/Foundation/Components/Text/MultiLineEditableTextBox/ModioCommonMultiLineEditableTextBoxStyle.h"
 #include "Widgets/Images/SImage.h"
@@ -19,10 +20,115 @@
 #include "Widgets/Layout/SScaleBox.h"
 #include "Styling/SlateTypes.h"
 
+FReply SModioCommonMultiLineEditableTextBox::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (bIgnoreOnKeyDown)
+	{
+		return FReply::Unhandled();
+	}
+
+	const FKey Key = InKeyEvent.GetKey();
+
+	if (Key == EKeys::Up || Key == EKeys::Gamepad_RightStick_Up || Key == EKeys::Gamepad_DPad_Up)
+	{
+		return HandleNavigation(MyGeometry, EUINavigation::Up);
+	}
+	if (Key == EKeys::Down || Key == EKeys::Gamepad_RightStick_Down || Key == EKeys::Gamepad_DPad_Down)
+	{
+		return HandleNavigation(MyGeometry, EUINavigation::Down);
+	}
+	if (Key == EKeys::Left || Key == EKeys::Gamepad_RightStick_Left || Key == EKeys::Gamepad_LeftStick_Left || Key == EKeys::Gamepad_DPad_Left)
+	{
+		return HandleNavigation(MyGeometry, EUINavigation::Left);
+	}
+	if (Key == EKeys::Right || Key == EKeys::Gamepad_RightStick_Right || Key == EKeys::Gamepad_LeftStick_Right || Key == EKeys::Gamepad_DPad_Right)
+	{
+		return HandleNavigation(MyGeometry, EUINavigation::Right);
+	}
+
+	return FReply::Unhandled();
+}
+
+FReply SModioCommonMultiLineEditableTextBox::HandleNavigation(const FGeometry& MyGeometry, EUINavigation Navigation)
+{
+	TSharedPtr<SWidget> EditableTextWidget = StaticCastSharedPtr<SWidget>(EditableText);
+	if (!EditableTextWidget)
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to handle '%s' navigation for the multi line text box"), *UEnum::GetValueAsString(Navigation));
+		return FReply::Unhandled();
+	}
+
+	UE_LOG(ModioUI5, Log, TEXT("Sending '%s' navigation to the multiline editable text"), *UEnum::GetValueAsString(Navigation));
+
+	if (Navigation == EUINavigation::Left || Navigation == EUINavigation::Right)
+	{
+		FKey LeftOrRightKey = Navigation == EUINavigation::Left ? EKeys::Left : EKeys::Right;
+		FKeyEvent LeftOrRightEvent(LeftOrRightKey, FSlateApplication::Get().GetModifierKeys(), 0, false, 0, 0);
+		bIgnoreOnKeyDown = true;
+		FReply HandledEvent = EditableTextWidget->OnKeyDown(MyGeometry, LeftOrRightEvent);
+		bIgnoreOnKeyDown = false;
+		return HandledEvent;
+	}
+
+	if (Navigation == EUINavigation::Up || Navigation == EUINavigation::Down)
+	{
+		FKey UpOrDownKey = Navigation == EUINavigation::Up ? EKeys::Up : EKeys::Down;
+		const FTextLocation PriorCursorPosition = EditableText->GetCursorLocation();
+		FKeyEvent UpOrDownEvent(UpOrDownKey, FSlateApplication::Get().GetModifierKeys(), 0, false, 0, 0);
+		bIgnoreOnKeyDown = true;
+		FReply HandledEvent = EditableTextWidget->OnKeyDown(MyGeometry, UpOrDownEvent);
+		bIgnoreOnKeyDown = false;
+		const FTextLocation NewCursorPosition = EditableText->GetCursorLocation();
+
+		if (HandledEvent.IsEventHandled())
+		{
+			// If the cursor changed position, the editable text handled the event by moving the cursor
+			if (PriorCursorPosition != NewCursorPosition)
+			{
+				return HandledEvent;
+			}
+
+			// Otherwise, simulate up/down navigation using the "Gamepad_LeftY" key to go beyond this widget
+			const float AnalogValue = Navigation == EUINavigation::Up ? 1.0f : -1.0f;
+			FAnalogInputEvent GamepadYEvent(EKeys::Gamepad_LeftY, FSlateApplication::Get().GetModifierKeys(), 0, false, 0, 0, AnalogValue);
+			FSlateApplication::Get().ProcessAnalogInputEvent(GamepadYEvent);
+			return FReply::Handled();
+		}
+	}
+
+	return FReply::Unhandled();
+}
+
+void SModioCommonMultiLineEditableTextBox::OnFocusChanging(const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath, const FFocusEvent& InFocusEvent)
+{
+	SMultiLineEditableTextBox::OnFocusChanging(PreviousFocusPath, NewWidgetPath, InFocusEvent);
+
+	// This is needed to apply the focused style to the text box even when the text is read-only
+	if (bApplyFocusedStyleInReadOnlyMode && EditableText && Style && EditableText->IsTextReadOnly())
+	{
+		if (!bIsTextBoxFocused && NewWidgetPath.IsValid() && NewWidgetPath.ContainsWidget(this))
+		{
+			bIsTextBoxFocused = true;
+			EditableTextBoxStyle = *Style;
+			const_cast<FEditableTextBoxStyle*>(Style)->BackgroundImageReadOnly = Style->BackgroundImageFocused;
+			SetStyle(Style);
+		}
+		else
+		{
+			const_cast<FEditableTextBoxStyle*>(Style)->BackgroundImageReadOnly = EditableTextBoxStyle.BackgroundImageReadOnly;
+			SetStyle(Style);
+			bIsTextBoxFocused = false;
+		}
+	}
+}
+
 void UModioCommonMultiLineEditableTextBox::SetStyle(TSubclassOf<UModioCommonMultiLineEditableTextBoxStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 bool UModioCommonMultiLineEditableTextBox::IsTextBoxFocused() const
@@ -50,6 +156,10 @@ void UModioCommonMultiLineEditableTextBox::SynchronizeProperties()
 	if (UModioCommonMultiLineEditableTextBoxStyle* StyleCDO = ModioStyle.GetDefaultObject())
 	{
 		SetHintText(StyleCDO->HintText);
+		if (SModioCommonMultiLineEditableTextBox* EditableTextWidget = StaticCastSharedPtr<SModioCommonMultiLineEditableTextBox>(MyEditableTextBlock).Get())
+		{
+			EditableTextWidget->SetApplyFocusedStyleInReadOnlyMode(StyleCDO->bApplyFocusedStyleInReadOnlyMode);
+		}
 	}
 }
 
@@ -69,7 +179,7 @@ TSharedRef<SWidget> UModioCommonMultiLineEditableTextBox::RebuildWidget()
 		.ClearKeyboardFocusOnCommit(ClearKeyboardFocusOnCommit)
 		.SelectAllTextOnCommit(SelectAllTextOnCommit)
 		.AllowContextMenu(AllowContextMenu)
-		.OnTextChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnTextChanged))
+		.OnTextChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnCommonTextChanged))
 		.OnTextCommitted(BIND_UOBJECT_DELEGATE(FOnTextCommitted, HandleOnTextCommitted))
 		//.VirtualKeyboardType(EVirtualKeyboardType::AsKeyboardType(KeyboardType.GetValue()))
 		.VirtualKeyboardOptions(VirtualKeyboardOptions)
@@ -79,6 +189,15 @@ TSharedRef<SWidget> UModioCommonMultiLineEditableTextBox::RebuildWidget()
 		.OverflowPolicy(OverflowPolicy)
 		.AlwaysShowScrollbars(AlwaysShowScrollbars)
 		.AllowMultiLine(AllowMultiLine);
+
+	MyEditableTextBlock->SetOnKeyDownHandler(FOnKeyDown::CreateWeakLambda(this, [this](const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) -> FReply
+	{
+		if (TSharedPtr<SWidget> WidgetToHandle = StaticCastSharedPtr<SWidget>(MyEditableTextBlock))
+		{
+			return WidgetToHandle->OnKeyDown(MyGeometry, InKeyEvent);
+		}
+		return FReply::Unhandled();
+	}));
 	
 	// clang-format off
 	return SAssignNew(MyVerticalBox, SModioCommonFocusableVerticalBox)
@@ -159,7 +278,7 @@ const FSlateBrush* UModioCommonMultiLineEditableTextBox::GetBorderImage() const
 	return nullptr;
 }
 
-void UModioCommonMultiLineEditableTextBox::HandleOnTextChanged(const FText& InText)
+void UModioCommonMultiLineEditableTextBox::HandleOnCommonTextChanged(const FText& InText)
 {
 	if (const UModioCommonMultiLineEditableTextBoxStyle* StyleCDO = ModioStyle.GetDefaultObject())
 	{
@@ -170,6 +289,6 @@ void UModioCommonMultiLineEditableTextBox::HandleOnTextChanged(const FText& InTe
 			return;
 		}
 	}
-	Super::HandleOnTextChanged(InText);
+	HandleOnTextChanged(InText);
 	OnMultiLineEditableTextChanged.Broadcast(InText);
 }

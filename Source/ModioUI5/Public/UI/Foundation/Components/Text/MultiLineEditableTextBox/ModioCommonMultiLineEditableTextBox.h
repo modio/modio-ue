@@ -24,10 +24,31 @@
 class UModioCommonMultiLineEditableTextBoxStyle;
 class SModioCommonMultiLineEditableTextBox;
 
+/**
+ * @brief Multi Line Editable Text Box which supports keyboard and gamepad navigation
+ */
 class MODIOUI5_API SModioCommonMultiLineEditableTextBox : public SMultiLineEditableTextBox
 {
 public:
+	virtual void SetApplyFocusedStyleInReadOnlyMode(bool bInApplyFocusedStyleInReadOnlyMode) { bApplyFocusedStyleInReadOnlyMode = bInApplyFocusedStyleInReadOnlyMode; }
+
 	virtual bool SupportsKeyboardFocus() const override { return true; }
+	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply HandleNavigation(const FGeometry& MyGeometry, EUINavigation Navigation);
+	virtual void OnFocusChanging(const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath, const FFocusEvent& InFocusEvent) override;
+
+protected:
+	/** Whether we should ignore the next OnKeyDown event */
+	bool bIgnoreOnKeyDown = false;
+
+	/** Whether the text box is currently focused */
+	bool bIsTextBoxFocused = false;
+
+	/** Editable text box style. Used for intermediary storage */
+	FEditableTextBoxStyle EditableTextBoxStyle;
+
+	/** Whether to apply the focused style when the text box is read only */
+	bool bApplyFocusedStyleInReadOnlyMode = false;
 };
 
 /**
@@ -107,7 +128,7 @@ protected:
 	virtual bool HasValidationError() const { return false; }
 	
 	const FSlateBrush* GetBorderImage() const;
-	void HandleOnTextChanged(const FText& InText);
+	virtual void HandleOnCommonTextChanged(const FText& InText);
 
 	TSharedPtr<SVerticalBox> MyVerticalBox;
 };

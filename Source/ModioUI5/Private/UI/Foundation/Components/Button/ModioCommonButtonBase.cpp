@@ -11,6 +11,7 @@
 
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "CommonActionWidget.h"
+#include "ModioUI5.h"
 #include "Input/CommonUIInputTypes.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Foundation/Components/Image/ModioCommonDynamicImage.h"
@@ -78,6 +79,7 @@ void UModioCommonButtonBase::NativeOnCurrentTextStyleChanged()
 	{
 		Cast<UCommonTextBlock>(TextBlock)->SetStyle(GetCurrentTextStyleClass());
 	}
+	RefreshIconStyle();
 }
 
 bool UModioCommonButtonBase::Initialize()
@@ -175,15 +177,31 @@ void UModioCommonButtonBase::NativeOnUnhovered()
 	SynchronizeProperties();
 }
 
+FReply UModioCommonButtonBase::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (bShouldTriggerButtonClickOnEnterOrGamepadAccept &&
+		(InKeyEvent.GetKey() == EKeys::Enter || InKeyEvent.GetKey() == EKeys::Virtual_Accept))
+	{
+		UE_LOG(ModioUI5, Log, TEXT("The key '%s' was pressed and handled by the button '%s' as a click"), *InKeyEvent.GetKey().ToString(), *GetName());
+		HandleButtonClicked();
+		return FReply::Handled();
+	}
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+}
+
 void UModioCommonButtonBase::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
+	RefreshIconStyle();
+}
 
+void UModioCommonButtonBase::RefreshIconStyle()
+{
 	if (UModioCommonButtonStyle* StyleCDO = Cast<UModioCommonButtonStyle>(Style.GetDefaultObject()))
 	{
 		if (Icon)
 		{
-			Icon->SetStyle(IsHovered() ? StyleCDO->FocusedIconStyle : StyleCDO->NormalIconStyle);
+			Icon->SetStyle(GetSelected() || IsHovered() ? StyleCDO->FocusedIconStyle : StyleCDO->NormalIconStyle);
 		}
 	}
 }

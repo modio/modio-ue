@@ -87,7 +87,7 @@ bool UModioCommonModOperationTrackerWidget::IsModDownloading_Implementation() co
 		return false;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
 
 	if (const FModioModCollectionEntry* FoundEntryPtr = UserSubscriptions.Find(ModID))
 	{
@@ -121,7 +121,7 @@ bool UModioCommonModOperationTrackerWidget::IsModExtracting_Implementation() con
 		return false;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
 
 	if (const FModioModCollectionEntry* FoundEntryPtr = UserSubscriptions.Find(ModID))
 	{
@@ -153,7 +153,7 @@ bool UModioCommonModOperationTrackerWidget::IsModInQueue_Implementation() const
 		return false;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
 
 	if (const FModioModCollectionEntry* FoundEntryPtr = UserSubscriptions.Find(ModID))
 	{
@@ -208,7 +208,7 @@ bool UModioCommonModOperationTrackerWidget::IsModInstalled_Implementation() cons
 		return false;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
 
 	if (const FModioModCollectionEntry* FoundEntryPtr = UserSubscriptions.Find(ModID))
 	{
@@ -228,6 +228,22 @@ bool UModioCommonModOperationTrackerWidget::HasModErrors_Implementation() const
 	}
 #endif
 	return bHasErrors;
+}
+
+int64 UModioCommonModOperationTrackerWidget::GetPreviewTotal() const
+{
+#if WITH_EDITOR
+	return PreviewTotal;
+#endif
+	return 0;
+}
+
+int64 UModioCommonModOperationTrackerWidget::GetPreviewCurrent() const
+{
+#if WITH_EDITOR
+	return PreviewCurrent;
+#endif
+	return 0;
 }
 
 void UModioCommonModOperationTrackerWidget::OnWidgetRebuilt()

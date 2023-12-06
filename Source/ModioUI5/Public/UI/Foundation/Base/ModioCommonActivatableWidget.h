@@ -141,6 +141,7 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "Listen For Input Action", Category = "Mod.io Common UI|Input")
 	void BP_ListenForInputAction(UModioCommonButtonBase* Button, FDataTableRowHandle InputAction, const FText& DisplayName, const FOnModioCommonActivatableWidgetActionFired& OnActionFired);
 
+	DECLARE_DELEGATE(FOnModioCommonActivatableWidgetActionFiredFast);
 	/**
 	 * @brief Listens for an input action and fires a callback when it's fired. Binds and unbinds on BindInputAction and UnbindInputAction
 	 * @param Button Button to listen for input on. If null, will listen on this widget
@@ -148,13 +149,16 @@ public:
 	 * @param DisplayName Display name of the input action
 	 * @param OnActionFired Callback to fire when the input action is fired
 	 */
-	virtual void ListenForInputAction(TObjectPtr<UModioCommonButtonBase> Button, FDataTableRowHandle InputAction, const FText& DisplayName, TFunction<void()> OnActionFired);
+	virtual void ListenForInputAction(TObjectPtr<UModioCommonButtonBase> Button, FDataTableRowHandle InputAction, const FText& DisplayName, const FOnModioCommonActivatableWidgetActionFiredFast& OnActionFired);
 
 	/**
 	 * @brief Clears all listening input actions
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Input")
 	void ClearListeningInputActions();
+
+	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI|Input")
+	void ClearListeningInputAction(UModioCommonButtonBase* Button);
 
 protected:
 	//~ Begin UUserWidget Interface
@@ -171,17 +175,11 @@ private:
 		FDataTableRowHandle InputAction;
 		FText DisplayName;
 		TWeakObjectPtr<UModioCommonButtonBase> Button;
-		TFunction<void()> OnActionFired;
+		FOnModioCommonActivatableWidgetActionFiredFast OnActionFired;
 
 		FListeningInputActionStruct() = delete;
 
-		FListeningInputActionStruct(const FDataTableRowHandle& InInputAction, const FText& DisplayName, const TFunction<void()>& OnActionFired)
-			: InputAction(InInputAction)
-			, DisplayName(DisplayName)
-			, OnActionFired(OnActionFired)
-		{}
-
-		FListeningInputActionStruct(const FDataTableRowHandle& InInputAction, const FText& DisplayName, TWeakObjectPtr<UModioCommonButtonBase> InButton, const TFunction<void()>& OnActionFired)
+		FListeningInputActionStruct(const FDataTableRowHandle& InInputAction, const FText& DisplayName, TWeakObjectPtr<UModioCommonButtonBase> InButton, const FOnModioCommonActivatableWidgetActionFiredFast& OnActionFired)
 			: InputAction(InInputAction),
 			  DisplayName(DisplayName),
 			  Button(InButton),

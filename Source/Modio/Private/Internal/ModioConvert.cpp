@@ -357,3 +357,18 @@ EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& PlatformIn)
 	checkf(false, TEXT("Missed a case in ToUnreal(const Modio::ModfilePlatform& PlatformIn)"));
 	return EModioModfilePlatform::Windows;
 }
+
+EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In)
+{
+    switch (In)
+    {
+        case Modio::UserSubscriptionList::ChangeType::Added:
+            return EModioModChangeType::Added;
+        case Modio::UserSubscriptionList::ChangeType::Removed:
+            return EModioModChangeType::Removed;
+        case Modio::UserSubscriptionList::ChangeType::Updated:
+            return EModioModChangeType::Updated;
+        default:
+            return EModioModChangeType::Removed;
+    }
+}

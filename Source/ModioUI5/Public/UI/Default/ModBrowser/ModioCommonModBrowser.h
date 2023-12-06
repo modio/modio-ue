@@ -25,12 +25,19 @@ class UModioCommonTabListWidgetBase;
 class UModioCommonUserProfileBase;
 class UModioCommonTabButtonBase;
 class UModioCommonModListBase;
-class UCommonActivatableWidgetStack;
+class UModioCommonActivatableWidgetStack;
 class UModioCommonQuickAccessViewBase;
 class UModioCommonModDetailsViewBase;
 class UModioCommonActionBar;
 class UModioCommonDialogInfo;
 struct FModioModInfo;
+
+UENUM(BlueprintType)
+enum class EModioCommonSearchViewType : uint8
+{
+	SearchResults,
+	Collection
+};
 
 /**
  * @brief Modio Common UI widget that displays a mod browser. This is a main entry point for mod browsing, searching, authorisation, etc
@@ -41,11 +48,6 @@ class MODIOUI5_API UModioCommonModBrowser : public UModioCommonModBrowserBase
 {
 	GENERATED_BODY()
 
-public:
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Transient, Category = "Mod.io Common UI|Preview")
-	bool bPreviewDisplayFeaturedOrCollection = true;
-#endif
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, MustImplement = "ModioUINotificationController"), Category = "Mod.io Common UI")
 	TObjectPtr<UWidget> NotificationController;
@@ -57,35 +59,22 @@ protected:
 	TObjectPtr<UModioCommonTabListWidgetBase> TabList;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonWidgetSwitcher> ContentSwitcher;
+	TObjectPtr<UModioCommonActivatableWidgetStack> ContentStack;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UCommonActivatableWidgetStack> AuthStack;
+	TObjectPtr<UModioCommonActivatableWidgetStack> AuthStack;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UCommonActivatableWidgetStack> ReportStack;
+	TObjectPtr<UModioCommonActivatableWidgetStack> ReportStack;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UCommonActivatableWidgetStack> RightTabStack;
+	TObjectPtr<UModioCommonActivatableWidgetStack> RightTabStack;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UCommonActivatableWidgetStack> DialogStack;
+	TObjectPtr<UModioCommonActivatableWidgetStack> DialogStack;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonActionBar> ActionBar;
-
-protected:
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonModListBase> FeaturedView;
-
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonModListBase> CollectionView;
-
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonModListBase> SearchResultsView;
-
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonModDetailsViewBase> ModDetailsView;
 
 protected:
 	//~ Begin UUserWidget Interface
@@ -119,7 +108,7 @@ public:
 	bool HideQuickAccessView();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search")
-	bool ShowSearchView();
+	bool ShowSearchView(EModioCommonSearchViewType SearchType, const FModioModCategoryParams& CurrentFilterParams);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search")
 	bool HideSearchView();
@@ -133,9 +122,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Mod Details")
 	bool HideModDetailsView();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void HandleViewChanged();
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Tab")
-	bool AddTab(FName TabNameID, const FText& TabText, TSubclassOf<UModioCommonActivatableWidget> ContentClass, UModioCommonActivatableWidget*& OutContent);
+	bool AddTab(FName TabNameID, const FText& TabText, TSubclassOf<UModioCommonActivatableWidget> ContentClass);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Tab")
+	bool AddEmptyTab(FName TabNameID, const FText& TabText);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Tab")
+	bool AddContentForTab(FName TabNameID, TSubclassOf<UModioCommonActivatableWidget> ContentClass, UModioCommonActivatableWidget*& OutContent);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Tab")
 	void RemoveTab(FName TabNameID);
@@ -144,19 +142,15 @@ protected:
 	void ClearTabs();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Tab")
-	bool GetViewFromTabNameID(FName TabNameID, UModioCommonActivatableWidget*& OutView) const;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mod.io Common UI|Tab")
-	bool bShowSearchViewOnSearchResults = true;
+	bool GetViewFromTabNameID(FName TabNameID, TSubclassOf<UModioCommonActivatableWidget>& OutView) const;
 
 	//~ Begin IModioModBrowserInterface Interface
 	virtual void ShowDetailsForMod_Implementation(FModioModID ModID) override;
-	virtual void ShowSearchResults_Implementation(const FModioFilterParams& FilterParams) override;
+	virtual void ShowSearchResults_Implementation(const FModioModCategoryParams& FilterParams) override;
 	virtual void ShowUserAuth_Implementation() override;
 	virtual void LogOut_Implementation() override;
 	virtual void ShowReportMod_Implementation(UObject* DialogDataSource) override;
 	virtual bool GetIsCollectionModDisableUIEnabled_Implementation() override;
-public:
-	void ShowDialog(UModioCommonDialogInfo* DialogInfo);
+	virtual void ShowDialog_Implementation(UObject* DialogDataSource) override;
 	//~ End IModioModBrowserInterface Interface
 };

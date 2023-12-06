@@ -72,7 +72,7 @@ void UModioModCollectionTile::NativeOnSetDataSource()
 	// 'More Options' to do a force uninstall, in that case)
 	if (SubscribeButton)
 	{
-		if (CollectionEntry->bCachedSubscriptionStatus == false)
+		if (CollectionEntry->bCachedSubscriptionStatus == false && !IsSystemMod())
 		{
 			SubscribeButton->SetVisibility(ESlateVisibility::Collapsed);
 		}
@@ -424,20 +424,28 @@ void UModioModCollectionTile::UpdateDiskSize()
 		}
 
 		TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions = Subsystem->QueryUserSubscriptions();
+		TMap<FModioModID, FModioModCollectionEntry> SystemInstallations = Subsystem->QuerySystemInstallations();
+		bool IsSystemMod = false;
 
 		UModioModCollectionEntryUI* CollectionEntry = Cast<UModioModCollectionEntryUI>(DataSource);
 		if (!CollectionEntry)
 		{
 			return;
 		}
+		FModioModID ModID = CollectionEntry->GetModID_Implementation();
 
-		if (!UserSubscriptions.Contains(CollectionEntry->GetModID_Implementation()))
+		if (!UserSubscriptions.Contains(ModID))
 		{
-			return;
+			if (!SystemInstallations.Contains(ModID))
+			{
+				return;
+			}
+			IsSystemMod = true;
 		}
-
-		const uint64 NumBytes =
-			UserSubscriptions[CollectionEntry->GetModID_Implementation()].GetSizeOnDisk().Underlying;
+		
+		const uint64 NumBytes = !IsSystemMod ?
+			UserSubscriptions[CollectionEntry->GetModID_Implementation()].GetSizeOnDisk().Underlying :
+			SystemInstallations[CollectionEntry->GetModID_Implementation()].GetSizeOnDisk().Underlying;
 		SizeOnDiskLabel->SetVisibility(ESlateVisibility::Collapsed);
 
 		if (NumBytes < GB)
@@ -458,6 +466,18 @@ void UModioModCollectionTile::UpdateDiskSize()
 	}
 }
 
+bool UModioModCollectionTile::IsSystemMod() 
+{
+	if(UModioModInfoUI* BoundModInfo = GetAsModInfoUIObject())
+	{
+		if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+		{
+			return Subsystem->QuerySystemInstallations().Contains(BoundModInfo->Underlying.ModId);
+		}
+	}
+	return false;
+}
+
 void UModioModCollectionTile::OnModSubscriptionStatusChanged(FModioModID ID, bool Subscribed)
 {
 	if (DataSource)
@@ -465,8 +485,10 @@ void UModioModCollectionTile::OnModSubscriptionStatusChanged(FModioModID ID, boo
 		UModioModCollectionEntryUI* Data = Cast<UModioModCollectionEntryUI>(DataSource);
 		if (Data)
 		{
-			if (Data->Underlying.GetModProfile().ModId == ID)
+			if (Data->Underlying.GetID() == ID)
 			{
+				Data->bCachedSubscriptionStatus = Subscribed;
+
 				if (SubscribeButton)
 				{
 					SubscribeButton->SetVisibility(Subscribed ? ESlateVisibility::Visible
@@ -674,7 +696,7 @@ void UModioModCollectionTile::ShowModDetails()
 
 void UModioModCollectionTile::NativeSubscribeClicked()
 {
-	if (!GetSubscriptionState())
+	if (!GetSubscriptionState() && !IsSystemMod())
 	{
 		return;
 	}

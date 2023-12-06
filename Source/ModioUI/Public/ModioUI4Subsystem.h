@@ -24,7 +24,6 @@
 #include "ModioUI4Subsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMenuTabIndexChanged, int, TabIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRetryAllAsyncLoaders);
 DECLARE_MULTICAST_DELEGATE(FOnGlobalMouseClick);
 DECLARE_DELEGATE_RetVal(int32, FOnGetCurrentTabIndex);
 DECLARE_DELEGATE_RetVal(bool, FOnGetMenuState);
@@ -85,7 +84,6 @@ public:
 	void CloseDownloadDrawer();
 	void ShowReportEmailDialog(UObject* DialogDataSource);
 	void ShowUninstallConfirmationDialog(UObject* DialogDataSource);
-	void RetryAllAsyncLoaders();
 	bool IsAnyDialogOpen();
 
 	EModioUIInputMode GetLastInputDevice()
@@ -95,7 +93,6 @@ public:
 
 	FOnMenuTabIndexChanged OnMenuTabIndexChanged;
 	FOnInputDeviceChanged OnInputDeviceChanged;
-	FOnRetryAllAsyncLoaders OnRetryAllAsyncLoaders;
 	FOnGlobalMouseClick OnGlobalMouseClick;
 	FOnCursorVisibilityChanged OnCursorVisibilityChanged;
 	FOnGetCurrentTabIndex OnGetCurrentTabIndex;

@@ -18,8 +18,11 @@
 
 void UModioCommonNotificationWidget::SetStyle(TSubclassOf<UModioCommonNotificationWidgetStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonNotificationWidget::SynchronizeProperties()

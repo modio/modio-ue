@@ -16,46 +16,47 @@
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Settings/Params/ModioCommonAuthParams.h"
 #include "Libraries/ModioSDKLibrary.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 
 void UModioCommonEmailAuthView::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
 
-	if (const UModioCommonEmailAuthParamsSettings* Settings = GetDefault<UModioCommonEmailAuthParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (TitleTextBlock)
 		{
-			TitleTextBlock->SetText(Settings->TitleText);
+			TitleTextBlock->SetText(UISettings->EmailAuthParams.TitleText);
 		}
 
 		if (DescriptionTextBlock)
 		{
-			DescriptionTextBlock->SetText(Settings->DescriptionText);
+			DescriptionTextBlock->SetText(UISettings->EmailAuthParams.DescriptionText);
 		}
 
 		if (ValidationTextBlock)
 		{
-			ValidationTextBlock->SetText(Settings->ValidationText);
+			ValidationTextBlock->SetText(UISettings->EmailAuthParams.ValidationText);
 		}
 
 		if (EmailTextBox)
 		{
-			EmailTextBox->SetHintText(Settings->EmailTooltipText);
+			EmailTextBox->SetHintText(UISettings->EmailAuthParams.EmailTooltipText);
 		}
 
 		if (BackButton)
 		{
-			BackButton->SetLabel(Settings->BackButtonText);
+			BackButton->SetLabel(UISettings->EmailAuthParams.BackButtonText);
 		}
 
 		if (SubmitButton)
 		{
-			SubmitButton->SetLabel(Settings->SubmitButtonText);
+			SubmitButton->SetLabel(UISettings->EmailAuthParams.SubmitButtonText);
 		}
 
 		if (CancelButton)
 		{
-			CancelButton->SetLabel(Settings->CancelButtonText);
+			CancelButton->SetLabel(UISettings->EmailAuthParams.CancelButtonText);
 		}
 	}
 }
@@ -63,39 +64,35 @@ void UModioCommonEmailAuthView::SynchronizeProperties()
 void UModioCommonEmailAuthView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
-	const UModioCommonAuthParamsSettings* AuthSettings = GetDefault<UModioCommonAuthParamsSettings>();
-	const UModioCommonEmailAuthParamsSettings* EmailAuthSettings = GetDefault<UModioCommonEmailAuthParamsSettings>();
-	if (!AuthSettings || !EmailAuthSettings)
-	{
-		return;
-	}
 
-	if (BackButton)
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		ListenForInputAction(BackButton, AuthSettings->BackInputAction, EmailAuthSettings->BackButtonText, [this]() {
-			if (OnBackClicked.IsBound()) OnBackClicked.Execute();
-		});
-	}
+		if (BackButton)
+		{
+			ListenForInputAction(BackButton, UISettings->AuthParams.BackInputAction, UISettings->EmailAuthParams.BackButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				if (OnBackClicked.IsBound()) OnBackClicked.Execute();
+			}));
+		}
 
-	if (SubmitButton)
-	{
-		ListenForInputAction(SubmitButton, AuthSettings->SubmitInputAction, EmailAuthSettings->SubmitButtonText, [this]() {
-			if (EmailTextBox && OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(EmailTextBox->GetText().ToString());
-		});
-	}
+		if (SubmitButton)
+		{
+			ListenForInputAction(SubmitButton, UISettings->AuthParams.SubmitInputAction, UISettings->EmailAuthParams.SubmitButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				if (EmailTextBox && OnSubmitClicked.IsBound()) OnSubmitClicked.Execute(EmailTextBox->GetText().ToString());
+			}));
+		}
 
-	if (CancelButton)
-	{
-		ListenForInputAction(CancelButton, AuthSettings->CancelInputAction, EmailAuthSettings->CancelButtonText, [this]() {
-			if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
-		});
-	}
+		if (CancelButton)
+		{
+			ListenForInputAction(CancelButton, UISettings->AuthParams.CancelInputAction, UISettings->EmailAuthParams.CancelButtonText, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				if (OnCancelClicked.IsBound()) OnCancelClicked.Execute();
+			}));
+		}
 
-	if (EmailTextBox)
-	{
-		EmailTextBox->OnEditableTextChanged.AddDynamic(this, &UModioCommonEmailAuthView::OnEditableTextBoxTextChanged);
-		SetValidationTextVisibility(ESlateVisibility::Hidden);
+		if (EmailTextBox)
+		{
+			EmailTextBox->OnEditableTextChanged.AddDynamic(this, &UModioCommonEmailAuthView::OnEditableTextBoxTextChanged);
+			SetValidationTextVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 

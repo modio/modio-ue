@@ -15,22 +15,21 @@
 #include "UI/Foundation/Components/List/ModioCommonModListView.h"
 #include "UI/Foundation/Components/List/ModioCommonModTileView.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
-#include "UI/Settings/Params/ModioCommonModCollectionParams.h"
 #include "Components/ListView.h"
 #include "Algo/Reverse.h"
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "TimerManager.h"
 #include "ModioUI5.h"
-#include "UI/Foundation/Components/Tab/ModioCommonTabListWidgetBase.h"
-
-// These are only for the internal identification of the tabs
-const FName AllInstalledTabId = FName(TEXT("AllInstalled"));
-const FName SystemModsTabId = FName(TEXT("SystemMods"));
+#include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
+#include "UI/Settings/ModioCommonUISettings.h"
 
 void UModioCommonCollectionView::SetStyle(TSubclassOf<UModioCommonCollectionViewStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonCollectionView::UpdateDownloadingMods_Implementation()
@@ -41,10 +40,7 @@ void UModioCommonCollectionView::UpdateDownloadingMods_Implementation()
 		return;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> UserSubscriptions =
-		ViewTabType == EModioCommonCollectionViewTabType::SystemMods
-			? Subsystem->QuerySystemInstallations()
-			: Subsystem->QueryUserSubscriptions();
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
 	
 	// Rebuild the Pending Downloads list
 	TArray<FModioModCollectionEntry> Entries;
@@ -63,6 +59,8 @@ void UModioCommonCollectionView::UpdateDownloadingMods_Implementation()
 		return Entry.GetModState() != EModioModState::Downloading
 			   && Entry.GetModState() != EModioModState::Extracting;
 	});
+	ApplySortingAndFiltering(DownloadingEntries);
+	ApplySortingAndFiltering(QueuedEntries);
 
 	Entries.Empty();
 	Entries.Append(MoveTemp(DownloadingEntries));
@@ -78,6 +76,8 @@ void UModioCommonCollectionView::UpdateDownloadingMods_Implementation()
 		return;
 	}
 
+	UModioModCategoryParamsUI* CategoryParams = Cast<UModioModCategoryParamsUI>(DataSource);
+	LastAppliedDownloadingFilterParams = CategoryParams ? CategoryParams->Underlying : FModioModCategoryParams();
 	if (DownloadingModList && DownloadingModList->Implements<UModioCommonModListViewInterface>() && !IsDesignTime())
 	{
 		IModioCommonModListViewInterface::Execute_SetModsFromModCollectionEntryArray(DownloadingModList, Entries, false);
@@ -92,21 +92,13 @@ void UModioCommonCollectionView::UpdateInstalledMods_Implementation()
 		return;
 	}
 
-	TMap<FModioModID, FModioModCollectionEntry> Installations =
-		ViewTabType == EModioCommonCollectionViewTabType::SystemMods
-			? Subsystem->QuerySystemInstallations()
-			: Subsystem->QueryUserInstallations(true);
+	const TMap<FModioModID, FModioModCollectionEntry>& Installations = Subsystem->QuerySystemInstallations();
 
 	TArray<FModioModCollectionEntry> Entries;
 	Installations.GenerateValueArray(Entries);
 	Entries.RemoveAll([](const FModioModCollectionEntry& Entry) {
 		return Entry.GetModState() != EModioModState::Installed;
 	});
-
-	if (NumOfInstalledModsTextBlock)
-	{
-		NumOfInstalledModsTextBlock->SetText(FText::AsNumber(Entries.Num()));
-	}
 
 	if (NumOfErrorsTextBlock)
 	{
@@ -118,15 +110,48 @@ void UModioCommonCollectionView::UpdateInstalledMods_Implementation()
 		return;
 	}
 
+	UModioModCategoryParamsUI* CategoryParams = Cast<UModioModCategoryParamsUI>(DataSource);
+	const bool bDifferentSortField = [this, CategoryParams]()
+	{
+		if (CategoryParams)
+		{
+			return LastAppliedInstalledFilterParams.ManualSortField != CategoryParams->Underlying.ManualSortField;
+		}
+		return false;
+	}();
+	if (InstalledModList && InstalledModList->Implements<UModioCommonModListViewInterface>() && !IsDesignTime()
+		&& bDifferentSortField)
+	{
+		IModioCommonModListViewInterface::Execute_RequestFullClearSelection(InstalledModList, true);
+	}
+
+	LastAppliedInstalledFilterParams = CategoryParams ? CategoryParams->Underlying : FModioModCategoryParams();
+	ApplySortingAndFiltering(Entries);
+
+	if (NumOfInstalledModsTextBlock)
+	{
+		NumOfInstalledModsTextBlock->SetText(FText::AsNumber(Entries.Num()));
+	}
+	
 	if (InstalledModList && InstalledModList->Implements<UModioCommonModListViewInterface>() && !IsDesignTime())
 	{
 		IModioCommonModListViewInterface::Execute_SetModsFromModCollectionEntryArray(InstalledModList, Entries, false);
+		if (bDifferentSortField && Entries.Num() > 0)
+		{
+			IModioCommonModListViewInterface::Execute_SetModSelectionByID(InstalledModList, Entries[0].GetID());
+		}
 	}
 }
 
 bool UModioCommonCollectionView::AreDownloadingSameMods_Implementation(const TArray<FModioModCollectionEntry>& NewDownloadingMods) const
 {
 	if (!DownloadingModList || IsDesignTime())
+	{
+		return false;
+	}
+
+	UModioModCategoryParamsUI* CategoryParams = Cast<UModioModCategoryParamsUI>(DataSource);
+	if (CategoryParams && LastAppliedDownloadingFilterParams != CategoryParams->Underlying)
 	{
 		return false;
 	}
@@ -162,6 +187,12 @@ bool UModioCommonCollectionView::AreInstalledSameMods_Implementation(const TArra
 		return false;
 	}
 
+	UModioModCategoryParamsUI* CategoryParams = Cast<UModioModCategoryParamsUI>(DataSource);
+	if (CategoryParams && LastAppliedInstalledFilterParams != CategoryParams->Underlying)
+	{
+		return false;
+	}
+
 	const TArray<UObject*>& OldInstalledMods = InstalledModList->GetListItems();
 
 	if (OldInstalledMods.Num() != NewInstalledMods.Num())
@@ -193,31 +224,36 @@ void UModioCommonCollectionView::SynchronizeProperties()
 	UpdateDownloadingMods();
 	UpdateInstalledMods();
 
-	if (const UModioCommonModCollectionParamsSettings* Settings = GetDefault<UModioCommonModCollectionParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (DownloadingModsLabelTextBlock)
 		{
-			DownloadingModsLabelTextBlock->SetText(Settings->DownloadingModsLabel);
+			DownloadingModsLabelTextBlock->SetText(UISettings->CollectionParams.DownloadingModsLabel);
 		}
 
 		if (DownloadingModsDescriptionTextBlock)
 		{
-			DownloadingModsDescriptionTextBlock->SetText(Settings->DownloadingModsDescription);
+			DownloadingModsDescriptionTextBlock->SetText(UISettings->CollectionParams.DownloadingModsDescription);
 		}
 
 		if (InstalledModsLabelTextBlock)
 		{
-			InstalledModsLabelTextBlock->SetText(Settings->InstalledModsLabel);
+			InstalledModsLabelTextBlock->SetText(UISettings->CollectionParams.InstalledModsLabel);
 		}
 
 		if (InstalledModsDescriptionTextBlock)
 		{
-			InstalledModsDescriptionTextBlock->SetText(Settings->InstalledModsDescription);
+			InstalledModsDescriptionTextBlock->SetText(UISettings->CollectionParams.InstalledModsDescription);
 		}
 
 		if (ErrorsTextBlock)
 		{
-			ErrorsTextBlock->SetText(Settings->ErrorsLabel);
+			ErrorsTextBlock->SetText(UISettings->CollectionParams.ErrorsLabel);
+		}
+
+		if (FilterButton)
+		{
+			FilterButton->SetLabel(UISettings->CollectionParams.FilterButtonLabel);
 		}
 	}
 
@@ -239,38 +275,6 @@ void UModioCommonCollectionView::SynchronizeProperties()
 		else if (UModioCommonModTileView* ModTileView = Cast<UModioCommonModTileView>(InstalledModList))
 		{
 			ModTileView->SetStyle(StyleCDO->ModListStyle);
-		}
-
-		if (const UModioCommonModCollectionParamsSettings* Settings = GetDefault<UModioCommonModCollectionParamsSettings>())
-		{
-			if (TabList)
-			{
-				TabList->RemoveAllDynamicTabs();
-
-				TabList->SetPreviousTabInputActionData(Settings->PreviousTabInputAction);
-				TabList->SetNextTabInputActionData(Settings->NextTabInputAction);
-
-				TabList->SetListeningForInput(false);
-				TabList->SetListeningForInput(true);
-
-				FModioCommonTabDescriptor AllInstalledTabInfo;
-				{
-					AllInstalledTabInfo.TabId = AllInstalledTabId;
-					AllInstalledTabInfo.TabText = Settings->AllInstalledCategoryName;
-					AllInstalledTabInfo.TabButtonType = StyleCDO->CategoryTabButtonClass;
-					AllInstalledTabInfo.TabButtonStyle = StyleCDO->CategoryTabButtonStyle;
-				}
-				TabList->RegisterDynamicTab(AllInstalledTabInfo);
-
-				FModioCommonTabDescriptor SystemModsTabInfo;
-				{
-					SystemModsTabInfo.TabId = SystemModsTabId;
-					SystemModsTabInfo.TabText = Settings->SystemModsCategoryName;
-					SystemModsTabInfo.TabButtonType = StyleCDO->CategoryTabButtonClass;
-					SystemModsTabInfo.TabButtonStyle = StyleCDO->CategoryTabButtonStyle;
-				}
-				TabList->RegisterDynamicTab(SystemModsTabInfo);
-			}
 		}
 		
 		if (DownloadingModsLabelTextBlock)
@@ -317,6 +321,11 @@ void UModioCommonCollectionView::SynchronizeProperties()
 		{
 			FetchUpdateButton->SetStyle(StyleCDO->FetchUpdateButtonStyle);
 		}
+
+		if (FilterButton)
+		{
+			FilterButton->SetStyle(StyleCDO->FilterButtonStyle);
+		}
 	}
 }
 
@@ -327,22 +336,25 @@ UWidget* UModioCommonCollectionView::NativeGetDesiredFocusTarget() const
 		return WidgetToFocus;
 	}
 
-	if (!DownloadingModList || DownloadingModList->GetNumItems() <= 0)
+	if (LastFocusedModList == InstalledModList)
 	{
 		if (InstalledModList && InstalledModList->Implements<UModioCommonModListViewInterface>())
 		{
-			if (InstalledModList->Implements<UModioCommonModListViewInterface>())
+			if (UWidget* FocusTarget = IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(InstalledModList, true, true))
 			{
-				return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(InstalledModList);
+				if (FocusTarget != InstalledModList)
+				{
+					return FocusTarget;
+				}
 			}
 		}
-		return InstalledModList;
 	}
+
 	if (DownloadingModList && DownloadingModList->Implements<UModioCommonModListViewInterface>())
 	{
-		if (DownloadingModList->Implements<UModioCommonModListViewInterface>())
+		if (UWidget* FocusTarget = IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(DownloadingModList, true, true))
 		{
-			return IModioCommonModListViewInterface::Execute_GetDesiredListFocusTarget(DownloadingModList);
+			return FocusTarget;
 		}
 	}
 	return DownloadingModList;
@@ -356,24 +368,17 @@ void UModioCommonCollectionView::NativeOnInitialized()
 	IModioUISubscriptionsChangedReceiver::Register<UModioCommonCollectionView>();
 	IModioUIUserChangedReceiver::Register<UModioCommonCollectionView>();
 
-	if (TabList)
-	{
-		TabList->OnTabSelectedFast.AddWeakLambda(this, [this](FName TabId) {
-			if (!IsActivated())
-			{
-				return;
-			}
-			RefreshListByTabId(TabId);
-		});
-	}
-
 	if (DownloadingModList)
 	{
 		DownloadingModList->OnItemSelectionChanged().AddWeakLambda(this, [this](UObject* Item) {
 			if (Item && DownloadingModList && InstalledModList
 				&& DownloadingModList->GetSelectedItem<UObject>() == Item)
 			{
-				InstalledModList->ClearSelection();
+				LastFocusedModList = DownloadingModList;
+				if (InstalledModList->Implements<UModioCommonModListViewInterface>())
+				{
+					IModioCommonModListViewInterface::Execute_RequestFullClearSelection(InstalledModList, false);
+				}
 			}
 		});
 	}
@@ -384,7 +389,11 @@ void UModioCommonCollectionView::NativeOnInitialized()
 			if (Item && DownloadingModList && InstalledModList
 				&& InstalledModList->GetSelectedItem<UObject>() == Item)
 			{
-				DownloadingModList->ClearSelection();
+				LastFocusedModList = InstalledModList;
+				if (DownloadingModList->Implements<UModioCommonModListViewInterface>())
+				{
+					IModioCommonModListViewInterface::Execute_RequestFullClearSelection(DownloadingModList, false);
+				}
 			}
 		});
 	}
@@ -395,6 +404,16 @@ void UModioCommonCollectionView::NativeOnInitialized()
 	{
 		Subsystem->OnUserChanged.AddWeakLambda(this, [this](TOptional<FModioUser> User) 
 		{
+			if (DownloadingModList)
+			{
+				DownloadingModList->ClearListItems();
+			}
+			if (InstalledModList)
+			{
+				InstalledModList->ClearListItems();
+			}
+			UpdateDownloadingMods();
+			UpdateInstalledMods();
 			if (User.IsSet())
 			{
 				OnFetchUpdatesClicked();
@@ -410,7 +429,7 @@ void UModioCommonCollectionView::NativeTick(const FGeometry& MyGeometry, float I
 	{
 		if (TOptional<FModioModProgressInfo> CurrentProgress = Subsystem->QueryCurrentModUpdate())
 		{
-			UpdateDownloadingMods();
+			//UpdateDownloadingMods();
 		}
 	}
 }
@@ -420,6 +439,11 @@ void UModioCommonCollectionView::NativeUserChanged(TOptional<FModioUser> NewUser
 	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
 	UpdateDownloadingMods();
 	UpdateInstalledMods();
+
+	if (FetchUpdateButton) 
+	{
+		FetchUpdateButton->SetVisibility(NewUser.IsSet() ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	}
 }
 
 void UModioCommonCollectionView::NativeOnModManagementEvent(FModioModManagementEvent Event)
@@ -448,12 +472,12 @@ void UModioCommonCollectionView::OnFetchUpdatesClicked_Implementation()
 	{
 		Subsystem->FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioCommonCollectionView::OnFetchExternalCompleted));
 
-		if (const UModioCommonModCollectionParamsSettings* Settings = GetDefault<UModioCommonModCollectionParamsSettings>())
+		if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 		{
 			if (FetchUpdateButton)
 			{
 				FetchUpdateButton->SetIsEnabled(false);
-				FetchUpdateButton->SetLabel(Settings->SearchingFetchUpdateButtonLabel);
+				FetchUpdateButton->SetLabel(UISettings->CollectionParams.SearchingFetchUpdateButtonLabel);
 			}
 		}
 	}
@@ -474,7 +498,7 @@ void UModioCommonCollectionView::OnFetchExternalCompleted_Implementation(FModioE
 		UpdateInstalledMods();
 	}
 
-	if (const UModioCommonModCollectionParamsSettings* Settings = GetDefault<UModioCommonModCollectionParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
 		if (FetchUpdateButton)
 		{
@@ -487,45 +511,177 @@ void UModioCommonCollectionView::OnFetchExternalCompleted_Implementation(FModioE
 					FetchUpdateButton->SetIsEnabled(true);
 				}, 1, false);
 			}
-			FetchUpdateButton->SetLabel(Settings->DefaultFetchUpdateButtonLabel);
+			FetchUpdateButton->SetLabel(UISettings->CollectionParams.DefaultFetchUpdateButtonLabel);
 		}
 	}
 }
 
-void UModioCommonCollectionView::RefreshListByTabId_Implementation(FName TabId)
+void UModioCommonCollectionView::ShowSearchView_Implementation()
 {
-#if WITH_EDITOR
-	if (!IsDesignTime())
-#endif
+	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		if (TabId.IsEqual(AllInstalledTabId))
+		if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(Subsystem->GetModBrowserInstance()))
 		{
-			ViewTabType = EModioCommonCollectionViewTabType::AllInstalled;
+			UModioModCategoryParamsUI* CategoryParams = Cast<UModioModCategoryParamsUI>(DataSource);
+			ModBrowser->ShowSearchView(EModioCommonSearchViewType::Collection, CategoryParams ? CategoryParams->Underlying : FModioModCategoryParams());
 		}
-		else if (TabId.IsEqual(SystemModsTabId))
-		{
-			ViewTabType = EModioCommonCollectionViewTabType::SystemMods;
-		}
-		else
-		{
-			UE_LOG(ModioUI5, Error, TEXT("Unable to refresh mod list in '%s' for tab '%s': Tab ID '%s' is not supported"), *GetName(), *TabId.ToString(), *TabId.ToString());
-			return;
-		}
-
-		UpdateDownloadingMods();
-		UpdateInstalledMods();
 	}
 }
 
-void UModioCommonCollectionView::UpdateInputBindings()
+void UModioCommonCollectionView::SortAToZ(TArray<FModioModCollectionEntry>& ModList)
+{
+	Algo::Sort(ModList, [](const FModioModCollectionEntry& A, const FModioModCollectionEntry& B) {
+		return FName(A.GetModProfile().ProfileName)
+			.LexicalLess(FName(B.GetModProfile().ProfileName));
+	});
+}
+
+void UModioCommonCollectionView::SortZToA(TArray<FModioModCollectionEntry>& ModList)
+{
+	Algo::Sort(ModList, [](const FModioModCollectionEntry& A, const FModioModCollectionEntry& B) {
+		return FName(B.GetModProfile().ProfileName)
+			.LexicalLess(FName(A.GetModProfile().ProfileName));
+	});
+}
+
+void UModioCommonCollectionView::SortSizeOnDisk(TArray<FModioModCollectionEntry>& ModList)
+{
+	Algo::Sort(ModList, [](const FModioModCollectionEntry& A, const FModioModCollectionEntry& B) {
+		return A.GetSizeOnDisk() > B.GetSizeOnDisk();
+	});
+}
+
+void UModioCommonCollectionView::SortRecentlyUpdated(TArray<FModioModCollectionEntry>& ModList)
+{
+	Algo::Sort(ModList, [](const FModioModCollectionEntry& A, const FModioModCollectionEntry& B) {
+		return A.GetModProfile().ProfileDateUpdated < B.GetModProfile().ProfileDateUpdated;
+	});
+}
+
+void UModioCommonCollectionView::ApplySortingAndFiltering(TArray<FModioModCollectionEntry>& ModList)
+{
+	UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
+	if (!UISubsystem || !Subsystem)
+	{
+		UE_LOG(ModioUI5, Error, TEXT("Unable to apply sorting and filtering to mod list in '%s': Modio Subsystem is not available"), *GetName());
+		return;
+	}
+
+	const TMap<FModioModID, FModioModCollectionEntry>& UserSubscriptions = Subsystem->QueryUserSubscriptions();
+
+	FModioModCategoryParams FilterParams = [this]() {
+		UModioModCategoryParamsUI* CategoryParams = Cast<UModioModCategoryParamsUI>(DataSource);
+		if (CategoryParams)
+		{
+			return CategoryParams->Underlying;
+		}
+		return FModioModCategoryParams();
+	}();
+
+	FString SearchKeywords = FilterParams.SearchKeywords;
+	SearchKeywords.TrimStartAndEndInline();
+
+	const bool bFilterByEnabledState = UISubsystem->GetIsCollectionModDisableUIEnabled() && FilterParams.EnabledFilter != EModioEnabledFilterType::None;
+	ModList.RemoveAll([this, &FilterParams, bFilterByEnabledState, UISubsystem, &SearchKeywords, &UserSubscriptions](const FModioModCollectionEntry& Entry) {
+		bool bRemove = false;
+		if (!SearchKeywords.IsEmpty())
+		{
+			bRemove |= !Entry.GetModProfile().ProfileName.Contains(SearchKeywords);
+		}
+
+		if (!bRemove && FilterParams.InstalledField != EModioInstalledFilterType::None)
+		{
+			if (!bRemove && FilterParams.InstalledField == EModioInstalledFilterType::CurrentUser)
+			{
+				bRemove |= !UserSubscriptions.Contains(Entry.GetID());
+			}
+			else if (!bRemove && FilterParams.InstalledField == EModioInstalledFilterType::AnotherUser)
+			{
+				bRemove |= UserSubscriptions.Contains(Entry.GetID());
+			}
+		}
+
+		if (!bRemove && bFilterByEnabledState)
+		{
+			if (!bRemove && FilterParams.EnabledFilter == EModioEnabledFilterType::Enabled)
+			{
+				bRemove |= !UISubsystem->QueryIsModEnabled(Entry.GetID());
+			}
+			else if (!bRemove && FilterParams.EnabledFilter == EModioEnabledFilterType::Disabled)
+			{
+				bRemove |= UISubsystem->QueryIsModEnabled(Entry.GetID());
+			}
+		}
+
+		if (!bRemove && (FilterParams.Tags.Num() > 0 || FilterParams.ExcludedTags.Num() > 0))
+		{
+			TSet<FModioModTag> EntryTags = TSet<FModioModTag>(Entry.GetModProfile().Tags);
+
+			if (!bRemove)
+			{
+				for (const FString& Tag : FilterParams.Tags)
+				{
+					if (!EntryTags.Contains(FModioModTag{Tag}))
+					{
+						bRemove = true;
+						break;
+					}
+				}
+			}
+
+			if (!bRemove)
+			{
+				for (const FString& Tag : FilterParams.ExcludedTags)
+				{
+					if (EntryTags.Contains(FModioModTag{Tag}))
+					{
+						bRemove = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return bRemove;
+	});
+
+	switch (FilterParams.ManualSortField) {
+		case EModioManualSortType::AToZ:
+			SortAToZ(ModList);
+		break;
+		case EModioManualSortType::ZToA:
+			SortZToA(ModList);
+		break;
+		case EModioManualSortType::SizeOnDisk:
+			SortSizeOnDisk(ModList);
+		break;
+		case EModioManualSortType::RecentlyUpdated:
+			SortRecentlyUpdated(ModList);
+		break;
+	}
+}
+
+void UModioCommonCollectionView::UpdateInputBindings_Implementation()
 {
 	ClearListeningInputActions();
-	if (const UModioCommonModCollectionParamsSettings* Settings = GetDefault<UModioCommonModCollectionParamsSettings>())
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-		ListenForInputAction(FetchUpdateButton, Settings->CheckForUpdatesInputAction, Settings->DefaultFetchUpdateButtonLabel, [this]() 
-		{ 
-			OnFetchUpdatesClicked();
-		});
+		if (FetchUpdateButton)
+		{
+			ListenForInputAction(FetchUpdateButton, UISettings->CollectionParams.CheckForUpdatesInputAction, UISettings->CollectionParams.DefaultFetchUpdateButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{ 
+				OnFetchUpdatesClicked();
+			}));
+		}
+
+		if (FilterButton)
+		{
+			ListenForInputAction(FilterButton, UISettings->CollectionParams.FilterInputAction, UISettings->CollectionParams.FilterButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() 
+			{ 
+				ShowSearchView();
+			}));
+		}
 	}
 	else
 	{

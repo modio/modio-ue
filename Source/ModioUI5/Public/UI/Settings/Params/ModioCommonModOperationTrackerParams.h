@@ -18,8 +18,8 @@
 /**
  * Project Settings customization for ModioCommonModOperationTrackerUserWidget
  */
-UCLASS(Config = "ModioCommonModOperationTrackerParams", DefaultConfig, meta = (DisplayName = "Mod Operation Tracker Params"))
-class MODIOUI5_API UModioCommonModOperationTrackerParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonModOperationTrackerParamsSettings
 {
 	GENERATED_BODY()
 
@@ -32,8 +32,4 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText SpeedLabelText = NSLOCTEXT("Modio", "Speed", "Speed");
-
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
 };

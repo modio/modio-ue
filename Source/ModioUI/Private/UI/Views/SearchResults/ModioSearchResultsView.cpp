@@ -94,7 +94,7 @@ void UModioSearchResultsView::NativeOnInitialized()
 
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		if (UModioMenu* MenuInstance = Cast<UModioMenu>(Subsystem->ModBrowserInstance))
+		if (UModioMenu* MenuInstance = Cast<UModioMenu>(Subsystem->GetModBrowserInstance()))
 		{
 			MenuInstance->GetDrawerController()->OnDrawerClosed.AddDynamic(this, &UModioSearchResultsView::OnDrawerClosed);
 		}
@@ -421,7 +421,7 @@ FReply UModioSearchResultsView::NativeOnPreviewKeyDown(const FGeometry& MyGeomet
 		return FReply::Handled();
 	}
 
-	UModioMenu* Menu = Cast<UModioMenu>(Subsystem->ModBrowserInstance);
+	UModioMenu* Menu = Cast<UModioMenu>(Subsystem->GetModBrowserInstance());
 
 	if (IsValid(Menu) && Menu->IsAnyDrawerExpanded())
 	{

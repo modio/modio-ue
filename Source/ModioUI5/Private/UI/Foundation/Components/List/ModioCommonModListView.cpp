@@ -34,7 +34,7 @@ void UModioCommonModListView::NativeSetListItems(const TArray<UObject*>& InListI
 					}))
 				{
 					continue;
-				};
+				}
 			}
 			AddItem(Item);
 		}
@@ -55,7 +55,7 @@ void UModioCommonModListView::NativeSetListItems(const TArray<UObject*>& InListI
 		if (UWorld* World = Cast<UObject>(this)->GetWorld())
 		{
 			World->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateWeakLambda(Cast<UObject>(this), [this, SelectedModID]() mutable {
-				if (SelectedModID.IsSet() && GetOwningPlayer() && (bFocusOnceListIsPopulatedRequested || HasAnyUserFocus() || HasFocusedDescendants()))
+				if (SelectedModID.IsSet() && GetOwningPlayer() && bFocusOnceListIsPopulatedRequested)
 				{
 					Execute_SetModSelectionByID(this, SelectedModID.GetValue());
 					bFocusOnceListIsPopulatedRequested = false;

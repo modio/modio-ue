@@ -19,13 +19,12 @@
 /**
  * Project Settings customization for ModioCommonGenericModEntry
  */
-UCLASS(Config = "ModioCommonModEntryParams", DefaultConfig, meta = (DisplayName = "Mod Entry Params"))
-class MODIOUI5_API UModioCommonModEntryParamsSettings : public UDeveloperSettings
+USTRUCT(BlueprintType, Category = "Mod.io Common UI")
+struct MODIOUI5_API FModioCommonModEntryParamsSettings
 {
 	GENERATED_BODY()
 
-public:
-	UModioCommonModEntryParamsSettings()
+	FModioCommonModEntryParamsSettings()
 	{
 		OpenModDetailsInputAction.RowName = "Tertiary";
 		OpenModDetailsInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
@@ -38,6 +37,9 @@ public:
 
 		SwitchEnabledInputAction.RowName = "Secondary";
 		SwitchEnabledInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		ForceUninstallInputAction.RowName = "Secondary";
+		ForceUninstallInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
@@ -56,28 +58,34 @@ public:
 	FText DisableLabel = NSLOCTEXT("Modio", "Disable", "Disable");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText ForceUninstallLabel = NSLOCTEXT("Modio", "ForceUninstall", "Force Uninstall");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText OpenModDetailsLabel = NSLOCTEXT("Modio", "OpenModDetails", "Mod Details");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText OpenReportLabel = NSLOCTEXT("Modio", "OpenReport", "Report");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText DownloadingLabel = NSLOCTEXT("Modio", "Downloading", "Downloading:");
+	FText DownloadingLabel = NSLOCTEXT("Modio", "Downloading", "Downloading - ");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText ExtractingLabel = NSLOCTEXT("Modio", "Extracting", "Extracting:");
+	FText ExtractingLabel = NSLOCTEXT("Modio", "Extracting", "Extracting - ");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText QueuedLabel = NSLOCTEXT("Modio", "Extracting", "Queued");
+	FText QueuedLabel = NSLOCTEXT("Modio", "Queued", "Queued");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText SpeedLabel = NSLOCTEXT("Modio", "Speed", "Speed:");
+	FText SpeedLabel = NSLOCTEXT("Modio", "Speed", "Speed - ");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText SizeLabel = NSLOCTEXT("Modio", "Size", "Size:");
+	FText SizeLabel = NSLOCTEXT("Modio", "Size", "Size - ");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText ErrorLabel = NSLOCTEXT("Modio", "Error", "Error:");
+	FText ErrorLabel = NSLOCTEXT("Modio", "Error", "Error - ");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText InstalledByOthersLabel = NSLOCTEXT("Modio", "InstalledByOthers", "Installed by others");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Delays", meta = (UIMin = 0.0, UIMax = 2.0))
 	float DeselectionDelay = 0.5f;
@@ -94,7 +102,6 @@ public:
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
 	FDataTableRowHandle OpenModDetailsInputAction;
 
-	// Begin UDeveloperSettings Interface
-	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
-	// End UDeveloperSettings Interface
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	FDataTableRowHandle ForceUninstallInputAction;
 };

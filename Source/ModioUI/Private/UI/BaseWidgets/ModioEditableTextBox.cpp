@@ -10,10 +10,10 @@
 
 #include "UI/BaseWidgets/ModioEditableTextBox.h"
 
-#include "ModioUI4Subsystem.h"
+#include "Core/Input/ModioInputKeys.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
-#include "Core/Input/ModioInputKeys.h"
+#include "ModioUI4Subsystem.h"
 #include "UI/Styles/ModioEditableTextBoxStyle.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Widgets/Images/SImage.h"
@@ -27,16 +27,16 @@ UModioEditableTextBox::UModioEditableTextBox(const FObjectInitializer& Initializ
 	MinimumDesiredWidth = 200;
 }
 
-void UModioEditableTextBox::StartInput() 
+void UModioEditableTextBox::StartInput()
 {
 	if (MyEditableTextBlock.IsValid())
 	{
 		FWidgetPath WidgetToFocusPath;
-		
+
 		FSlateApplication::Get().GeneratePathToWidgetUnchecked(MyEditableTextBlock.ToSharedRef(), WidgetToFocusPath);
 		FSlateApplication::Get().SetKeyboardFocus(WidgetToFocusPath, EFocusCause::SetDirectly);
 
-		if (!WidgetToFocusPath.IsValid()) 
+		if (!WidgetToFocusPath.IsValid())
 		{
 			return;
 		}
@@ -123,6 +123,14 @@ void UModioEditableTextBox::NativeSetHintText(FText InHintText)
 	if (MyEditableTextBlock)
 	{
 		MyEditableTextBlock->SetHintText(InHintText);
+	}
+}
+
+void UModioEditableTextBox::NativeSetInput(const FString& Input)
+{
+	if (MyEditableTextBlock)
+	{
+		MyEditableTextBlock->SetText(FText::FromString(Input));
 	}
 }
 
@@ -230,17 +238,9 @@ FReply UModioEditableTextBox::OnKeyDownHandler(const FGeometry& MyGeometry, cons
 		OnSubmit.Broadcast();
 		return FReply::Handled();
 	}
-
 	if (GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Down))
 	{
 		OnNavigateDown.Broadcast();
-	}
-
-	UModioUI4Subsystem* subsystem = GEngine->GetEngineSubsystem<UModioUI4Subsystem>();
-
-	if ((GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Next) || GetCommandKeyForEvent(InKeyEvent).Contains(FModioInputKeys::Previous)) && subsystem->GetLastInputDevice() != EModioUIInputMode::Keyboard)
-	{
-		return FReply::Handled();
 	}
 	return FReply::Unhandled();
 }

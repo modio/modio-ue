@@ -17,8 +17,11 @@
 
 void UModioCommonRichTextBlock::SetStyle(TSubclassOf<UModioCommonRichTextStyle> InStyle)
 {
-	ModioStyle = InStyle;
-	SynchronizeProperties();
+	if (InStyle && InStyle != ModioStyle)
+	{
+		ModioStyle = InStyle;
+		SynchronizeProperties();
+	}
 }
 
 void UModioCommonRichTextBlock::SynchronizeProperties()

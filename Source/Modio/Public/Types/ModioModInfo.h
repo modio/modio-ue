@@ -179,7 +179,7 @@ struct MODIO_API FModioModInfo
 
 	/** @brief Price of this mod */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Monetization")
-	int32 Price;
+	int32 Price = 0;
 
 	friend struct FModioModInfo ToUnreal(const struct Modio::ModInfo& In);
 };

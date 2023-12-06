@@ -11,25 +11,35 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UI/EventHandlers/IModioUIModManagementEventReceiver.h"
+#include "UI/EventHandlers/IModioUISubscriptionsChangedReceiver.h"
+#include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
 #include "UI/Foundation/Base/ModBrowser/ModioCommonModListBase.h"
 #include "ModioCommonFeaturedView.generated.h"
 
 class UModioCommonFeaturedViewStyle;
 class UModioCommonActivatableWidget;
-class UModioCommonFeaturedPrimaryView;
-class UModioCommonFeaturedAdditionalView;
-class UCommonRichTextBlock;
+class UModioCommonSearchResultsView;
+class UModioCommonTabButtonBase;
+class UModioCommonTabListWidgetBase;
+class UModioCommonButtonBase;
 
 /**
- * @brief Featured View that displays primary and additional featured mods
+ * @brief Featured View that displays mods in a featured view
  * It supports styling through the Mod.io Common UI styling system
  */
 UCLASS(Abstract, Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
-class MODIOUI5_API UModioCommonFeaturedView : public UModioCommonModListBase
+class MODIOUI5_API UModioCommonFeaturedView
+	: public UModioCommonModListBase,
+	  public IModioUIUserChangedReceiver,
+	  public IModioUISubscriptionsChangedReceiver,
+	  public IModioUIModManagementEventReceiver
 {
 	GENERATED_BODY()
 
 public:
+	UModioCommonFeaturedView();
+
 	/**
 	 * @brief Sets the style of the Featured View within the Mod.io Common UI styling system
 	 * @param InStyle The style to set
@@ -42,24 +52,34 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style", Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonFeaturedViewStyle> ModioStyle;
 
-public:
+protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonFeaturedPrimaryView> PrimaryView;
-	
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UModioCommonFeaturedAdditionalView> AdditionalView;
-
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
-	TObjectPtr<UCommonRichTextBlock> CategoryLabel;
+	TObjectPtr<UModioCommonSearchResultsView> SearchResultsView;
 
 public:
 	virtual void SynchronizeProperties() override;
 protected:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual void NativeOnSetDataSource() override;
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
-	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnInitialized() override;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	void RefreshList();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	void RefreshListByFilter(const FModioFilterParams& Filter);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	void RefreshListByCategoryName(FName InCategoryName);
 
 protected:
-	UPROPERTY(Transient)
-	TObjectPtr<UModioCommonActivatableWidget> LastFocusedView;
+	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI")
+	FModioFilterParams PreviouslyAppliedFilter;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Mod.io Common UI")
+	int64 OverriddenModsCount = INDEX_NONE;
+
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Mod.io Common UI")
+	bool bWasFilterAppliedAtLeastOnce = false;
 };

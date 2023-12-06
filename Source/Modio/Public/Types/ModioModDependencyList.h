@@ -12,10 +12,13 @@
 #include "CoreMinimal.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioPagedResult.h"
+#include "Types/ModioModProgressInfo.h"
 #include "Containers/UnrealString.h"
 #include "Misc/Optional.h"
 
 #include "ModioModDependencyList.generated.h"
+
+typedef TMap<FModioModID, EModioModChangeType> PreviewMapDef;
 
 /**
 * Basic reference data about a dependency relationship to another mod
@@ -85,4 +88,54 @@ struct MODIO_API FModioOptionalModDependencyList
     * Stored optional ModioModDependencyList
     **/
 	TOptional<FModioModDependencyList> Internal;
+};
+
+/**
+ * Strong type struct to wrap a PreviewMap data as a map value
+ **/
+USTRUCT(BlueprintType)
+struct MODIO_API FModioMapPreview
+{
+	GENERATED_BODY()
+
+	/**
+	 * Default constructor without parameters
+	 **/
+	FModioMapPreview() = default;
+
+	/**
+	 * Convenience constructor that has a map of ModID and Mod changes
+	 * @param ModPreviewMap Key/value pairs that contains mod changes
+	 **/
+	FModioMapPreview(PreviewMapDef&& ModPreview);
+
+	/**
+	 * Stored map preview
+	 **/
+	PreviewMapDef Internal;
+};
+
+/**
+ * Strong type struct to wrap a MapPreview data as an optional value
+ **/
+USTRUCT(BlueprintType)
+struct MODIO_API FModioOptionalMapPreview
+{
+	GENERATED_BODY()
+
+	/**
+	 * Default constructor without parameters
+	 **/
+	FModioOptionalMapPreview() = default;
+
+	/**
+	 * Convenience constructor that has a map of ModID and Mod changes
+	 * @param ModPreview An optional value that contains mod preview
+	 **/
+	FModioOptionalMapPreview(TOptional<FModioMapPreview>&& ModPreview);
+
+	/**
+	 * Stored optional FModioMapPreview
+	 **/
+	TOptional<FModioMapPreview> Internal;
 };

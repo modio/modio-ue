@@ -9,7 +9,6 @@
  */
 
 #include "UI/Default/Dialog/ModioCommonDialogMessageView.h"
-#include "UI/Settings/Params/ModioCommonDialogParams.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Foundation/Components/Button/ModioCommonButtonBase.h"
 #include "UI/Foundation/Components/Text/EditableTextBox/ModioCommonEditableTextBox.h"
@@ -20,32 +19,42 @@
 void UModioCommonDialogMessageView::SynchronizeProperties() 
 {
 	Super::SynchronizeProperties();
-
-	if (const UModioCommonDialogMessageParamsSettings* Settings = GetDefault<UModioCommonDialogMessageParamsSettings>())
-	{
-		if (SubmitButton)
-		{
-			SubmitButton->SetLabel(Settings->SubmitButtonText);
-		}
-	}
 }
 
 void UModioCommonDialogMessageView::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
-	
-	const UModioCommonDialogParamsSettings* DialogSettings = GetDefault<UModioCommonDialogParamsSettings>();
-	const UModioCommonDialogMessageParamsSettings* DialogMessageSettings = GetDefault<UModioCommonDialogMessageParamsSettings>();
-	if (!DialogSettings || !DialogMessageSettings)
+
+	if (BackButton)
 	{
-		return;
+		SetButtonEnabledState(BackButton, false);
+		BackButton->OnClicked().AddWeakLambda(this, [this]() {
+			if (UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DataSource))
+			{
+				DialogInfo->HandleDialogButtonClicked(EModioCommonDialogButtonType::Back);
+			}
+		});
 	}
 
-	if (SubmitButton)
+	if (CancelButton)
 	{
-		ListenForInputAction(SubmitButton, DialogSettings->SubmitInputAction, DialogMessageSettings->SubmitButtonText, [this]() 
-		{
-			if (OnSubmitClicked.IsBound()) OnSubmitClicked.Execute();
+		SetButtonEnabledState(CancelButton, false);
+		CancelButton->OnClicked().AddWeakLambda(this, [this]() {
+			if (UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DataSource))
+			{
+				DialogInfo->HandleDialogButtonClicked(EModioCommonDialogButtonType::Cancel);
+			}
+		});
+	}
+
+	if (ConfirmButton)
+	{
+		SetButtonEnabledState(ConfirmButton, false);
+		ConfirmButton->OnClicked().AddWeakLambda(this, [this]() {
+			if (UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DataSource))
+			{
+				DialogInfo->HandleDialogButtonClicked(EModioCommonDialogButtonType::Confirm);
+			}
 		});
 	}
 }
@@ -53,9 +62,8 @@ void UModioCommonDialogMessageView::NativeOnInitialized()
 void UModioCommonDialogMessageView::NativeOnSetDataSource()
 {
 	Super::NativeOnSetDataSource();
-
-	UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DataSource);
-	if (DialogInfo)
+	
+	if (UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DataSource))
 	{
 		if (TitleTextBlock)
 		{
@@ -65,7 +73,15 @@ void UModioCommonDialogMessageView::NativeOnSetDataSource()
 		{
 			DescriptionTextBlock->SetText(DialogInfo->DialogText);
 		}
+
+		TArray<UModioCommonButtonBase*> ButtonsToDisplay = GetButtonsToDisplay();
+		for (UModioCommonButtonBase* Button : ButtonsToDisplay)
+		{
+			SetButtonEnabledState(Button, true);
+		}
 	}
+
+	FocusOnDesiredWidget();
 }
 
 UWidget* UModioCommonDialogMessageView::NativeGetDesiredFocusTarget() const
@@ -74,5 +90,40 @@ UWidget* UModioCommonDialogMessageView::NativeGetDesiredFocusTarget() const
 	{
 		return WidgetToFocus;
 	}
-	return SubmitButton.Get();
+	TArray<UModioCommonButtonBase*> ButtonsToDisplay = GetButtonsToDisplay();
+	for (UModioCommonButtonBase* Button : ButtonsToDisplay)
+	{
+		return Button;
+	}
+	return nullptr;
+}
+
+void UModioCommonDialogMessageView::SetButtonEnabledState_Implementation(UModioCommonButtonBase* Button, bool bEnabled)
+{
+	if (Button)
+	{
+		Button->SetVisibility(bEnabled ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+		Button->SetIsEnabled(bEnabled);
+	}
+}
+
+TArray<UModioCommonButtonBase*> UModioCommonDialogMessageView::GetButtonsToDisplay_Implementation() const
+{
+	TArray<UModioCommonButtonBase*> ButtonsToDisplay;
+	if (UModioCommonDialogInfo* DialogInfo = Cast<UModioCommonDialogInfo>(DataSource))
+	{
+		if (BackButton && EnumHasAnyFlags(static_cast<EModioCommonDialogButtonType>(DialogInfo->ButtonsToDisplay), EModioCommonDialogButtonType::Back))
+		{
+			ButtonsToDisplay.Add(BackButton);
+		}
+		if (CancelButton && EnumHasAnyFlags(static_cast<EModioCommonDialogButtonType>(DialogInfo->ButtonsToDisplay), EModioCommonDialogButtonType::Cancel))
+		{
+			ButtonsToDisplay.Add(CancelButton);
+		}
+		if (ConfirmButton && EnumHasAnyFlags(static_cast<EModioCommonDialogButtonType>(DialogInfo->ButtonsToDisplay), EModioCommonDialogButtonType::Confirm))
+		{
+			ButtonsToDisplay.Add(ConfirmButton);
+		}
+	}
+	return ButtonsToDisplay;
 }

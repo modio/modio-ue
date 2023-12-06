@@ -8,7 +8,6 @@
  *
  */
 
-
 #include "UI/Foundation/Base/ModioCommonWidgetSwitcher.h"
 
 #include "UI/Foundation/Base/ModioCommonActivatableWidget.h"
@@ -16,12 +15,15 @@
 void UModioCommonWidgetSwitcher::HandleSlateActiveIndexChanged(int32 ActiveIndex)
 {
 	Super::HandleSlateActiveIndexChanged(ActiveIndex);
-	
-	if (UModioCommonActivatableWidget* IncomingActivatable = Cast<UModioCommonActivatableWidget>(GetWidgetAtIndex(ActiveWidgetIndex)))
+
+	if (UModioCommonActivatableWidget* IncomingActivatable =
+			Cast<UModioCommonActivatableWidget>(GetWidgetAtIndex(GetActiveWidgetIndex())))
 	{
 		if (IncomingActivatable->GetAutoFocusOnActivation())
 		{
 			IncomingActivatable->FocusOnDesiredWidget();
 		}
 	}
+
+	OnActiveWidgetIndexChanged_BP.Broadcast(GetWidgetAtIndex(GetActiveWidgetIndex()), GetActiveWidgetIndex());
 }
