@@ -11,7 +11,10 @@
 #include "../../Public/DetailCustomizations/SModFileRow.h"
 #include <Widgets/SModioEditorWindowCompoundWidget.h>
 #include <WindowManager.h>
-#include <Launch/Resources/Version.h>
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
+	#include <Launch/Resources/Version.h>
+#endif
 
 void SModFileRow::Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTableView)
 {

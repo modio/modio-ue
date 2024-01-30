@@ -291,9 +291,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	bool GetIsCollectionModDisableUIEnabled();
 
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void ExecuteOnModBrowserClosedDelegate();
 
 	void ShowUserAuth();
+
+	bool IsUserAuthenticated();
 
 	TArray<FModioModID> ModsDownloadedThisSession;
 };

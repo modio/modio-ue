@@ -17,7 +17,11 @@ public class ModioUIEditor : ModuleRules
     public ModioUIEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        bEnforceIWYU = true;
+#if UE_5_3_OR_LATER
+	    IWYUSupport = IWYUSupport.Full;
+        #else
+		bEnforceIWYU = true;
+#endif
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UnrealEd", "Modio", "ModioUI","ModioUICore", "DetailCustomizations", "PropertyEditor", "PropertyPath" });
 

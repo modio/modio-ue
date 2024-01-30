@@ -1,6 +1,3 @@
-== mod.io Mod Browser UE5 UI
-
-Mod.io UE5 UI is built upon the concepts outlined in the link:https://docs.unrealengine.com/5.0/en-US/common-ui-plugin-for-advanced-user-interfaces-in-unreal-engine/[Common UI].
 
 === How to Set Up Common UI for Project to Use Mod.io UE5 UI
 

@@ -11,8 +11,14 @@
 #include "../../Public/Widgets/SModioEditorWindowCompoundWidget.h"
 #include <SlateOptMacros.h>
 #include <Delegates/DelegateSignatureImpl.inl>
-#include <DesktopPlatform/Public/IDesktopPlatform.h>
-#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
+	#include <DesktopPlatform/Public/IDesktopPlatform.h>
+	#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+#else
+	#include "DesktopPlatformModule.h"
+	#include "IDesktopPlatform.h"
+#endif
 #include <HttpModule.h>
 #include <HAL/FileManagerGeneric.h>
 #include <Interfaces/IHttpRequest.h>
@@ -40,7 +46,9 @@
 #include <Engine/Engine.h>
 #include <Misc/MessageDialog.h>
 #include <Widgets/SWindow.h>
-#include <Launch/Resources/Version.h>
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
+	#include <Launch/Resources/Version.h>
+#endif
 #include <Kismet/GameplayStatics.h>
 
 
@@ -231,7 +239,11 @@ void SModioEditorWindowCompoundWidget::OnVerifyCurrentUserAuthenticationComplete
 
 			const FText Title = Localize("UserInfo", "User Information");
 			const FText Message = Localize("UserInfoMessage", FString::Printf(TEXT("Modio user '%s' already logged in on this platform"), *CurrentUser->Username));
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
 			EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, &Title);
+			#else
+			EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, Title);
+			#endif
 			if (UserSelection == EAppReturnType::Ok)
 			{
 				DrawModCreationToolWidget();
@@ -701,7 +713,12 @@ void SModioEditorWindowCompoundWidget::DrawModCreationToolWidget()
 
 													const FText Title = Localize("ModCreated", "Mod Created");
 													const FText Message = Localize("ModCreatedMessage", "Would you like to add a mod file?");
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
 													EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::YesNo, Message, &Title);
+													#else
+													EAppReturnType::Type UserSelection =
+														FMessageDialog::Open(EAppMsgType::YesNo, Message, Title);
+													#endif
 													if (UserSelection == EAppReturnType::Yes) 
 													{
 														DrawCreateModFileToolWidget(ModId.GetValue());

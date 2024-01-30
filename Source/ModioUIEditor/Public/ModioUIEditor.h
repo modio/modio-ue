@@ -17,26 +17,9 @@ DECLARE_LOG_CATEGORY_EXTERN(ModioUIEditor, All, All);
 
 class FModioUIEditor : public IModuleInterface
 {
-	TSet<FName> DerivedClassNames;
-	TArray<FName> CustomPropertyTypeLayoutNames;
-	TArray<FName>CustomClassLayoutNames;
-	TSharedPtr<class FModioModInfoUIAssetActions> AssetActions;
-	TSharedPtr<class FAssetTypeActions_ModioDialogInfo> DialogInfoActions;
-	FDelegateHandle ContentBrowserExtensionsDelegateHandle;
-	void RegisterSettings();
-	void UnregisterSettings();
-
-	void RegisterDetailsCustomizations();
-	void UnregisterDetailsCustomizations();
-	void RegisterAssetActions();
-	void UnregisterAssetActions();
-	public:
-
 	/* Called when the module is loaded */
 	virtual void StartupModule() override;
 
 	/* Called when the module is unloaded */
 	virtual void ShutdownModule() override;
-
-
 };

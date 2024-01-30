@@ -23,6 +23,11 @@ void UModioUIAsyncLoader::NativeLinkAsyncOperationWidget(const TScriptInterface<
 	IModioUIAsyncOperationWidget::Execute_SetOperationStateDelegate(Widget.GetObject(), Delegate);
 }
 
+EModioUIAsyncOperationWidgetState UModioUIAsyncLoader::NativeGetAsyncOperationState() const
+{
+	return CurrentState;
+}
+
 TSharedRef<SWidget> UModioUIAsyncLoader::RebuildWidget()
 {
 	SAssignNew(MyWidgetSwitcher, SWidgetSwitcher);
@@ -151,9 +156,4 @@ void UModioUIAsyncLoader::NativeHandleAsyncOperationStateChange(EModioUIAsyncOpe
 			}
 		}
 	}
-}
-
-EModioUIAsyncOperationWidgetState UModioUIAsyncLoader::NativeGetAsyncOperationState() const
-{
-	return CurrentState;
 }

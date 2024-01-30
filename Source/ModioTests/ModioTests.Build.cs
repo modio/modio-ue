@@ -19,7 +19,13 @@ public class ModioTests : ModuleRules
     {
         PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
 		PrivatePCHHeaderFile = "Private/ModioTestsPrivatePCH.h";
-        bEnforceIWYU = true;
+
+#if UE_5_3_OR_LATER
+	    IWYUSupport = IWYUSupport.Full;
+	    CppStandard = CppStandardVersion.Cpp17;
+#else
+		bEnforceIWYU = true;
+#endif
         {
            
             PublicIncludePaths.AddRange(new string[] {

@@ -70,7 +70,7 @@ void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ErrorCode, FModioMod
 						UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
 						ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
 						DisplayNotificationParams(
-							UModioNotificationParamsLibrary::CreateSubscriptionNotification(ErrorCode, ModInfoObj));
+							UModioNotificationParamsLibrary::CreateSubscriptionNotification(ErrorCode ? ErrorCode : InternalErrorCode, ModInfoObj));
 					}));
 
 		OnModSubscribeFailed.Broadcast(ID);
@@ -90,7 +90,7 @@ void UModioUISubsystem::UnsubscribeHandler(FModioErrorCode ErrorCode, FModioModI
 							UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
 							ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
 							DisplayNotificationParams(
-								UModioNotificationParamsLibrary::CreateUninstallNotification(ErrorCode, ModInfoObj));
+								UModioNotificationParamsLibrary::CreateUnsubscriptionNotification(ErrorCode ? ErrorCode : InternalErrorCode, ModInfoObj));
 						}));
 		}
 	}
@@ -111,6 +111,18 @@ void UModioUISubsystem::UninstallHandler(FModioErrorCode ErrorCode, FModioModID 
 	Event.Event = EModioModManagementEventType::Uninstalled;
 	Event.Status = ErrorCode;
 	OnModManagementEvent.Broadcast(Event);
+
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		Subsystem->GetModInfoAsync(
+			ID, FOnGetModInfoDelegateFast::CreateWeakLambda(
+					this, [this, ErrorCode](FModioErrorCode InternalErrorCode, TOptional<FModioModInfo> ModInfo) {
+						UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
+						ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
+						DisplayNotificationParams(
+							UModioNotificationParamsLibrary::CreateUninstallNotification(ErrorCode ? ErrorCode : InternalErrorCode, ModInfoObj));
+					}));
+	};
 }
 
 void UModioUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -698,6 +710,16 @@ void UModioUISubsystem::OnGetModTagOptionsComplete(FModioErrorCode ec, TOptional
 	{
 		CachedModTags = ModTags;
 	}
+}
+
+bool UModioUISubsystem::IsUserAuthenticated()
+{
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		TOptional<FModioUser> NewUser = Subsystem->QueryUserProfile();
+		return NewUser.IsSet(); 
+	}
+	return false;
 }
 
 #include "Loc/EndModioLocNamespace.h"

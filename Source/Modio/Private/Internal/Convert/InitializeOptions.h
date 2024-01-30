@@ -81,7 +81,7 @@ FORCEINLINE Modio::InitializeOptions ToModio(const FModioInitializeOptions& In)
 	if (In.LocalSessionIdentifier.IsSet())
 	{
 		Options.User = ToModio(In.LocalSessionIdentifier.GetValue());
-	}
+	} else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Please set LocalSessionIdentifier on your InitializeOptions before passing them to InitializeAsync"));
 	}	

@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using UnrealBuildTool;
 #if UE_5_0_OR_LATER
 using EpicGames.Core;
+using Microsoft.Extensions.Logging;
 #else
 using Tools.DotNETCommon;
 #endif
@@ -109,27 +110,37 @@ public class Modio : ModuleRules
         return Json.Load<ModioPlatformConfigFile>(new FileReference(PlatformConfigPath));
 #endif
     }
-    private void DumpNativePlatformConfig(ModioPlatformConfigFile.PlatformConfig Config)
+
+    private void InternalLog(string message)
+    {
+#if UE_5_3_OR_LATER
+	    Logger.LogInformation(message);
+        #else
+        Log.TraceInformation(message);
+#endif
+    }
+
+	private void DumpNativePlatformConfig(ModioPlatformConfigFile.PlatformConfig Config)
     {
         foreach (string IncludeDirectory in Config.IncludeDirectories)
         {
-            Log.TraceInformation("Include: " + IncludeDirectory);
+	        InternalLog("Include: " + IncludeDirectory);
         }
         foreach (string Define in Config.PlatformSpecificDefines)
         {
-            Log.TraceInformation("Define: " + Define);
+	        InternalLog("Define: " + Define);
         }
         foreach (string SourceFolder in Config.PlatformSourceFolderNames)
         {
-            Log.TraceInformation("Source Directory: " + SourceFolder);
+	        InternalLog("Source Directory: " + SourceFolder);
         }
         foreach (string ModuleName in Config.ModuleDependencies)
         {
-            Log.TraceInformation("Platform Module: " + ModuleName);
+            InternalLog("Platform Module: " + ModuleName);
         }
         foreach (string SystemLibrary in Config.SystemLibraryDependencies)
         {
-            Log.TraceInformation("System Library: " + SystemLibrary);
+	        InternalLog("System Library: " + SystemLibrary);
         }
     }
 
@@ -165,11 +176,11 @@ public class Modio : ModuleRules
                         if (PlatformMatches(Target.Platform, Platform.Key))
                         {
 #if ENABLE_TRACE_LOG
-                            Log.TraceInformation("Merging in platform configuration " + Platform.Key);
+                            InternalLog("Merging in platform configuration " + Platform.Key);
 #endif
 
-                            //This is the first matching platform we've found, so create our config
-                            if (MergedConfig == null)
+							//This is the first matching platform we've found, so create our config
+							if (MergedConfig == null)
                             {
                                 MergedConfig = new ModioPlatformConfigFile.PlatformConfig();
                             }
@@ -246,9 +257,9 @@ public class Modio : ModuleRules
         else
         {
 #if ENABLE_TRACE_LOG
-        Log.TraceInformation("TestConfig.json not found. Skipping unit tests");
+        InternalLog("TestConfig.json not found. Skipping unit tests");
 #endif
-            return null;
+			return null;
         }
     }
 
@@ -260,9 +271,9 @@ public class Modio : ModuleRules
             foreach (string CompilerDefine in TestConfig.TestDefines)
             {
 #if ENABLE_TRACE_LOG
-                Log.TraceInformation("Testing Define: " + CompilerDefine);
+                InternalLog("Testing Define: " + CompilerDefine);
 #endif
-                PrivateDefinitions.Add(CompilerDefine);
+				PrivateDefinitions.Add(CompilerDefine);
             }
             foreach(ModioTestConfigFile.FileToCopy TestFile in TestConfig.TestFiles)
             {
@@ -419,11 +430,11 @@ public class Modio : ModuleRules
             ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedSourcePath, RootPlatformName)));
 
 #if ENABLE_TRACE_LOG
-            Log.TraceInformation("Adding native platform source directory " + Path.Combine(GeneratedSourcePath, RootPlatformName));
+            InternalLog("Adding native platform source directory " + Path.Combine(GeneratedSourcePath, RootPlatformName));
 #endif
-        }
-        // Add any platform-specific additional modules as private dependencies
-        PrivateDependencyModuleNames.AddRange(Config.ModuleDependencies.ToArray());
+		}
+		// Add any platform-specific additional modules as private dependencies
+		PrivateDependencyModuleNames.AddRange(Config.ModuleDependencies.ToArray());
 
         // Add platform-specific compiler defines
         foreach (string CompilerDefine in Config.PlatformSpecificDefines)
@@ -490,9 +501,14 @@ public class Modio : ModuleRules
         PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
         PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
         bEnableUndefinedIdentifierWarnings = false;
-        bEnforceIWYU = true;
-        //bUseUnity = false;
-        bAllowConfidentialPlatformDefines = true;
+#if UE_5_3_OR_LATER
+	    IWYUSupport = IWYUSupport.Full;
+	    CppStandard = CppStandardVersion.Cpp17;
+#else
+		bEnforceIWYU = true;
+#endif
+		//bUseUnity = false;
+		bAllowConfidentialPlatformDefines = true;
         string GeneratedSourcePath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedSource");
         string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedHeader");
 

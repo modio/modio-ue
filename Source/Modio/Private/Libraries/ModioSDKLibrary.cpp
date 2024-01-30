@@ -132,7 +132,7 @@ bool UModioSDKLibrary::IsValidEmailAddressFormat(const FString& String)
 		return false;
 	}
 
-	const FRegexPattern Pattern(TEXT("^([a-z0-9]+)((\\.|-|_)([a-z0-9])+)*@([a-z0-9]+)(\\.([a-z0-9]{2,8}+))+$"));
+	const FRegexPattern Pattern(TEXT("^\\w+([-+.']\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$"));
 	FRegexMatcher Matcher(Pattern, String);
 
 	return Matcher.FindNext();

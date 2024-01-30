@@ -9,8 +9,14 @@
  */
 
 #include "WindowManager.h"
-#include <DesktopPlatform/Public/IDesktopPlatform.h>
-#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
+	#include <DesktopPlatform/Public/IDesktopPlatform.h>
+	#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+#else
+	#include "DesktopPlatformModule.h"
+	#include "IDesktopPlatform.h"
+#endif
 #include <DetailCustomizations/ModioCreateModParamsDetails.h>
 #include <DetailCustomizations/ModioBrowseModFileDetails.h>
 #include <DetailCustomizations/ModioBrowseModsParamsDetails.h>

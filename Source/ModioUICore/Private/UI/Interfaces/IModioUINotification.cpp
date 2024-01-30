@@ -46,13 +46,24 @@ FModioNotificationParams UModioNotificationParamsLibrary::CreateSubscriptionNoti
 	return NewParams;
 }
 
+FModioNotificationParams UModioNotificationParamsLibrary::CreateUnsubscriptionNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo)
+{
+	FModioNotificationParams NewParams;
+	if (ModInfo.GetObject())
+	{
+		const FModioModInfo FullModInfo = ModInfo->Execute_GetFullModInfo(ModInfo.GetObject());
+		NewParams = CreateNotificationParams(StatusCode, FText::FromString(FullModInfo.ProfileName), LOCTEXT("UnsubscriptionSuccess", "Subscription Removed!"), LOCTEXT("UnsubscriptionFailed", "Unsubscription Failed"));
+	}
+	return NewParams;
+}
+
 FModioNotificationParams UModioNotificationParamsLibrary::CreateUninstallNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo)
 {
 	FModioNotificationParams NewParams;
 	if (ModInfo.GetObject())
 	{
 		const FModioModInfo FullModInfo = ModInfo->Execute_GetFullModInfo(ModInfo.GetObject());
-		NewParams = CreateNotificationParams(StatusCode, FText::FromString(FullModInfo.ProfileName), LOCTEXT("UninstallSuccess", "Mod Uninstalled!"), LOCTEXT("SubscriptionFailed", "Subscription Failed"));
+		NewParams = CreateNotificationParams(StatusCode, FText::FromString(FullModInfo.ProfileName), LOCTEXT("UninstallSuccess", "Mod Uninstalled!"), LOCTEXT("UninstallFailed", "Uninstall Failed"));
 	}
 	return NewParams;
 }
