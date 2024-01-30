@@ -7,10 +7,9 @@ The mod.io UE Plugin also includes a series of additional modules which provide 
 [.stretch,stripes=odd,frame=none, cols="25%,~,"]
 |===
 |Module Name|Description|Module Type
-|ModioUI|UI module containing all Slate and UMG widgets for the UE4 UI|Runtime
-|ModioUI5|UI module containing all Slate and UMG widgets for the UE5 Common UI|Runtime
-|ModioUICore|Core UI module containing all shared entities between UE4 and UE5 UIs|Runtime
-|ModioUIEditor|Editor details customization and asset factories for UE4 UI classes|Editor
+|ModioUI|UI module containing all Slate and UMG widgets for the UE5 Common UI|Runtime
+|ModioUICore|Core UI module containing all shared entities for UE5 UIs|Runtime
+|ModioUIEditor|Editor details customization and asset factories for UE5 UI classes|Editor
 |MSDFSupport|Module containing material expression for rendering MSDF textures as pseudo-vectors|Runtime
 |MSDFSupportEditor|Importer for SVGs that will convert them to MSDF textures the UI can render|Editor
 |===
@@ -75,6 +74,4 @@ if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem
 
 You can close the Mod Browser by calling `CloseModBrowserUI()` on the ModioUISubsystem.
 
-link:ui4-documentation.adoc[UE4 UI Documentation]
-
-link:ui5-documentation.adoc[UE5 Common UI Documentation]
+include::ui5-documentation.adoc[]

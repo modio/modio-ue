@@ -57,18 +57,25 @@ TOptional<Dest> ToUnrealOptional(Source Original);
 template<typename Dest, typename Source>
 Dest ToBP(Source Original);
 
-FModioBackgroundThread::FModioBackgroundThread(UModioSubsystem* modio)
+FModioBackgroundThread::FModioBackgroundThread(UModioSubsystem* ModioSubsystem)
 {
-	CurrentModio = modio;
-	CurrentRunningThread =
-		FRunnableThread::Create(this, TEXT("ModioBackgroundThread"), 0U, EThreadPriority::TPri_Normal);
+	CurrentModioSubsystem = ModioSubsystem;
+	CurrentRunningThread = TUniquePtr<FRunnableThread>(FRunnableThread::Create(this, TEXT("ModioBackgroundThread"), 0U, EThreadPriority::TPri_Normal));
 }
 
 FModioBackgroundThread::~FModioBackgroundThread()
 {
-	CurrentRunningThread->Kill();
-	delete CurrentRunningThread;
-	CurrentRunningThread = NULL;
+	CurrentRunningThread.Reset();
+}
+
+void FModioBackgroundThread::KillThreadSafe()
+{
+	if (CurrentRunningThread)
+	{
+		// It automatically executes the FModioBackgroundThread::Stop() method and waits for the thread to finish
+		CurrentRunningThread->Kill(true);
+	}
+	CurrentRunningThread.Reset();
 }
 
 bool FModioBackgroundThread::Init()
@@ -81,36 +88,23 @@ uint32 FModioBackgroundThread::Run()
 {
 	while (!bStopThread)
 	{
-		if (!CurrentModio)
+		if (!CurrentModioSubsystem)
 		{
 			FPlatformProcess::Sleep(0.001f);
 			continue;
 		}
 
-		CurrentModio->RunPendingHandlers();
+		CurrentModioSubsystem->RunPendingHandlers();
 		FPlatformProcess::Sleep(0.001f);
 	}
 
 	UE_LOG(LogModio, Warning, TEXT("MODIO THREAD EXITED"));
-
 	return 0;
 }
 
 void FModioBackgroundThread::Stop()
 {
 	bStopThread = true;
-}
-
-void FModioBackgroundThread::Exit()
-{
-	delete this;
-}
-
-void FModioBackgroundThread::EndThread()
-{
-	Stop();
-	CurrentRunningThread->Kill();
-	CurrentRunningThread->WaitForCompletion();
 }
 
 void UModioSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -186,7 +180,7 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 
 	if (bUseBackgroundThread && !BackgroundThread)
 	{
-		BackgroundThread = new FModioBackgroundThread(this);
+		BackgroundThread = MakeUnique<FModioBackgroundThread>(this);
 	}
 
 #if WITH_EDITOR
@@ -333,7 +327,6 @@ FModioErrorCode UModioSubsystem::EnableModManagement(FOnModManagementDelegateFas
 						  {
 							  // @todo: For some smarter caching, look at the event and see if we should invalidate the
 							  // cache
-							  WeakThis->InvalidateUserInstallationCache();
 							  Callback.ExecuteIfBound(ToUnreal(Event));
 						  }
 					  }));
@@ -396,12 +389,10 @@ void UModioSubsystem::KillBackgroundThread()
 	return; // thread is not being destoyed between PIE sessions
 #endif
 
-	if (bUseBackgroundThread && BackgroundThread)
+	if (bUseBackgroundThread && BackgroundThread.IsValid())
 	{
-		BackgroundThread->Stop();
-		BackgroundThread->EndThread();
-		delete BackgroundThread;
-		BackgroundThread = NULL;
+		BackgroundThread->KillThreadSafe();
+		BackgroundThread.Reset();
 	}
 }
 
@@ -416,13 +407,13 @@ void UModioSubsystem::ShutdownAsync(FOnErrorOnlyDelegateFast OnShutdownComplete)
 #if WITH_EDITOR
 		WeakThis->bInitializedDuringPIE = false;
 #endif
-		WeakThis->KillBackgroundThread();
 
 		if (WeakThis->bUseBackgroundThread)
 		{
 			AsyncTask(ENamedThreads::GameThread, ([WeakThis, ec, OnShutdownComplete]() {
 						  if (WeakThis.IsValid())
 						  {
+							  WeakThis->KillBackgroundThread();
 							  WeakThis->InvalidateUserSubscriptionCache();
 							  OnShutdownComplete.ExecuteIfBound(ToUnreal(ec));
 						  }
@@ -476,17 +467,9 @@ const TMap<FModioModID, FModioModCollectionEntry>& UModioSubsystem::QueryUserSub
 	return CachedUserSubscriptions.GetValue();
 }
 
-const TMap<FModioModID, FModioModCollectionEntry>& UModioSubsystem::QueryUserInstallations(bool bIncludeOutdatedMods)
+TMap<FModioModID, FModioModCollectionEntry> UModioSubsystem::QueryUserInstallations(bool bIncludeOutdatedMods)
 {
-	TOptional<TMap<FModioModID, FModioModCollectionEntry>>& UserInstallation =
-		bIncludeOutdatedMods ? CachedUserInstallationWithOutdatedMods : CachedUserInstallationWithoutOutdatedMods;
-
-	if (!UserInstallation)
-	{
-		UserInstallation =
-			ToUnreal<FModioModID, FModioModCollectionEntry>(Modio::QueryUserInstallations(bIncludeOutdatedMods));
-	}
-	return UserInstallation.GetValue();
+	return ToUnreal<FModioModID, FModioModCollectionEntry>(Modio::QueryUserInstallations(bIncludeOutdatedMods));
 }
 
 TOptional<FModioUser> UModioSubsystem::QueryUserProfile()
@@ -897,12 +880,6 @@ void UModioSubsystem::K2_GetUserMediaAvatarAsync(EModioAvatarSize AvatarSize, FO
 void UModioSubsystem::InvalidateUserSubscriptionCache()
 {
 	CachedUserSubscriptions.Reset();
-}
-
-void UModioSubsystem::InvalidateUserInstallationCache()
-{
-	CachedUserInstallationWithOutdatedMods.Reset();
-	CachedUserInstallationWithoutOutdatedMods.Reset();
 }
 
 FModioImageCache& UModioSubsystem::GetImageCache() const

@@ -13,8 +13,14 @@
 #include "../../Public/Objects/ModioEditModParamsObject.h"
 #include "PropertyEditing.h"
 #include "Widgets/Input/SCheckBox.h"
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
 #include <DesktopPlatform/Public/IDesktopPlatform.h>
-#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+	#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+#else
+	#include "DesktopPlatformModule.h"
+	#include "IDesktopPlatform.h"
+#endif
 #include <Framework/Application/SlateApplication.h>
 #include <WindowManager.h>
 #include <Widgets/Images/SThrobber.h>

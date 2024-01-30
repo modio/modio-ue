@@ -19,6 +19,11 @@
 			"LoadingPhase": "Default"
 		},
 		{
+			"Name": "ModioUICore",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
 			"Name": "ModioEx",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
@@ -29,45 +34,15 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "ModioUICore",
-			"Type": "Runtime",
-			"LoadingPhase": "PreDefault"
-		},
-		{
 			"Name": "ModioTests",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "ModioUIEditor",
-			"Type": "Editor",
-			"LoadingPhase": "PostEngineInit"
-		},
-		{
-			"Name": "MSDFSupportEditor",
-			"Type": "Editor",
-			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux"
-			]
-		},
-		{
-			"Name": "MSDFSupport",
-			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
-				"Win64",
-				"Mac",
-				"Linux"
-			]
-		},
-		{
 			"Name": "uring",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
+			"PlatformAllowList": [
 				"Linux"
 			]
 		},
@@ -75,7 +50,7 @@
 			"Name": "mbedtls",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
+			"PlatformAllowList": [
 				"Linux"
 			]
 		},
@@ -87,8 +62,14 @@
 	],
 	"LocalizationTargets": [
 		{
-			"Name": "ModioUI",
+			"Name": "ModioUI5",
 			"LoadingPolicy": "Always"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "CommonUI",
+			"Enabled": true
 		}
 	]
 }

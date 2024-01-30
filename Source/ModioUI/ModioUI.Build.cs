@@ -1,40 +1,60 @@
-/* 
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
- *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
- *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+/*
+ *  Copyright (C) 2023 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
+ *
  */
 
 using System.IO;
-using System.Collections.Generic;
 using UnrealBuildTool;
 
 public class ModioUI : ModuleRules
 {
-    public ModioUI(ReadOnlyTargetRules Target) : base(Target)
-    {
-        PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
-        PrivatePCHHeaderFile = "Private/ModioUIPrivatePCH.h";
-        bEnableUndefinedIdentifierWarnings = false;
-        bEnforceIWYU = true;
-        //bUseUnity = false;
-        
-        PublicDependencyModuleNames.AddRange(new string[] {
-            "Core", "Engine", "UMG", "Slate", "SlateCore", "InputCore", "Modio", "ModioUICore", "PropertyPath", "RHI", "MSDFSupport"
-			// ... add other public dependencies that you statically link with here ...
+	public ModioUI(ReadOnlyTargetRules Target) : base(Target)
+	{
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"Projects"
 		});
 
-        PrivateDependencyModuleNames.AddRange(new string[] {
-            "CoreUObject", "RenderCore", "WidgetCarousel", "ApplicationCore", "AppFramework", "AssetRegistry"
-			// ... add private dependencies that you statically link with here ...
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"Slate",
+			"SlateCore",
+			"UMG",
+			"Modio",
+			"ModioUICore",
+			"DeveloperSettings",
+			"HTTP",
+			"InputCore"
 		});
 
-        DynamicallyLoadedModuleNames.AddRange(new string[] {
-			// ... add any modules that your module loads dynamically here ...
+		if (Target.Version.MajorVersion >= 5 && Target.Version.MinorVersion >= 0)
+		{
+			PublicDependencyModuleNames.AddRange(new string[]
+			{
+				"CommonUI",
+				"CommonInput",
+				"GameplayTags"
+			});
+		}
+
+		PublicIncludePaths.AddRange(new string[]
+		{
+			Path.Combine(ModuleDirectory, "Public")
 		});
 
-    }
+		PrivateIncludePaths.AddRange(new string[]
+		{
+			Path.Combine(ModuleDirectory, "Private")
+		});
+	}
 }

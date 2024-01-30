@@ -39,7 +39,6 @@ FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 	Out.Theme = ToUnreal(In.Theme);
 	Out.Stats = ToUnreal(In.Stats);
 	Out.OtherUrls = ToUnreal<FModioOtherUrl>(In.OtherUrls);
-	Out.Platforms = ToUnreal<EModioModfilePlatform>(In.Platforms);
 	Out.GameMonetizationOptions = ToUnreal<EGameMonetizationFlags, Modio::GameMonetizationOptions>(In.GameMonetizationOptions);
 	Out.VirtualTokenName = ToUnreal(In.VirtualTokenName);
 	Out.PlatformSupport = ToUnreal<FModioGamePlatform>(In.PlatformSupport);

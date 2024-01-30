@@ -1,6 +1,7 @@
 #include "ModioEditor.h"
 #include "ModioEditorSettings.h"
 #include "Runtime/Launch/Resources/Version.h"
+#include "Misc/EngineVersionComparison.h"
 
 #if WITH_EDITOR
 	#include "ISettingsModule.h"
@@ -114,7 +115,11 @@ void FModioEditor::PluginButtonClicked()
 		const FText Message = FText::FromString("Please specify a valid Game Id and Api Key in 'Project Settings->Plugins->mod.io'");
 
 		UE_LOG(LogTemp, Error, TEXT("%s"), *Message.ToString());
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
 		EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, &Title);
+		#else
+		EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, Title);
+		#endif
 		if (UserSelection == EAppReturnType::Ok)
 		{
 			return;

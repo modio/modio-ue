@@ -11,7 +11,10 @@
 #pragma once
 
 #include "Containers/Queue.h"
-#include "Core/Public/HAL/Runnable.h"
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_OLDER_THAN(5, 3, 0)
+	#include "Core/Public/HAL/Runnable.h"
+#endif
 #include "HAL/Runnable.h"
 #include "HAL/RunnableThread.h"
 #include "ModioImageCache.h"
@@ -41,6 +44,7 @@
 #include "Types/ModioUser.h"
 #include "Types/ModioUserList.h"
 #include "Types/ModioValidationError.h"
+#include "Templates/UniquePtr.h"
 
 #include "ModioSubsystem.generated.h"
 
@@ -97,25 +101,30 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCo
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErrorCode, ErrorCode, FModioOptionalMapPreview, ModioPreviewMap);
 
-class ARunnableThread;
+class UModioSubsystem;
 
 class FModioBackgroundThread : public FRunnable
 {
 public:
-	bool bStopThread = false;
+	FModioBackgroundThread(UModioSubsystem* ModioSubsystem);
+	virtual ~FModioBackgroundThread();
 
-	FModioBackgroundThread(class UModioSubsystem* modio);
-	~FModioBackgroundThread();
+	/**
+	 * Safely kills the thread. This will wait for the thread to finish any pending work (in Run()) before exiting
+	 */
+	void KillThreadSafe();
 
+	//~ Begin FRunnable Interface
 	virtual bool Init() override;
 	virtual uint32 Run() override;
 	virtual void Stop() override;
-	virtual void Exit() override;
+	//~ End FRunnable Interface
 
-	void EndThread();
+protected:
+	bool bStopThread = false;
 
-	class UModioSubsystem* CurrentModio;
-	FRunnableThread* CurrentRunningThread = nullptr;
+	UModioSubsystem* CurrentModioSubsystem;
+	TUniquePtr<FRunnableThread> CurrentRunningThread;
 };
 
 /**
@@ -129,7 +138,7 @@ class UModioSubsystem : public UEngineSubsystem
 	GENERATED_BODY()
 
 protected:
-	class FModioBackgroundThread* BackgroundThread = nullptr;
+	TUniquePtr<FModioBackgroundThread> BackgroundThread;
 
 #if WITH_EDITOR
 	/// @brief Internal method used for emitting a warning during PIE if the Plugin was initialized during that PIE
@@ -335,7 +344,7 @@ public:
 	 * mods
 	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|User")
-	MODIO_API const TMap<FModioModID, FModioModCollectionEntry>& QueryUserInstallations(bool bIncludeOutdatedMods);
+	MODIO_API TMap<FModioModID, FModioModCollectionEntry> QueryUserInstallations(bool bIncludeOutdatedMods);
 
 	/**
 	 * @brief Fetches the currently authenticated mod.io user profile if there is one associated with the current
@@ -782,7 +791,6 @@ private:
 	TUniquePtr<struct FModioImageCache> ImageCache;
 
 	void InvalidateUserSubscriptionCache();
-	void InvalidateUserInstallationCache();
 
 private:
 	/** Maps two letter ISO 639-1 language codes to EModioLanguage values */
@@ -805,10 +813,6 @@ private:
 
 	/** Cached user profile */
 	TOptional<FModioUser> CachedUserProfile;
-
-	/** Cached list of user installation */
-	TOptional<TMap<FModioModID, FModioModCollectionEntry>> CachedUserInstallationWithOutdatedMods;
-	TOptional<TMap<FModioModID, FModioModCollectionEntry>> CachedUserInstallationWithoutOutdatedMods;
 
 public:
 #pragma region Blueprint methods

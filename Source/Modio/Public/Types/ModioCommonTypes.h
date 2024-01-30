@@ -56,6 +56,24 @@ enum class EModioPortal : uint8
 };
 
 /**
+ * Enum representing a named platform that the plugin is running on.
+ **/
+UENUM(BlueprintType)
+enum class EModioPlatformName : uint8
+{
+	Windows,
+	Mac,
+	Linux,
+	PS4,
+	PS5,
+	XBoxOne,
+	XSX,
+	Switch,
+	Unknown
+};
+
+
+/**
  * Enum representing the platform(s) that a modfile is enabled for
  **/
 UENUM(BlueprintType)

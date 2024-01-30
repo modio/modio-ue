@@ -18,43 +18,74 @@
 #include "ModioUIAsyncLoader.generated.h"
 
 /**
-* Class definition for a Modio async loader UI that contains references to other widgets
-**/
-UCLASS()
+ * Async loader widget which can switch between three states: InProgress, Success, and Failure
+ */
+UCLASS(Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io UI"))
 class MODIOUICORE_API UModioUIAsyncLoader : public UWidget, public IModioUIAsyncHandlerWidget, public INamedSlotInterface
 {
 	GENERATED_BODY()
 protected:
+	/**
+	 * Current state of the async operation
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Widgets")
 	EModioUIAsyncOperationWidgetState CurrentState = EModioUIAsyncOperationWidgetState::InProgress;
 
-	TSharedPtr<class SWidgetSwitcher> MyWidgetSwitcher;
-
+	/**
+	 * Mapping of slot names ("Error Widget", "Loading Widget", "Widget") to the widgets that are assigned to them
+	 */
 	UPROPERTY()
 	TMap<FName, UWidget*> NamedWidgets;
 
+	//~ Begin INamedSlotInterface Interface
 	virtual void GetSlotNames(TArray<FName>& SlotNames) const override;
-
 	virtual UWidget* GetContentForSlot(FName SlotName) const override;
-
 	virtual void SetContentForSlot(FName SlotName, UWidget* Content) override;
+	//~ End INamedSlotInterface Interface
+
+	//~ Begin UVisual Interface
 	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
+	//~ End UVisual Interface
+
+
+	//~ Begin UWidget Interface
+public:
 	virtual void SynchronizeProperties() override;
+protected:
+	virtual TSharedRef<SWidget> RebuildWidget() override;
+	//~ End UWidget Interface
+
+	/**
+	 * Called when the retry is requested
+	 */
 	UFUNCTION()
-	void OnRetryRequested();
+	virtual void OnRetryRequested();
+
+	/**
+	 * Called when the async operation state changes
+	 */
 	UFUNCTION()
 	virtual void NativeHandleAsyncOperationStateChange(EModioUIAsyncOperationWidgetState NewState);
 
-	virtual EModioUIAsyncOperationWidgetState NativeGetAsyncOperationState() const override;
-
+	//~ Begin IModioUIAsyncHandlerWidget Interface
 	virtual void NativeLinkAsyncOperationWidget(const TScriptInterface<IModioUIAsyncOperationWidget>& Widget) override;
+	virtual EModioUIAsyncOperationWidgetState NativeGetAsyncOperationState() const override;
+	//~ End IModioUIAsyncHandlerWidget Interface
 
-	virtual TSharedRef<SWidget> RebuildWidget() override;
-
+	/**
+	 * Gets the content widget for the current state
+	 * @return The content widget
+	 */
 	virtual UWidget* GetContentWidget();
 
 public:
-
+	/**
+	 * Retries the async operation
+	 */
 	UFUNCTION()
 	void Retry();
+
+protected:
+	/** Switcher that contains the three widgets for each state */
+	TSharedPtr<class SWidgetSwitcher> MyWidgetSwitcher;
 };

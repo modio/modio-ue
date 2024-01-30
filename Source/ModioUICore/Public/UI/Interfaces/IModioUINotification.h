@@ -16,6 +16,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioErrorCode.h"
 #include "UObject/Interface.h"
+#include "Misc/Crc.h"
 
 #include "IModioUINotification.generated.h"
 
@@ -26,6 +27,27 @@ USTRUCT(BlueprintType)
 struct MODIOUICORE_API FModioNotificationParams
 {
 	GENERATED_BODY()
+
+	FModioNotificationParams() = default;
+
+	bool operator==(const FModioNotificationParams& Other) const
+	{
+		return ErrorCode == Other.ErrorCode && NotificationContextObject == Other.NotificationContextObject && Duration
+		       == Other.Duration && FormatArgs.Num() == Other.FormatArgs.Num() && NamedTextFormats.Num();
+	}
+
+	bool operator!=(const FModioNotificationParams& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	friend uint32 GetTypeHash(const FModioNotificationParams& Other)
+	{
+		return FCrc::MemCrc32(&Other.ErrorCode, sizeof(FModioErrorCode)) ^
+		       ::GetTypeHash(Other.NotificationContextObject) ^ ::GetTypeHash(Other.Duration) ^
+		       FCrc::MemCrc32(&Other.FormatArgs, sizeof(FFormatNamedArguments)) ^ FCrc::MemCrc32(
+			       &Other.NamedTextFormats, sizeof(TMap<FName, FText>));
+	}
 
 	/**
 	* Key-value pair dictionary typedef to give format to the notification
@@ -91,6 +113,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams CreateSubscriptionNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo);
 
+	/**
+	 * Create a notification parameters instance using an error code
+	 * @param StatusCode The modio error code to store
+	 * @param ModInfo A class interface related to ModInfoUIDetails
+	 * @return FModioNotificationParams instance
+	 */
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
+	static FModioNotificationParams CreateUnsubscriptionNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo);
+
+	/**
+	 * Create a notification parameters instance using an error code
+	 * Intended to be used when the user is trying to forcibly uninstall a mod (e.g. when the mod is installed for another user but not the current user)
+	 * @param StatusCode The modio error code to store
+	 * @param ModInfo A class interface related to ModInfoUIDetails
+	 * @return FModioNotificationParams instance
+	 */
 	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams CreateUninstallNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo);
 
