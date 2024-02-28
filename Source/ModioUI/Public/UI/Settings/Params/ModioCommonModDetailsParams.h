@@ -90,18 +90,18 @@ struct MODIOUI_API FModioCommonModDetailsParamsSettings
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText ExtractingLabel = NSLOCTEXT("Modio", "Extracting", "Extracting");
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle SubscribeInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle CancelInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle RateUpInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle RateDownInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle OpenReportInputAction;
 };

@@ -56,7 +56,7 @@ public:
 	/**
 	 * Bitmask of the buttons to display in the dialog
 	 */
-	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "EModioCommonDialogButtonType"), Category = "Dialog")
+	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "/Script/ModioUI.EModioCommonDialogButtonType"), Category = "Dialog")
 	uint8 ButtonsToDisplay = 0;
 
 	/**

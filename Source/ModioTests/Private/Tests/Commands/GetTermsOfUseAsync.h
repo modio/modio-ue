@@ -25,7 +25,7 @@ public:
 	using FModioTestLatentCommandBase::Update;
 	virtual void Start() override
 	{
-		Modio->GetTermsOfUseAsync(EModioLanguage::English, FOnGetTermsOfUseDelegateFast::CreateSP(this, &FModioGetTermsOfUseAsyncCommand::Callback));
+		Modio->GetTermsOfUseAsync(FOnGetTermsOfUseDelegateFast::CreateSP(this, &FModioGetTermsOfUseAsyncCommand::Callback));
 	}
 	void Callback(FModioErrorCode ec, TOptional<FModioTerms> Terms)
 	{

@@ -46,7 +46,7 @@ void UModioCommonQuickAccessTabView::HandleOnMainGameMenuButtonClicked_Implement
 {
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
-		Subsystem->ExecuteOnModBrowserClosedDelegate();
+		Subsystem->ExecuteOnModBrowserCloseRequestedDelegate();
 	}
 }
 

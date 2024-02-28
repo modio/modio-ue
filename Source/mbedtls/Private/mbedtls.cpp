@@ -6,12 +6,12 @@ DEFINE_LOG_CATEGORY(mbedtls);
 
 void Fmbedtls::StartupModule()
 {
-	UE_LOG(mbedtls, Warning, TEXT("mbedtls module has been loaded"));
+	UE_LOG(mbedtls, Display, TEXT("mbedtls module has been loaded"));
 }
 
 void Fmbedtls::ShutdownModule()
 {
-	UE_LOG(mbedtls, Warning, TEXT("mbedtls module has been unloaded"));
+	UE_LOG(mbedtls, Display, TEXT("mbedtls module has been unloaded"));
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -51,9 +51,9 @@ struct MODIOUI_API FModioCommonFilteredModListParams
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText TotalSingleModTextFormat = NSLOCTEXT("Modio", "CurrentPageTextFormat", "{0} mod found");
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle PreviousPageInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle NextPageInputAction;
 };

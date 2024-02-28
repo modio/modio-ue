@@ -788,33 +788,31 @@ void UModioSubsystem::K2_AuthenticateUserExternalAsync(const FModioAuthenticatio
 		User, Provider,
 		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
-// Deprecated
-void UModioSubsystem::GetTermsOfUseAsync(EModioAuthenticationProvider Provider, EModioLanguage Locale,
-										 FOnGetTermsOfUseDelegateFast Callback)
-{
-	GetTermsOfUseAsync(Locale, Callback);
-}
 
-void UModioSubsystem::GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegateFast Callback)
+void UModioSubsystem::GetTermsOfUseAsync(FOnGetTermsOfUseDelegateFast Callback)
 {
-	Modio::GetTermsOfUseAsync(ToModio(Locale), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms) {
+	Modio::GetTermsOfUseAsync( [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::Terms> Terms) {
 		AsyncTask(ENamedThreads::GameThread,
 				  ([Callback, ec, Terms]() { Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioTerms>(Terms)); }));
 	});
 }
-// Deprecated
-void UModioSubsystem::K2_GetTermsOfUseAsync_DEPRECATED(EModioAuthenticationProvider Provider, EModioLanguage Locale,
-													   FOnGetTermsOfUseDelegate Callback)
-{
-	K2_GetTermsOfUseAsync(Locale, Callback);
-}
 
-void UModioSubsystem::K2_GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegate Callback)
+void UModioSubsystem::K2_GetTermsOfUseAsync( FOnGetTermsOfUseDelegate Callback)
 {
-	GetTermsOfUseAsync(Locale, FOnGetTermsOfUseDelegateFast::CreateLambda(
+	GetTermsOfUseAsync(FOnGetTermsOfUseDelegateFast::CreateLambda(
 								   [Callback](FModioErrorCode ec, TOptional<FModioTerms> Terms) {
 									   Callback.ExecuteIfBound(ec, ToBP<FModioOptionalTerms>(Terms));
 								   }));
+}
+
+void UModioSubsystem::SetLanguage(EModioLanguage Locale)
+{
+	Modio::SetLanguage(ToModio(Locale));
+}
+
+void UModioSubsystem::K2_SetLanguage(EModioLanguage Locale)
+{
+	SetLanguage(Locale);
 }
 
 void UModioSubsystem::ClearUserDataAsync(FOnErrorOnlyDelegateFast Callback)
@@ -1138,6 +1136,21 @@ void UModioSubsystem::K2_GetMutedUsersAsync(FOnMuteUsersDelegate Callback)
 bool UModioSubsystem::IsUsingBackgroundThread()
 {
 	return bUseBackgroundThread;
+}
+
+FString UModioSubsystem::GetDefaultModInstallationDirectory(FModioGameID GameID)
+{
+	return ToUnreal(Modio::GetDefaultModInstallationDirectory(ToModio(GameID)));
+}
+
+FString UModioSubsystem::GetDefaultModInstallationDirectory(int64 GameID)
+{
+	return GetDefaultModInstallationDirectory(FModioGameID(GameID));
+}
+
+FString UModioSubsystem::K2_GetDefaultModInstallationDirectory(FModioGameID GameID)
+{
+	return GetDefaultModInstallationDirectory(GameID);
 }
 
 EModioLanguage UModioSubsystem::ConvertLanguageCodeToModio(FString LanguageCode)

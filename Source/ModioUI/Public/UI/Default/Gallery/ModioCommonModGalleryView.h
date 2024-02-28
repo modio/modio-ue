@@ -11,9 +11,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Types/ModioModInfo.h"
 #include "UI/Foundation/Base/ModioCommonActivatableWidget.h"
 #include "UI/Interfaces/IModioUIAsyncOperationWidget.h"
+#include "Types/ModioCommonTypes.h"
 #include "ModioCommonModGalleryView.generated.h"
 
 class UHorizontalBox;
@@ -47,6 +47,7 @@ public:
 	void SetStyle(UPARAM(DisplayName = "Style") TSubclassOf<UModioCommonModGalleryViewStyle> InStyle);
 
 protected:
+	/** The style of the Mod Gallery View within the Mod.io Common UI styling system */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), DisplayName = "Style", Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonModGalleryViewStyle> ModioStyle;
 
@@ -69,23 +70,32 @@ protected:
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
 	//~ End UCommonActivatableWidget Interface
 
+	/** The size of the gallery image to display */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mod.io Common UI|Properties")
+	EModioGallerySize GallerySize = EModioGallerySize::Thumb1280;
+
+	/** The size of the logo to display when there is no gallery image */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mod.io Common UI|Properties")
+	EModioLogoSize LogoSize = EModioLogoSize::Thumb1280;
+
+	/** List of gallery image thumbnails used to navigate between images */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonListView> ImageNavButtons;
 
-	/** Stored property to selected gallery image */
+	/** Currently selected gallery image */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonDynamicImage> SelectedGalleryImage;
 
-	/** Stored property to the previous button */
+	/** Button to go to the previous image */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonButtonBase> PreviousButton;
 	
-	/** Stored property to the next button */
+	/** Button to go to the next image */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonButtonBase> NextButton;
 
 	/** Loader widget to display while the mod gallery is loading */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"), Category = "Mod.io Common UI|Widgets")
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "/Script/ModioUICore.ModioUIAsyncHandlerWidget"), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UWidget> ModGalleryLoader;
 
 	/** Widget to display when there is an error loading the mod gallery */
@@ -96,11 +106,19 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void RefreshGallery();
 
+	/**
+	 * Sets the visibility of the previous button
+	 * @param bVisible Whether the previous button should be visible
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void SetPreviousButtonVisibility(bool bVisible);
+	void SetPreviousButtonVisibility(bool bIsVisible);
 
+	/**
+	 * Sets the visibility of the next button
+	 * @param bVisible Whether the next button should be visible
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void SetNextButtonVisibility(bool bVisible);
+	void SetNextButtonVisibility(bool bIsVisible);
 
 public:
 	/** Go to next image */
@@ -111,26 +129,34 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void GoToPreviousImage();
 
-	/** 
-	* Go to previous image
-	* @returns Returns the image at the current index
-	*/
+	/**
+	 * Gets the currently selected gallery image index
+	 * @return The currently selected gallery image index
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	int32 GetCurrentImageGalleryIndex();
+	int32 GetSelectedImageGalleryIndex();
 
-	/** 
-	* Go to previous image
-	* @returns Returns the number of gallery images
-	*/
+	/**
+	 * Go to previous image
+	 * @returns Returns the number of gallery images
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Mod.io Common UI")
 	int32 GetNumGalleryImages();
 
+	/**
+	 * Adds a default gallery image to the gallery (if there is no gallery image)
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Mod.io Common UI")
 	void AddDefaultGalleryImage();
 
+	/**
+	 * Adds a gallery image to the gallery
+	 * @param ImageGalleryIndex The index of the image to add (used to load via UModioSubsystem::GetModMediaAsync)
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "Mod.io Common UI")
 	void AddGalleryImage(int32 ImageGalleryIndex);
 
 private:
+	/** Currently selected gallery image index */
 	int32 CurrentImageGalleryIndex = 0;
 };

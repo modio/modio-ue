@@ -51,7 +51,7 @@ class MODIOUI_API UModioCommonModBrowser : public UModioCommonModBrowserBase
 
 protected:
 	/** Notification controller widget that handles displaying notifications to the user */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, MustImplement = "ModioUINotificationController"), Category = "Mod.io Common UI")
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, MustImplement = "/Script/ModioUICore.ModioUINotificationController"), Category = "Mod.io Common UI")
 	TObjectPtr<UWidget> NotificationController;
 
 	/** User Profile widget that displays the basic information about a user */

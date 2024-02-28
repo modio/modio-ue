@@ -6,12 +6,12 @@ DEFINE_LOG_CATEGORY(ModioUI);
 
 void FModioUI::StartupModule()
 {
-	UE_LOG(ModioUI, Warning, TEXT("ModioUI5 module has been loaded"));
+	UE_LOG(ModioUI, Display, TEXT("ModioUI5 module has been loaded"));
 }
 
 void FModioUI::ShutdownModule()
 {
-	UE_LOG(ModioUI, Warning, TEXT("ModioUI5 module has been unloaded"));
+	UE_LOG(ModioUI, Display, TEXT("ModioUI5 module has been unloaded"));
 }
 
 #undef LOCTEXT_NAMESPACE

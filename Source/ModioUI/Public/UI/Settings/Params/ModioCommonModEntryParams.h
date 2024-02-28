@@ -90,18 +90,18 @@ struct MODIOUI_API FModioCommonModEntryParamsSettings
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Delays", meta = (UIMin = 0.0, UIMax = 2.0))
 	float DeselectionDelay = 0.5f;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle SubscribeInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle CancelInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle SwitchEnabledInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle OpenModDetailsInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle ForceUninstallInputAction;
 };

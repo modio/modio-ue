@@ -39,7 +39,8 @@ std::map<std::string, std::string> ToModio(const TMap<FString, FString>& StringM
 
 std::chrono::system_clock::time_point ToModioDateTime(FDateTime Time)
 {
-	return std::chrono::system_clock::time_point(std::chrono::system_clock::duration(Time.ToUnixTimestamp()));
+	std::chrono::seconds DurationSinceEpoch(Time.ToUnixTimestamp());
+	return std::chrono::system_clock::time_point(DurationSinceEpoch);
 }
 
 int64 ToUnreal(std::int64_t Value)
@@ -153,6 +154,8 @@ Modio::GallerySize ToModio(EModioGallerySize GallerySize)
 			return Modio::GallerySize::Original;
 		case EModioGallerySize::Thumb320:
 			return Modio::GallerySize::Thumb320;
+		case EModioGallerySize::Thumb1280:
+			return Modio::GallerySize::Thumb1280;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EModioGallerySize GallerySize)"));
@@ -360,15 +363,15 @@ EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& PlatformIn)
 
 EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In)
 {
-    switch (In)
-    {
-        case Modio::UserSubscriptionList::ChangeType::Added:
-            return EModioModChangeType::Added;
-        case Modio::UserSubscriptionList::ChangeType::Removed:
-            return EModioModChangeType::Removed;
-        case Modio::UserSubscriptionList::ChangeType::Updated:
-            return EModioModChangeType::Updated;
-        default:
-            return EModioModChangeType::Removed;
-    }
+	switch (In)
+	{
+		case Modio::UserSubscriptionList::ChangeType::Added:
+			return EModioModChangeType::Added;
+		case Modio::UserSubscriptionList::ChangeType::Removed:
+			return EModioModChangeType::Removed;
+		case Modio::UserSubscriptionList::ChangeType::Updated:
+			return EModioModChangeType::Updated;
+		default:
+			return EModioModChangeType::Removed;
+	}
 }

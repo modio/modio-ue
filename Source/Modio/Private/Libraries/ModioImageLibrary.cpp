@@ -72,6 +72,8 @@ FVector2D UModioImageLibrary::GetGallerySize(UTexture* GalleryImage, EModioGalle
 										 : FVector2D(EForceInit::ForceInitToZero);
 		case EModioGallerySize::Thumb320:
 			return FVector2D(320, 180);
+		case EModioGallerySize::Thumb1280:
+			return FVector2D(1280, 720);
 	}
 
 	return FVector2D(EForceInit::ForceInitToZero);

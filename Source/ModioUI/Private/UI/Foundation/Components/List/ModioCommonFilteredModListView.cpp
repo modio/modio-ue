@@ -22,6 +22,7 @@
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
 #include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonFilteredModListParams.h"
+#include "Containers/Ticker.h"
 
 void UModioCommonFilteredModListView::SetStyle(TSubclassOf<UModioCommonFilteredModListViewStyle> InStyle)
 {
@@ -428,22 +429,35 @@ void UModioCommonFilteredModListView::NativeOnListAllModsRequestCompleted(FStrin
 	}
 
 	IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::Success);
-	FocusOnDesiredWidget();
+
+	// We should delay the focus on the desired widget to the next frame as the list view will not be fully refreshed until then
+	FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateWeakLambda(this, [this](float DeltaTime)
+	{
+		if (TotalMods > 0 && GetNumItems() <= 0)
+		{
+			// If we have mods but no items, we need to wait for the list to be populated
+			return true;
+		}
+
+		FocusOnDesiredWidget();
+		// We only want to focus once, so we remove the ticker
+		return false;
+	}));
 }
 
-void UModioCommonFilteredModListView::SetInitialScreenVisibility_Implementation(bool bVisible)
+void UModioCommonFilteredModListView::SetInitialScreenVisibility_Implementation(bool bIsVisible)
 {
 	if (InitialScreenContainer)
 	{
-		InitialScreenContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+		InitialScreenContainer->SetVisibility(bIsVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 
-void UModioCommonFilteredModListView::SetNoResultsVisibility_Implementation(bool bVisible)
+void UModioCommonFilteredModListView::SetNoResultsVisibility_Implementation(bool bIsVisible)
 {
 	if (NoResultsContainer)
 	{
-		NoResultsContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+		NoResultsContainer->SetVisibility(bIsVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 
@@ -486,11 +500,11 @@ void UModioCommonFilteredModListView::UpdateInputActions_Implementation()
 	}
 }
 
-void UModioCommonFilteredModListView::SetPageNavigationVisibility_Implementation(bool bVisible)
+void UModioCommonFilteredModListView::SetPageNavigationVisibility_Implementation(bool bIsVisible)
 {
 	if (PageNavigationContainer)
 	{
-		PageNavigationContainer->SetVisibility(bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+		PageNavigationContainer->SetVisibility(bIsVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 

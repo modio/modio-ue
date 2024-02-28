@@ -49,6 +49,7 @@ bool UModioUISubsystem::RequestModEnabledState(FModioModID ID, bool bNewEnabledS
 
 void UModioUISubsystem::SubscriptionHandler(FModioErrorCode ErrorCode, FModioModID ID)
 {
+	LastSubscriptionErrorCode = ErrorCode;
 	if (ErrorCode)
 	{
 		UE_LOG(ModioUICore, Warning, TEXT("Failed to subscribe to mod %s. Received error code %d: %s"),
@@ -403,7 +404,7 @@ FText UModioUISubsystem::FormatText(FText Input)
 
 UUserWidget* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UUserWidget> MenuClass,
 														  APlayerController* Controller,
-														  FOnModBrowserClosed BrowserClosedDelegate)
+														  FOnModBrowserCloseRequested OnModBrowserCloseRequestedDelegate)
 {
 	if (!MenuClass)
 	{
@@ -418,7 +419,7 @@ UUserWidget* UModioUISubsystem::ShowModBrowserUIForPlayer(TSubclassOf<UUserWidge
 
 	ModBrowserInstance = CreateWidget<UUserWidget>(Controller, MenuClass);
 	ModBrowserInstance->AddToViewport();
-	OnModBrowserClosed = BrowserClosedDelegate;
+	OnModBrowserCloseRequested = OnModBrowserCloseRequestedDelegate;
 	OwningPlayerController = Controller;
 	UModioSubsystem* subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
 	if (subsystem->QueryUserProfile().IsSet())
@@ -459,10 +460,10 @@ bool UModioUISubsystem::GetIsCollectionModDisableUIEnabled()
 	return false;
 }
 
-void UModioUISubsystem::ExecuteOnModBrowserClosedDelegate()
+void UModioUISubsystem::ExecuteOnModBrowserCloseRequestedDelegate()
 {
 	// Host application must bind BrowserClosedDelegate before creating ModBrowserUI
-	OnModBrowserClosed.ExecuteIfBound();
+	OnModBrowserCloseRequested.ExecuteIfBound();
 }
 
 void UModioUISubsystem::ShowUserAuth()

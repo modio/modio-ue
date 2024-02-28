@@ -33,6 +33,9 @@ public:
 	DECLARE_DELEGATE(UModioCommonAuthViewEmailAuthSucceeded);
 	UModioCommonAuthViewEmailAuthSucceeded OnEmailAuthSucceeded;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	void SetShowTermsOfView(bool bShow);
+
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UModioCommonWidgetSwitcher> AuthSwitcher;

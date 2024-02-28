@@ -82,7 +82,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")
 	TObjectPtr<UModioCommonTextBlock> NumOfErrorsTextBlock;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "ModioCommonModListViewInterface"), Category = "Mod.io Common UI|Collection View|Widgets")
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "/Script/ModioUI.ModioCommonModListViewInterface"), Category = "Mod.io Common UI|Collection View|Widgets")
 	TObjectPtr<UListView> ModList;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Collection View|Widgets")

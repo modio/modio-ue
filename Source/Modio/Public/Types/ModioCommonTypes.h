@@ -138,7 +138,10 @@ enum class EModioGallerySize : uint8
 	Original,
 
 	/** 320x180px Thumbnail **/
-	Thumb320
+	Thumb320,
+
+	/** 1280x720 Thumbnail **/
+	Thumb1280
 };
 
 /**
@@ -340,7 +343,7 @@ struct MODIO_API FModioOptionalModID
 /**
  * Strong type struct to wrap a GameID to uniquely identify a single game in mod.io
  **/
-USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeGameId"))
+USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeGameId"))
 struct MODIO_API FModioGameID
 {
 	GENERATED_BODY()
@@ -645,7 +648,7 @@ struct TStructOpsTypeTraits<FModioUserID> : public TStructOpsTypeTraitsBase2<FMo
 /**
  * Strong type struct to wrap an ApiKey, used to communicate with the mod.io service
  **/
-USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeApiKey"))
+USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeApiKey"))
 struct MODIO_API FModioApiKey
 {
 	GENERATED_BODY()
@@ -770,7 +773,7 @@ private:
 /**
  * Simple struct to encapsulate portal-specific data required when consuming entitlements
  **/
-USTRUCT(BlueprintType, meta = (HasNativeMake = "Modio.ModioCommonTypesLibrary.MakeEntitlementParams"))
+USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeEntitlementParams"))
 struct MODIO_API FModioEntitlementParams
 {
 	GENERATED_BODY()

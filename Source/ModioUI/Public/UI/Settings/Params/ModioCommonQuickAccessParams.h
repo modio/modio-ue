@@ -38,7 +38,7 @@ public:
 	}
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText MainGameMenuButtonLabel = NSLOCTEXT("Modio", "MainGameMenu", "Main Game Menu");
+	FText MainGameMenuButtonLabel = NSLOCTEXT("Modio", "MainMenu", "Main Menu");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText MyCollectionButtonLabel = NSLOCTEXT("Modio", "MyCollection", "My Collection");
@@ -49,13 +49,13 @@ public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText LogOutButtonLabel = NSLOCTEXT("Modio", "LogOutButtonLabel", "Log Out");
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle MainGameMenuInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle AuthInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle MyCollectionInputAction;
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Bool")

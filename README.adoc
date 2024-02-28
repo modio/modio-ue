@@ -77,7 +77,7 @@ Once this is done, you can configure the plugin and get started.
 
 The plugin requires some configuration information to behave correctly. You can access the configuration settings in the Project Settings window:
 
-image::Doc/img/UE4/plugin_settings.png[]
+image::Doc/img/plugin_settings.png[]
 
 The settings have the following parameters:
 
@@ -88,6 +88,7 @@ The settings have the following parameters:
 |[.paramname]#Environment#|Your current environment, Live or Test (check difference below)
 |[.paramname]#Log Level#|The default logging level to use. Messages with a lower log level will be silently discarded.
 |[.paramname]#Portal#|The default portal to use. This usually corresponds to the store your game will be being distributed through.
+|[.paramname]#Use Background Thread#|Run the mod.io plugin on a managed background thread.
 |===
 
 ==== Endpoint Environment

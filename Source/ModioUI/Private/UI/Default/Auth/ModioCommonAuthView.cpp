@@ -26,6 +26,14 @@
 #include "Types/ModioTerms.h"
 #include "Types/ModioAuthenticationParams.h"
 
+void UModioCommonAuthView::SetShowTermsOfView_Implementation(bool bShow)
+{
+	if (AuthSwitcher && TermsOfUseView && EmailAuthView && AuthSwitcher->GetActiveWidget() == TermsOfUseView)
+	{
+		AuthSwitcher->SetActiveWidget(bShow ? Cast<UWidget>(TermsOfUseView.Get()) : Cast<UWidget>(EmailAuthView.Get()));
+	}
+}
+
 void UModioCommonAuthView::NativeOnActivated()
 {
 	if (AuthSwitcher)
@@ -47,7 +55,10 @@ void UModioCommonAuthView::NativeOnActivated()
 			{
 				CurrentLanguage = Subsystem->ConvertLanguageCodeToModio(FInternationalization::Get().GetCurrentLanguage()->GetTwoLetterISOLanguageName());
 			}
-			Subsystem->GetTermsOfUseAsync(CurrentLanguage, FOnGetTermsOfUseDelegateFast::CreateWeakLambda(this, [this](FModioErrorCode ErrorCode, TOptional<FModioTerms> Terms) {
+
+			Subsystem->SetLanguage(CurrentLanguage);
+
+			Subsystem->GetTermsOfUseAsync(FOnGetTermsOfUseDelegateFast::CreateWeakLambda(this, [this](FModioErrorCode ErrorCode, TOptional<FModioTerms> Terms) {
 				if (!AuthSwitcher)
 				{
 					return;

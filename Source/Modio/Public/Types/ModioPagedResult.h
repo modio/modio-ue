@@ -46,7 +46,7 @@ struct MODIO_API FModioPagedResult
 	FModioPagedResult(int32 ResultOffset, int32 PageSize, int32 TotalResultCount, int32 ResultCount);
 
 	/**
-	 * Retrive the page index
+	 * Retrieve the index of this page
 	 * @result Integer value with the index
 	 **/
 	int32 GetPageIndex() const
@@ -55,7 +55,7 @@ struct MODIO_API FModioPagedResult
 	}
 
 	/**
-	 * Retrive the page size
+	 * Retrieve the amount of results per page
 	 * @result Integer value with the size
 	 **/
 	int32 GetPageSize() const
@@ -64,8 +64,17 @@ struct MODIO_API FModioPagedResult
 	}
 
 	/**
-	 * Retrive the total count of results
-	 * @result Integer value with the total amount of results
+	 * Retrieve the total amount of pages
+	 * @result Integer value with the page count
+	 **/
+	int32 GetPageCount() const
+	{
+		return PageCount;
+	}
+
+	/**
+	 * Retrieve the total amount of results
+	 * @result Integer value with the total result count
 	 **/
 	int32 GetTotalResultCount() const
 	{
@@ -73,8 +82,8 @@ struct MODIO_API FModioPagedResult
 	}
 
 	/**
-	 * Retrive the page count
-	 * @result Integer value with this page count
+	 * Retrieve the amount of results for this page
+	 * @result Integer value with the result count
 	 **/
 	int32 GetResultCount() const
 	{
@@ -83,31 +92,31 @@ struct MODIO_API FModioPagedResult
 
 protected:
 	/**
-	 * Stored property of referenced page index
+	 * @brief The index of this page
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|PagedResult|Page")
 	int32 PageIndex {};
 
 	/**
-	 * Stored property of referenced page size
+	 * @brief The amount of results allowed to be displayed within a page
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|PagedResult|Page")
 	int32 PageSize {};
 
 	/**
-	 * Stored property of referenced page count
+	 * @brief The total amount of pages
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|PagedResult|Page")
 	int32 PageCount {};
 
 	/**
-	 * Stored property of the result total count
+	 * @brief The total amount of results
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|PagedResult")
 	int32 TotalResultCount {};
 
 	/**
-	 * Stored property of the result count
+	 * @brief The amount of results for this page
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|PagedResult")
 	int32 ResultCount {};

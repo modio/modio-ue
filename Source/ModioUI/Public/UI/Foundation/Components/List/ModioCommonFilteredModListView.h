@@ -77,7 +77,7 @@ protected:
 	TSubclassOf<UModioCommonFilteredModListViewStyle> ModioStyle;
 
 	/** The list view to display the mods */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, MustImplement = "ModioCommonModListViewInterface"), Category = "Mod.io Common UI|Widgets")
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget, MustImplement = "/Script/ModioUI.ModioCommonModListViewInterface"), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UListView> ModList;
 
 	/** The container that holds the initial screen (the screen that is displayed by default when no search has been performed yet) */
@@ -113,7 +113,7 @@ protected:
 	TObjectPtr<UModioCommonTextBlock> TotalModsTextBlock;
 
 	/** Loader widget to display while the filtered mod list is loading */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"), Category = "Mod.io Common UI|Widgets")
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "/Script/ModioUICore.ModioUIAsyncHandlerWidget"), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UWidget> ModListLoader;
 
 	/** Widget to display when there is an error loading the filtered mod list */
@@ -186,10 +186,10 @@ protected:
 
 	/**
 	 * Sets the visibility of the page navigation buttons
-	 * @param bVisible Whether the page navigation buttons should be visible or not
+	 * @param bIsVisible Whether the page navigation buttons should be visible or not
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void SetPageNavigationVisibility(bool bVisible);
+	void SetPageNavigationVisibility(bool bIsVisible);
 
 	/**
 	 * Navigate to the previous page
@@ -205,17 +205,17 @@ protected:
 
 	/**
 	 * Sets the visibility of the initial screen (the screen that is displayed by default when no search has been performed yet)
-	 * @param bVisible Whether the initial screen should be visible or not
+	 * @param bIsVisible Whether the initial screen should be visible or not
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void SetInitialScreenVisibility(bool bVisible);
+	void SetInitialScreenVisibility(bool bIsVisible);
 
 	/**
 	 * Sets the visibility of the no results screen (the screen that is displayed when the search returns no results)
-	 * @param bVisible Whether the no results screen should be visible or not
+	 * @param bIsVisible Whether the no results screen should be visible or not
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void SetNoResultsVisibility(bool bVisible);
+	void SetNoResultsVisibility(bool bIsVisible);
 
 protected:
 	/** Whether the list view has been searched before or not */

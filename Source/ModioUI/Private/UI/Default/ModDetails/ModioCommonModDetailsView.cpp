@@ -896,6 +896,8 @@ void UModioCommonModDetailsView::HandleSubscribeClicked_Implementation()
 		return;
 	}
 
+	IsRateLimited(Subsystem->LastSubscriptionErrorCode);
+
 	const FModioModID ModID = Execute_GetModID(this);
 	
 	if (!Execute_IsModSubscribed(this))

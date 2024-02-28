@@ -826,6 +826,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <ul class="sectlevel2">
 <li><a href="#_ui_specific_plugin_modules">UI-Specific Plugin Modules</a></li>
 <li><a href="#_displaying_the_mod_browser">Displaying the Mod Browser</a></li>
+<li><a href="#_closing_the_mod_browser">Closing the Mod Browser</a></li>
 <li><a href="#_how_to_set_up_common_ui_for_project_to_use_mod_io_ue5_ui">How to Set Up Common UI for Project to Use Mod.io UE5 UI</a>
 <ul class="sectlevel3">
 <li><a href="#_enable_common_ui_plugin">Enable Common UI plugin</a></li>
@@ -876,6 +877,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 </li>
 <li><a href="#_modiocommonauthview">ModioCommonAuthView</a>
 <ul class="sectlevel3">
+<li><a href="#SetShowTermsOfView">Set Show Terms Of View</a></li>
 <li><a href="#OnTermsOfUseViewSubmitClicked">On Terms Of Use View Submit Clicked</a></li>
 <li><a href="#OnTermsOfUseViewLinkClicked">On Terms Of Use View Link Clicked</a></li>
 <li><a href="#OnTermsOfUseViewCancelClicked">On Terms Of Use View Cancel Clicked</a></li>
@@ -1130,7 +1132,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#RefreshGallery">Refresh Gallery</a></li>
 <li><a href="#GoToPreviousImage">Go to Previous Image</a></li>
 <li><a href="#GoToNextImage">Go to Next Image</a></li>
-<li><a href="#GetCurrentImageGalleryIndex">Get Current Image Gallery Index</a></li>
+<li><a href="#GetSelectedImageGalleryIndex">Get Selected Image Gallery Index</a></li>
 </ul>
 </li>
 <li><a href="#_modiocommonmodlistviewinterface">ModioCommonModListViewInterface</a>
@@ -1359,6 +1361,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#K2_SubmitModRatingAsync">SubmitModRatingAsync</a></li>
 <li><a href="#K2_SubmitModChangesAsync">SubmitModChangesAsync</a></li>
 <li><a href="#K2_ShutdownAsync">ShutdownAsync</a></li>
+<li><a href="#K2_SetLanguage">SetLanguage</a></li>
 <li><a href="#K2_RequestEmailAuthCodeAsync">RequestEmailAuthCodeAsync</a></li>
 <li><a href="#K2_ReportContentAsync">ReportContentAsync</a></li>
 <li><a href="#K2_QueryUserProfile">QueryUserProfile</a></li>
@@ -1453,7 +1456,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#GetIsCollectionModDisableUIEnabled">Get Is Collection Mod Disable UIEnabled</a></li>
 <li><a href="#GetCurrentDPIScaleValue">Get Current DPIScale Value</a></li>
 <li><a href="#FormatText">Format Text</a></li>
-<li><a href="#ExecuteOnModBrowserClosedDelegate">Execute on Mod Browser Closed Delegate</a></li>
+<li><a href="#ExecuteOnModBrowserCloseRequestedDelegate">Execute on Mod Browser Close Requested Delegate</a></li>
 <li><a href="#DisplayNotificationParams">Display Notification Params</a></li>
 <li><a href="#DisplayNotificationManual">Display Notification Manual</a></li>
 <li><a href="#DisplayNotification">Display Notification</a></li>
@@ -1617,6 +1620,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#GetDesiredFileSizeUnit">Get Desired File Size Unit</a></li>
 <li><a href="#GetDefaultSessionIdWindows">Get Default Session Id Windows</a></li>
 <li><a href="#Filesize_ToString">ToString (Filesize)</a></li>
+<li><a href="#K2_GetDefaultModInstallationDirectory">GetDefaultModInstallationDirectory</a></li>
 <li><a href="#Subtract">ModioUnsigned64 - ModioUnsigned64</a></li>
 <li><a href="#Percentage_Unsigned64">Percentage Unsigned 64</a></li>
 <li><a href="#NotEqualTo">ModioUnsigned64 != ModioUnsigned64</a></li>
@@ -1723,7 +1727,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="img/UE4/plugin_settings.png" alt="plugin settings">
+<img src="img/plugin_settings.png" alt="plugin settings">
 </div>
 </div>
 <div class="paragraph">
@@ -1750,6 +1754,10 @@ table.stripes-odd tr:nth-of-type(odd) {
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Log Level</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default logging level to use. Messages with a lower log level will be silently discarded.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Portal</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default portal to use. This usually corresponds to the store your game will be being distributed through.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Use Background Thread</span></p></td>
@@ -2648,7 +2656,7 @@ This collection includes mods that are still in the process of being installed! 
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">FetchExternalUpdates</span><span class="p">()</span>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">QueryUserSubscriptions</span><span class="p">()</span>
 <span class="p">{</span>
 	<span class="k">if</span> <span class="p">(</span><span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">())</span>
 	<span class="p">{</span>
@@ -3239,8 +3247,20 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="sect2">
 <h3 id="_displaying_the_mod_browser">Displaying the Mod Browser</h3>
 <div class="paragraph">
-<p>The main Mod Browser widget is located at <code>/Modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget</code>. After the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem <code>UModioUISubsystem</code> using the function <code>ShowModBrowserUIForPlayer()</code>.
+<p>The main Mod Browser widget is located at <code>Modio/Content/UI5/Default/Widgets/ModBrowser/W_ModioCommonModBrowser</code>. After the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem <code>UModioUISubsystem</code> using the function <code>ShowModBrowserUIForPlayer()</code>.
 Currently the mod browser does not support being embedded inside your own UI hierarchy, so you must load it directly (for instance, from a button on your main menu).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+When showing the Mod Browser UI, you can pass in a <code>FOnModBrowserCloseRequested</code> delegate. You can use this delegate first to check conditions before finally closing the browser, more details below in <a href="#_closing_the_mod_browser">Closing the Mod Browser</a>.
+</td>
+</tr>
+</table>
 </div>
 <details>
 <summary class="title">Blueprint Example</summary>
@@ -3269,9 +3289,9 @@ Currently the mod browser does not support being embedded inside your own UI hie
         <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PC</span> <span class="o">=</span> <span class="n">CurrentWorld</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">())</span>
         <span class="p">{</span>
             <span class="c1">// Create and bind a delegate to be invoked when the browser is closed</span>
-            <span class="n">FOnModBrowserClosed</span> <span class="n">BrowserClosedDelegate</span><span class="p">;</span>
-            <span class="c1">// OnModBrowserClosed needs to be marked UFUNCTION()</span>
-            <span class="n">BrowserClosedDelegate</span><span class="p">.</span><span class="n">BindDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ASomeActor</span><span class="o">::</span><span class="n">OnModBrowserClosed</span><span class="p">);</span>
+            <span class="n">FOnModBrowserCloseRequested</span> <span class="n">OnBrowserCloseRequestedDelegate</span><span class="p">;</span>
+            <span class="c1">// OnModBrowserCloseRequested needs to be marked UFUNCTION()</span>
+            <span class="n">OnBrowserCloseRequestedDelegate</span><span class="p">.</span><span class="n">BindDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ASomeActor</span><span class="o">::</span><span class="n">OnModBrowserCloseRequested</span><span class="p">);</span>
 
             <span class="c1">// Get a reference to the mod browser implementation (this will be exposed in the UI Settings object</span>
             <span class="c1">// in a future release)</span>
@@ -3282,7 +3302,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
             <span class="p">{</span>
                 <span class="c1">// Request the browser widget be instantiated and displayed</span>
                 <span class="n">UModioMenu</span><span class="o">*</span> <span class="n">MenuWidget</span> <span class="o">=</span>
-                    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">ReferencedClass</span><span class="p">,</span> <span class="n">PC</span><span class="p">,</span> <span class="n">BrowserClosedDelegate</span><span class="p">);</span>
+                    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">ReferencedClass</span><span class="p">,</span> <span class="n">PC</span><span class="p">,</span> <span class="n">OnBrowserCloseRequestedDelegate</span><span class="p">);</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">MenuWidget</span><span class="p">)</span>
                 <span class="p">{</span>
                     <span class="c1">// Focus the user on the browser</span>
@@ -3296,9 +3316,81 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </div>
 </div>
 </details>
-<div class="paragraph">
-<p>You can close the Mod Browser by calling <code>CloseModBrowserUI()</code> on the ModioUISubsystem.</p>
 </div>
+<div class="sect2">
+<h3 id="_closing_the_mod_browser">Closing the Mod Browser</h3>
+<div class="paragraph">
+<p>The Mod Browser can currently be closed from within the Quick Access tab - accessed by via the user profile icon at the top right of the window - and clicking on the 'Main Game Menu' button.
+This widget is located at <code>/Modio/Content/UI5/Default/Widgets/QuickAccess/W_ModioCommonQuickAccessTabView</code>, containing a <code>MainGameMenuButton</code> button, the input action for which can be customized in:</p>
+</div>
+<div class="paragraph">
+<p><code>Project Settings &#8594; Modio Common UI Settings &#8594; QuickAccess &#8594; Quick Access Params &#8594; MainGameMenuInputAction</code></p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_browserquickaccess.png" alt="plugin ui browserquickaccess">
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+As mentioned in the <a href="#_displaying_the_mod_browser">Displaying the Mod Browser</a> section a <code>FOnModBrowserCloseRequested</code> delegate is passed in, which is what is being called by the back button above.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The Mod Browser can be closed by calling <code>CloseModBrowserUI()</code> on the ModioUISubsystem, or conditionally after receiving the <code>FOnModBrowserCloseRequested</code> delegate callback.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="paragraph">
+<p>From Blueprint, you can use the <a href="#CloseModBrowserUI">Close Mod Browser UI</a> node to manually close the mod browser.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_closemodbrowser.png" alt="plugin ui closemodbrowser">
+</div>
+</div>
+<div class="paragraph">
+<p>Or to perform the same logic being done with the back button, use <a href="#ExecuteOnModBrowserCloseRequestedDelegate">Execute on Mod Browser Close Requested Delegate</a> and then handle that callback to finally close the UI as above.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/plugin_ui_closemodbrowser_2.png" alt="plugin ui closemodbrowser 2">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">UModioUISubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioUISubsystem</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">CloseModBrowserUI</span><span class="p">();</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Or to perform the same logic being done with the back button, use <a href="#ExecuteOnModBrowserCloseRequestedDelegate">Execute on Mod Browser Close Requested Delegate</a> and then handle that callback to finally close the UI as above.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">UModioUISubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioUISubsystem</span><span class="o">&gt;</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">ExecuteOnModBrowserCloseRequestedDelegate</span><span class="p">();</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
 </div>
 <div class="sect2">
 <h3 id="_how_to_set_up_common_ui_for_project_to_use_mod_io_ue5_ui">How to Set Up Common UI for Project to Use Mod.io UE5 UI</h3>
@@ -3953,6 +4045,20 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="sect2">
 <h3 id="_modiocommonauthview">ModioCommonAuthView</h3>
 <hr>
+<div class="sect3">
+<h4 id="SetShowTermsOfView">Set Show Terms Of View</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetShowTermsOfView.png" alt="nd img SetShowTermsOfView">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetShowTermsOfView</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bShow</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
 <div class="sect3">
 <h4 id="OnTermsOfUseViewSubmitClicked">On Terms Of Use View Submit Clicked</h4>
 <div class="imageblock">
@@ -5274,7 +5380,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetPageNavigationVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bVisible</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetPageNavigationVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIsVisible</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <h5 id="_parameters_34" class="discrete">Parameters</h5>
@@ -5289,7 +5395,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modio Common Filtered Mod List View Object Reference</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Visible</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Is Visible</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether the page navigation buttons should be visible or not</p></td>
 </tr>
 </tbody>
@@ -5305,7 +5411,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetNoResultsVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bVisible</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetNoResultsVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIsVisible</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <h5 id="_parameters_35" class="discrete">Parameters</h5>
@@ -5320,7 +5426,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modio Common Filtered Mod List View Object Reference</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Visible</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Is Visible</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether the no results screen should be visible or not</p></td>
 </tr>
 </tbody>
@@ -5336,7 +5442,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetInitialScreenVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bVisible</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetInitialScreenVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIsVisible</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <h5 id="_parameters_36" class="discrete">Parameters</h5>
@@ -5351,7 +5457,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modio Common Filtered Mod List View Object Reference</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Visible</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Is Visible</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether the initial screen should be visible or not</p></td>
 </tr>
 </tbody>
@@ -7102,9 +7208,26 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetPreviousButtonVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bVisible</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetPreviousButtonVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIsVisible</span><span class="p">)</span></code></pre>
 </div>
 </div>
+<h5 id="_parameters_66" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Common Mod Gallery View Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Is Visible</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 <div class="sect3">
@@ -7116,9 +7239,26 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetNextButtonVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bVisible</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetNextButtonVisibility</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIsVisible</span><span class="p">)</span></code></pre>
 </div>
 </div>
+<h5 id="_parameters_67" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Common Mod Gallery View Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Is Visible</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 <div class="sect3">
@@ -7164,18 +7304,18 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <hr>
 </div>
 <div class="sect3">
-<h4 id="GetCurrentImageGalleryIndex">Get Current Image Gallery Index</h4>
+<h4 id="GetSelectedImageGalleryIndex">Get Selected Image Gallery Index</h4>
 <div class="imageblock">
 <div class="content">
-<img src="img/nd_img_GetCurrentImageGalleryIndex.png" alt="nd img GetCurrentImageGalleryIndex">
+<img src="img/nd_img_GetSelectedImageGalleryIndex.png" alt="nd img GetSelectedImageGalleryIndex">
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetCurrentImageGalleryIndex</span><span class="p">()</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetSelectedImageGalleryIndex</span><span class="p">()</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_66" class="discrete">Parameters</h5>
+<h5 id="_parameters_68" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7188,10 +7328,14 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Returns the image at the current index</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The currently selected gallery image index</p></td>
 </tr>
 </tbody>
 </table>
+<h5 id="_returns_20" class="discrete">Returns</h5>
+<div class="paragraph">
+<p>The currently selected gallery image index</p>
+</div>
 <hr>
 </div>
 </div>
@@ -7210,7 +7354,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetModsFromModInfoList</span><span class="p">(</span><span class="n">FModioModInfoList</span> <span class="n">InList</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bAddToExisting</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_67" class="discrete">Parameters</h5>
+<h5 id="_parameters_69" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7245,7 +7389,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetModsFromModInfoArray</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModInfo</span><span class="o">&gt;</span> <span class="n">InArray</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bAddToExisting</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_68" class="discrete">Parameters</h5>
+<h5 id="_parameters_70" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7280,7 +7424,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetModsFromModCollectionEntryArray</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModCollectionEntry</span><span class="o">&gt;</span> <span class="n">InArray</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bAddToExisting</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_69" class="discrete">Parameters</h5>
+<h5 id="_parameters_71" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7315,7 +7459,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetModSelectionByID</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_70" class="discrete">Parameters</h5>
+<h5 id="_parameters_72" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7346,7 +7490,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetFocusOnceListIsPopulated</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bFocus</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_71" class="discrete">Parameters</h5>
+<h5 id="_parameters_73" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7377,7 +7521,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">RequestFullClearSelection</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bResetPreviouslySelected</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_72" class="discrete">Parameters</h5>
+<h5 id="_parameters_74" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7408,7 +7552,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">GetSelectedModItem</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIncludePreviouslySelected</span><span class="p">,</span> <span class="n">UObject</span><span class="o">*</span> <span class="n">OutModItem</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_73" class="discrete">Parameters</h5>
+<h5 id="_parameters_75" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7433,7 +7577,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_20" class="discrete">Returns</h5>
+<h5 id="_returns_21" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Whether the currently selected mod item was found</p>
 </div>
@@ -7451,7 +7595,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">GetEntryWidgetFromItem</span><span class="p">(</span><span class="n">UObject</span><span class="o">*</span> <span class="n">InItem</span><span class="p">,</span> <span class="n">UWidget</span><span class="o">*</span> <span class="n">OutEntryWidget</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_74" class="discrete">Parameters</h5>
+<h5 id="_parameters_76" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7476,7 +7620,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_21" class="discrete">Returns</h5>
+<h5 id="_returns_22" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Whether the entry widget was found</p>
 </div>
@@ -7494,7 +7638,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">GetDesiredListFocusTarget</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIncludePreviouslySelected</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIncludeFirstItem</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_75" class="discrete">Parameters</h5>
+<h5 id="_parameters_77" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7519,7 +7663,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_22" class="discrete">Returns</h5>
+<h5 id="_returns_23" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>The desired focus target for the list view</p>
 </div>
@@ -7541,7 +7685,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetTrackingModID</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_76" class="discrete">Parameters</h5>
+<h5 id="_parameters_78" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7572,7 +7716,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonModOperationTrackerUserWidgetStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_77" class="discrete">Parameters</h5>
+<h5 id="_parameters_79" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7603,7 +7747,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetNumOfQueuedMods</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_78" class="discrete">Parameters</h5>
+<h5 id="_parameters_80" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7620,7 +7764,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_23" class="discrete">Returns</h5>
+<h5 id="_returns_24" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>The number of queued mods</p>
 </div>
@@ -7638,7 +7782,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">GetCurrentDownloadingMod</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">OutDownloadingMod</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_79" class="discrete">Parameters</h5>
+<h5 id="_parameters_81" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7659,7 +7803,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_24" class="discrete">Returns</h5>
+<h5 id="_returns_25" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Whether we have a current mod being downloaded</p>
 </div>
@@ -7709,7 +7853,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int64</span> <span class="n">GetPreviewTotal</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_80" class="discrete">Parameters</h5>
+<h5 id="_parameters_82" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7726,7 +7870,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_25" class="discrete">Returns</h5>
+<h5 id="_returns_26" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>The total progress</p>
 </div>
@@ -7744,7 +7888,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int64</span> <span class="n">GetPreviewCurrent</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_81" class="discrete">Parameters</h5>
+<h5 id="_parameters_83" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7761,7 +7905,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_26" class="discrete">Returns</h5>
+<h5 id="_returns_27" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>The current progress</p>
 </div>
@@ -7783,7 +7927,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetTag</span><span class="p">(</span><span class="n">FString</span> <span class="n">InTag</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_82" class="discrete">Parameters</h5>
+<h5 id="_parameters_84" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7814,7 +7958,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetSelected</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bIsSelected</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_83" class="discrete">Parameters</h5>
+<h5 id="_parameters_85" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7845,7 +7989,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetAllowMultipleSelection</span><span class="p">(</span><span class="kt">bool</span> <span class="n">bInAllowMultipleSelection</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_84" class="discrete">Parameters</h5>
+<h5 id="_parameters_86" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7876,7 +8020,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetTag</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_85" class="discrete">Parameters</h5>
+<h5 id="_parameters_87" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7893,7 +8037,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_27" class="discrete">Returns</h5>
+<h5 id="_returns_28" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>The tag for this entry</p>
 </div>
@@ -7911,7 +8055,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">GetSelected</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_86" class="discrete">Parameters</h5>
+<h5 id="_parameters_88" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7928,7 +8072,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_28" class="discrete">Returns</h5>
+<h5 id="_returns_29" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Whether this tag entry is selected</p>
 </div>
@@ -7946,7 +8090,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">GetAllowMultipleSelection</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_87" class="discrete">Parameters</h5>
+<h5 id="_parameters_89" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7963,7 +8107,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_29" class="discrete">Returns</h5>
+<h5 id="_returns_30" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Whether this tag entry allows multiple selection</p>
 </div>
@@ -7985,7 +8129,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetTagsString</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FString</span><span class="o">&gt;</span> <span class="n">Tags</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_88" class="discrete">Parameters</h5>
+<h5 id="_parameters_90" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8016,7 +8160,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetTags</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModTag</span><span class="o">&gt;</span> <span class="n">ModTags</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_89" class="discrete">Parameters</h5>
+<h5 id="_parameters_91" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8051,7 +8195,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonMultiLineEditableTextBoxStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_90" class="discrete">Parameters</h5>
+<h5 id="_parameters_92" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8100,7 +8244,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">OnNotificationExpired</span><span class="p">(</span><span class="n">UWidget</span><span class="o">*</span> <span class="n">Notification</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_91" class="discrete">Parameters</h5>
+<h5 id="_parameters_93" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8135,7 +8279,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonNotificationWidgetStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_92" class="discrete">Parameters</h5>
+<h5 id="_parameters_94" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8170,7 +8314,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonProgressBarStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_93" class="discrete">Parameters</h5>
+<h5 id="_parameters_95" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8205,7 +8349,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonQuickAccessTabViewStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_94" class="discrete">Parameters</h5>
+<h5 id="_parameters_96" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8296,7 +8440,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsUserAuthenticated</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_95" class="discrete">Parameters</h5>
+<h5 id="_parameters_97" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8313,7 +8457,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_30" class="discrete">Returns</h5>
+<h5 id="_returns_31" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>True if the user is authenticated, false otherwise</p>
 </div>
@@ -8367,7 +8511,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsEmailValid</span><span class="p">(</span><span class="n">FString</span> <span class="n">Email</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_96" class="discrete">Parameters</h5>
+<h5 id="_parameters_98" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8388,7 +8532,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_31" class="discrete">Returns</h5>
+<h5 id="_returns_32" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Whether the email address is valid or not</p>
 </div>
@@ -8600,7 +8744,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonRichTextStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_97" class="discrete">Parameters</h5>
+<h5 id="_parameters_99" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8635,7 +8779,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonScrollBarStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_98" class="discrete">Parameters</h5>
+<h5 id="_parameters_100" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8670,7 +8814,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">UpdateNavigationData</span><span class="p">(</span><span class="n">int32</span> <span class="n">PendingScrollOffset</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_99" class="discrete">Parameters</h5>
+<h5 id="_parameters_101" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8701,7 +8845,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonScrollBoxStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_100" class="discrete">Parameters</h5>
+<h5 id="_parameters_102" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8732,7 +8876,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">OnUserScrolledHandle</span><span class="p">(</span><span class="kt">float</span> <span class="n">CurrentOffset</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_101" class="discrete">Parameters</h5>
+<h5 id="_parameters_103" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8781,7 +8925,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonSearchResultsViewStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_102" class="discrete">Parameters</h5>
+<h5 id="_parameters_104" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8830,7 +8974,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonSearchTabViewStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_103" class="discrete">Parameters</h5>
+<h5 id="_parameters_105" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8875,7 +9019,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModCategoryParams</span> <span class="n">GetFilterParamsWrapper</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_104" class="discrete">Parameters</h5>
+<h5 id="_parameters_106" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8892,7 +9036,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_32" class="discrete">Returns</h5>
+<h5 id="_returns_33" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>The filter params wrapper</p>
 </div>
@@ -8910,7 +9054,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioFilterParams</span> <span class="n">GetFilterParams</span><span class="p">()</span> <span class="k">const</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_105" class="discrete">Parameters</h5>
+<h5 id="_parameters_107" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8927,7 +9071,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_33" class="discrete">Returns</h5>
+<h5 id="_returns_34" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>The currently selected filter params</p>
 </div>
@@ -8949,7 +9093,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonStorageSpaceTrackerUserWidgetStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_106" class="discrete">Parameters</h5>
+<h5 id="_parameters_108" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9012,7 +9156,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">SelectTabByIDExtended</span><span class="p">(</span><span class="n">FName</span> <span class="n">TabNameID</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bSuppressClickFeedback</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bSuppressOnTabSelectedIfAlreadySelected</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_107" class="discrete">Parameters</h5>
+<h5 id="_parameters_109" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9041,7 +9185,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_34" class="discrete">Returns</h5>
+<h5 id="_returns_35" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Whether the tab was successfully selected</p>
 </div>
@@ -9133,7 +9277,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">SetStyle</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioCommonListViewStyle</span><span class="o">&gt;</span>  <span class="n">InStyle</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_108" class="discrete">Parameters</h5>
+<h5 id="_parameters_110" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9446,7 +9590,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioPopupBase</span><span class="o">*</span> <span class="n">PushPopup</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UModioPopupBase</span><span class="o">&gt;</span>  <span class="n">PopupClass</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_109" class="discrete">Parameters</h5>
+<h5 id="_parameters_111" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9484,7 +9628,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="paragraph">
 <p>Pops a topmost item on the popup stack</p>
 </div>
-<h5 id="_parameters_110" class="discrete">Parameters</h5>
+<h5 id="_parameters_112" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9505,7 +9649,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_35" class="discrete">Returns</h5>
+<h5 id="_returns_36" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>the next popup on the stack</p>
 </div>
@@ -9544,7 +9688,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </li>
 </ul>
 </div>
-<h5 id="_parameters_111" class="discrete">Parameters</h5>
+<h5 id="_parameters_113" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9619,7 +9763,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="paragraph">
 <p>Sets the global logging level - messages with a log level below the specified value will not be displayed</p>
 </div>
-<h5 id="_parameters_112" class="discrete">Parameters</h5>
+<h5 id="_parameters_114" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9653,7 +9797,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="paragraph">
 <p>Runs any pending SDK work on the calling thread, including invoking any callbacks passed to asynchronous operations. NOTE: This should be called while <a href="#K2_InitializeAsync">InitializeAsync</a> and <a href="#K2_ShutdownAsync">ShutdownAsync</a> are running, as they both utilize the internal event loop for functionality.</p>
 </div>
-<h5 id="_parameters_113" class="discrete">Parameters</h5>
+<h5 id="_parameters_115" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9683,7 +9827,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="paragraph">
 <p>Fetches the local view of the user&#8217;s subscribed mods, including mods that are subscribed but not yet installed</p>
 </div>
-<h5 id="_parameters_114" class="discrete">Parameters</h5>
+<h5 id="_parameters_116" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9700,7 +9844,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_36" class="discrete">Returns</h5>
+<h5 id="_returns_37" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>TMap&lt;FModioID, FModioModCollectionEntry&gt; providing information about the subscribed mods</p>
 </div>
@@ -9721,7 +9865,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="paragraph">
 <p>Fetches the subset of the user&#8217;s subscribed mods that are installed and therefore ready for loading</p>
 </div>
-<h5 id="_parameters_115" class="discrete">Parameters</h5>
+<h5 id="_parameters_117" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9742,7 +9886,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_37" class="discrete">Returns</h5>
+<h5 id="_returns_38" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>TMap&lt;FModioID, FModioModCollectionEntry&gt; providing information about the subscribed mods</p>
 </div>
@@ -9763,7 +9907,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 <div class="paragraph">
 <p>Fetches all mods installed on the system such that a consuming application can present the information in a UI in order to free up space by uninstalling mods</p>
 </div>
-<h5 id="_parameters_116" class="discrete">Parameters</h5>
+<h5 id="_parameters_118" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9780,7 +9924,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_38" class="discrete">Returns</h5>
+<h5 id="_returns_39" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods installed on the system regardless of which user installed them</p>
 </div>
@@ -9812,7 +9956,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </li>
 </ul>
 </div>
-<h5 id="_parameters_117" class="discrete">Parameters</h5>
+<h5 id="_parameters_119" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9833,7 +9977,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_39" class="discrete">Returns</h5>
+<h5 id="_returns_40" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Error code indicating the status of the prioritization request. Will be empty if the prioritization was successful or if the mod was already being processed</p>
 </div>
@@ -9895,7 +10039,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </li>
 </ul>
 </div>
-<h5 id="_parameters_118" class="discrete">Parameters</h5>
+<h5 id="_parameters_120" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9964,7 +10108,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </li>
 </ul>
 </div>
-<h5 id="_parameters_119" class="discrete">Parameters</h5>
+<h5 id="_parameters_121" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10042,7 +10186,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </li>
 </ul>
 </div>
-<h5 id="_parameters_120" class="discrete">Parameters</h5>
+<h5 id="_parameters_122" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10115,7 +10259,7 @@ Currently the mod browser does not support being embedded inside your own UI hie
 </li>
 </ul>
 </div>
-<h5 id="_parameters_121" class="discrete">Parameters</h5>
+<h5 id="_parameters_123" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10208,7 +10352,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_122" class="discrete">Parameters</h5>
+<h5 id="_parameters_124" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10289,7 +10433,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_123" class="discrete">Parameters</h5>
+<h5 id="_parameters_125" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10370,7 +10514,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_124" class="discrete">Parameters</h5>
+<h5 id="_parameters_126" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10455,7 +10599,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_125" class="discrete">Parameters</h5>
+<h5 id="_parameters_127" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10526,7 +10670,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with an OperationCanceled error category. This function will NOT block while the deinitialization occurs.</p>
 </div>
-<h5 id="_parameters_126" class="discrete">Parameters</h5>
+<h5 id="_parameters_128" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10540,6 +10684,40 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">On Shutdown Complete</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Callback invoked when the plugin is shut down and calling <a href="#RunPendingHandlers">Run Pending Handlers</a> is no longer required</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="K2_SetLanguage">SetLanguage</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_SetLanguage.png" alt="nd img K2 SetLanguage">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_SetLanguage</span><span class="p">(</span><span class="n">EModioLanguage</span> <span class="n">Locale</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Set language to get corresponding data from the server</p>
+</div>
+<h5 id="_parameters_129" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Locale</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -10574,7 +10752,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_127" class="discrete">Parameters</h5>
+<h5 id="_parameters_130" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10641,7 +10819,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_128" class="discrete">Parameters</h5>
+<h5 id="_parameters_131" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10700,7 +10878,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Fetches the currently authenticated mod.io user profile if there is one associated with the current platform user</p>
 </div>
-<h5 id="_parameters_129" class="discrete">Parameters</h5>
+<h5 id="_parameters_132" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10717,7 +10895,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_40" class="discrete">Returns</h5>
+<h5 id="_returns_41" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>FModioOptionalUser object containing profile information</p>
 </div>
@@ -10738,7 +10916,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Provides progress information for a mod installation or update operation if one is currently in progress.</p>
 </div>
-<h5 id="_parameters_130" class="discrete">Parameters</h5>
+<h5 id="_parameters_133" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10755,7 +10933,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_41" class="discrete">Returns</h5>
+<h5 id="_returns_42" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Optional ModProgressInfo object containing information regarding the progress of the installation operation.</p>
 </div>
@@ -10774,9 +10952,9 @@ This function is part of an experimental feature and is subject to change.
 </div>
 </div>
 <div class="paragraph">
-<p>Retrieve a list of updates between the users local mod state, and the server-side state. This allows  you to identify which mods will be modified by the next call to <a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a> in order to  perform any content management (such as unloading files) that might be required.</p>
+<p>Retrieve a list of updates between the users local mod state, and the server-side state. This allows you to identify which mods will be modified by the next call to <a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a> in order to perform any content management (such as unloading files) that might be required.</p>
 </div>
-<h5 id="_parameters_131" class="discrete">Parameters</h5>
+<h5 id="_parameters_134" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10821,7 +10999,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_132" class="discrete">Parameters</h5>
+<h5 id="_parameters_135" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10894,7 +11072,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_133" class="discrete">Parameters</h5>
+<h5 id="_parameters_136" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10964,7 +11142,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_134" class="discrete">Parameters</h5>
+<h5 id="_parameters_137" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11019,7 +11197,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the set of mods the specified user has installed on this device</p>
 </div>
-<h5 id="_parameters_135" class="discrete">Parameters</h5>
+<h5 id="_parameters_138" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11096,7 +11274,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_136" class="discrete">Parameters</h5>
+<h5 id="_parameters_139" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11149,7 +11327,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_GetTermsOfUseAsync</span><span class="p">(</span><span class="n">EModioLanguage</span> <span class="n">Locale</span><span class="p">,</span> <span class="n">FOnGetTermsOfUseDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_GetTermsOfUseAsync</span><span class="p">(</span><span class="n">FOnGetTermsOfUseDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -11163,7 +11341,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_137" class="discrete">Parameters</h5>
+<h5 id="_parameters_140" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11173,10 +11351,6 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Locale</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The language to display the terms of use in</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
@@ -11229,7 +11403,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_138" class="discrete">Parameters</h5>
+<h5 id="_parameters_141" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11291,7 +11465,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_139" class="discrete">Parameters</h5>
+<h5 id="_parameters_142" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11353,7 +11527,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_140" class="discrete">Parameters</h5>
+<h5 id="_parameters_143" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11435,7 +11609,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_141" class="discrete">Parameters</h5>
+<h5 id="_parameters_144" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11521,7 +11695,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_142" class="discrete">Parameters</h5>
+<h5 id="_parameters_145" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11603,7 +11777,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_143" class="discrete">Parameters</h5>
+<h5 id="_parameters_146" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11689,7 +11863,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_144" class="discrete">Parameters</h5>
+<h5 id="_parameters_147" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11760,7 +11934,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h5 id="_parameters_145" class="discrete">Parameters</h5>
+<h5 id="_parameters_148" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11805,7 +11979,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_146" class="discrete">Parameters</h5>
+<h5 id="_parameters_149" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11868,7 +12042,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Forcibly uninstalls a mod from the system. This can be used when the host application requires additional space for other mods. The current user must not be subscribed to the mod to force uninstall. To remove a mod the current user is subscribed to, first use <a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a>. If the mod does not uninstall (due to a different user on the same system remaining subscribed), ForceUninstallModAsync can be called next.</p>
 </div>
-<h5 id="_parameters_147" class="discrete">Parameters</h5>
+<h5 id="_parameters_150" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11931,7 +12105,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Synchronises the local list of the current user&#8217;s subscribed mods with the server. Any mods that have been externally subscribed will be automatically marked for installation, and mods that have been externally removed from the user&#8217;s subscriptions may be uninstalled if no other local users have a current subscription.</p>
 </div>
-<h5 id="_parameters_148" class="discrete">Parameters</h5>
+<h5 id="_parameters_151" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11965,7 +12139,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enables the automatic management of installed mods on the system based on the user&#8217;s subscriptions.</p>
 </div>
-<h5 id="_parameters_149" class="discrete">Parameters</h5>
+<h5 id="_parameters_152" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12017,7 +12191,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_150" class="discrete">Parameters</h5>
+<h5 id="_parameters_153" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12082,7 +12256,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_151" class="discrete">Parameters</h5>
+<h5 id="_parameters_154" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12159,7 +12333,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_152" class="discrete">Parameters</h5>
+<h5 id="_parameters_155" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12232,7 +12406,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_153" class="discrete">Parameters</h5>
+<h5 id="_parameters_156" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12313,7 +12487,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the automatic management process is currently installing or removing mods</p>
 </div>
-<h5 id="_parameters_154" class="discrete">Parameters</h5>
+<h5 id="_parameters_157" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12330,7 +12504,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_42" class="discrete">Returns</h5>
+<h5 id="_returns_43" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>True if automatic management is currently performing an operation</p>
 </div>
@@ -12359,7 +12533,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_155" class="discrete">Parameters</h5>
+<h5 id="_parameters_158" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12376,7 +12550,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_43" class="discrete">Returns</h5>
+<h5 id="_returns_44" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Collection of FModioValidationError objects, or empty collection if there were no validation failures</p>
 </div>
@@ -12397,7 +12571,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Disables automatic installation or uninstallation of mods based on the user&#8217;s subscriptions. Allows currently processing installation to complete; will cancel any pending operations when called.</p>
 </div>
-<h5 id="_parameters_156" class="discrete">Parameters</h5>
+<h5 id="_parameters_159" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12428,7 +12602,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">TArray</span><span class="o">&lt;</span><span class="n">UModioTagInfoUI</span><span class="o">*&gt;</span> <span class="n">GetTagCategoriesForUI</span><span class="p">()</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_157" class="discrete">Parameters</h5>
+<h5 id="_parameters_160" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12445,7 +12619,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_44" class="discrete">Returns</h5>
+<h5 id="_returns_45" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Array with its corresponding info tags</p>
 </div>
@@ -12502,7 +12676,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Call this to pass in a delegate that will receive operation state change notifications</p>
 </div>
-<h5 id="_parameters_158" class="discrete">Parameters</h5>
+<h5 id="_parameters_161" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12536,7 +12710,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Call this to request that the underlying widget retry the async operation</p>
 </div>
-<h5 id="_parameters_159" class="discrete">Parameters</h5>
+<h5 id="_parameters_162" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12584,7 +12758,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Call this to pass in a delegate that will receive operation state change notifications</p>
 </div>
-<h5 id="_parameters_160" class="discrete">Parameters</h5>
+<h5 id="_parameters_163" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12675,7 +12849,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">Configure</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_161" class="discrete">Parameters</h5>
+<h5 id="_parameters_164" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12727,7 +12901,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Function to display an error code notification widget</p>
 </div>
-<h5 id="_parameters_162" class="discrete">Parameters</h5>
+<h5 id="_parameters_165" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12775,7 +12949,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Function to display an arbitrary notification widget that the caller has already configured</p>
 </div>
-<h5 id="_parameters_163" class="discrete">Parameters</h5>
+<h5 id="_parameters_166" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12821,7 +12995,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UUserWidget</span><span class="o">*</span> <span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UUserWidget</span><span class="o">&gt;</span>  <span class="n">MenuClass</span><span class="p">,</span> <span class="n">APlayerController</span><span class="o">*</span> <span class="n">Controller</span><span class="p">,</span> <span class="n">FOnModBrowserClosed</span> <span class="n">BrowserClosedDelegate</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UUserWidget</span><span class="o">*</span> <span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UUserWidget</span><span class="o">&gt;</span>  <span class="n">MenuClass</span><span class="p">,</span> <span class="n">APlayerController</span><span class="o">*</span> <span class="n">Controller</span><span class="p">,</span> <span class="n">FOnModBrowserCloseRequested</span> <span class="n">OnModBrowserCloseRequestedDelegate</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -13065,15 +13239,15 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
-<h4 id="ExecuteOnModBrowserClosedDelegate">Execute on Mod Browser Closed Delegate</h4>
+<h4 id="ExecuteOnModBrowserCloseRequestedDelegate">Execute on Mod Browser Close Requested Delegate</h4>
 <div class="imageblock">
 <div class="content">
-<img src="img/nd_img_ExecuteOnModBrowserClosedDelegate.png" alt="nd img ExecuteOnModBrowserClosedDelegate">
+<img src="img/nd_img_ExecuteOnModBrowserCloseRequestedDelegate.png" alt="nd img ExecuteOnModBrowserCloseRequestedDelegate">
 </div>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ExecuteOnModBrowserClosedDelegate</span><span class="p">()</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">ExecuteOnModBrowserCloseRequestedDelegate</span><span class="p">()</span></code></pre>
 </div>
 </div>
 <hr>
@@ -13536,27 +13710,27 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int32">int32</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageIndex</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The index of this page</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int32">int32</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageSize</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of results allowed to be displayed within a page</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int32">int32</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PageCount</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The total amount of pages</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int32">int32</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TotalResultCount</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The total amount of results</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int32">int32</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ResultCount</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of results for this page</p></td>
 </tr>
 </tbody>
 </table>
@@ -14835,7 +15009,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the session identifier for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_164" class="discrete">Parameters</h4>
+<h4 id="_parameters_167" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -14856,7 +15030,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_45" class="discrete">Returns</h4>
+<h4 id="_returns_46" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>New Initialization Options object with the session identifier set to the desired value</p>
 </div>
@@ -14877,7 +15051,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the portal for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_165" class="discrete">Parameters</h4>
+<h4 id="_parameters_168" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -14898,7 +15072,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_46" class="discrete">Returns</h4>
+<h4 id="_returns_47" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>New Initialization Options object with the portal set to the desired value</p>
 </div>
@@ -14919,7 +15093,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if not equal</p>
 </div>
-<h4 id="_parameters_166" class="discrete">Parameters</h4>
+<h4 id="_parameters_169" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -14957,7 +15131,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Make initialization options, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_167" class="discrete">Parameters</h4>
+<h4 id="_parameters_170" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15003,7 +15177,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a game id from a integer, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_168" class="discrete">Parameters</h4>
+<h4 id="_parameters_171" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15037,7 +15211,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create entitlement parameters</p>
 </div>
-<h4 id="_parameters_169" class="discrete">Parameters</h4>
+<h4 id="_parameters_172" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15071,7 +15245,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Creates an AuthenticationParams object</p>
 </div>
-<h4 id="_parameters_170" class="discrete">Parameters</h4>
+<h4 id="_parameters_173" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15096,7 +15270,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_47" class="discrete">Returns</h4>
+<h4 id="_returns_48" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The constructed FModioAuthenticationParams object for use with <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a></p>
 </div>
@@ -15117,7 +15291,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a ApiKey id from a string, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_171" class="discrete">Parameters</h4>
+<h4 id="_parameters_174" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15151,7 +15325,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use with care.</p>
 </div>
-<h4 id="_parameters_172" class="discrete">Parameters</h4>
+<h4 id="_parameters_175" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15168,7 +15342,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_48" class="discrete">Returns</h4>
+<h4 id="_returns_49" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The underlying value</p>
 </div>
@@ -15189,7 +15363,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if equal</p>
 </div>
-<h4 id="_parameters_173" class="discrete">Parameters</h4>
+<h4 id="_parameters_176" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15378,7 +15552,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetValue</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_174" class="discrete">Parameters</h4>
+<h4 id="_parameters_177" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15395,7 +15569,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_49" class="discrete">Returns</h4>
+<h4 id="_returns_50" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>0 if there is no error</p>
 </div>
@@ -15413,7 +15587,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetMessage</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_175" class="discrete">Parameters</h4>
+<h4 id="_parameters_178" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15430,7 +15604,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_50" class="discrete">Returns</h4>
+<h4 id="_returns_51" class="discrete">Returns</h4>
 <hr>
 </div>
 <div class="sect2">
@@ -15448,7 +15622,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the passed-in ErrorCode matches the specified error condition</p>
 </div>
-<h4 id="_parameters_176" class="discrete">Parameters</h4>
+<h4 id="_parameters_179" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15469,7 +15643,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_51" class="discrete">Returns</h4>
+<h4 id="_returns_52" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the code matches the condition</p>
 </div>
@@ -15490,7 +15664,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Runs a filter over the user&#8217;s subscription list</p>
 </div>
-<h4 id="_parameters_177" class="discrete">Parameters</h4>
+<h4 id="_parameters_180" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15605,7 +15779,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetLogoSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Logo</span><span class="p">,</span> <span class="n">EModioLogoSize</span> <span class="n">LogoSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_178" class="discrete">Parameters</h4>
+<h4 id="_parameters_181" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15626,7 +15800,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_52" class="discrete">Returns</h4>
+<h4 id="_returns_53" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the logo if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -15644,7 +15818,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetGallerySize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">GalleryImage</span><span class="p">,</span> <span class="n">EModioGallerySize</span> <span class="n">GallerySize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_179" class="discrete">Parameters</h4>
+<h4 id="_parameters_182" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15665,7 +15839,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_53" class="discrete">Returns</h4>
+<h4 id="_returns_54" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the gallery image if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -15683,7 +15857,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetAvatarSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Avatar</span><span class="p">,</span> <span class="n">EModioAvatarSize</span> <span class="n">AvatarSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_180" class="discrete">Parameters</h4>
+<h4 id="_parameters_183" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15704,7 +15878,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_54" class="discrete">Returns</h4>
+<h4 id="_returns_55" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the avatar if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -15722,7 +15896,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetPath</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_181" class="discrete">Parameters</h4>
+<h4 id="_parameters_184" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15739,7 +15913,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_55" class="discrete">Returns</h4>
+<h4 id="_returns_56" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Path to the mod&#8217;s installation folder on disk NOTE: If the mod is not yet installed this path may not yet exist. Check <a href="#GetModState">Get Mod State</a> before trying to load files in this location</p>
 </div>
@@ -15757,7 +15931,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioModState</span> <span class="n">GetModState</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_182" class="discrete">Parameters</h4>
+<h4 id="_parameters_185" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15774,7 +15948,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_56" class="discrete">Returns</h4>
+<h4 id="_returns_57" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>EModioModState enum representing current state of the mod</p>
 </div>
@@ -15792,7 +15966,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModInfo</span> <span class="n">GetModProfile</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_183" class="discrete">Parameters</h4>
+<h4 id="_parameters_186" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15809,7 +15983,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_57" class="discrete">Returns</h4>
+<h4 id="_returns_58" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioModInfo containing mod profile data</p>
 </div>
@@ -15827,7 +16001,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModID</span> <span class="n">GetID</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_184" class="discrete">Parameters</h4>
+<h4 id="_parameters_187" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15844,7 +16018,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_58" class="discrete">Returns</h4>
+<h4 id="_returns_59" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Mod ID</p>
 </div>
@@ -15865,7 +16039,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the total amount of progress required for the specified state.</p>
 </div>
-<h4 id="_parameters_185" class="discrete">Parameters</h4>
+<h4 id="_parameters_188" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15886,7 +16060,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_59" class="discrete">Returns</h4>
+<h4 id="_returns_60" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Modio::FileSize for total progress in bytes</p>
 </div>
@@ -15907,7 +16081,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Returns a EModioModProgressState indicating which state the mod operation is in</p>
 </div>
-<h4 id="_parameters_186" class="discrete">Parameters</h4>
+<h4 id="_parameters_189" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15941,7 +16115,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the progress value for the specified state. <code>CurrentProgress == TotalProgress</code> for states which have completed, for example if a mod is currently Extracting, then passing in Downloading would give you a value equal to the total download size because the download has completed</p>
 </div>
-<h4 id="_parameters_187" class="discrete">Parameters</h4>
+<h4 id="_parameters_190" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15962,7 +16136,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_60" class="discrete">Returns</h4>
+<h4 id="_returns_61" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioUnsigned64 containing current progress in bytes</p>
 </div>
@@ -15983,7 +16157,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get the default portal for the platform the game is running on.</p>
 </div>
-<h4 id="_parameters_188" class="discrete">Parameters</h4>
+<h4 id="_parameters_191" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15996,7 +16170,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_61" class="discrete">Returns</h4>
+<h4 id="_returns_62" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>EModioPortal of the portal to use</p>
 </div>
@@ -16017,7 +16191,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get the default Authentication Provider for the current platform the game is running on</p>
 </div>
-<h4 id="_parameters_189" class="discrete">Parameters</h4>
+<h4 id="_parameters_192" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16030,7 +16204,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_62" class="discrete">Returns</h4>
+<h4 id="_returns_63" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>EModioAuthenticationProvider to use for authentication calls</p>
 </div>
@@ -16051,7 +16225,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Gets the current platform that the game is running on</p>
 </div>
-<h4 id="_parameters_190" class="discrete">Parameters</h4>
+<h4 id="_parameters_193" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16064,7 +16238,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_63" class="discrete">Returns</h4>
+<h4 id="_returns_64" class="discrete">Returns</h4>
 <hr>
 </div>
 <div class="sect2">
@@ -16082,7 +16256,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Sets the correct decimals depending on the file size or speed</p>
 </div>
-<h4 id="_parameters_191" class="discrete">Parameters</h4>
+<h4 id="_parameters_194" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16116,7 +16290,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Dividend/Divisor and return the floating point result with no checks *</p>
 </div>
-<h4 id="_parameters_192" class="discrete">Parameters</h4>
+<h4 id="_parameters_195" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16151,7 +16325,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidSecurityCodeFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_193" class="discrete">Parameters</h4>
+<h4 id="_parameters_196" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16168,7 +16342,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_64" class="discrete">Returns</h4>
+<h4 id="_returns_65" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the security code has a valid format</p>
 </div>
@@ -16186,7 +16360,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidEmailAddressFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_194" class="discrete">Parameters</h4>
+<h4 id="_parameters_197" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16203,7 +16377,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_65" class="discrete">Returns</h4>
+<h4 id="_returns_66" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the email address has a valid format</p>
 </div>
@@ -16224,7 +16398,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Gets the time span between present and specified past date FString</p>
 </div>
-<h4 id="_parameters_195" class="discrete">Parameters</h4>
+<h4 id="_parameters_198" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16258,7 +16432,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Shortens the specified large number</p>
 </div>
-<h4 id="_parameters_196" class="discrete">Parameters</h4>
+<h4 id="_parameters_199" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16289,7 +16463,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioInitializeOptions</span> <span class="n">GetProjectInitializeOptionsForSessionId</span><span class="p">(</span><span class="n">FString</span> <span class="n">SessionId</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_197" class="discrete">Parameters</h4>
+<h4 id="_parameters_200" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16362,7 +16536,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">GetDesiredFileSizeUnit</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_198" class="discrete">Parameters</h4>
+<h4 id="_parameters_201" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16379,7 +16553,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_66" class="discrete">Returns</h4>
+<h4 id="_returns_67" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>the desired file size unit</p>
 </div>
@@ -16400,7 +16574,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get Session Id for Windows  for initialization of the SDK return empty string if you are not on Windows</p>
 </div>
-<h4 id="_parameters_199" class="discrete">Parameters</h4>
+<h4 id="_parameters_202" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16428,7 +16602,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">Filesize_ToString</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MinDecimals</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MaxDecimals</span><span class="p">,</span> <span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">Unit</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIncludeUnitName</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_200" class="discrete">Parameters</h4>
+<h4 id="_parameters_203" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16461,9 +16635,47 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_67" class="discrete">Returns</h4>
+<h4 id="_returns_68" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>A text formatted from your specifications</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="K2_GetDefaultModInstallationDirectory">GetDefaultModInstallationDirectory</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_GetDefaultModInstallationDirectory.png" alt="nd img K2 GetDefaultModInstallationDirectory">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">K2_GetDefaultModInstallationDirectory</span><span class="p">(</span><span class="n">FModioGameID</span> <span class="n">GameID</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Returns the default mod installation directory for this game and platform, ignoring overrides and without requiring the SDK to be initialized.</p>
+</div>
+<h4 id="_parameters_204" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Game ID</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The FModioGameID of the game we&#8217;re fetching the default mod installation directory for.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default mod installation directory for the specified game on the current platform</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_69" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>The default mod installation directory for the specified game on the current platform</p>
 </div>
 <hr>
 </div>
@@ -16650,7 +16862,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Submit a new mod, with its logo data coming from an in-memory buffer rather than a file.</p>
 </div>
-<h4 id="_parameters_201" class="discrete">Parameters</h4>
+<h4 id="_parameters_205" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16703,7 +16915,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_202" class="discrete">Parameters</h4>
+<h4 id="_parameters_206" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16752,7 +16964,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_203" class="discrete">Parameters</h4>
+<h4 id="_parameters_207" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16791,7 +17003,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetTextArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_204" class="discrete">Parameters</h4>
+<h4 id="_parameters_208" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16816,7 +17028,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_68" class="discrete">Returns</h4>
+<h4 id="_returns_70" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -16834,7 +17046,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetStringArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_205" class="discrete">Parameters</h4>
+<h4 id="_parameters_209" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16859,7 +17071,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_69" class="discrete">Returns</h4>
+<h4 id="_returns_71" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -16877,7 +17089,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetIntegerArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">int32</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_206" class="discrete">Parameters</h4>
+<h4 id="_parameters_210" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16902,7 +17114,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_70" class="discrete">Returns</h4>
+<h4 id="_returns_72" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -16920,7 +17132,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetFloatArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_207" class="discrete">Parameters</h4>
+<h4 id="_parameters_211" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16945,7 +17157,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_71" class="discrete">Returns</h4>
+<h4 id="_returns_73" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -16963,7 +17175,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUnsubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_208" class="discrete">Parameters</h4>
+<h4 id="_parameters_212" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16984,7 +17196,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_72" class="discrete">Returns</h4>
+<h4 id="_returns_74" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17002,85 +17214,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUninstallNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_209" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_73" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateSubscriptionNotification">Create Subscription Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateSubscriptionNotification.png" alt="nd img CreateSubscriptionNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateSubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_210" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_74" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateRatingNotification">Create Rating Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateRatingNotification.png" alt="nd img CreateRatingNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateRatingNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_211" class="discrete">Parameters</h4>
+<h4 id="_parameters_213" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17108,6 +17242,84 @@ return empty string if you are not on Windows</p></td>
 <hr>
 </div>
 <div class="sect2">
+<h3 id="CreateSubscriptionNotification">Create Subscription Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateSubscriptionNotification.png" alt="nd img CreateSubscriptionNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateSubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_214" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_76" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateRatingNotification">Create Rating Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateRatingNotification.png" alt="nd img CreateRatingNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateRatingNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_215" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_77" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="CreateNotificationParams">Create Notification Params</h3>
 <div class="imageblock">
 <div class="content">
@@ -17119,7 +17331,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateNotificationParams</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">SuccessText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_212" class="discrete">Parameters</h4>
+<h4 id="_parameters_216" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17148,7 +17360,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_76" class="discrete">Returns</h4>
+<h4 id="_returns_78" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17166,7 +17378,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateInstallationNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_213" class="discrete">Parameters</h4>
+<h4 id="_parameters_217" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17187,7 +17399,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_77" class="discrete">Returns</h4>
+<h4 id="_returns_79" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17205,7 +17417,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">AddFormatText</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FName</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_214" class="discrete">Parameters</h4>
+<h4 id="_parameters_218" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17230,7 +17442,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_78" class="discrete">Returns</h4>
+<h4 id="_returns_80" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -17248,7 +17460,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_215" class="discrete">Parameters</h4>
+<h4 id="_parameters_219" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17265,7 +17477,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_79" class="discrete">Returns</h4>
+<h4 id="_returns_81" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17283,7 +17495,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateManualDialogInfo</span><span class="p">(</span><span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">DialogText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_216" class="discrete">Parameters</h4>
+<h4 id="_parameters_220" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17304,7 +17516,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_80" class="discrete">Returns</h4>
+<h4 id="_returns_82" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17322,7 +17534,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateErrorDialogInfo</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_217" class="discrete">Parameters</h4>
+<h4 id="_parameters_221" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17343,7 +17555,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_81" class="discrete">Returns</h4>
+<h4 id="_returns_83" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17361,7 +17573,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateConfirmUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_218" class="discrete">Parameters</h4>
+<h4 id="_parameters_222" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17378,7 +17590,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_82" class="discrete">Returns</h4>
+<h4 id="_returns_84" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17396,7 +17608,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">CreateFromParams</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UWidget</span><span class="o">&gt;</span>  <span class="n">NotificationClass</span><span class="p">,</span> <span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">,</span> <span class="n">UWidget</span><span class="o">*</span> <span class="n">Outer</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_219" class="discrete">Parameters</h4>
+<h4 id="_parameters_223" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17421,7 +17633,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_83" class="discrete">Returns</h4>
+<h4 id="_returns_85" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>An instance of a Widget subclass that is a notification</p>
 </div>
@@ -17933,6 +18145,10 @@ return empty string if you are not on Windows</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Thumb320</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">320x180px Thumbnail *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Thumb1280</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1280x720 Thumbnail *</p></td>
 </tr>
 </tbody>
 </table>
@@ -18732,7 +18948,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-01-31 09:14:09 +1100
+Last updated 2024-02-28 12:30:06 +1100
 </div>
 </div>
 </body>

@@ -202,7 +202,8 @@ public:
 	MODIO_API void RunPendingHandlers();
 
 	/**
-	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with an OperationCanceled error category. This function will NOT block while the deinitialization occurs.
+	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with an
+	 *OperationCanceled error category. This function will NOT block while the deinitialization occurs.
 	 * @param OnShutdownComplete Callback invoked when the plugin is shut down and calling <<RunPendingHandlers>> is no
 	 * longer required
 	 * @requires initialized-sdk
@@ -268,11 +269,11 @@ public:
 	MODIO_API void FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetchDone);
 
 	/**
-	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows you to
-	 * identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to perform any content 
-	 * management (such as unloading files) that might be required.
-	 * @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with ModID
-	 * as keys and changes as values. Empty when there are no differences between local and the mod.io API service
+	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows you
+	 *to identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to perform any
+	 *content management (such as unloading files) that might be required.
+	 * @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with
+	 *ModID as keys and changes as values. Empty when there are no differences between local and the mod.io API service
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
@@ -441,7 +442,8 @@ public:
 									FOnGetMediaDelegateFast Callback);
 
 private:
-	TMap<TTuple<FModioModID, EModioGallerySize, int32>, FOnGetMediaMulticastDelegateFast> PendingModMediaGalleryRequests;
+	TMap<TTuple<FModioModID, EModioGallerySize, int32>, FOnGetMediaMulticastDelegateFast>
+		PendingModMediaGalleryRequests;
 
 public:
 	/**
@@ -620,30 +622,19 @@ public:
 	 * @docpublic
 	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
 	 * who wishes to create a mod.io account
-	 * @param Provider The provider to use to perform the authentication
-	 * @param Locale The language to display the terms of use in
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @errorcategory SDKNotInitialized|SDK not initialized
-	 * @deprecated Deprecated as of 2023.10. Call GetTermsOfUseAsync() without an EModioAuthenticationProvider instead.
 	 **/
-	UE_DEPRECATED(
-		4.26, "Deprecated as of 2023.10. Call GetTermsOfUseAsync() without an EModioAuthenticationProvider instead.")
-	MODIO_API void GetTermsOfUseAsync(EModioAuthenticationProvider Provider, EModioLanguage Locale,
-									  FOnGetTermsOfUseDelegateFast Callback);
+	MODIO_API void GetTermsOfUseAsync(FOnGetTermsOfUseDelegateFast Callback);
 
 	/**
 	 * @docpublic
-	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
-	 * who wishes to create a mod.io account
-	 * @param Locale The language to display the terms of use in
-	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
-	 * @requires initialized-sdk
-	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @brief Set language to get corresponding data from the server
+	 * @param EModioLanguage to set
 	 **/
-	MODIO_API void GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegateFast Callback);
+	MODIO_API void SetLanguage(EModioLanguage Locale);
 
 	/**
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
@@ -787,6 +778,24 @@ public:
 	 */
 	MODIO_API void ListUserCreatedModsAsync(FModioFilterParams Filter, FOnListUserCreatedModsDelegateFast Callback);
 
+	/**
+	 * @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
+	 * requiring the SDK to be initialized.
+	 * @param GameID The FModioGameID of the game we're fetching the default mod installation directory for.
+	 * @return The default mod installation directory for the specified game on the current platform
+	 */
+	static MODIO_API FString GetDefaultModInstallationDirectory(FModioGameID GameID);
+
+	/**
+	 * @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
+	 * requiring the SDK to be initialized. This overload takes an int64 for the GameID param, allowing other modules to
+	 * execute this function via a delegate without depending on this module and the FModioGameID type.
+	 * @param GameID An int64 representing the GameID of the game we're fetching the default mod installation directory
+	 * for.
+	 * @return The default mod installation directory for the specified game on the current platform
+	 */
+	static MODIO_API FString GetDefaultModInstallationDirectory(int64 GameID);
+
 private:
 	TUniquePtr<struct FModioImageCache> ImageCache;
 
@@ -888,11 +897,11 @@ public:
 	MODIO_API void K2_FetchExternalUpdatesAsync(FOnErrorOnlyDelegate OnFetchDone);
 
 	/**
-	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows 
-	 * you to identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to 
+	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows
+	 * you to identify which mods will be modified by the next call to <<FetchExternalUpdatesAsync>> in order to
 	 * perform any content management (such as unloading files) that might be required.
-	 * @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with ModID
-	 * as keys and changes as values. Empty when there are no differences between local and the mod.io API service
+	 * @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with
+	 *ModID as keys and changes as values. Empty when there are no differences between local and the mod.io API service
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "PreviewExternalUpdatesAsync", Category = "mod.io|Mod Management")
 	MODIO_API void K2_PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegate OnPreviewDone);
@@ -1133,33 +1142,21 @@ public:
 	/**
 	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
 	 * who wishes to create a mod.io account
-	 * @param Provider The provider to use to perform the authentication
-	 * @param Locale The language to display the terms of use in
-	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
-	 * @requires initialized-sdk
-	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @errorcategory SDKNotInitialized|SDK not initialized
-	 * @deprecated Deprecated as of 2023.10. Call K2_GetTermsOfUseAsync() without an EModioAuthenticationProvider
-	 *instead
-	 **/
-	// clang-format off
-	UFUNCTION(BlueprintCallable, DisplayName = "GetTermsOfUseAsync", Category = "mod.io|Authentication",
-			  meta = (DeprecatedFunction, DeprecationMessage = "Deprecated as of 2023.10. Call K2_GetTermsOfUseAsync() without an EModioAuthenticationProvider instead."))
-	MODIO_API void K2_GetTermsOfUseAsync_DEPRECATED(EModioAuthenticationProvider Provider, EModioLanguage Locale,
-													FOnGetTermsOfUseDelegate Callback);
-	// clang-format on
-
-	/**
-	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
-	 * who wishes to create a mod.io account
-	 * @param Locale The language to display the terms of use in
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
 	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetTermsOfUseAsync", Category = "mod.io|Authentication")
-	MODIO_API void K2_GetTermsOfUseAsync(EModioLanguage Locale, FOnGetTermsOfUseDelegate Callback);
+	MODIO_API void K2_GetTermsOfUseAsync(FOnGetTermsOfUseDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Set language to get corresponding data from the server
+	 * @param EModioLanguage to set
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "SetLanguage", Category = "mod.io")
+	MODIO_API void K2_SetLanguage(EModioLanguage Locale);
 
 	/**
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
@@ -1367,6 +1364,15 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "ListUserCreatedModsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_ListUserCreatedModsAsync(const FModioFilterParams& Filter,
 											   FOnListUserCreatedModsDelegate Callback);
+
+	/**
+	 * @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
+	 * requiring the SDK to be initialized.
+	 * @param GameID The FModioGameID of the game we're fetching the default mod installation directory for.
+	 * @return The default mod installation directory for the specified game on the current platform
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetDefaultModInstallationDirectory", Category = "mod.io|Mods")
+	static MODIO_API FString K2_GetDefaultModInstallationDirectory(FModioGameID GameID);
 
 #pragma endregion
 

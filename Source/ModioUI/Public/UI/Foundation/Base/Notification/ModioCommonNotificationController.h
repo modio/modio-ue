@@ -93,11 +93,11 @@ protected:
 	//~ End IModioUINotificationController Interface
 
 	/** Error notification class to use when displaying an error */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUINotification"), Category = "Mod.io Common UI")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "/Script/ModioUICore.ModioUINotification"), Category = "Mod.io Common UI")
 	TSubclassOf<UUserWidget> ErrorNotificationClass;
 
 	/** Success notification class to use when displaying a success */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "ModioUINotification"), Category = "Mod.io Common UI")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, meta = (MustImplement = "/Script/ModioUICore.ModioUINotification"), Category = "Mod.io Common UI")
 	TSubclassOf<UUserWidget> SuccessNotificationClass;
 
 	/** Notification list to display notifications in */

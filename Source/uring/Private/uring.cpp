@@ -16,12 +16,12 @@ DEFINE_LOG_CATEGORY(uring);
 
 void Furing::StartupModule()
 {
-	UE_LOG(uring, Warning, TEXT("uring module has been loaded"));
+	UE_LOG(uring, Display, TEXT("uring module has been loaded"));
 }
 
 void Furing::ShutdownModule()
 {
-	UE_LOG(uring, Warning, TEXT("uring module has been unloaded"));
+	UE_LOG(uring, Display, TEXT("uring module has been unloaded"));
 }
 
 #undef LOCTEXT_NAMESPACE

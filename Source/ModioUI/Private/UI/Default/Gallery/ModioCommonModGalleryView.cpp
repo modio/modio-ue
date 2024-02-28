@@ -1,3 +1,14 @@
+/*
+ *  Copyright (C) 2023 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
+ *
+ */
+
+
 #include "UI/Default/Gallery/ModioCommonModGalleryView.h"
 
 #include "ModioSubsystem.h"
@@ -15,6 +26,7 @@
 #include "UI/Interfaces/IModioUIAsyncHandlerWidget.h"
 #include "UI/Settings/ModioCommonUISettings.h"
 #include "UI/Settings/Params/ModioCommonModGalleryParams.h"
+#include "Types/ModioModInfo.h"
 
 UModioCommonModGalleryView::UModioCommonModGalleryView()
 {
@@ -159,19 +171,6 @@ void UModioCommonModGalleryView::NativeOnSetDataSource()
 	RefreshGallery();
 }
 
-UWidget* UModioCommonModGalleryView::NativeGetDesiredFocusTarget() const
-{
-	if (ModGalleryLoader && ModGalleryLoader->Implements<UModioUIAsyncHandlerWidget>()
-		&& IModioUIAsyncHandlerWidget::Execute_GetAsyncOperationState(ModGalleryLoader) == EModioUIAsyncOperationWidgetState::Error)
-	{
-		if (UWidget* WidgetToFocus = ErrorWithRetryWidget->GetDesiredFocusTarget())
-		{
-			return WidgetToFocus;
-		}
-	}
-	return Super::NativeGetDesiredFocusTarget();
-}
-
 void UModioCommonModGalleryView::BindInputActions()
 {
 	Super::BindInputActions();
@@ -184,7 +183,7 @@ void UModioCommonModGalleryView::BindInputActions()
 		return;
 	}
 
-	if (CurrentImageGalleryIndex <= 0)
+	if (GetSelectedImageGalleryIndex() <= 0)
 	{
 		SetPreviousButtonVisibility(false);
 	}
@@ -193,7 +192,7 @@ void UModioCommonModGalleryView::BindInputActions()
 		SetPreviousButtonVisibility(true);
 	}
 
-	if (CurrentImageGalleryIndex >= GetNumGalleryImages() - 1)
+	if (GetSelectedImageGalleryIndex() >= GetNumGalleryImages() - 1)
 	{
 		SetNextButtonVisibility(false);
 	}
@@ -209,6 +208,23 @@ void UModioCommonModGalleryView::UnbindInputActions()
 
 	SetPreviousButtonVisibility(false);
 	SetNextButtonVisibility(false);
+}
+
+UWidget* UModioCommonModGalleryView::NativeGetDesiredFocusTarget() const
+{
+	if (UWidget* WidgetToFocus = BP_GetDesiredFocusTarget())
+	{
+		return WidgetToFocus;
+	}
+	if (ModGalleryLoader && ModGalleryLoader->Implements<UModioUIAsyncHandlerWidget>()
+		&& IModioUIAsyncHandlerWidget::Execute_GetAsyncOperationState(ModGalleryLoader) == EModioUIAsyncOperationWidgetState::Error)
+	{
+		if (UWidget* WidgetToFocus = ErrorWithRetryWidget->GetDesiredFocusTarget())
+		{
+			return WidgetToFocus;
+		}
+	}
+	return Super::NativeGetDesiredFocusTarget();
 }
 
 void UModioCommonModGalleryView::RefreshGallery_Implementation()
@@ -229,16 +245,17 @@ void UModioCommonModGalleryView::RefreshGallery_Implementation()
 
 	if (SelectedGalleryImage && GetNumGalleryImages() > 0)
 	{
-		SelectedGalleryImage->LoadImageFromGallery(ModId, EModioGallerySize::Original, CurrentImageGalleryIndex);
+		const int32 CurrentlySelectedImageIndex = GetSelectedImageGalleryIndex();
+		SelectedGalleryImage->LoadImageFromGallery(ModId, GallerySize, CurrentlySelectedImageIndex);
 		if (ImageNavButtons)
 		{
-			ImageNavButtons->SetSelectedIndex(CurrentImageGalleryIndex);
-			ImageNavButtons->ScrollIndexIntoView(CurrentImageGalleryIndex);
+			ImageNavButtons->SetSelectedIndex(CurrentlySelectedImageIndex);
+			ImageNavButtons->ScrollIndexIntoView(CurrentlySelectedImageIndex);
 		}
 	}
 	else if (SelectedGalleryImage)
 	{
-		SelectedGalleryImage->LoadImageFromLogo(ModId, EModioLogoSize::Thumb1280);
+		SelectedGalleryImage->LoadImageFromLogo(ModId, LogoSize);
 	}
 	else
 	{
@@ -253,7 +270,7 @@ void UModioCommonModGalleryView::RefreshGallery_Implementation()
 	if (NextButton) NextButton->SetVisibility(ControlsVisibility);
 }
 
-void UModioCommonModGalleryView::SetPreviousButtonVisibility_Implementation(bool bVisible)
+void UModioCommonModGalleryView::SetPreviousButtonVisibility_Implementation(bool bIsVisible)
 {
 	if (!PreviousButton)
 	{
@@ -266,7 +283,7 @@ void UModioCommonModGalleryView::SetPreviousButtonVisibility_Implementation(bool
 		return;
 	}
 
-	if (bVisible && !UISettings->ModGalleryParams.PreviousImageInputAction.IsNull())
+	if (bIsVisible && !UISettings->ModGalleryParams.PreviousImageInputAction.IsNull())
 	{
 		PreviousButton->SetTriggeringInputAction(UISettings->ModGalleryParams.PreviousImageInputAction);
 		PreviousButton->SetIsInteractionEnabled(true);
@@ -278,7 +295,7 @@ void UModioCommonModGalleryView::SetPreviousButtonVisibility_Implementation(bool
 	}
 }
 
-void UModioCommonModGalleryView::SetNextButtonVisibility_Implementation(bool bVisible)
+void UModioCommonModGalleryView::SetNextButtonVisibility_Implementation(bool bIsVisible)
 {
 	if (!NextButton)
 	{
@@ -291,7 +308,7 @@ void UModioCommonModGalleryView::SetNextButtonVisibility_Implementation(bool bVi
 		return;
 	}
 
-	if (bVisible && !UISettings->ModGalleryParams.NextImageInputAction.IsNull())
+	if (bIsVisible && !UISettings->ModGalleryParams.NextImageInputAction.IsNull())
 	{
 		NextButton->SetTriggeringInputAction(UISettings->ModGalleryParams.NextImageInputAction);
 		NextButton->SetIsInteractionEnabled(true);
@@ -307,7 +324,7 @@ void UModioCommonModGalleryView::GoToNextImage_Implementation()
 {
 	CurrentImageGalleryIndex++;
 
-	if (!FMath::IsWithinInclusive(CurrentImageGalleryIndex, 0, GetNumGalleryImages() - 1))
+	if (!FMath::IsWithinInclusive(GetSelectedImageGalleryIndex(), 0, GetNumGalleryImages() - 1))
 	{
 		CurrentImageGalleryIndex = 0;
 	}
@@ -319,7 +336,7 @@ void UModioCommonModGalleryView::GoToPreviousImage_Implementation()
 {
 	CurrentImageGalleryIndex--;
 
-	if (!FMath::IsWithinInclusive(CurrentImageGalleryIndex, 0, GetNumGalleryImages() - 1))
+	if (!FMath::IsWithinInclusive(GetSelectedImageGalleryIndex(), 0, GetNumGalleryImages() - 1))
 	{
 		CurrentImageGalleryIndex = GetNumGalleryImages() - 1;
 	}
@@ -327,7 +344,7 @@ void UModioCommonModGalleryView::GoToPreviousImage_Implementation()
 	RefreshGallery();
 }
 
-int32 UModioCommonModGalleryView::GetCurrentImageGalleryIndex_Implementation()
+int32 UModioCommonModGalleryView::GetSelectedImageGalleryIndex_Implementation()
 {
 	return CurrentImageGalleryIndex;
 }

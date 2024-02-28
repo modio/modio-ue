@@ -63,7 +63,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnDisplayModDetailsForID, const FModioModID
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnGetModEnabled, FModioModID, Mod);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnModEnabledChanged, FModioModID, Mod, bool, bNewStateIsEnabled);
 
-DECLARE_DYNAMIC_DELEGATE(FOnModBrowserClosed);
+DECLARE_DYNAMIC_DELEGATE(FOnModBrowserCloseRequested);
 
 DECLARE_MULTICAST_DELEGATE(FOnAuthenticationChangeStarted);
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FOnDisplaySearchResults, FModioFilterParams, Params);
@@ -141,7 +141,7 @@ protected:
 
 	void OnGetModTagOptionsComplete(FModioErrorCode ModioErrorCode, TOptional<FModioModTagOptions> ModioModTagInfos);
 
-	FOnModBrowserClosed OnModBrowserClosed;
+	FOnModBrowserCloseRequested OnModBrowserCloseRequested;
 
 public:
 	FOnDisplayNotificationWidget OnDisplayNotificationWidget;
@@ -261,7 +261,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	UUserWidget* ShowModBrowserUIForPlayer(TSubclassOf<UUserWidget> MenuClass, APlayerController* Controller,
-										   FOnModBrowserClosed BrowserClosedDelegate);
+										   FOnModBrowserCloseRequested OnModBrowserCloseRequestedDelegate);
 
 	/// Sets the browser visibility to collapsed, does not free resources and is generally more stable
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
@@ -292,11 +292,13 @@ public:
 	bool GetIsCollectionModDisableUIEnabled();
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	void ExecuteOnModBrowserClosedDelegate();
+	void ExecuteOnModBrowserCloseRequestedDelegate();
 
 	void ShowUserAuth();
 
 	bool IsUserAuthenticated();
 
 	TArray<FModioModID> ModsDownloadedThisSession;
+
+	FModioErrorCode LastSubscriptionErrorCode;
 };

@@ -56,10 +56,10 @@ struct MODIOUI_API FModioCommonCollectionParamsSettings
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText FilterButtonLabel = NSLOCTEXT("Modio", "CollectionFilterButtonLabel", "Filter");
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle CheckForUpdatesInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle FilterInputAction;
 };
 
@@ -116,9 +116,9 @@ struct MODIOUI_API FModioCommonModBrowserParamsSettings
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Mod Browser")
 	FText SearchResultsViewTabText = NSLOCTEXT("Modio", "SearchResultsViewTabText", "Search");
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle PreviousTabInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle NextTabInputAction;
 };

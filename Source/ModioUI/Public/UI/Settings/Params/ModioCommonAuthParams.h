@@ -42,19 +42,19 @@ struct MODIOUI_API FModioCommonAuthParamsSettings
 		TermsInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle BackInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle SubmitInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle CancelInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle TermsInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle PrivacyInputAction;
 };
 
@@ -67,7 +67,7 @@ struct MODIOUI_API FModioCommonEmailAuthCodeParamsSettings
 	GENERATED_BODY()
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText TitleText = NSLOCTEXT("Modio", "EmailAuthTitle", "Email Authenticating");
+	FText TitleText = NSLOCTEXT("Modio", "EmailAuthTitle", "Email Authentication");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText DescriptionText = NSLOCTEXT("Modio", "EmailAuthDescription", "Once the verification email is received, enter the 5-digit code provided.");
@@ -94,7 +94,7 @@ struct MODIOUI_API FModioCommonEmailAuthLoadingParamsSettings
 	GENERATED_BODY()
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText TitleText = NSLOCTEXT("Modio", "EmailAuthLoadingTitle", "Email Authenticating");
+	FText TitleText = NSLOCTEXT("Modio", "EmailAuthLoadingTitle", "Email Authentication");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText DescriptionText = NSLOCTEXT("Modio", "EmailAuthLoadingDescription", "Waiting for response ...");
@@ -112,13 +112,13 @@ struct MODIOUI_API FModioCommonEmailAuthParamsSettings
 	GENERATED_BODY()
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText TitleText = NSLOCTEXT("Modio", "EmailAuthTitle", "Email Authenticating");
+	FText TitleText = NSLOCTEXT("Modio", "EmailAuthTitle", "Email Authentication");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText DescriptionText = NSLOCTEXT("Modio", "EmailAuthDescription", "Please verify your email to continue");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText ValidationText = NSLOCTEXT("Modio", "EmailValidation", "Please enter a valid email address.");
+	FText ValidationText = NSLOCTEXT("Modio", "EmailValidation", "Please enter a valid email address");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText EmailTooltipText = NSLOCTEXT("Modio", "EmailAuthEmailTooltip", "Email");
@@ -145,7 +145,7 @@ struct MODIOUI_API FModioCommonTermsOfUseParamsSettings
 	FText TitleText = NSLOCTEXT("Modio", "TermsOfUseTitle", "Terms Of Use");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText ContentText = NSLOCTEXT("Modio", "ContentText", "We use mod.io to support user-generated content in-game. By clicking \"I Agree\" you agree to the mod.io Terms of Use and a mod.io account will be created for you (using your display name, avatar and ID). Please sea the mod.io Privacy Policy on how mod.io processes your personal data.");
+	FText ContentText = NSLOCTEXT("Modio", "ContentText", "We use mod.io to support user-generated content in-game. By clicking \"I Agree\" you agree to the mod.io Terms of Use and a mod.io account will be created for you (using your display name, avatar and ID). Please see the mod.io Privacy Policy on how mod.io processes your personal data.");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText SubmitButtonText = NSLOCTEXT("Modio", "SubmitButtonText", "I Agree");

@@ -160,7 +160,7 @@ protected:
 	TObjectPtr<UModioCommonTextBlock> SpeedDetailsTextBlock;
 
 	/** Loader widget to display while the mod details are loading */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "ModioUIAsyncHandlerWidget"), Category = "Mod.io Common UI|Widgets")
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional, MustImplement = "/Script/ModioUICore.ModioUIAsyncHandlerWidget"), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UWidget> ModDetailsLoader;
 
 	/** Widget to display when there is an error loading the mod details */

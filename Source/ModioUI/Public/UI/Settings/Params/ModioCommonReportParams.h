@@ -42,16 +42,16 @@ public:
 		CancelInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle ProceedInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle BackInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle SubmitInputAction;
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle CancelInputAction;
 };
 
@@ -66,7 +66,7 @@ struct MODIOUI_API FModioCommonReportReasonParamsSettings
 public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText DescriptionText = NSLOCTEXT("Modio", "ReportReasonDescription", "Please select the reason(s) for reporting a mod.");
+	FText DescriptionText = NSLOCTEXT("Modio", "ReportReasonDescription", "Please select a reason for reporting this mod");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText ProceedButtonText = NSLOCTEXT("Modio", "ProceedButtonText", "Proceed");
@@ -85,7 +85,7 @@ struct MODIOUI_API FModioCommonReportEmailParamsSettings
 
 public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText DescriptionText = NSLOCTEXT("Modio", "ReportEmailDescription", "Your email may be shared with moderators and the person that posted the allegedly infringing content you are reporting.");
+	FText DescriptionText = NSLOCTEXT("Modio", "ReportEmailDescription", "Your email may be shared with moderators and the person that posted the allegedly infringing content");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText ValidationText = NSLOCTEXT("Modio", "EmailValidation", "Please enter a valid email address.");

@@ -33,6 +33,6 @@ struct MODIOUI_API FModioCommonErrorWithRetryParamsSettings
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText RetryButtonTextLabel = NSLOCTEXT("Modio", "RetryButtonText", " Retry");
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle RetryInputAction;
 };

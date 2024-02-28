@@ -34,6 +34,6 @@ public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText ProfileButtonLabel = NSLOCTEXT("Modio", "ProfileButtonLabel", "Profile");
 
-	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = CommonInputActionDataBase), Category = "Actions")
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle ProfileInputAction;
 };

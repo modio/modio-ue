@@ -460,7 +460,7 @@ public class Modio : ModuleRules
         }
 
         // Enable Modio Profiling in non-shipping builds
-        if (Target.Configuration != UnrealTargetConfiguration.Shipping && DoesPlatformSupportProfiling(Target.Platform))
+        if (Target.Configuration != UnrealTargetConfiguration.Shipping && Target.Configuration != UnrealTargetConfiguration.Test && DoesPlatformSupportProfiling(Target.Platform))
         {
             PrivateDefinitions.Add("MODIO_ENABLE_PROFILING=1");
             PrivateDefinitions.Add("MODIO_UNREAL_PROFILING_SUPPORT=1");
