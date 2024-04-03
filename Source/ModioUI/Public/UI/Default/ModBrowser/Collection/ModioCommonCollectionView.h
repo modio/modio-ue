@@ -133,6 +133,9 @@ protected:
 	void UpdateInputBindings();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
+	FModioModCategoryParams GetDefaultCategoryFilterParams(bool bUserAuthenticated);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Collection View|Update")
 	void SetDefaultCategoryFilterParams(bool bUserAuthenticated);
 
 	//~ Begin UCommonActivatableWidget Implementation

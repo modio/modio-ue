@@ -22,6 +22,8 @@ class MODIOUICORE_API UModioUIAsyncHandlerWidget : public UInterface
 	GENERATED_BODY()
 };
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnChangeAsyncHandlerOperationState, EModioUIAsyncOperationWidgetState, NewState);
+
 class MODIOUICORE_API IModioUIAsyncHandlerWidget : public IInterface
 {
 	GENERATED_BODY()
@@ -29,6 +31,7 @@ class MODIOUICORE_API IModioUIAsyncHandlerWidget : public IInterface
 protected:
 	virtual void NativeLinkAsyncOperationWidget(const TScriptInterface<IModioUIAsyncOperationWidget>& Widget) {}
 	virtual EModioUIAsyncOperationWidgetState NativeGetAsyncOperationState() const { return EModioUIAsyncOperationWidgetState::Error; }
+	virtual void NativeSetOnOperationStateDelegate(const FOnChangeAsyncHandlerOperationState& Delegate) {}
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIAsyncHandlerWidgets")
@@ -43,5 +46,12 @@ public:
 	EModioUIAsyncOperationWidgetState GetAsyncOperationState_Implementation() const
 	{
 		return NativeGetAsyncOperationState();
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ModioUIAsyncHandlerWidgets")
+	void SetOnOperationStateDelegate(const FOnChangeAsyncHandlerOperationState& Delegate);
+	void SetOnOperationStateDelegate_Implementation(const FOnChangeAsyncHandlerOperationState& Delegate)
+	{
+		NativeSetOnOperationStateDelegate(Delegate);
 	}
 };

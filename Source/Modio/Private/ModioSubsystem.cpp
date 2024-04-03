@@ -18,6 +18,7 @@
 #include "Internal/Convert/ErrorCode.h"
 #include "Internal/Convert/FilterParams.h"
 #include "Internal/Convert/GameInfo.h"
+#include "Internal/Convert/GameInfoList.h"
 #include "Internal/Convert/GamePlatform.h"
 #include "Internal/Convert/InitializeOptions.h"
 #include "Internal/Convert/List.h"
@@ -235,6 +236,17 @@ void UModioSubsystem::ListAllModsAsync(const FModioFilterParams& Filter, FOnList
 							});
 }
 
+MODIO_API void UModioSubsystem::ListUserGamesAsync(const FModioFilterParams& Filter, FOnListUserGamesDelegateFast Callback)
+{
+	Modio::ListUserGamesAsync(ToModio(Filter),
+							[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::GameInfoList> Result) {
+								AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Result]() {
+											  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+											  Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioGameInfoList>(Result));
+										  }));
+							});
+}
+
 void UModioSubsystem::SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegateFast OnSubscribeComplete)
 {
 	Modio::SubscribeToModAsync(ToModio(ModToSubscribeTo), [WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
@@ -338,6 +350,14 @@ void UModioSubsystem::K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnL
 	ListAllModsAsync(Filter, FOnListAllModsDelegateFast::CreateLambda(
 								 [Callback](FModioErrorCode ec, TOptional<FModioModInfoList> ModList) {
 									 Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModInfoList>(ModList));
+								 }));
+}
+
+MODIO_API void UModioSubsystem::K2_ListUserGamesAsync(const FModioFilterParams& Filter, FOnListUserGamesDelegate Callback)
+{
+	ListUserGamesAsync(Filter, FOnListUserGamesDelegateFast::CreateLambda(
+								 [Callback](FModioErrorCode ec, TOptional<FModioGameInfoList> GameList) {
+									   Callback.ExecuteIfBound(ec, ToBP<FModioOptionalGameInfoList>(GameList));
 								 }));
 }
 

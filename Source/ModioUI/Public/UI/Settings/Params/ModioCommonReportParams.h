@@ -145,7 +145,7 @@ struct MODIOUI_API FModioCommonReportSummaryParamsSettings
 
 public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText DescriptionText = NSLOCTEXT("Modio", "ReportSummaryDescription", "Report Summary");
+	FText DescriptionText = NSLOCTEXT("Modio", "ReportSummaryDescription", "Summary");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText ReasonLabelText = NSLOCTEXT("Modio", "ReasonLabelText", "Reason:");

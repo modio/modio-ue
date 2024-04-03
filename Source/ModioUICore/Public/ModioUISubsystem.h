@@ -274,7 +274,7 @@ public:
 	void ShowDetailsForMod(FModioModID ID);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	bool ShowSearchResults(const FModioModCategoryParams& SearchParameters);
+	bool ShowSearchResults(const FModioModCategoryParams& SearchParameters, bool bIsDefaultFilter);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void DisplayNotification(UPARAM(ref) TScriptInterface<IModioUINotification>& Notification);
@@ -294,6 +294,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void ExecuteOnModBrowserCloseRequestedDelegate();
 
+	// If CachedGameInfo is set, returns it through the callback
+	// else retrieve it from the SDK first via UModioSubsystem and caches it
+	void GetGameInfoAsync(FOnGetGameInfoDelegateFast Callback);
+
 	void ShowUserAuth();
 
 	bool IsUserAuthenticated();
@@ -301,4 +305,6 @@ public:
 	TArray<FModioModID> ModsDownloadedThisSession;
 
 	FModioErrorCode LastSubscriptionErrorCode;
+
+	TOptional<FModioGameInfo> CachedGameInfo;
 };

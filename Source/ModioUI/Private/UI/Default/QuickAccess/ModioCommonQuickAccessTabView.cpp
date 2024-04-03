@@ -19,7 +19,6 @@
 #include "UI/Foundation/Components/Border/ModioCommonBorder.h"
 #include "UI/Foundation/Components/Text/TextBlock/ModioCommonTextBlock.h"
 #include "UI/Foundation/Utilities/ModOperationTracker/ModioCommonModOperationTrackerUserWidget.h"
-#include "UI/Foundation/Utilities/StorageSpaceTracker/ModioCommonStorageSpaceTrackerUserWidget.h"
 #include "UI/Settings/Params/ModioCommonQuickAccessParams.h"
 #include "UI/Settings/ModioCommonUISettings.h"
 
@@ -120,26 +119,33 @@ void UModioCommonQuickAccessTabView::NativeOnInitialized()
 
 	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{
-	if (MainGameMenuButton)
-	{
-			MainGameMenuButton->SetVisibility(UISettings->QuickAccessParams.bShowMainGameMenu ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
-			if (UISettings->QuickAccessParams.bShowMainGameMenu) 
-			{
-				ListenForInputAction(MainGameMenuButton, UISettings->QuickAccessParams.MainGameMenuInputAction, UISettings->QuickAccessParams.MainGameMenuButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
-					HandleOnMainGameMenuButtonClicked();
-				}));
+		if (MainGameMenuButton)
+		{
+				MainGameMenuButton->SetVisibility(UISettings->QuickAccessParams.bShowMainGameMenu ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+				if (UISettings->QuickAccessParams.bShowMainGameMenu) 
+				{
+					ListenForInputAction(MainGameMenuButton, UISettings->QuickAccessParams.MainGameMenuInputAction, UISettings->QuickAccessParams.MainGameMenuButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+						HandleOnMainGameMenuButtonClicked();
+					}));
+			}
 		}
-	}
 
-	if (AuthButton)
-	{
-			ListenForInputAction(AuthButton, UISettings->QuickAccessParams.AuthInputAction, IsUserAuthenticated() ? UISettings->QuickAccessParams.LogOutButtonLabel : UISettings->QuickAccessParams.LogInButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
-				HandleOnAuthButtonClicked();
-			}));
-	}
+		if (AuthButton)
+		{
+			if(UISettings->bShowAuthButton)
+			{
+				ListenForInputAction(AuthButton, UISettings->QuickAccessParams.AuthInputAction, IsUserAuthenticated() ? UISettings->QuickAccessParams.LogOutButtonLabel : UISettings->QuickAccessParams.LogInButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+					HandleOnAuthButtonClicked();
+				}));
+			}
+			else
+			{
+				AuthButton->SetVisibility(ESlateVisibility::Collapsed);
+			}
+		}
 
-	if (MyCollectionButton)
-	{
+		if (MyCollectionButton)
+		{
 			ListenForInputAction(MyCollectionButton, UISettings->QuickAccessParams.MyCollectionInputAction, UISettings->QuickAccessParams.MyCollectionButtonLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 				HandleOnCollectionButtonClicked();
 			}));
@@ -219,11 +225,6 @@ void UModioCommonQuickAccessTabView::SynchronizeProperties()
 		if (UserNameTextBlock)
 		{
 			UserNameTextBlock->SetStyle(StyleCDO->UserNameTextStyle);
-		}
-
-		if (StorageSpaceTrackerUserWidget)
-		{
-			StorageSpaceTrackerUserWidget->SetStyle(StyleCDO->StorageSpaceTrackerStyle);
 		}
 
 		if (ModOperationTrackerUserWidget)

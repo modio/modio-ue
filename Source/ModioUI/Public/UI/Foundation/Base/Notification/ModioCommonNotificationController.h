@@ -104,15 +104,53 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget), Category = "Mod.io Common UI")
 	TObjectPtr<UPanelWidget> NotificationList;
 
+	/** This is needed to allow finding both by value and by key at O(1) */
+	template<typename ParamsType>
+	struct FBidirectionalWidgetMappedParams
+	{
+		const ParamsType* Find(const TStrongObjectPtr<UWidget>& Widget) const
+		{
+			return MappedWidgetToParams.Find(Widget);
+		}
+		const TStrongObjectPtr<UWidget>* Find(const ParamsType& Params) const
+		{
+			return MappedParamsToWidget.Find(Params);
+		}
+		void Add(const ParamsType& Params, const TStrongObjectPtr<UWidget>& Widget)
+		{
+			MappedParamsToWidget.Add(Params, Widget);
+			MappedWidgetToParams.Add(Widget, Params);
+		}
+		void Remove(const ParamsType& Params)
+		{
+			if (const TStrongObjectPtr<UWidget>* FoundWidget = MappedParamsToWidget.Find(Params))
+			{
+				MappedWidgetToParams.Remove(*FoundWidget);
+				MappedParamsToWidget.Remove(Params);
+			}
+		}
+		void Remove(const TStrongObjectPtr<UWidget>& Widget)
+		{
+			if (const ParamsType* FoundParams = MappedWidgetToParams.Find(Widget))
+			{
+				MappedParamsToWidget.Remove(*FoundParams);
+				MappedWidgetToParams.Remove(Widget);
+			}
+		}
+
+		TMap<ParamsType, TStrongObjectPtr<UWidget>> MappedParamsToWidget;
+		TMap<TStrongObjectPtr<UWidget>, ParamsType> MappedWidgetToParams;
+	};
+
 	/**
 	 * Map of manual notification parameters to the notification widget
 	 */
-	TMap<FModioManualNotificationParams, TStrongObjectPtr<UWidget>> MappedManualParams;
+	FBidirectionalWidgetMappedParams<FModioManualNotificationParams> MappedManualParams;
 
 	/**
 	 * Map of notification parameters to the notification widget
 	 */
-	TMap<FModioNotificationParams, TStrongObjectPtr<UWidget>> MappedParams;
+	FBidirectionalWidgetMappedParams<FModioNotificationParams> MappedParams;
 
 	/**
 	 * @brief Checks if the same notification is already displayed and if so, moves it to the front of the list

@@ -52,7 +52,8 @@ enum class EModioPortal : uint8
 	Nintendo,
 	PSN,
 	Steam,
-	XboxLive
+	XboxLive,
+	Android
 };
 
 /**
@@ -69,7 +70,9 @@ enum class EModioPlatformName : uint8
 	XBoxOne,
 	XSX,
 	Switch,
-	Unknown
+	Unknown,
+	Android,
+	iOS
 };
 
 

@@ -26,20 +26,23 @@ struct MODIOUI_API FModioCommonModDetailsParamsSettings
 
 	FModioCommonModDetailsParamsSettings()
 	{
-		SubscribeInputAction.RowName = "Primary";
+		SubscribeInputAction.RowName = "Tertiary";
 		SubscribeInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		CancelInputAction.RowName = "Primary";
+		CancelInputAction.RowName = "Tertiary";
 		CancelInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		RateUpInputAction.RowName = "Primary";
+		RateUpInputAction.RowName = "Tertiary";
 		RateUpInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
 		RateDownInputAction.RowName = "Secondary";
 		RateDownInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		OpenReportInputAction.RowName = "Tertiary";
+		OpenReportInputAction.RowName = "RightTabSecondary";
 		OpenReportInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		SwitchEnabledInputAction.RowName = "LeftTabSecondary";
+		SwitchEnabledInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
@@ -90,6 +93,12 @@ struct MODIOUI_API FModioCommonModDetailsParamsSettings
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText ExtractingLabel = NSLOCTEXT("Modio", "Extracting", "Extracting");
 
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText EnableLabel = NSLOCTEXT("Modio", "Enable", "Enable");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText DisableLabel = NSLOCTEXT("Modio", "Disable", "Disable");
+
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle SubscribeInputAction;
 
@@ -104,4 +113,7 @@ struct MODIOUI_API FModioCommonModDetailsParamsSettings
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle OpenReportInputAction;
+	
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
+	FDataTableRowHandle SwitchEnabledInputAction;
 };

@@ -16,6 +16,7 @@
 #include "Core/ModioFilterParamsUI.h"
 #include "ModioCommonModBrowser.generated.h"
 
+enum class ECommonInputType : uint8;
 class UModioCommonSearchViewBase;
 class UModioCommonModBrowserStyle;
 class UModioCommonSearchTabView;
@@ -118,7 +119,7 @@ public:
 	bool HideQuickAccessView();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search")
-	bool ShowSearchView(EModioCommonSearchViewType SearchType, const FModioModCategoryParams& CurrentFilterParams);
+	bool ShowSearchView(EModioCommonSearchViewType SearchType, const FModioModCategoryParams& CurrentFilterParams, const FModioModCategoryParams& DefaultFilterParams = FModioModCategoryParams());
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search")
 	bool HideSearchView();
@@ -154,9 +155,11 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Tab")
 	bool GetViewFromTabNameID(FName TabNameID, TSubclassOf<UModioCommonActivatableWidget>& OutView) const;
 
+	void OnInputMethodChanged(ECommonInputType NewInputType);
+
 	//~ Begin IModioModBrowserInterface Interface
 	virtual void ShowDetailsForMod_Implementation(FModioModID ModID) override;
-	virtual void ShowSearchResults_Implementation(const FModioModCategoryParams& FilterParams) override;
+	virtual void ShowSearchResults_Implementation(const FModioModCategoryParams& FilterParams, bool bIsDefaultFilter) override;
 	virtual void ShowUserAuth_Implementation() override;
 	virtual void LogOut_Implementation() override;
 	virtual void ShowReportMod_Implementation(UObject* DialogDataSource) override;
@@ -165,4 +168,5 @@ protected:
 	//~ End IModioModBrowserInterface Interface
 
 	TOptional<FModioModCategoryParams> PendingFilterParams;
+	TOptional<bool> PendingIsDefaultFilter;
 };

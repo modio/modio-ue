@@ -18,6 +18,7 @@
 #include "Engine/GameViewportClient.h"
 #include "UnrealClient.h"
 #include "Algo/RemoveIf.h"
+#include "Async/Async.h"
 
 #if WITH_EDITOR
 #include "Blueprint/WidgetTree.h"
@@ -52,6 +53,16 @@ void UModioCommonActivatableWidget::NativeOnSetDataSource()
 
 void UModioCommonActivatableWidget::BindInputActions()
 {
+	// If we're not on the game thread, we need to defer this to the game thread (since UMG/Slate and the ListeningInputActions array are not thread safe)
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]()
+		{
+			WeakThis->UnbindInputActions();
+		});
+		return;
+	}
+
 	for (FListeningInputActionStruct& ListeningInputAction : ListeningInputActions)
 	{
 		if (ListeningInputAction.InputAction.IsNull())
@@ -78,6 +89,16 @@ void UModioCommonActivatableWidget::BP_BindInputActions_Implementation()
 
 void UModioCommonActivatableWidget::UnbindInputActions()
 {
+	// If we're not on the game thread, we need to defer this to the game thread (since UMG/Slate and the ListeningInputActions array are not thread safe)
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]()
+		{
+			WeakThis->UnbindInputActions();
+		});
+		return;
+	}
+
 	for (FBoundInputActionStruct& BoundInputAction : BoundInputActions)
 	{
 		if (BoundInputAction.Button.IsValid())
@@ -138,6 +159,16 @@ void UModioCommonActivatableWidget::BP_ListenForInputAction(UModioCommonButtonBa
 
 void UModioCommonActivatableWidget::ListenForInputAction(TObjectPtr<UModioCommonButtonBase> Button, FDataTableRowHandle InputAction, const FText& DisplayName, const FOnModioCommonActivatableWidgetActionFiredFast& OnActionFired)
 {
+	// If we're not on the game thread, we need to defer this to the game thread (since UMG/Slate and the ListeningInputActions array are not thread safe)
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this), Button, InputAction, DisplayName, OnActionFired]()
+		{
+			WeakThis->ListenForInputAction(Button.Get(), InputAction, DisplayName, OnActionFired);
+		});
+		return;
+	}
+
 	if (!InputAction.IsNull())
 	{
 		if (Button)
@@ -180,6 +211,16 @@ void UModioCommonActivatableWidget::ClearListeningInputActions()
 
 void UModioCommonActivatableWidget::ClearListeningInputAction(UModioCommonButtonBase* Button)
 {
+	// If we're not on the game thread, we need to defer this to the game thread (since UMG/Slate and the ListeningInputActions array are not thread safe)
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this), Button]()
+		{
+			WeakThis->ClearListeningInputAction(Button);
+		});
+		return;
+	}
+
 	for (FBoundInputActionStruct& BoundInputAction : BoundInputActions)
 	{
 		if (BoundInputAction.Button.IsValid() && BoundInputAction.Button.Get() == Button)

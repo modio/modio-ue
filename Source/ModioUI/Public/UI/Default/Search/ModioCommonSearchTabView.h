@@ -95,10 +95,16 @@ protected:
 
 public:
 	/**
-	 * Resets the search tab view, clearing the search text and resetting the filtering options
+	 * Resets the search tab view, clearing the search text and resetting the filtering options to the default values
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search Tab View")
 	void Reset();
+
+	/**
+	 * Zeros out the search tab view, clearing the search text and zeroing out the filtering options
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Search Tab View")
+	void ZeroOut();
 
 	/**
 	 * Gets the currently selected filter params

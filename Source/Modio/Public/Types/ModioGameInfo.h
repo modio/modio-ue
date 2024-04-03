@@ -44,6 +44,20 @@ enum class EGameMonetizationFlags : uint8
 };
 
 /**
+* @brief Maturity options for a game
+* 0 = Don't allow mature content in mods (default)
+* 1 = This game allows mods containing mature content
+* 2 = This game is for mature audiences only
+**/
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EGameMaturityFlags : uint8
+{
+	None = 0,
+	MatureModsAllowed = 1,
+	MatureAudiencesOnly = 2,
+};
+
+/**
  * Full game profile with extended information
  **/
 USTRUCT(BlueprintType)
@@ -120,9 +134,17 @@ struct MODIO_API FModioGameInfo
 	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.9 release. Please use the <<GamePlatforms>> instead."), BlueprintReadOnly, Category = "mod.io|GameInfo")
 	TArray<EModioModfilePlatform> Platforms = {};
 
+	/** @brief Whether or not the game allows negative ratings */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	bool bAllowNegativeRatings = false;
+
 	/** @brief Monetization options for the game */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
 	EGameMonetizationFlags GameMonetizationOptions = EGameMonetizationFlags::None;
+
+	/** @brief Maturity options for the game */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	EGameMaturityFlags GameMaturityOptions = EGameMaturityFlags::None;
 
 	/** @brief Name of the Virtual Tokens for this game */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")

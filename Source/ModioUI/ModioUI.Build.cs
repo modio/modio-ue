@@ -56,5 +56,5 @@ public class ModioUI : ModuleRules
 		{
 			Path.Combine(ModuleDirectory, "Private")
 		});
-	}
+    }
 }

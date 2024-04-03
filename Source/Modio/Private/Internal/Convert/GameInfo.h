@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include "Internal/Convert/GamePlatform.h"
 #include "Internal/Convert/GameStats.h"
 #include "Internal/Convert/HeaderImage.h"
 #include "Internal/Convert/Icon.h"
@@ -39,7 +40,9 @@ FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 	Out.Theme = ToUnreal(In.Theme);
 	Out.Stats = ToUnreal(In.Stats);
 	Out.OtherUrls = ToUnreal<FModioOtherUrl>(In.OtherUrls);
+	Out.bAllowNegativeRatings = In.CommunityOptions.HasFlag(Modio::GameCommunityOptions::AllowNegativeRatings);
 	Out.GameMonetizationOptions = ToUnreal<EGameMonetizationFlags, Modio::GameMonetizationOptions>(In.GameMonetizationOptions);
+	Out.GameMaturityOptions = ToUnreal<EGameMaturityFlags, Modio::GameMaturityOptions>(In.MaturityOptions);
 	Out.VirtualTokenName = ToUnreal(In.VirtualTokenName);
 	Out.PlatformSupport = ToUnreal<FModioGamePlatform>(In.PlatformSupport);
 

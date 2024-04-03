@@ -77,6 +77,12 @@ struct MODIOUI_API FModioCommonCodeInputTextBoxInputStyle : public FTextBlockSty
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
 	float MinimumCharacterWidth = 0;
+
+	/**
+	 * Hint text to display when the input field is empty or in platform-specific hint text locations (such as above the input field)
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Widget")
+	FText HintText;
 };
 
 /**

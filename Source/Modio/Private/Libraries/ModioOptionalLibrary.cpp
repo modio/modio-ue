@@ -10,6 +10,7 @@
 
 #include "Libraries/ModioOptionalLibrary.h"
 #include "Types/ModioGameInfo.h"
+#include "Types/ModioGameInfoList.h"
 #include "Types/ModioModDependencyList.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModTagOptions.h"
@@ -42,6 +43,17 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalModInfoList(const FModioOption
 															  FModioModInfoList& ModInfoList)
 {
 	return GetValueInternal(OptionalModInfoList, ModInfoList);
+}
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalGameInfoList(const FModioOptionalGameInfoList& OptionalGameInfoList)
+{
+	return IsSetInternal(OptionalGameInfoList);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalGameInfoList(const FModioOptionalGameInfoList& OptionalGameInfoList,
+															   FModioGameInfoList& GameInfoList)
+{
+	return GetValueInternal(OptionalGameInfoList, GameInfoList);
 }
 
 bool UModioOptionalLibrary::IsSet_ModioOptionalModInfo(const FModioOptionalModInfo& OptionalModInfo)

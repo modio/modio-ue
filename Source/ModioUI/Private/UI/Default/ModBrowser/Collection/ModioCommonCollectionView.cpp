@@ -38,6 +38,14 @@ void UModioCommonCollectionView::UpdateMods_Implementation()
 	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
 	if (!Subsystem)
 	{
+		UE_LOG(ModioUI, Error, TEXT("Unable to update mods in '%s': Modio Subsystem is not available"), *GetName());
+		return;
+	}
+
+	UModioUISubsystem* UISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
+	if (!UISubsystem)
+	{
+		UE_LOG(ModioUI, Error, TEXT("Unable to update mods in '%s': Modio UI Subsystem is not available"), *GetName());
 		return;
 	}
 
@@ -93,17 +101,9 @@ void UModioCommonCollectionView::UpdateMods_Implementation()
 		return false;
 	}();
 
-	const int32 NumOfAppliedFilters = [CategoryParams]() {
-		if (CategoryParams)
-		{
-			int32 InternalNumOfAppliedFilters = CategoryParams->Underlying.Tags.Num() + CategoryParams->Underlying.ToFilterParams().SearchKeywords.Num();
-			InternalNumOfAppliedFilters += CategoryParams->Underlying.InstalledField != EModioInstalledFilterType::None ? 1 : 0;
-			InternalNumOfAppliedFilters += CategoryParams->Underlying.EnabledFilter != EModioEnabledFilterType::None ? 1 : 0;
-			InternalNumOfAppliedFilters += CategoryParams->Underlying.ManualSortField != EModioManualSortType::AToZ ? 1 : 0;
-			return InternalNumOfAppliedFilters;
-		}
-		return 0;
-	}();
+	const FModioModCategoryParams DefaultCategoryParams = GetDefaultCategoryFilterParams(UISubsystem->IsUserAuthenticated());
+	const int32 NumOfAppliedFilters = DefaultCategoryParams.GetNumOfDifferences(CategoryParams ? CategoryParams->Underlying : FModioModCategoryParams());
+
 	if (FilterCounterTextBlock)
 	{
 		FilterCounterTextBlock->SetText(FText::FromString(FString::FromInt(NumOfAppliedFilters)));
@@ -405,7 +405,8 @@ void UModioCommonCollectionView::ShowSearchView_Implementation()
 		if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(Subsystem->GetModBrowserInstance()))
 		{
 			UModioModCategoryParamsUI* CategoryParams = Cast<UModioModCategoryParamsUI>(DataSource);
-			ModBrowser->ShowSearchView(EModioCommonSearchViewType::Collection, CategoryParams ? CategoryParams->Underlying : FModioModCategoryParams());
+			FModioModCategoryParams FilterParams = CategoryParams ? CategoryParams->Underlying : FModioModCategoryParams();
+			ModBrowser->ShowSearchView(EModioCommonSearchViewType::Collection, FilterParams, GetDefaultCategoryFilterParams(Subsystem->IsUserAuthenticated()));
 		}
 	}
 }
@@ -581,12 +582,17 @@ void UModioCommonCollectionView::UpdateInputBindings_Implementation()
 	BindInputActions();
 }
 
+FModioModCategoryParams UModioCommonCollectionView::GetDefaultCategoryFilterParams_Implementation(bool bUserAuthenticated)
+{
+	FModioModCategoryParams DefaultFCategoryParamsStruct;
+	DefaultFCategoryParamsStruct.InstalledField = bUserAuthenticated ? EModioInstalledFilterType::CurrentUser : EModioInstalledFilterType::None;
+	return DefaultFCategoryParamsStruct;
+}
+
 void UModioCommonCollectionView::SetDefaultCategoryFilterParams_Implementation(bool bUserAuthenticated)
 {
 	UModioModCategoryParamsUI* DefaultUCategoryParamsObject = NewObject<UModioModCategoryParamsUI>();
-	FModioModCategoryParams DefaultFCategoryParamsStruct;
-	DefaultFCategoryParamsStruct.InstalledField = bUserAuthenticated ? EModioInstalledFilterType::CurrentUser : EModioInstalledFilterType::None;
-	DefaultUCategoryParamsObject->Underlying = DefaultFCategoryParamsStruct;
+	DefaultUCategoryParamsObject->Underlying = GetDefaultCategoryFilterParams(bUserAuthenticated);
 	SetDataSource(DefaultUCategoryParamsObject);
 }
 

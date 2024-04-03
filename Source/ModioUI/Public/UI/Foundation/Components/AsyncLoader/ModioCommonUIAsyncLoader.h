@@ -16,7 +16,7 @@
 
 /**
  * Async loader widget which can switch between three states: InProgress, Success, and Failure
- * Also automatically activates and deactivates the content widget within the Common UI framework when the state changes
+ * Also automatically recursively activates and deactivates the content widget within the Common UI framework when the state changes
  */
 UCLASS(Blueprintable, ClassGroup = "UI", meta = (Category = "Mod.io Common UI"))
 class MODIOUI_API UModioCommonUIAsyncLoader : public UModioUIAsyncLoader
@@ -27,4 +27,12 @@ public:
 	//~ Begin UModioUIAsyncLoader Interface
 	virtual void NativeHandleAsyncOperationStateChange(EModioUIAsyncOperationWidgetState NewState) override;
 	//~ End UModioUIAsyncLoader Interface
+
+protected:
+	/**
+	 * Recursively activates or deactivates the widget and its children
+	 * @param Widget Widget to activate or deactivate
+	 * @param bActivate Whether to activate or deactivate the widget
+	 */
+	void SetActivationState_Recursive(UWidget* Widget, bool bActivate);
 };

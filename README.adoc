@@ -32,7 +32,7 @@ The mod.io plugin is generally maintained to support the 3 most recent versions 
 
 ### Platform compatability
 
-The mod.io plugin supports Windows, Linux and Mac as part of the public release.
+The mod.io plugin supports Windows, Linux, iOS and Mac as part of the public release.
 
 For access to Windows (GDK), XBox, Playstation 4, Playstation 5 or Switch, please <<contact-us,(Contact Us)>>.
 

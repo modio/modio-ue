@@ -22,6 +22,7 @@
 #include "ModioErrorCondition.h"
 #include "ModioSubsystem.h"
 #include "ModioUICore.h"
+#include "Libraries/ModioSDKLibrary.h"
 #include "UI/Interfaces/IModioModBrowser.h"
 
 void UModioUISubsystem::GetPreloadDependencies(TArray<UObject*>& OutDeps)
@@ -466,6 +467,24 @@ void UModioUISubsystem::ExecuteOnModBrowserCloseRequestedDelegate()
 	OnModBrowserCloseRequested.ExecuteIfBound();
 }
 
+void UModioUISubsystem::GetGameInfoAsync(FOnGetGameInfoDelegateFast Callback)
+{
+	if(CachedGameInfo.IsSet())
+	{
+		Callback.Execute(FModioErrorCode(), CachedGameInfo);
+	}
+	else if(UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		ModioSubsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(), FOnGetGameInfoDelegateFast::CreateWeakLambda(this, [this, Callback](const FModioErrorCode& ErrorCode, const TOptional<FModioGameInfo>& GameInfo) {
+			if(!ErrorCode && GameInfo.IsSet())
+			{
+				CachedGameInfo = GameInfo;
+				Callback.Execute(ErrorCode, CachedGameInfo);
+			}
+		 }));
+	}
+}
+
 void UModioUISubsystem::ShowUserAuth()
 {
 	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
@@ -486,7 +505,7 @@ void UModioUISubsystem::ShowDetailsForMod(FModioModID ID)
 	}
 }
 
-bool UModioUISubsystem::ShowSearchResults(const FModioModCategoryParams& SearchParameters)
+bool UModioUISubsystem::ShowSearchResults(const FModioModCategoryParams& SearchParameters, bool bIsDefaultFilter)
 {
 	if (OnDisplaySearchResults.IsBound())
 	{
@@ -495,7 +514,7 @@ bool UModioUISubsystem::ShowSearchResults(const FModioModCategoryParams& SearchP
 
 	if (ModBrowserInstance && ModBrowserInstance->Implements<UModioModBrowserInterface>())
 	{
-		IModioModBrowserInterface::Execute_ShowSearchResults(ModBrowserInstance, SearchParameters);
+		IModioModBrowserInterface::Execute_ShowSearchResults(ModBrowserInstance, SearchParameters, bIsDefaultFilter);
 	}
 	return true;
 }

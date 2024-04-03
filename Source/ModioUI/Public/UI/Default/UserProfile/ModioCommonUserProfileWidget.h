@@ -35,7 +35,5 @@ protected:
 protected:
 	//~ Begin UUserWidget Interface
 	virtual void NativeOnInitialized() override;
-	virtual void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) override;
-	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 	//~ End UUserWidget Interface
 };

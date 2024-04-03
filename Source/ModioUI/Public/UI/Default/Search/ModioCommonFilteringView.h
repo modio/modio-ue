@@ -48,10 +48,16 @@ protected:
 
 public:
 	/**
-	 * Resets the filtering options, making all tags unselected
+	 * Resets the filtering options to the default values
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
 	void ResetFiltering();
+
+	/**
+	 * Zeros out the filtering options, making all tags unselected
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Mod.io Common UI")
+	void ZeroOutFiltering();
 
 	/**
 	 * Sets the selected tag group values (filtering options)
@@ -87,9 +93,10 @@ public:
 	/**
 	 * Synchronizes the filter params with the previously selected tag group values
 	 * @param PreviouslySelectedTagGroupValues The previously selected tag group values
+	 * @param bResetToDefault Whether to reset the filter params to the default values
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
-	void SynchronizeFilterParams(const TArray<FString>& PreviouslySelectedTagGroupValues);
+	void SynchronizeFilterParams(const TArray<FString>& PreviouslySelectedTagGroupValues, bool bResetToDefault = false);
 protected:
 	//~ Begin UCommonActivatableWidget Interface
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;

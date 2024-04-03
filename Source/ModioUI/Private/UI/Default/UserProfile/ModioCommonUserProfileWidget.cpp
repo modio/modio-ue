@@ -19,7 +19,6 @@
 UModioCommonUserProfileWidget::UModioCommonUserProfileWidget()
 {
 	bAutoFocusOnActivation = false;
-	bAutoBindInputAction = false;
 }
 
 void UModioCommonUserProfileWidget::NativeOnInitialized()
@@ -40,17 +39,4 @@ void UModioCommonUserProfileWidget::NativeOnInitialized()
 		}
 	}
 	Super::NativeOnInitialized();
-}
-
-void UModioCommonUserProfileWidget::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent)
-{
-	Super::NativeOnAddedToFocusPath(InFocusEvent);
-	UnbindInputActions();
-	BindInputActions();
-}
-
-void UModioCommonUserProfileWidget::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
-{
-	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
-	UnbindInputActions();
 }

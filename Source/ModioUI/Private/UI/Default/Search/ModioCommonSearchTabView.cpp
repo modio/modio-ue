@@ -193,7 +193,7 @@ void UModioCommonSearchTabView::ShowSearchResults_Implementation()
 	if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
 	{
 		DeactivateWidget();
-		Subsystem->ShowSearchResults(GetFilterParamsWrapper());
+		Subsystem->ShowSearchResults(GetFilterParamsWrapper(), false);
 	}
 }
 
@@ -202,6 +202,19 @@ void UModioCommonSearchTabView::Reset_Implementation()
 	if (FilteringView)
 	{
 		FilteringView->ResetFiltering();
+	}
+
+	if (SearchTextBox)
+	{
+		SearchTextBox->SetText(FText::GetEmpty());
+	}
+}
+
+void UModioCommonSearchTabView::ZeroOut_Implementation()
+{
+	if (FilteringView)
+	{
+		FilteringView->ZeroOutFiltering();
 	}
 
 	if (SearchTextBox)

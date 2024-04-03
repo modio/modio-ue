@@ -26,10 +26,10 @@ struct MODIOUI_API FModioCommonModGalleryParamsSettings
 
 	FModioCommonModGalleryParamsSettings()
 	{
-		PreviousImageInputAction.RowName = "LeftTabSecondary";
+		PreviousImageInputAction.RowName = "LeftTab";
 		PreviousImageInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		NextImageInputAction.RowName = "RightTabSecondary";
+		NextImageInputAction.RowName = "RightTab";
 		NextImageInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
 		SubscribeInputAction.RowName = "Primary";

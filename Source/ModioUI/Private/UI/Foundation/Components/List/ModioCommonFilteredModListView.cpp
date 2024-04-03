@@ -189,6 +189,7 @@ void UModioCommonFilteredModListView::NativeOnInitialized()
 	IModioUIAsyncOperationWidget::Execute_NotifyOperationState(this, EModioUIAsyncOperationWidgetState::InProgress);
 	SetPageNavigationVisibility(false);
 	IModioUIModInfoReceiver::Register<UModioCommonFilteredModListView>(EModioUIModInfoEventType::ListAllMods);
+	IModioUIUserChangedReceiver::Register<UModioCommonFilteredModListView>();
 
 	if (ErrorWithRetryWidget)
 	{
@@ -286,6 +287,18 @@ void UModioCommonFilteredModListView::SynchronizeProperties()
 	}
 
 	UpdateInputActions();
+}
+
+void UModioCommonFilteredModListView::NativeUserChanged(TOptional<FModioUser> NewUser)
+{
+	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
+	UModioFilterParamsUI* FilterParamsPtr = Cast<UModioFilterParamsUI>(DataSource);
+	if (!FilterParamsPtr)
+	{
+		UE_LOG(ModioUI, Error, TEXT("Unable to request filtered mod list in '%s': Filter params are invalid"), *GetName());
+		return;
+	}
+	SetDataSource(FilterParamsPtr);
 }
 
 void UModioCommonFilteredModListView::SetModSelectionByID_Implementation(FModioModID ModID)

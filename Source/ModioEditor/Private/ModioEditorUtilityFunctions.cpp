@@ -9,6 +9,7 @@
 #include "ModioEditorSettings.h"
 #include "Modules/ModuleManager.h"
 #include "Templates/UnrealTemplate.h"
+#include "ISettingsModule.h"
 
 void UModioEditorUtilityFunctions::SelectAssetsInContentBrowser(const TArray<FString>& AssetPaths)
 {
@@ -48,8 +49,27 @@ void UModioEditorUtilityFunctions::SetDisplayGettingStartedWidgetOnStartup(bool 
 	}
 }
 
+void UModioEditorUtilityFunctions::SetDisplayToolsMenuItem(bool bNewValue)
+{
+	if (UModioEditorSettings* EditorSettings = GetMutableDefault<UModioEditorSettings>())
+	{
+		EditorSettings->bDisplayToolsMenuItem = bNewValue;
+		EditorSettings->SaveConfig();
+	}
+}
+
 void UModioEditorUtilityFunctions::OpenTutorialBrowser()
 {
 	FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>(TEXT("LevelEditor"));
 	LevelEditorModule.GetLevelEditorTabManager()->TryInvokeTab(FTabId("TutorialsBrowser"));
+}
+
+void UModioEditorUtilityFunctions::OpenModioSettings()
+{
+#if WITH_EDITOR
+	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
+	{
+		SettingsModule->ShowViewer("Project", "Plugins", "mod.io");
+	}
+#endif
 }

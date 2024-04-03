@@ -10,15 +10,16 @@
 
 #include "UI/Foundation/Components/AsyncLoader/ModioCommonUIAsyncLoader.h"
 #include "CommonActivatableWidget.h"
+#include "Components/PanelWidget.h"
 
 void UModioCommonUIAsyncLoader::NativeHandleAsyncOperationStateChange(EModioUIAsyncOperationWidgetState NewState)
 {
 	const bool bDifferentState = NewState != CurrentState;
 	if (bDifferentState)
 	{
-		if (UCommonActivatableWidget* ContentWidget = Cast<UCommonActivatableWidget>(GetContentWidget()))
+		if (UWidget* ContentWidget = GetContentWidget())
 		{
-			ContentWidget->DeactivateWidget();
+			SetActivationState_Recursive(ContentWidget, false);
 		}
 	}
 
@@ -26,9 +27,24 @@ void UModioCommonUIAsyncLoader::NativeHandleAsyncOperationStateChange(EModioUIAs
 
 	if (bDifferentState)
 	{
-		if (UCommonActivatableWidget* ContentWidget = Cast<UCommonActivatableWidget>(GetContentWidget()))
+		if (UWidget* ContentWidget = GetContentWidget())
 		{
-			ContentWidget->ActivateWidget();
+			SetActivationState_Recursive(ContentWidget, true);
+		}
+	}
+}
+
+void UModioCommonUIAsyncLoader::SetActivationState_Recursive(UWidget* Widget, bool bActivate)
+{
+	if (UCommonActivatableWidget* ActivatableWidget = Cast<UCommonActivatableWidget>(Widget))
+	{
+		bActivate ? ActivatableWidget->ActivateWidget() : ActivatableWidget->DeactivateWidget();
+	}
+	else if (UPanelWidget* PanelWidget = Cast<UPanelWidget>(Widget))
+	{
+		for (UWidget* ChildWidget : PanelWidget->GetAllChildren())
+		{
+			SetActivationState_Recursive(ChildWidget, bActivate);
 		}
 	}
 }

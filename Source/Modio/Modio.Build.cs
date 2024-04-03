@@ -42,6 +42,8 @@ public class Modio : ModuleRules
             public List<string> ModuleDependencies = new List<string>();
             public List<string> SystemLibraryDependencies = new List<string>();
             public List<string> PlatformSourceFolderNames = new List<string>();
+            public List<string> AndroidPluginPropertiesForReceipt = new List<string>();
+
         }
         public Dictionary<string, PlatformConfig> Platforms;
         public List<string> IncludeDirectories;
@@ -49,7 +51,7 @@ public class Modio : ModuleRules
         public List<string> ModuleDependencies = new List<string>();
         public List<string> SystemLibraryDependencies = new List<string>();
     };
-#if UE_5_0_OR_LATER
+
     private ModioPlatformConfigFile.PlatformConfig ParseInnerPlatformConfig(JsonObject InnerPlatformObject)
     {
         ModioPlatformConfigFile.PlatformConfig ParsedInnerPlatform = new ModioPlatformConfigFile.PlatformConfig();
@@ -78,14 +80,17 @@ public class Modio : ModuleRules
         {
             ParsedInnerPlatform.SystemLibraryDependencies = new List<string>(ParsedPlatformSystemLibraryDependencies);
         }
-        return ParsedInnerPlatform;
-    }
-#endif
+        string[] ParsedAndroidPluginPropertiesForReceipt;
+        if (InnerPlatformObject.TryGetStringArrayField("AndroidPluginPropertiesForReceipt", out ParsedAndroidPluginPropertiesForReceipt))
+        {
+	        ParsedInnerPlatform.AndroidPluginPropertiesForReceipt = new List<string>(ParsedAndroidPluginPropertiesForReceipt);
+        }
 
+		return ParsedInnerPlatform;
+    }
     
     private ModioPlatformConfigFile TryLoadPlatformConfig(string PlatformConfigPath)
     {
-#if UE_5_0_OR_LATER
         ModioPlatformConfigFile ParsedConfig = new ModioPlatformConfigFile();
 
         JsonObject PlatformConfigObject = JsonObject.Read(new FileReference(PlatformConfigPath));
@@ -105,10 +110,8 @@ public class Modio : ModuleRules
         JsonObject PlatformsInnerObject = PlatformConfigObject.GetObjectField("Platforms");
         ParsedConfig.Platforms = PlatformsInnerObject.KeyNames.ToDictionary(x => x, x =>
         ParseInnerPlatformConfig(PlatformsInnerObject.GetObjectField(x)), System.StringComparer.OrdinalIgnoreCase);
+
         return ParsedConfig;
-#else
-        return Json.Load<ModioPlatformConfigFile>(new FileReference(PlatformConfigPath));
-#endif
     }
 
     private void InternalLog(string message)
@@ -189,6 +192,7 @@ public class Modio : ModuleRules
                             MergedConfig.PlatformSpecificDefines.AddRange(Platform.Value.PlatformSpecificDefines);
                             MergedConfig.ModuleDependencies.AddRange(Platform.Value.ModuleDependencies);
                             MergedConfig.SystemLibraryDependencies.AddRange(Platform.Value.SystemLibraryDependencies);
+                            MergedConfig.AndroidPluginPropertiesForReceipt.AddRange(Platform.Value.AndroidPluginPropertiesForReceipt);
                             bFoundPlatformConfig = true;
                         }
                     }
@@ -199,7 +203,7 @@ public class Modio : ModuleRules
                         MergedConfig.PlatformSpecificDefines.AddRange(CurrentConfig.PlatformSpecificDefines);
                         MergedConfig.ModuleDependencies.AddRange(CurrentConfig.ModuleDependencies);
                         MergedConfig.SystemLibraryDependencies.AddRange(CurrentConfig.SystemLibraryDependencies);
-                    }
+}
                 }
             }
         }
@@ -228,9 +232,8 @@ public class Modio : ModuleRules
     {
         string TestConfigPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/tests", "UnrealTestConfig.json"); 
         if (File.Exists(TestConfigPath))
-        {
-#if UE_5_0_OR_LATER
-            ModioTestConfigFile ParsedConfig = new ModioTestConfigFile();
+        { 
+	        ModioTestConfigFile ParsedConfig = new ModioTestConfigFile();
 
             JsonObject TestConfigObject = JsonObject.Read(new FileReference(TestConfigPath));
             string[] ParsedTestDefines;
@@ -250,9 +253,6 @@ public class Modio : ModuleRules
                 }
             }
             return ParsedConfig;
-#else
-            return Json.Load<ModioTestConfigFile>(new FileReference(TestConfigPath));
-#endif
         }
         else
         {
@@ -444,6 +444,14 @@ public class Modio : ModuleRules
         // Add platform-specific include directories
         PrivateIncludePaths.AddRange(Config.IncludeDirectories);
         PublicSystemLibraries.AddRange(Config.SystemLibraryDependencies);
+
+        string pluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
+
+        InternalLog($"AndroidPluginPropertiesForReceipt is {Config.AndroidPluginPropertiesForReceipt.Count}");
+        foreach (var androidPluginProp in Config.AndroidPluginPropertiesForReceipt)
+        {
+			AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(pluginPath, androidPluginProp));
+		}
     }
     private void AddCommonDefinitions()
     {

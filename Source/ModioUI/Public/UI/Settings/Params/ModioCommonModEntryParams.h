@@ -26,19 +26,19 @@ struct MODIOUI_API FModioCommonModEntryParamsSettings
 
 	FModioCommonModEntryParamsSettings()
 	{
-		OpenModDetailsInputAction.RowName = "Tertiary";
+		OpenModDetailsInputAction.RowName = "Primary";
 		OpenModDetailsInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		SubscribeInputAction.RowName = "Primary";
+		SubscribeInputAction.RowName = "Tertiary";
 		SubscribeInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		CancelInputAction.RowName = "Primary";
+		CancelInputAction.RowName = "Tertiary";
 		CancelInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		SwitchEnabledInputAction.RowName = "Secondary";
+		SwitchEnabledInputAction.RowName = "LeftTabSecondary";
 		SwitchEnabledInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		ForceUninstallInputAction.RowName = "Secondary";
+		ForceUninstallInputAction.RowName = "LeftTabSecondary";
 		ForceUninstallInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 

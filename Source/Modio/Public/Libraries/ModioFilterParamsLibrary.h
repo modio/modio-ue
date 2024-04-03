@@ -147,4 +147,19 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& MetadataLike(UPARAM(ref) FModioFilterParams& Filter, FString SearchString);
+
+	/**
+	 * @brief Indicates results should exclude all mods which contain mature content
+	 * @return *this
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
+	static FModioFilterParams& DisallowMatureContent(UPARAM(ref) FModioFilterParams& Filter);
+
+	/**
+	 * @brief Indicates results should be filtered by maturity options
+	 * @param ByMaturity Maturity flags to filter by
+	 * @return *this
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
+	static FModioFilterParams& WithMatureContentFlags(UPARAM(ref) FModioFilterParams& Filter, UPARAM(meta = (Bitmask, BitmaskEnum = EModioMaturityFlags)) int32 ByMaturity);
 };

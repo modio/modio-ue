@@ -48,7 +48,7 @@ public:
 	void LogOut();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
-	void ShowSearchResults(const FModioModCategoryParams& FilterParams);
+	void ShowSearchResults(const FModioModCategoryParams& FilterParams, bool bIsDefaultFilter);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "IModioModBrowserInterface")
 	void ShowReportMod(UObject* DialogDataSource);

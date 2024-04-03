@@ -89,6 +89,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void ShowSearchView();
 
+	/**
+	 * Gets the number of applied filters
+	 * 
+	 * @param NumOfAppliedFilters The number of applied filters
+	 * @return True if the number of applied filters was successfully retrieved, false otherwise
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
+	bool GetNumOfAppliedFilters(int32& NumOfAppliedFilters) const;
+
 protected:
 	//~ Begin UCommonActivatableWidget Interface
 	virtual UWidget* NativeGetDesiredFocusTarget() const override;
@@ -114,4 +123,11 @@ public:
 	/** Whether the search has been performed at least once or not */
 	UPROPERTY(Transient, BlueprintReadOnly, Category = "Mod.io Common UI|Data")
 	bool bWasEverPopulated = false;
+
+	/**
+	 * Cached default filter params
+	 * Can be used a reference to compare against the current filter params, for example, to determine the number of applied filters
+	 */
+	UPROPERTY(Transient, BlueprintReadWrite, Category = "Mod.io Common UI")
+	TObjectPtr<UModioFilterParamsUI> CachedDefaultFilterParams;
 };

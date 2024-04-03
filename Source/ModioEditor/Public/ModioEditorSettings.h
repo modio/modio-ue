@@ -23,6 +23,9 @@ public:
 	bool bShowGettingStartedOnStartup = true;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "modio Editor")
+	bool bDisplayToolsMenuItem = true;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "modio Editor")
 	TSoftObjectPtr<class UEditorUtilityWidgetBlueprint> GettingStartedWidget;
 };
 

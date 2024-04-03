@@ -138,10 +138,12 @@ bool UModioCommonReportMessageView::IsMessageValid(const FString& Message)
 {
 	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>())
 	{	
-		FString TempString = FString(Message);
-		TempString.RemoveSpacesInline();
-		
-		if (Message.IsEmpty() || TempString.IsEmpty() || Message.Len() > UISettings->ReportMessageParams.MessageLength)
+		FString CleanMessage = Message;
+		CleanMessage.TrimStartAndEndInline();
+		CleanMessage.ReplaceInline(TEXT("\n"), TEXT(""));
+		CleanMessage.ReplaceInline(TEXT("\r"), TEXT(""));
+		CleanMessage.ReplaceInline(TEXT("\t"), TEXT(""));
+		if (CleanMessage.IsEmpty() || Message.Len() > UISettings->ReportMessageParams.MessageLength)
 		{
 			SetErrorMessage(ESlateVisibility::Visible);
 			return false;

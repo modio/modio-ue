@@ -38,9 +38,36 @@ void UModioCommonSearchResultsView::ShowSearchView_Implementation()
 	{
 		if (UModioCommonModBrowser* ModBrowser = Cast<UModioCommonModBrowser>(Subsystem->GetModBrowserInstance()))
 		{
-			ModBrowser->ShowSearchView(EModioCommonSearchViewType::SearchResults, FilterParamsPtr ? FilterParamsPtr->Underlying : FModioFilterParams());
+			ModBrowser->ShowSearchView(EModioCommonSearchViewType::SearchResults,
+				FilterParamsPtr ? FilterParamsPtr->Underlying : FModioFilterParams(),
+				CachedDefaultFilterParams ? CachedDefaultFilterParams->Underlying : FModioFilterParams());
 		}
 	}
+}
+
+bool UModioCommonSearchResultsView::GetNumOfAppliedFilters_Implementation(int32& NumOfAppliedFilters) const
+{
+	NumOfAppliedFilters = 0;
+
+	UModioFilterParamsUI* FilterParamsPtr = Cast<UModioFilterParamsUI>(DataSource);
+	if (!FilterParamsPtr)
+	{
+		UE_LOG(ModioUI, Error, TEXT("Unable to get number of applied filters for '%s': DataSource is not of type UModioFilterParamsUI"), *GetName());
+		return false;
+	}
+
+	const FModioFilterParams& FilterParams = FilterParamsPtr->Underlying;
+
+	if (CachedDefaultFilterParams)
+	{
+		NumOfAppliedFilters = FModioModCategoryParams(CachedDefaultFilterParams->Underlying).GetNumOfDifferences(FilterParams);
+	}
+	else
+	{
+		NumOfAppliedFilters = FilterParams.Tags.Num() + FilterParams.SearchKeywords.Num();
+	}
+	
+	return true;
 }
 
 UWidget* UModioCommonSearchResultsView::NativeGetDesiredFocusTarget() const
@@ -185,12 +212,21 @@ void UModioCommonSearchResultsView::NativeOnSetDataSource()
 		return;
 	}
 
+	if (FilterParamsPtr->bIsDefaultFilter)
+	{
+		CachedDefaultFilterParams = FilterParamsPtr;
+	}
+
 	const FModioFilterParams& FilterParams = FilterParamsPtr->Underlying;
 
-	const int32 NumOfAppliedFilters = FilterParams.Tags.Num() + FilterParams.SearchKeywords.Num();
-	if (FilterCounterTextBlock)
+	int32 NumOfAppliedFilters;
+	if (FilterCounterTextBlock && GetNumOfAppliedFilters(NumOfAppliedFilters))
 	{
 		FilterCounterTextBlock->SetText(FText::FromString(FString::FromInt(NumOfAppliedFilters)));
+	}
+	else
+	{
+		UE_LOG(ModioUI, Error, TEXT("Unable to set filter counter for '%s': GetNumOfAppliedFilters failed"), *GetName());
 	}
 
 	FString NewKeywords;

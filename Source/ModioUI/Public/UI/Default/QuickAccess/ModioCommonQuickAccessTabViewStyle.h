@@ -43,9 +43,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonTextStyle> UserNameTextStyle;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
-	TSubclassOf<UModioCommonStorageSpaceTrackerUserWidgetStyle> StorageSpaceTrackerStyle;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mod.io Common UI|Style")
 	TSubclassOf<UModioCommonModOperationTrackerUserWidgetStyle> ModOperationTrackerStyle;

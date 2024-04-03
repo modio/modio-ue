@@ -29,6 +29,11 @@
 #include "ISettingsModule.h"
 #endif
 
+#if PLATFORM_ANDROID
+	#include "Android/AndroidApplication.h"
+	extern JavaVM* GJavaVM;
+#endif
+
 #define LOCTEXT_NAMESPACE "FModioModule"
 
 void FModioModule::StartupModule()
@@ -91,6 +96,13 @@ void FModioModule::StartupModule()
 			FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("ThirdPartyLibraryError", "Failed to load example third party
 	library"));
 		}*/
+
+	
+#if PLATFORM_ANDROID
+	Modio::InitializeAndroidJNI(GJavaVM, AndroidJavaEnv::GetClassLoader());
+	Modio::SetGlobalActivity(FAndroidApplication::GetGameActivityThis());
+	Modio::InitializeAndroid();
+#endif
 }
 
 void FModioModule::UnregisterSettings()

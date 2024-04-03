@@ -27,7 +27,7 @@ struct MODIOUI_API FModioCommonQuickAccessParamsSettings
 public:
 	FModioCommonQuickAccessParamsSettings()
 	{
-		MyCollectionInputAction.RowName = "Primary";
+		MyCollectionInputAction.RowName = "SpecialRight";
 		MyCollectionInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
 		MainGameMenuInputAction.RowName = "Tertiary";

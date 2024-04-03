@@ -15,6 +15,7 @@
 #include "Components/PanelWidget.h"
 #include "UI/Foundation/Base/Notification/ModioCommonNotificationWidgetBase.h"
 #include "Engine/BlueprintGeneratedClass.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 
 void UModioCommonNotificationController::NativeOnInitialized()
 {
@@ -28,6 +29,8 @@ void UModioCommonNotificationController::OnNotificationExpired_Implementation(UW
 	{
 		NotificationList->RemoveChild(Notification);
 	}
+	MappedManualParams.Remove(TStrongObjectPtr<UWidget>(Notification));
+	MappedParams.Remove(TStrongObjectPtr<UWidget>(Notification));
 }
 
 void UModioCommonNotificationController::NativeDisplayNotification(const TScriptInterface<IModioUINotification>& Notification)
@@ -52,7 +55,7 @@ void UModioCommonNotificationController::NativeDisplayNotification(const TScript
 void UModioCommonNotificationController::NativeDisplayNotificationParams(const FModioNotificationParams& Params)
 {
 	IModioUINotificationController::NativeDisplayNotificationParams(Params);
-	UE_LOG(ModioUI, Log, TEXT("Displaying notification with error code %s"), *Params.ErrorCode.GetErrorMessage());
+	UE_LOG(ModioUI, Log, TEXT("Displaying notification with error code '%s'. Value: %d"), *Params.ErrorCode.GetErrorMessage(), static_cast<int32>(Params.ErrorCode.GetValue()));
 
 	// Check if the same notification is already displayed and if so, move it to the front of the list and avoid creating a new one
 	if (RefreshNotificationOrder(Params))
@@ -63,7 +66,19 @@ void UModioCommonNotificationController::NativeDisplayNotificationParams(const F
 	if (ErrorNotificationClass && SuccessNotificationClass)
 	{
 		TSubclassOf<UWidget> ActualClass;
-		if (UBlueprintGeneratedClass* GeneratedClass = Cast<UBlueprintGeneratedClass>(Params.ErrorCode ? ErrorNotificationClass.Get() : SuccessNotificationClass.Get()))
+		TSubclassOf<UUserWidget> NotificationWidgetClass = [this, &Params]() {
+			bool bInstallOrUpdateCancelled = UModioErrorConditionLibrary::ErrorCodeMatches(Params.ErrorCode, EModioErrorCondition::InstallOrUpdateCancelled);
+			if (!Params.ErrorCode || bInstallOrUpdateCancelled)
+			{
+				if (bInstallOrUpdateCancelled)
+				{
+					UE_LOG(ModioUI, Log, TEXT("Showing InstallOrUpdateCancelled notification as success"));
+				}
+				return SuccessNotificationClass;
+			}
+			return ErrorNotificationClass;
+		}();
+		if (UBlueprintGeneratedClass* GeneratedClass = Cast<UBlueprintGeneratedClass>(NotificationWidgetClass.Get()))
 		{
 			if (GeneratedClass->ImplementsInterface(UModioUINotification::StaticClass()))
 			{
@@ -72,7 +87,7 @@ void UModioCommonNotificationController::NativeDisplayNotificationParams(const F
 		}
 		else if (ErrorNotificationClass->ImplementsInterface(UModioUINotification::StaticClass()) && SuccessNotificationClass->ImplementsInterface(UModioUINotification::StaticClass()))
 		{
-			ActualClass = Params.ErrorCode ? ErrorNotificationClass.Get() : SuccessNotificationClass.Get();
+			ActualClass = NotificationWidgetClass.Get();
 		}
 		if (*ActualClass)
 		{
@@ -117,10 +132,9 @@ void UModioCommonNotificationController::NativeDisplayNotificationManual(const F
 
 bool UModioCommonNotificationController::RefreshNotificationOrder(const FModioManualNotificationParams& Params)
 {
-	if (MappedManualParams.Contains(Params))
+	if (const TStrongObjectPtr<UWidget>* Notification = MappedManualParams.Find(Params))
 	{
-		UWidget* Notification = MappedManualParams[Params].Get();
-		MoveNotificationToFront(Notification);
+		MoveNotificationToFront(Notification->Get());
 		return true;
 	}
 	return false;
@@ -128,10 +142,9 @@ bool UModioCommonNotificationController::RefreshNotificationOrder(const FModioMa
 
 bool UModioCommonNotificationController::RefreshNotificationOrder(const FModioNotificationParams& Params)
 {
-	if (MappedParams.Contains(Params))
+	if (const TStrongObjectPtr<UWidget>* Notification = MappedParams.Find(Params))
 	{
-		UWidget* Notification = MappedParams[Params].Get();
-		MoveNotificationToFront(Notification);
+		MoveNotificationToFront(Notification->Get());
 		return true;
 	}
 	return false;

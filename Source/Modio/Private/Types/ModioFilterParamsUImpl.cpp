@@ -114,3 +114,15 @@ FModioFilterParams& FModioFilterParams::MetadataLike(FString SearchString)
 	MetadataBlobSearchString = SearchString;
 	return *this;
 }
+
+FModioFilterParams& FModioFilterParams::DisallowMatureContent()
+{
+	Maturity = EModioMaturityFlags::None;
+	return *this;
+}
+
+FModioFilterParams& FModioFilterParams::WithMatureContentFlags(EModioMaturityFlags ByMaturity)
+{
+	Maturity = ByMaturity;
+	return *this;
+}

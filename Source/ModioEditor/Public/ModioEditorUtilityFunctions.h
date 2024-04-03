@@ -21,5 +21,11 @@ class MODIOEDITOR_API UModioEditorUtilityFunctions : public UEditorUtilityLibrar
 	static void SetDisplayGettingStartedWidgetOnStartup(bool bNewValue);
 
 	UFUNCTION(BlueprintCallable, Category = "Modio|EditorUtilities")
+	static void SetDisplayToolsMenuItem(bool bNewValue);
+
+	UFUNCTION(BlueprintCallable, Category = "Modio|EditorUtilities")
 	static void OpenTutorialBrowser();
+
+	UFUNCTION(BlueprintCallable, Category = "Modio|EditorUtilities")
+	static void OpenModioSettings();
 };

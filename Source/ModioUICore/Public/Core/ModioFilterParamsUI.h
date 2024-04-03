@@ -26,10 +26,16 @@ class MODIOUICORE_API UModioFilterParamsUI : public UObject
 
 public:
 	/**
-	* Stored property of the filter params in this class
-	**/
+	 * Stored property of the filter params in this class
+	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFilterParamsUI")
 	FModioFilterParams Underlying;
+
+	/**
+	 * Whether this filter is the default filter for the view or was overridden by the user (if applicable)
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFilterParamsUI")
+	bool bIsDefaultFilter = false;
 };
 
 UENUM(BlueprintType)
@@ -87,7 +93,7 @@ struct MODIOUICORE_API FModioModCategoryParams
 	TArray<FString> ExcludedTags;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base")
-	EModioSortDirection Direction = EModioSortDirection::Ascending;
+	EModioSortDirection Direction = EModioSortDirection::Descending;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Base")
 	EModioSortFieldType SortField = EModioSortFieldType::ID;
@@ -134,6 +140,58 @@ struct MODIOUICORE_API FModioModCategoryParams
 			   .SortBy(SortField, Direction)
 			   .IndexedResults(0, Count)
 			   .NameContains(SearchKeywords.IsEmpty() ? TArray<FString>() : TArray<FString>{SearchKeywords});
+	}
+
+	/**
+	 * Returns the number of differences between this and the other filter params
+	 * @param Other The other filter params to compare to
+	 * @return The number of differences
+	 */
+	int32 GetNumOfDifferences(const FModioModCategoryParams& Other) const
+	{
+		int32 NumOfDifferences = 0;
+
+		if (SortField != Other.SortField)
+		{
+			++NumOfDifferences;
+		}
+		if (Direction != Other.Direction)
+		{
+			++NumOfDifferences;
+		}
+
+		int32 NumOfDifferentTags = 0;
+		const TSet<FString> CachedTagsSet(Tags);
+		for (const FString& Tag : Other.Tags)
+		{
+			if (!CachedTagsSet.Contains(Tag))
+			{
+				++NumOfDifferentTags;
+			}
+		}
+		NumOfDifferences += NumOfDifferentTags;
+
+		if (SearchKeywords != Other.SearchKeywords)
+		{
+			++NumOfDifferences;
+		}
+
+		if (InstalledField != Other.InstalledField)
+		{
+			++NumOfDifferences;
+		}
+
+		if (EnabledFilter != Other.EnabledFilter)
+		{
+			++NumOfDifferences;
+		}
+
+		if (ManualSortField != Other.ManualSortField)
+		{
+			++NumOfDifferences;
+		}
+
+		return NumOfDifferences;
 	}
 };
 

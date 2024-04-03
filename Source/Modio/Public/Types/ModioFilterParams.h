@@ -13,6 +13,8 @@
 #include "Types/ModioCommonTypes.h"
 #include "Misc/DateTime.h"
 
+#include "ModioModInfo.h"
+
 #include "ModioFilterParams.generated.h"
 
 
@@ -48,9 +50,9 @@ enum class EModioSortDirection : uint8
 UENUM(BlueprintType)
 enum class EModioRevenueFilterType : uint8
 {
-Free = 0, /** Return only free mods */
-Paid = 1, /** Return only paid mods */
-FreeAndPaid = 2 /** Return both free and paid mods */
+	Free = 0,		/** Return only free mods */
+	Paid = 1,		/** Return only paid mods */
+	FreeAndPaid = 2 /** Return both free and paid mods */
 };
 
 /** @brief Class storing a set of filter parameters for use in xref:ListAllModsAsync[] */
@@ -169,6 +171,19 @@ struct MODIO_API FModioFilterParams
 	 * @return *this
 	 */
 	FModioFilterParams& RevenueType(EModioRevenueFilterType RevenueFilter);
+		
+	/**
+	 * @brief Indicates results should exclude all mods which contain mature content
+	 * @return *this
+	 */
+	FModioFilterParams& DisallowMatureContent();
+
+	/**
+	 * @brief Indicates results should be filtered by maturity options
+	 * @param ByMaturity Maturity flags to filter by
+	 * @return *this
+	 */
+	FModioFilterParams& WithMatureContentFlags(EModioMaturityFlags ByMaturity);
 
 	/**
 	 *  @brief Converts the filter params to a string suitable for use in the REST API.
@@ -192,6 +207,7 @@ public:
 	TArray<FModioModID> ExcludedIDs;
 	TOptional<FString> MetadataBlobSearchString;
 	TOptional<EModioRevenueFilterType> Revenue;
+	TOptional<EModioMaturityFlags> Maturity;
 	bool isPaged = false;
 	int64 Index = 0;
 	int64 Count = 100;

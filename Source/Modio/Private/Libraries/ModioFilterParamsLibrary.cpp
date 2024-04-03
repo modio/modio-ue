@@ -72,3 +72,13 @@ FModioFilterParams& UModioFilterParamsLibrary::MetadataLike(FModioFilterParams& 
 {
 	return Filter.MetadataLike(SearchString);
 }
+
+FModioFilterParams& UModioFilterParamsLibrary::DisallowMatureContent(FModioFilterParams& Filter)
+{
+	return Filter.DisallowMatureContent();
+}
+
+FModioFilterParams& UModioFilterParamsLibrary::WithMatureContentFlags(FModioFilterParams& Filter, int32 ByMaturity)
+{
+	return Filter.WithMatureContentFlags(static_cast<EModioMaturityFlags>(ByMaturity));
+}

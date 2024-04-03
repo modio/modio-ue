@@ -12,6 +12,7 @@
 
 #include "CoreMinimal.h"
 #include "UI/EventHandlers/IModioUIModInfoReceiver.h"
+#include "UI/EventHandlers/IModioUIUserChangedReceiver.h"
 #include "UI/Foundation/Base/ModioCommonActivatableWidget.h"
 #include "UI/Foundation/Components/List/ModioCommonModListViewInterface.h"
 #include "UI/Interfaces/IModioUIAsyncOperationWidget.h"
@@ -32,7 +33,8 @@ class MODIOUI_API UModioCommonFilteredModListView
 	: public UModioCommonActivatableWidget,
 	  public IModioCommonModListViewInterface,
 	  public IModioUIModInfoReceiver,
-	  public IModioUIAsyncOperationWidget
+	  public IModioUIAsyncOperationWidget,
+	  public IModioUIUserChangedReceiver
 {
 	GENERATED_BODY()
 
@@ -169,6 +171,10 @@ public:
 	//~ End UUserWidget Interface
 
 protected:
+	//~ Begin IModioUIUserChangedReceiver Interface
+	virtual void NativeUserChanged(TOptional<FModioUser> NewUser) override;
+	//~ End IModioUIUserChangedReceiver Interface
+	
 	//~ Begin IModioCommonModListViewInterface Interface
 	virtual void SetModSelectionByID_Implementation(FModioModID ModID) override;
 	virtual UListView* GetListView() const override { return ModList; }

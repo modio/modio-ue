@@ -16,9 +16,13 @@ EModioPlatformName UModioPlatformHelpersLibrary::GetCurrentPlatform()
 		return EModioPlatformName::Mac;
 	#endif
 
+	#if PLATFORM_IOS
+		return EModioPlatformName::iOS;
+	#endif
+
 	#if PLATFORM_LINUX
 		return EModioPlatformName::Linux;
-#endif
+	#endif
 
 	#if PLATFORM_PS4
 		return EModioPlatformName::PS4;
@@ -38,6 +42,10 @@ EModioPlatformName UModioPlatformHelpersLibrary::GetCurrentPlatform()
 
 	#if PLATFORM_SWITCH
 		return EModioPlatformName::Switch;
+	#endif
+
+	#if PLATFORM_ANDROID
+		return EModioPlatformName::Android;
 	#endif
 }
 
@@ -59,6 +67,7 @@ EModioPortal UModioPlatformHelpersLibrary::GetDefaultPortalForCurrentPlatform()
 		case EModioPlatformName::Switch:
 			return EModioPortal::Nintendo;
 		case EModioPlatformName::Unknown:
+		case EModioPlatformName::iOS:
 			return EModioPortal::None;
 		default:
 			return EModioPortal::None;

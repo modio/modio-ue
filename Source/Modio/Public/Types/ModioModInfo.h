@@ -58,6 +58,7 @@ enum class EModioMaturityFlags : uint8
 	/** Content contains sexual references **/
 	Explicit = 8
 };
+ENUM_CLASS_FLAGS(EModioMaturityFlags);
 
 /**
 * Enumeration that represent mod server side status

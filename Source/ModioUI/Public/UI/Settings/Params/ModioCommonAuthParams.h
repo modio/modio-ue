@@ -97,7 +97,7 @@ struct MODIOUI_API FModioCommonEmailAuthLoadingParamsSettings
 	FText TitleText = NSLOCTEXT("Modio", "EmailAuthLoadingTitle", "Email Authentication");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
-	FText DescriptionText = NSLOCTEXT("Modio", "EmailAuthLoadingDescription", "Waiting for response ...");
+	FText DescriptionText = NSLOCTEXT("Modio", "EmailAuthLoadingDescription", "Waiting for response...");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText CancelButtonText = NSLOCTEXT("Modio", "CancelButtonText", "Cancel");

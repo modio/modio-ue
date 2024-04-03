@@ -28,6 +28,11 @@ EModioUIAsyncOperationWidgetState UModioUIAsyncLoader::NativeGetAsyncOperationSt
 	return CurrentState;
 }
 
+void UModioUIAsyncLoader::NativeSetOnOperationStateDelegate(const FOnChangeAsyncHandlerOperationState& Delegate)
+{
+	OnOperationStateChangeDelegate = Delegate;
+}
+
 TSharedRef<SWidget> UModioUIAsyncLoader::RebuildWidget()
 {
 	SAssignNew(MyWidgetSwitcher, SWidgetSwitcher);
@@ -147,6 +152,7 @@ void UModioUIAsyncLoader::NativeHandleAsyncOperationStateChange(EModioUIAsyncOpe
 {
 	if (NewState != CurrentState)
 	{
+		OnOperationStateChangeDelegate.ExecuteIfBound(NewState);
 		CurrentState = NewState;
 		if (MyWidgetSwitcher.IsValid())
 		{

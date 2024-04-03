@@ -34,6 +34,12 @@ public:
 	FModioModCategoryParams FilterParams;
 
 	/**
+	 * Default filter parameters to use when resetting the search
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFilterParamsUI")
+	FModioModCategoryParams DefaultFilterParams;
+
+	/**
 	 * The type of search to perform
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ModioFilterParamsUI")

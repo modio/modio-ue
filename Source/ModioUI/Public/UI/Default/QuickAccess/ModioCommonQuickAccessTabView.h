@@ -21,8 +21,6 @@ class UModioCommonTextBlock;
 class UModioCommonDynamicImage;
 class UModioCommonButtonBase;
 class UModioCommonModListView;
-class UModioCommonStorageSpaceTrackerWidget;
-class UModioCommonStorageSpaceTrackerUserWidget;
 class UModioCommonModOperationTrackerWidget;
 class UModioCommonModOperationTrackerUserWidget;
 class UModioCommonProfileImage;
@@ -70,10 +68,6 @@ protected:
 	/** The user's name */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonTextBlock> UserNameTextBlock;
-
-	/** The user's storage space tracker widget */
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
-	TObjectPtr<UModioCommonStorageSpaceTrackerUserWidget> StorageSpaceTrackerUserWidget;
 
 	/** The mod operation tracker user widget. Can be used to track and display the status of mod operations as a standalone widget */
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")

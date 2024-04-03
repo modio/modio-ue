@@ -81,6 +81,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UButton> CollectionButton;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
+	TObjectPtr<UModioCommonButtonBase> EnableButton;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
+	TObjectPtr<UModioCommonButtonBase> DisableButton;
+
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets")
 	TObjectPtr<UModioCommonTextBlock> ModSummaryTextBlock;
 
@@ -191,6 +197,10 @@ public:
 	//~ End UWidget Interface
 
 protected:
+	//~ Begin IModioUIModEnableWidget Interface
+	virtual void NativeOnModEnabledStateChanged(FModioModID ModID, bool bNewSubscriptionState) override;
+	//~ End IModioUIModEnableWidget Interface
+
 	//~ Begin IModioUISubscriptionsChangedReceiver Interface
 	virtual void NativeOnSubscriptionsChanged(FModioModID ModID, bool bNewSubscriptionState) override;
 	//~ End IModioUISubscriptionsChangedReceiver Interface
@@ -222,6 +232,20 @@ protected:
 	/** Activates input actions */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI")
 	void UpdateInputActions();
+
+	/**
+	 * Switch the visibility of the enable button
+	 * @param bIsVisible Whether the enable button should be visible
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Visibility")
+	void SwitchEnableButtonVisibility(bool bIsVisible);
+
+	/**
+	 * Switch the visibility of the disable button
+	 * @param bIsVisible Whether the disable button should be visible
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Visibility")
+	void SwitchDisableButtonVisibility(bool bIsVisible);
 
 	/**
 	 * Updates the operation progress percent (0.0 - 1.0)
@@ -290,9 +314,6 @@ protected:
 public:
 	/** Timer to put a delay between subscribe and unsubscribe */
 	FTimerHandle SubscriptionDelayTimer;
-
-	/** The mod details that was shown recently */
-	FModioModID LastModID;
 
 	/** Enables Rate Up button */
 	void AllowRatingUp(bool bAllow);

@@ -230,6 +230,18 @@ void UModioCommonModDetailsView::SynchronizeProperties()
 	}
 }
 
+void UModioCommonModDetailsView::NativeOnModEnabledStateChanged(FModioModID ModID, bool bNewSubscriptionState)
+{
+	Super::NativeOnModEnabledStateChanged(ModID, bNewSubscriptionState);
+	const FModioModID CurrentModID = Execute_GetModID(this);
+
+	if (DataSource && CurrentModID == ModID)
+	{
+		SetDataSource(DataSource);
+		UpdateInputActions();
+	}
+}
+
 void UModioCommonModDetailsView::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent)
 {
 	Super::NativeOnAddedToFocusPath(InFocusEvent);
@@ -445,6 +457,31 @@ void UModioCommonModDetailsView::ActivateTopButtonsInputBindings_Implementation(
 				HandleReportClicked();
 			}));
 		}
+
+		const bool bModInstalled = Execute_IsModInstalled(this);
+		const bool bModEnabled = Execute_IsModEnabled(this);
+
+		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+		{
+			if (bModInstalled && Subsystem->GetIsCollectionModDisableUIEnabled())
+			{
+				SwitchEnableButtonVisibility(!bModEnabled);
+				SwitchDisableButtonVisibility(bModEnabled);
+
+				UModioCommonButtonBase* EnableDisableButton = bModEnabled ? DisableButton : EnableButton;
+				if (EnableDisableButton)
+				{
+					ListenForInputAction(EnableDisableButton, UISettings->ModDetailsParams.SwitchEnabledInputAction, bModEnabled ? UISettings->ModDetailsParams.DisableLabel : UISettings->ModDetailsParams.EnableLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+						HandleSwitchEnabledClicked();
+					}));
+				}
+			}
+			else
+			{
+				SwitchEnableButtonVisibility(false);
+				SwitchDisableButtonVisibility(false);
+			}
+		}
 	}
 	else
 	{
@@ -459,18 +496,27 @@ void UModioCommonModDetailsView::ActivateBottomButtonsInputBindings_Implementati
 	ClearListeningInputActions();
 	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
 	{
-		ListenForInputAction(RateUpButton, UISettings->ModDetailsParams.RateUpInputAction, UISettings->ModDetailsParams.RateUpLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
+		if (RateUpButton)
 		{
-			HandleRateUpClicked();
-		}));
-		ListenForInputAction(RateDownButton, UISettings->ModDetailsParams.RateDownInputAction, UISettings->ModDetailsParams.RateDownLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
+			ListenForInputAction(RateUpButton, UISettings->ModDetailsParams.RateUpInputAction, UISettings->ModDetailsParams.RateUpLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
+			{
+				HandleRateUpClicked();
+			}));
+		}
+		if (RateDownButton)
 		{
-			HandleRateDownClicked();
-		}));
-		ListenForInputAction(ReportButton, UISettings->ModDetailsParams.OpenReportInputAction, UISettings->ModDetailsParams.ReportLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
+			ListenForInputAction(RateDownButton, UISettings->ModDetailsParams.RateDownInputAction, UISettings->ModDetailsParams.RateDownLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
+			{
+				HandleRateDownClicked();
+			}));
+		}
+		if (ReportButton)
 		{
-			HandleReportClicked();
-		}));
+			ListenForInputAction(ReportButton, UISettings->ModDetailsParams.OpenReportInputAction, UISettings->ModDetailsParams.ReportLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]()
+			{
+				HandleReportClicked();
+			}));
+		}
 	}
 	else
 	{
@@ -502,6 +548,22 @@ void UModioCommonModDetailsView::UpdateInputActions_Implementation()
 	else
 	{
 		ActivateTopButtonsInputBindings();
+	}
+}
+
+void UModioCommonModDetailsView::SwitchEnableButtonVisibility_Implementation(bool bIsVisible)
+{
+	if (EnableButton)
+	{
+		EnableButton->SetVisibility(bIsVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+	}
+}
+
+void UModioCommonModDetailsView::SwitchDisableButtonVisibility_Implementation(bool bIsVisible)
+{
+	if (DisableButton)
+	{
+		DisableButton->SetVisibility(bIsVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	}
 }
 
@@ -671,21 +733,17 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 		EnabledCheckBox->SetCheckedState(Execute_IsModEnabled(this) ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
 	}
 
-	if (!LastModID.ToString().Equals(ModInfo.ModId.ToString())) 
+	if (Execute_IsModDownloading(this) || Execute_IsModExtracting(this))
 	{
-		if (Execute_IsModDownloading(this) || Execute_IsModExtracting(this))
+		ShowProgress();
+	}
+	else
+	{
+		HideProgress();
+		if (Execute_IsModSubscribed(this)) 
 		{
-			ShowProgress();
+			ShowStatus();
 		}
-		else
-		{
-			HideProgress();
-			if (Execute_IsModSubscribed(this)) 
-			{
-				ShowStatus();
-			}
-		}
-		LastModID = ModInfo.ModId;
 	}
 
 	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>()) 
@@ -693,6 +751,16 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 		if (SubscribeButton)
 		{
 			SubscribeButton->SetLabel(Execute_IsModSubscribed(this) ? UISettings->ModDetailsParams.UnsubscribeLabel : UISettings->ModDetailsParams.SubscribeLabel);
+		}
+
+		if (EnableButton)
+		{
+			EnableButton->SetLabel(UISettings->ModDetailsParams.EnableLabel);
+		}
+
+		if (DisableButton)
+		{
+			DisableButton->SetLabel(UISettings->ModDetailsParams.DisableLabel);
 		}
 	}
 
@@ -703,6 +771,17 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 bool UModioCommonModDetailsView::Initialize()
 {
 	const bool bSuperInitialized = Super::Initialize();
+
+	if(UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		RateDownButton->SetVisibility(ESlateVisibility::Collapsed);
+		ModioUISubsystem->GetGameInfoAsync(FOnGetGameInfoDelegateFast::CreateWeakLambda(this, [this](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) {
+			if(!ErrorCode && GameInfo.IsSet())
+			{
+				RateDownButton->SetVisibility(GameInfo.GetValue().bAllowNegativeRatings ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+			}
+		 }));
+	}
 	if (ModOperationTrackerWidget)
 	{
 		ModOperationTrackerWidget->OnProgressFast.RemoveAll(this);

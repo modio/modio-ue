@@ -21,6 +21,9 @@
 	#include "GenericPlatform/GenericPlatformMisc.h"
 #endif
 
+#include "ModioSettings.h"
+#include "DetailCustomizations/ModioSettingsDetails.h"
+
 DEFINE_LOG_CATEGORY(ModioEditor);
 
 #define LOCTEXT_NAMESPACE "FModioEditor"
@@ -28,6 +31,14 @@ DEFINE_LOG_CATEGORY(ModioEditor);
 void FModioEditor::StartupModule()
 {
 #if WITH_EDITOR
+
+	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	PropertyModule.RegisterCustomClassLayout(
+		UModioSettings::StaticClass()->GetFName(),
+		FOnGetDetailCustomizationInstance::CreateStatic(&FModioSettingsDetails::MakeInstance));
+
+	PropertyModule.NotifyCustomizationModuleChanged();
+
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
 		SettingsModule->RegisterSettings(
@@ -56,8 +67,11 @@ void FModioEditor::StartupModule()
 	PluginCommands = MakeShareable(new FUICommandList);
 
 	PluginCommands->MapAction(FModioEditorWindowCommands::Get().OpenPluginWindow, FExecuteAction::CreateRaw(this, &FModioEditor::PluginButtonClicked), FCanExecuteAction());
-	
-	UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FModioEditor::RegisterMenus));
+
+	if (GetMutableDefault<UModioEditorSettings>()->bDisplayToolsMenuItem)
+	{
+		UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FModioEditor::RegisterMenus));
+	}
 
 	WindowManager::Get().RegisterObjectCustomizations();
 #endif

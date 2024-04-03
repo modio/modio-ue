@@ -193,6 +193,7 @@ void SModioCommonCodeInputTextBox::Construct(const FArguments& InArgs)
 	MyCharacterGrid->SetSlotPadding(Style.CharacterSpacing);
 	OnCodeSubmit = InArgs._OnCodeSubmit;
 	TextFlowDirection = InArgs._TextFlowDirection;
+	HiddenInputField->SetHintText(Style.HintText);
 
 	RebuildChildren(InArgs._NumChildren);
 }

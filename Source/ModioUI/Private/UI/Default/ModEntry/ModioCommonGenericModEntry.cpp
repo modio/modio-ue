@@ -170,7 +170,6 @@ void UModioCommonGenericModEntry::SynchronizeProperties()
 		return;
 	}
 
-	ClearListeningInputActions();
 	const FModioModInfo ModInfo = Execute_GetFullModInfo(this);
 
 	const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>();
@@ -320,6 +319,8 @@ void UModioCommonGenericModEntry::SynchronizeProperties()
 	{
 		SwitchForceUninstallButtonVisibility(false);
 	}
+
+	UpdateInputActions();
 }
 
 void UModioCommonGenericModEntry::NativeUpdateStyling(bool bIsListItemSelected)

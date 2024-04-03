@@ -197,6 +197,13 @@ FModioModCategoryParams UModioCommonFilteringView::GetFilterParamsWrapper_Implem
 
 void UModioCommonFilteringView::ResetFiltering_Implementation()
 {
+	TArray<FString> SelectedTagGroupValues;
+	GetSelectedTagGroupValues(SelectedTagGroupValues);
+	SynchronizeFilterParams(SelectedTagGroupValues, true);
+}
+
+void UModioCommonFilteringView::ZeroOutFiltering_Implementation()
+{
 	if (FilteringTagsContainer)
 	{
 		for (UWidget* ChildWidget : FilteringTagsContainer->GetAllChildren())
@@ -219,37 +226,41 @@ void UModioCommonFilteringView::AddModTagInfo_Implementation(const FModioModTagI
 	}
 }
 
-void UModioCommonFilteringView::SynchronizeFilterParams_Implementation(const TArray<FString>& PreviouslySelectedTagGroupValues)
+void UModioCommonFilteringView::SynchronizeFilterParams_Implementation(const TArray<FString>& PreviouslySelectedTagGroupValues, bool bResetToDefault)
 {
+	ZeroOutFiltering();
+	
 	UModioSearchResultsParamsUI* SearchResultsParamsUI = Cast<UModioSearchResultsParamsUI>(DataSource);
 	if (!SearchResultsParamsUI)
 	{
 		SetSelectedTagGroupValues(PreviouslySelectedTagGroupValues, true);
 		return;
 	}
+
+	const FModioModCategoryParams& FilterParams = bResetToDefault ? SearchResultsParamsUI->DefaultFilterParams : SearchResultsParamsUI->FilterParams;
 	
-	SetSelectedTagGroupValues(SearchResultsParamsUI->FilterParams.Tags, true);
+	SetSelectedTagGroupValues(FilterParams.Tags, true);
 
 	if (SearchResultsParamsUI->SearchType == EModioCommonSearchViewType::SearchResults)
 	{
-		if (const FText* FoundTag = SortFieldAndSortDirectionMap.Find({SearchResultsParamsUI->FilterParams.SortField, SearchResultsParamsUI->FilterParams.Direction}))
+		if (const FText* FoundTag = SortFieldAndSortDirectionMap.Find({FilterParams.SortField, FilterParams.Direction}))
 		{
 			SetSelectedTagGroupValues({FoundTag->ToString()}, true);
 		}
 	}
 	else if (SearchResultsParamsUI->SearchType == EModioCommonSearchViewType::Collection)
 	{
-		if (SearchResultsParamsUI->FilterParams.EnabledFilter != EModioEnabledFilterType::None)
+		if (FilterParams.EnabledFilter != EModioEnabledFilterType::None)
 		{
-			SetSelectedTagGroupValues({EnabledFilterFieldMap[SearchResultsParamsUI->FilterParams.EnabledFilter].ToString()}, true);
+			SetSelectedTagGroupValues({EnabledFilterFieldMap[FilterParams.EnabledFilter].ToString()}, true);
 		}
 
-		if (SearchResultsParamsUI->FilterParams.InstalledField != EModioInstalledFilterType::None)
+		if (FilterParams.InstalledField != EModioInstalledFilterType::None)
 		{
-			SetSelectedTagGroupValues({InstalledFilterFieldMap[SearchResultsParamsUI->FilterParams.InstalledField].ToString()}, true);
+			SetSelectedTagGroupValues({InstalledFilterFieldMap[FilterParams.InstalledField].ToString()}, true);
 		}
 
-		SetSelectedTagGroupValues({ManualSortFieldMap[SearchResultsParamsUI->FilterParams.ManualSortField].ToString()}, true);
+		SetSelectedTagGroupValues({ManualSortFieldMap[FilterParams.ManualSortField].ToString()}, true);
 	}
 }
 

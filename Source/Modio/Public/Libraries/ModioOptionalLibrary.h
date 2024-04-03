@@ -49,6 +49,28 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalModInfoList(const struct FModioOptionalModInfoList& OptionalModInfoList,
 												  struct FModioModInfoList& ModInfoList);
 
+		/**
+	 * Check if the Game info list has a valid value
+	 *
+	 * @param OptionalGameInfoList - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioOptionalGameInfoList)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalGameInfoList(const struct FModioOptionalGameInfoList& OptionalGameInfoList);
+
+	/**
+	 * Get the game info list from the optional if it's set
+	 *
+	 * @param OptionalGameInfoList -
+	 * @param GameInfoList - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalGameInfoList)")
+	static bool GetValue_ModioOptionalGameInfoList(const struct FModioOptionalGameInfoList& OptionalGameInfoList,
+												  struct FModioGameInfoList& GameInfoList);
+
 	/**
 	 * Check if the mod info has a valid value
 	 *

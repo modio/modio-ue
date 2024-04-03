@@ -11,3 +11,7 @@
 #pragma once
 
 #include "modio/ModioSDK.h"
+
+#if PLATFORM_ANDROID
+	#include "ModioAndroid.h"
+#endif

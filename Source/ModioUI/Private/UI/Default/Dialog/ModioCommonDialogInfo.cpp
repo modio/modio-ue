@@ -49,8 +49,8 @@ UModioCommonDialogInfo* UModioCommonDialogLibrary::CreateConfirmUninstallDialogI
 {
 	if (UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>())
 	{
-		DialogInfo->TitleText = NSLOCTEXT("Modio", "ForceUninstallTitle", "Are you sure you would like to uninstall?");
-		DialogInfo->DialogText = FText::Format(NSLOCTEXT("Modio", "ForceUninstallText", "This will uninstall {0} from your game. This cannot be undone."), FText::FromString(ModInfo.ProfileName));
+		DialogInfo->TitleText = NSLOCTEXT("Modio", "ForceUninstallTitle", "Are you sure?");
+		DialogInfo->DialogText = FText::Format(NSLOCTEXT("Modio", "ForceUninstallText", "This will uninstall {0} for all users on this system"), FText::FromString(ModInfo.ProfileName));
 		DialogInfo->AddButton(EModioCommonDialogButtonType::Confirm);
 		DialogInfo->AddButton(EModioCommonDialogButtonType::Cancel);
 		DialogInfo->OnDialogButtonClickedFast.AddWeakLambda(DialogInfo, [DialogInfo, ModInfo](EModioCommonDialogButtonType ButtonType) {
@@ -94,7 +94,7 @@ UModioCommonDialogInfo* UModioCommonDialogLibrary::CreateUninstallDialogInfo(con
 	if (UModioCommonDialogInfo* DialogInfo = NewObject<UModioCommonDialogInfo>())
 	{
 		DialogInfo->TitleText = FText::FromString(ModInfo.ProfileName);
-		DialogInfo->DialogText = NSLOCTEXT("Modio", "UninstallSuccessText", "The mod has been uninstalled successfully.");
+		DialogInfo->DialogText = NSLOCTEXT("Modio", "UninstallSuccessText", "This mod has been successfully uninstalled.");
 		DialogInfo->AddButton(EModioCommonDialogButtonType::Ok);
 		DialogInfo->AddButton(EModioCommonDialogButtonType::ModDetails);
 		DialogInfo->OnDialogButtonClickedFast.AddWeakLambda(DialogInfo, [DialogInfo, ModInfo](EModioCommonDialogButtonType ButtonType) {

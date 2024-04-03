@@ -8,48 +8,48 @@
  *
  */
 
-#include "../../Public/Widgets/SModioEditorWindowCompoundWidget.h"
-#include <SlateOptMacros.h>
-#include <Delegates/DelegateSignatureImpl.inl>
+#include "Widgets/SModioEditorWindowCompoundWidget.h"
+#include "SlateOptMacros.h"
+#include "Delegates/DelegateSignatureImpl.inl"
 #include "Misc/EngineVersionComparison.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
-	#include <DesktopPlatform/Public/IDesktopPlatform.h>
-	#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+	#include "DesktopPlatform/Public/IDesktopPlatform.h"
+	#include "DesktopPlatform/Public/DesktopPlatformModule.h"
 #else
 	#include "DesktopPlatformModule.h"
 	#include "IDesktopPlatform.h"
 #endif
-#include <HttpModule.h>
-#include <HAL/FileManagerGeneric.h>
-#include <Interfaces/IHttpRequest.h>
-#include <Interfaces/IHttpResponse.h>
-#include <Interfaces/IPluginManager.h>
-#include <IStructureDetailsView.h>
-#include <Libraries/ModioSDKLibrary.h>
-#include <Misc/FileHelper.h>
-#include <ModioErrorCondition.h>
-#include <ModioSubsystem.h>
-#include <Objects/ModioBrowseModFileCollectionObject.h>
-#include <Objects/ModioBrowseModFileObject.h>
-#include <Objects/ModioBrowseModsObject.h>
-#include <Objects/ModioCreateModParamsObject.h>
-#include <Objects/ModioCreateNewModFileParamsObject.h>
-#include <Objects/ModioEditModParamsObject.h>
-#include <Styling/SlateBrush.h>
-#include <Types/ModioCommonTypes.h>
-#include <Types/ModioModInfo.h>
-#include <Widgets/Input/SMultiLineEditableTextBox.h>
-#include <Widgets/Layout/SWrapBox.h>
-#include <Widgets/Layout/SHeader.h>
-#include <WindowManager.h>
-#include <Widgets/SOverlay.h>
-#include <Engine/Engine.h>
-#include <Misc/MessageDialog.h>
-#include <Widgets/SWindow.h>
+#include "HttpModule.h"
+#include "HAL/FileManagerGeneric.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+#include "Interfaces/IPluginManager.h"
+#include "IStructureDetailsView.h"
+#include "Libraries/ModioSDKLibrary.h"
+#include "Misc/FileHelper.h"
+#include "ModioErrorCondition.h"
+#include "ModioSubsystem.h"
+#include "Objects/ModioBrowseModFileCollectionObject.h"
+#include "Objects/ModioBrowseModFileObject.h"
+#include "Objects/ModioBrowseModsObject.h"
+#include "Objects/ModioCreateModParamsObject.h"
+#include "Objects/ModioCreateNewModFileParamsObject.h"
+#include "Objects/ModioEditModParamsObject.h"
+#include "Styling/SlateBrush.h"
+#include "Types/ModioCommonTypes.h"
+#include "Types/ModioModInfo.h"
+#include "Widgets/Input/SMultiLineEditableTextBox.h"
+#include "Widgets/Layout/SWrapBox.h"
+#include "Widgets/Layout/SHeader.h"
+#include "WindowManager.h"
+#include "Widgets/SOverlay.h"
+#include "Engine/Engine.h"
+#include "Misc/MessageDialog.h"
+#include "Widgets/SWindow.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
-	#include <Launch/Resources/Version.h>
+	#include "Launch/Resources/Version.h"
 #endif
-#include <Kismet/GameplayStatics.h>
+#include "Kismet/GameplayStatics.h"
 
 
 #define LOCTEXT_NAMESPACE "LocalizedText"

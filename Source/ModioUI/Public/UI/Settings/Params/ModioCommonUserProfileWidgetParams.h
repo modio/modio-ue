@@ -27,7 +27,7 @@ struct MODIOUI_API FModioCommonUserProfileWidgetParamsSettings
 public:
 	FModioCommonUserProfileWidgetParamsSettings()
 	{
-		ProfileInputAction.RowName = "Secondary";
+		ProfileInputAction.RowName = "Quaternary";
 		ProfileInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 

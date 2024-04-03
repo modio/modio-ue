@@ -11,6 +11,7 @@
 
 #include "UI/Default/ModBrowser/ModioCommonModBrowser.h"
 
+#include "CommonInputSubsystem.h"
 #include "ModioUI.h"
 #include "Core/ModioFilterParamsUI.h"
 #include "Core/ModioModInfoUI.h"
@@ -33,6 +34,7 @@
 #include "Algo/Find.h"
 #include "UI/Default/ModBrowser/Collection/ModioCommonCollectionView.h"
 #include "UI/Foundation/Base/ModioCommonActivatableWidgetStack.h"
+#include "UI/Foundation/Base/ActionBar/ModioCommonActionBar.h"
 
 // These are only for the internal identification of the tabs
 const FName FeaturedTabId = FName(TEXT("Featured"));
@@ -42,6 +44,13 @@ const FName ModDetailsTabId = FName(TEXT("ModDetails"));
 void UModioCommonModBrowser::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+
+	if (const UModioCommonUISettings* UISettings = GetDefault<UModioCommonUISettings>(); IsValid(UISettings) && UISettings->bHideActionBarDuringMouseAndKeyboardInput)
+	{
+		UCommonInputSubsystem* CommonInputSubsystem = UCommonInputSubsystem::Get(GetOwningLocalPlayer());
+		OnInputMethodChanged(CommonInputSubsystem->GetCurrentInputType());
+		CommonInputSubsystem->OnInputMethodChangedNative.AddUObject(this, &UModioCommonModBrowser::OnInputMethodChanged);
+	}
 
 	UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>();
 	if (!Subsystem)
@@ -104,6 +113,7 @@ void UModioCommonModBrowser::NativeOnInitialized()
 						return;
 					}
 					FilterParamsUI->Underlying = PendingFilterParams.IsSet() ? PendingFilterParams->ToFilterParams() : SelectedAdditionalCategoryParamsPtr->ToFilterParams();
+					FilterParamsUI->bIsDefaultFilter = PendingIsDefaultFilter.IsSet() ? PendingIsDefaultFilter.GetValue() : true;
 					PendingFilterParams.Reset();
 					CastedFeaturedView->SetDataSource(FilterParamsUI);
 				}
@@ -326,7 +336,7 @@ bool UModioCommonModBrowser::HideQuickAccessView_Implementation()
 	return true;
 }
 
-bool UModioCommonModBrowser::ShowSearchView_Implementation(EModioCommonSearchViewType SearchType, const FModioModCategoryParams& CurrentFilterParams)
+bool UModioCommonModBrowser::ShowSearchView_Implementation(EModioCommonSearchViewType SearchType, const FModioModCategoryParams& CurrentFilterParams, const FModioModCategoryParams& DefaultFilterParams)
 {
 	if (!RightTabStack)
 	{
@@ -359,6 +369,7 @@ bool UModioCommonModBrowser::ShowSearchView_Implementation(EModioCommonSearchVie
 	{
 		SearchResultsParams->SearchType = SearchType;
 		SearchResultsParams->FilterParams = CurrentFilterParams;
+		SearchResultsParams->DefaultFilterParams = DefaultFilterParams;
 		SearchView->SetDataSource(SearchResultsParams);
 		return true;
 	}
@@ -586,6 +597,11 @@ void UModioCommonModBrowser::HandleViewChanged_Implementation()
 	
 }
 
+void UModioCommonModBrowser::OnInputMethodChanged(ECommonInputType NewInputType)
+{
+	ActionBar->SetVisibility(NewInputType == ECommonInputType::MouseAndKeyboard ? DeactivatedVisibility : ActivatedVisibility);
+}
+
 void UModioCommonModBrowser::ShowDetailsForMod_Implementation(FModioModID ModID)
 {
 	UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
@@ -643,9 +659,9 @@ void UModioCommonModBrowser::LogOut_Implementation()
 	}
 }
 
-void UModioCommonModBrowser::ShowSearchResults_Implementation(const FModioModCategoryParams& FilterParams)
+void UModioCommonModBrowser::ShowSearchResults_Implementation(const FModioModCategoryParams& FilterParams, bool bIsDefaultFilter)
 {
-	Super::ShowSearchResults_Implementation(FilterParams);
+	Super::ShowSearchResults_Implementation(FilterParams, bIsDefaultFilter);
 
 	if (UModioCommonFeaturedView* FeaturedWidget = Cast<UModioCommonFeaturedView>(ContentStack->GetActiveWidget()))
 	{
@@ -656,6 +672,7 @@ void UModioCommonModBrowser::ShowSearchResults_Implementation(const FModioModCat
 			return;
 		}
 		FilterParamsUI->Underlying = FilterParams.ToFilterParams();
+		FilterParamsUI->bIsDefaultFilter = bIsDefaultFilter;
 		FeaturedWidget->SetDataSource(FilterParamsUI);
 	}
 	else if (UModioCommonCollectionView* CollectionWidget = Cast<UModioCommonCollectionView>(ContentStack->GetActiveWidget()))
@@ -672,6 +689,7 @@ void UModioCommonModBrowser::ShowSearchResults_Implementation(const FModioModCat
 	else
 	{
 		PendingFilterParams = FilterParams;
+		PendingIsDefaultFilter = bIsDefaultFilter;
 		ShowFeaturedView();
 	}
 

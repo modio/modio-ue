@@ -41,6 +41,10 @@ bool UModioCommonModEntryBase::IsModListItemValid_Implementation() const
 
 bool UModioCommonModEntryBase::IsModListItemSelected_Implementation() const
 {
+	if (CachedSelectionState.IsSet())
+	{
+		return CachedSelectionState.GetValue();
+	}
 	if (IsModListItemValid())
 	{
 		return IsListItemSelected();
@@ -245,8 +249,10 @@ void UModioCommonModEntryBase::NativeOnListItemObjectSet(UObject* ListItemObject
 void UModioCommonModEntryBase::NativeOnItemSelectionChanged(bool bIsSelected)
 {
 	IUserObjectListEntry::NativeOnItemSelectionChanged(bIsSelected);
+	CachedSelectionState = bIsSelected;
 	UpdateInputActions();
 	NativeUpdateStyling(IsModListItemSelected());
+	CachedSelectionState.Reset();
 }
 
 void UModioCommonModEntryBase::NativeOnEntryReleased()

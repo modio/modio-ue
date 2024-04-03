@@ -152,10 +152,10 @@ For more details on the error codes and how to inspect their values, please see 
 
 The plugin stores mods in a game-specific directory in the following directory by default:
 
-[stripes=odd,frame=none,cols="1,^1,^1"]
+[stripes=odd,frame=none,cols="1,^1,^1,^1"]
 |===
-| Windows                    | Linux                    | OSX
-|`${FolderID_Public}/mod.io` | `${USER_HOME}/mod.io`    | `${USER_HOME}/Library/Application Support/mod.io`
+| Windows                    | Linux                    | macOS 											| iOS
+|`${FolderID_Public}/mod.io` | `${USER_HOME}/mod.io`    | `${USER_HOME}/Library/Application Support/mod.io` | `${APP-DIRECTORY}/Documents/mod.io`
 |===
 
 However, this value can be overridden in one of two ways:
@@ -174,7 +174,7 @@ Per-game settings are stored in `${FOLDERID_LocalAppData}/mod.io/${GameId}/${mod
 +
 *Adding* a `RootLocalDataPath` element to this file will redirect the mod installation directory for this specific game only, for the current system account. Removing this value will cause the game to revert back to the global value in `globalsettings.json`.
 
-
+NOTE: In Linux, macOS & iOS, mods and data binds to a single user. Every other client would have their own instance in their home directory.
 
 '''
 

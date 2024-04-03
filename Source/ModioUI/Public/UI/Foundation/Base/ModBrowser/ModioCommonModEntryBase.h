@@ -20,6 +20,7 @@
 #include "UI/Interfaces/IModioUIModEnableWidget.h"
 #include "UI/EventHandlers/IModioUIModManagementEventReceiver.h"
 #include "UI/Interfaces/IModioExtendedModInfoUIDetails.h"
+#include "Misc/Optional.h"
 #include "ModioCommonModEntryBase.generated.h"
 
 class UModioCommonModOperationTrackerUserWidget;
@@ -165,4 +166,10 @@ private:
 
 	/** Whether the user is authenticated or not */
 	bool bIsUserAuthenticated = false;
+
+	/**
+	 * The cached selection state
+	 * The IUserListEntry::IsListItemSelected doesn't return the correct value when the IUserListEntry::NativeOnItemSelectionChanged is called too early (before the construction of entry is finished), so we need to cache the selection state
+	 */
+	TOptional<bool> CachedSelectionState;
 };

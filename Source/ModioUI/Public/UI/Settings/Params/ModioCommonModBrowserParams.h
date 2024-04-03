@@ -28,10 +28,10 @@ struct MODIOUI_API FModioCommonCollectionParamsSettings
 
 	FModioCommonCollectionParamsSettings()
 	{
-		FilterInputAction.RowName = "LeftTabTertiary";
+		FilterInputAction.RowName = "Secondary";
 		FilterInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 
-		CheckForUpdatesInputAction.RowName = "RightTabTertiary";
+		CheckForUpdatesInputAction.RowName = "Quinary";
 		CheckForUpdatesInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
@@ -75,20 +75,20 @@ struct MODIOUI_API FModioCommonFeaturedParamsSettings
 	TArray<FModioModCategoryParams> CategoryParams
 	{
 		[] {
-			FModioModCategoryParams MostRecent;
-			MostRecent.CategoryName = NSLOCTEXT("Modio", "MostPopular", "Popular");
-			MostRecent.Direction = EModioSortDirection::Descending;
-			MostRecent.SortField = EModioSortFieldType::DownloadsTotal;
-			MostRecent.Count = 20;
-			return MostRecent;
-		}(),
-		[] {
 			FModioModCategoryParams MostPopular;
-			MostPopular.CategoryName = NSLOCTEXT("Modio", "RecentlyAdded", "Recent");
+			MostPopular.CategoryName = NSLOCTEXT("Modio", "MostPopular", "Popular");
 			MostPopular.Direction = EModioSortDirection::Descending;
-			MostPopular.SortField = EModioSortFieldType::DateMarkedLive;
+			MostPopular.SortField = EModioSortFieldType::DownloadsTotal;
 			MostPopular.Count = 20;
 			return MostPopular;
+		}(),
+		[] {
+			FModioModCategoryParams MostRecent;
+			MostRecent.CategoryName = NSLOCTEXT("Modio", "RecentlyAdded", "Recent");
+			MostRecent.Direction = EModioSortDirection::Descending;
+			MostRecent.SortField = EModioSortFieldType::DateMarkedLive;
+			MostRecent.Count = 20;
+			return MostRecent;
 		}()
 	};
 };

@@ -70,7 +70,10 @@ protected:
 	//~ Begin IModioUIAsyncHandlerWidget Interface
 	virtual void NativeLinkAsyncOperationWidget(const TScriptInterface<IModioUIAsyncOperationWidget>& Widget) override;
 	virtual EModioUIAsyncOperationWidgetState NativeGetAsyncOperationState() const override;
+	virtual void NativeSetOnOperationStateDelegate(const FOnChangeAsyncHandlerOperationState& Delegate) override;
 	//~ End IModioUIAsyncHandlerWidget Interface
+
+	FOnChangeAsyncHandlerOperationState OnOperationStateChangeDelegate;
 
 	/**
 	 * Gets the content widget for the current state

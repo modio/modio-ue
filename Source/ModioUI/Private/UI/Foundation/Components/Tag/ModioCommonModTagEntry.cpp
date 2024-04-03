@@ -27,7 +27,7 @@ void UModioCommonModTagEntry::SetTag_Implementation(const FString& InTag)
 			{
 				FModioModCategoryParams FilterParams;
 				FilterParams.Tags = {Tag};
-				Subsystem->ShowSearchResults(FilterParams);
+				Subsystem->ShowSearchResults(FilterParams, false);
 				DeactivateWidget();
 			}
 		});

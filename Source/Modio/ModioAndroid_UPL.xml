@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<!-- init section is always evaluated once per architecture -->
+	<init>
+		<log text="*** [UPL]*** Modio - Android - init"/>
+	</init>
+
+	<!--Android Specific sections-->
+	<!--  optional updates applied to AndroidManifest.xml -->
+	<androidManifestUpdates>
+		<!-- Add permissions -->
+		<log text="*** [UPL]*** Modio - Android - androidManifestUpdates"/>
+		<addPermission android:name="android.permission.READ_EXTERNAL_STORAGE" android:required="true"/>
+		<addPermission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:required="true"/>
+		<addPermission android:name="android.permission.READ_INTERNAL_STORAGE" android:required="true"/>
+		<addPermission android:name="android.permission.WRITE_INTERNAL_STORAGE" android:required="true"/>
+		<addPermission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" android:required="true"/>
+	</androidManifestUpdates>
+
+	<!-- Copy java sources to build sources -->
+	<prebuildCopies>
+		<log text="*** [UPL]*** Modio - Android - prebuildCopies"/>
+		<copyDir src="$S(ProjectDir)/Plugins/Modio/Source/ThirdParty/NativeSDK/platform/android/java/com/modio/modiosdk" dst="$S(BuildDir)/src/com/modio/modiosdk" />
+	</prebuildCopies>
+
+	<resourceCopies>
+		<log text="Copy Cert resources"/>
+		<copyDir src="$S(ProjectDir)/Plugins/Modio/Source/ThirdParty/NativeSDK/platform/android/assets" dst="$S(BuildDir)/assets" />
+	</resourceCopies>
+
+	<!-- Set androidX and jetifier to true for some android versions -->
+	<gradleProperties>
+		<log text="*** [UPL]*** Modio - Android - gradleProperties"/>
+		<insert>
+			android.useAndroidX=true
+			android.enableJetifier=true
+		</insert>
+	</gradleProperties>
+	
+	<!-- Import classes in com.modio.modiosdk package -->
+	<gameActivityImportAdditions>
+		<log text="*** [UPL]*** Modio - Android - gameActivityImportAdditions"/>
+		<insert>
+			import com.modio.modiosdk.*;
+		</insert>
+	</gameActivityImportAdditions>
+	
+	<compilerArgument>-Xlint:deprecation</compilerArgument>
+</root>

@@ -19,6 +19,7 @@
 #include "HAL/RunnableThread.h"
 #include "ModioImageCache.h"
 #include "Subsystems/EngineSubsystem.h"
+#include "Templates/UniquePtr.h"
 #include "Types/ModioAuthenticationParams.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioCreateModFileParams.h"
@@ -27,6 +28,7 @@
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
 #include "Types/ModioGameInfo.h"
+#include "Types/ModioGameInfoList.h"
 #include "Types/ModioImageWrapper.h"
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioModCollectionEntry.h"
@@ -44,7 +46,6 @@
 #include "Types/ModioUser.h"
 #include "Types/ModioUserList.h"
 #include "Types/ModioValidationError.h"
-#include "Templates/UniquePtr.h"
 
 #include "ModioSubsystem.generated.h"
 
@@ -55,6 +56,7 @@ DECLARE_DELEGATE_OneParam(FOnUserProfileUpdatedDelegate, TOptional<FModioUser> U
 DECLARE_DELEGATE_TwoParams(FOnListAllModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnGetModInfoDelegateFast, FModioErrorCode, TOptional<FModioModInfo>);
 DECLARE_DELEGATE_TwoParams(FOnGetGameInfoDelegateFast, FModioErrorCode, TOptional<FModioGameInfo>);
+DECLARE_DELEGATE_TwoParams(FOnListUserGamesDelegateFast, FModioErrorCode, TOptional<FModioGameInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnGetMediaDelegateFast, FModioErrorCode, TOptional<FModioImageWrapper>);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnGetMediaMulticastDelegateFast, FModioErrorCode, TOptional<FModioImageWrapper>);
 DECLARE_DELEGATE_TwoParams(FOnGetModTagOptionsDelegateFast, FModioErrorCode, TOptional<FModioModTagOptions>);
@@ -81,6 +83,9 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModInfoDelegate, FModioErrorCode, Error
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetGameInfoDelegate, FModioErrorCode, ErrorCode, FModioOptionalGameInfo,
 								   GameInfo);
 
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserGamesDelegate, FModioErrorCode, ErrorCode, FModioOptionalGameInfoList,
+								   GameInfoList);
+
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetMediaDelegate, FModioErrorCode, ErrorCode, FModioOptionalImage, Path);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModTagOptionsDelegate, FModioErrorCode, ErrorCode, FModioOptionalModTagOptions,
@@ -99,7 +104,8 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnMuteUsersDelegate, FModioErrorCode, ErrorC
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCode, ErrorCode,
 								   FModioOptionalModInfoList, Result);
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErrorCode, ErrorCode, FModioOptionalMapPreview, ModioPreviewMap);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErrorCode, ErrorCode,
+								   FModioOptionalMapPreview, ModioPreviewMap);
 
 class UModioSubsystem;
 
@@ -375,6 +381,19 @@ public:
 	MODIO_API void ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegateFast Callback);
 
 	/**
+	 * @brief Provides a list of games for the current user, that match the parameters specified in the filter
+	 * @param Filter FModioFilterParams object containing any filters that should be applied to the query
+	 * @param Callback Callback invoked with a status code and an optional ModInfoList providing mod profiles
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 */
+	MODIO_API void ListUserGamesAsync(const FModioFilterParams& Filter, FOnListUserGamesDelegateFast Callback);
+
+	/**
 	 * @brief Fetches detailed information about the specified game
 	 * @param GameID Game ID of the game data to fetch
 	 * @param Callback Callback providing a status code and an optional FModioGameInfo object with the game's extended
@@ -521,9 +540,11 @@ public:
 									 FOnSubmitNewModDelegateFast Callback);
 
 	/**
-	 * @brief Queues the upload of a new mod file release for the specified mod, using the submitted parameters. The
-	 * upload's progress can be tracked in the same way as downloads; when completed, a Mod Management Event will be
-	 * triggered with the result code for the upload.
+	 * @brief Queues the upload of a new modfile release for the specified mod using the submitted parameters. This
+	 * function takes an FModioCreateModFileParams object to specify the path to the root folder of the new modfile. The
+	 * plugin will compress the folder's contents into a .zip archive and queue the result for upload. When the upload
+	 * completes, a Mod Management Event will be triggered. Note the plugin is also responsible for decompressing the
+	 * archive upon its installation at a later point in time.
 	 * @param Mod The ID of the mod you are submitting a file for
 	 * @param Params Information about the mod file being created, including the root path of the directory that will be
 	 * archived
@@ -956,6 +977,20 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ListAllModsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegate Callback);
+
+	/**
+	 * @brief Provides a list of games for the current user, that match the parameters specified in the filter
+	 * @param Filter FModioFilterParams object containing any filters that should be applied to the query
+	 * @param Callback Callback invoked with a status code and an optional GameInfoList providing game profiles
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "ListUserGamesAsync", Category = "mod.io|Mods")
+	MODIO_API void K2_ListUserGamesAsync(const FModioFilterParams& Filter, FOnListUserGamesDelegate Callback);
 
 	/**
 	 * @brief Fetches detailed information about the specified game

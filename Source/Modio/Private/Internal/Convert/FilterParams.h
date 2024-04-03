@@ -67,6 +67,11 @@ FORCEINLINE Modio::FilterParams::SortFieldType ToModio(EModioSortFieldType Envir
 }
 MODIO_END_CONVERT_SWITCHES
 
+FORCEINLINE Modio::MaturityOption ToModio(EModioMaturityFlags Maturity)
+{
+	return static_cast<Modio::MaturityOption>((uint8) Maturity);
+}
+
 FORCEINLINE Modio::FilterParams ToModio(const FModioFilterParams& In)
 {
 	Modio::FilterParams Out;
@@ -98,6 +103,11 @@ FORCEINLINE Modio::FilterParams ToModio(const FModioFilterParams& In)
 	if (In.Revenue.IsSet())
 	{
 		Out.RevenueType(ToModio(In.Revenue.GetValue()));
+	}
+
+	if (In.Maturity.IsSet())
+	{
+		Out.WithMatureContentFlags(ToModio(In.Maturity.GetValue()));
 	}
 
 	return Out.SortBy(ToModio(In.SortField), ToModio(In.Direction))

@@ -110,6 +110,14 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|UserProfile")
 	FModioCommonErrorWithRetryParamsSettings ErrorWithRetryParams;
+
+	// Hides the bottom action bar in the ModioCommonModBrowser automatically when MouseAndKeyboard is the current input type
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|ModBrowser")
+	bool bHideActionBarDuringMouseAndKeyboardInput = false;
+
+	// Whether or not to show the login/logout button in the QuickAccessTabView
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Auth")
+	bool bShowAuthButton = true;
 	
 	// Begin UDeveloperSettings Interface
 	virtual FName GetCategoryName() const override { return ModioCommonCategoryName; }
