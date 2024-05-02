@@ -113,8 +113,9 @@ void UModioCommonModBrowser::NativeOnInitialized()
 						return;
 					}
 					FilterParamsUI->Underlying = PendingFilterParams.IsSet() ? PendingFilterParams->ToFilterParams() : SelectedAdditionalCategoryParamsPtr->ToFilterParams();
-					FilterParamsUI->bIsDefaultFilter = PendingIsDefaultFilter.IsSet() ? PendingIsDefaultFilter.GetValue() : true;
+					FilterParamsUI->bIsDefaultFilter = PendingIsDefaultFilter.Get(true);
 					PendingFilterParams.Reset();
+					PendingIsDefaultFilter.Reset();
 					CastedFeaturedView->SetDataSource(FilterParamsUI);
 				}
 			}
@@ -238,6 +239,12 @@ bool UModioCommonModBrowser::ShowFeaturedView_Implementation()
 	{
 		UE_LOG(ModioUI, Error, TEXT("Unable to show featured view in '%s': Settings are invalid"), *GetName());
 		return false;
+	}
+
+	if (!TabList->GetActiveTab().IsNone())
+	{
+		TabList->SelectTabByIDExtended(TabList->GetActiveTab());
+		return true;
 	}
 
 	// Selecting the first featured category tab

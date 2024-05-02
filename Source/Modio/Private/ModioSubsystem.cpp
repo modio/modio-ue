@@ -249,7 +249,12 @@ MODIO_API void UModioSubsystem::ListUserGamesAsync(const FModioFilterParams& Fil
 
 void UModioSubsystem::SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegateFast OnSubscribeComplete)
 {
-	Modio::SubscribeToModAsync(ToModio(ModToSubscribeTo), [WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
+	SubscribeToModAsync(ModToSubscribeTo, false, MoveTemp(OnSubscribeComplete));
+}
+
+void UModioSubsystem::SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies, FOnErrorOnlyDelegateFast OnSubscribeComplete)
+{
+	Modio::SubscribeToModAsync(ToModio(ModToSubscribeTo), IncludeDependencies, [WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
 														   OnSubscribeComplete](Modio::ErrorCode ec) {
 		if (!WeakThis.IsValid())
 		{
@@ -361,9 +366,9 @@ MODIO_API void UModioSubsystem::K2_ListUserGamesAsync(const FModioFilterParams& 
 								 }));
 }
 
-void UModioSubsystem::K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegate OnSubscribeComplete)
+void UModioSubsystem::K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies, FOnErrorOnlyDelegate OnSubscribeComplete)
 {
-	SubscribeToModAsync(ModToSubscribeTo,
+	SubscribeToModAsync(ModToSubscribeTo, IncludeDependencies,
 						FOnErrorOnlyDelegateFast::CreateLambda(
 							[OnSubscribeComplete](FModioErrorCode ec) { OnSubscribeComplete.ExecuteIfBound(ec); }));
 }
@@ -405,15 +410,14 @@ void UModioSubsystem::DisableModManagement()
 
 void UModioSubsystem::KillBackgroundThread()
 {
-#if WITH_EDITOR
-	return; // thread is not being destoyed between PIE sessions
-#endif
-
+	// thread is not being destoyed between PIE sessions
+#if !WITH_EDITOR
 	if (bUseBackgroundThread && BackgroundThread.IsValid())
 	{
 		BackgroundThread->KillThreadSafe();
 		BackgroundThread.Reset();
 	}
+#endif
 }
 
 void UModioSubsystem::ShutdownAsync(FOnErrorOnlyDelegateFast OnShutdownComplete)
@@ -975,8 +979,13 @@ TArray<FModioModDependency> ToUnreal(const std::vector<Modio::ModDependency>& Or
 
 void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback)
 {
+	GetModDependenciesAsync(ModID, false, MoveTemp(Callback));
+}
+
+void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, bool Recursive, FOnGetModDependenciesDelegateFast Callback)
+{
 	Modio::GetModDependenciesAsync(
-		ToModio(ModID), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModDependencyList> Dependencies) {
+		ToModio(ModID), Recursive, [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModDependencyList> Dependencies) {
 			if (Dependencies)
 			{
 				FModioModDependencyList Out;
@@ -996,9 +1005,9 @@ FModioModCreationHandle UModioSubsystem::GetModCreationHandle()
 	return ToUnreal(Modio::GetModCreationHandle());
 }
 
-void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegate Callback)
+void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, bool Recursive, FOnGetModDependenciesDelegate Callback)
 {
-	GetModDependenciesAsync(ModID, FOnGetModDependenciesDelegateFast::CreateLambda(
+	GetModDependenciesAsync(ModID, Recursive, FOnGetModDependenciesDelegateFast::CreateLambda(
 									   [Callback](FModioErrorCode ec, TOptional<FModioModDependencyList> Dependencies) {
 										   Callback.ExecuteIfBound(
 											   ec, FModioOptionalModDependencyList(MoveTempIfPossible(Dependencies)));

@@ -239,8 +239,28 @@ public:
 	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
 	 * @errorcategory UserNotAuthenticatedError|No authenticated user
 	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
+	 * @deprecated 2024.4 Call SubscribeToModAsync() and specify if mod dependencies should be included.
 	 **/
+	UE_DEPRECATED(5.1, "Deprecated as of 2024.4. Call SubscribeToModAsync(FModioModID, bool,  FOnErrorOnlyDelegateFast) and specify if recursive dependency subscription is desired.")
 	MODIO_API void SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegateFast OnSubscribeComplete);
+
+	/**
+	 * @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
+	 * marks the mod for local installation by the SDK
+	 * @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
+	 * @param IncludeDependencies Subscribe to all dependencies as well.
+	 * @param OnSubscribeComplete Callback invoked when the subscription request is completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
+	 * @errorcategory UserNotAuthenticatedError|No authenticated user
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
+	 **/
+	MODIO_API void SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies,
+									   FOnErrorOnlyDelegateFast OnSubscribeComplete);
 
 	/**
 	 * @brief Sends a request to the mod.io server to remove the specified mod from the user's list of subscriptions.
@@ -510,8 +530,25 @@ public:
 	 * @errorcategory SDKNotInitialized|SDK not initialized
 	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 * @experimental
+	 * @deprecated 2024.4 Call GetModDependenciesAsync() and specify if recursion is desired.
 	 **/
+	UE_DEPRECATED(5.1, "Deprecated as of 2024.4. Call GetModDependenciesAsync(FModioModID, bool,  FOnErrorOnlyDelegateFast) and specify if recursive dependency resolution is desired.")
 	MODIO_API void GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback);
+
+	/**
+	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
+	 * @param ModID The mod to retrieve dependencies for
+	 * @param Recursive Include child dependencies in a recursive manner. \r\n NOTE: Recursion supports a maximum depth of 5.
+	 * @param Callback Callback providing a status code and an optional ModTagOptions object containing the available
+	 * tags
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
+	 * @experimental
+	 **/
+	MODIO_API void GetModDependenciesAsync(FModioModID ModID, bool Recursive, FOnGetModDependenciesDelegateFast Callback);
 
 	/**
 	 * @brief Gets a new mod handle for use with SubmitNewModAsync.
@@ -863,10 +900,12 @@ public:
 	MODIO_API void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions,
 									  FOnErrorOnlyDelegate OnInitComplete);
 
+
 	/**
 	 * @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
 	 * marks the mod for local installation by the SDK
 	 * @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
+	 * @param IncludeDependencies Subscribe to all dependencies as well.
 	 * @param OnSubscribeComplete Callback invoked when the subscription request is completed.
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
@@ -878,7 +917,8 @@ public:
 	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "SubscribeToModAsync", Category = "mod.io|Mods")
-	MODIO_API void K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegate OnSubscribeComplete);
+	MODIO_API void K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies,
+										  FOnErrorOnlyDelegate OnSubscribeComplete);
 
 	/**
 	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
@@ -1095,6 +1135,7 @@ public:
 	/**
 	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
 	 * @param ModID The mod to retrieve dependencies for
+	 * @param Recursive Fetches dependencies recursively up to a depth of 5
 	 * @param Callback Callback providing a status code and an optional ModTagOptions object containing the available
 	 * tags
 	 * @requires initialized-sdk
@@ -1105,7 +1146,7 @@ public:
 	 * @experimental
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModDependenciesAsync", Category = "mod.io|Mods")
-	MODIO_API void K2_GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegate Callback);
+	MODIO_API void K2_GetModDependenciesAsync(FModioModID ModID, bool Recursive, FOnGetModDependenciesDelegate Callback);
 
 	/**
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the

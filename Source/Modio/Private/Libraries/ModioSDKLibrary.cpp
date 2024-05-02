@@ -77,8 +77,6 @@ static FString ToString(EFileSizeUnit Unit)
 		default:
 			return TEXT("Unknown unit");
 	}
-
-	return TEXT("Unknown unit");
 }
 
 EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit(int64 FileSize)

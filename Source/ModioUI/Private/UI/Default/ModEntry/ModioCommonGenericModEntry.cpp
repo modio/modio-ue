@@ -93,7 +93,7 @@ void UModioCommonGenericModEntry::NativeOnMouseEnter(const FGeometry& InGeometry
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 	if (UWorld* World = GetWorld()) 
 	{
-		World->GetTimerManager().ClearTimer(DelesectTimerHandle);
+		World->GetTimerManager().ClearTimer(DeselectTimerHandle);
 	}
 	if (IsModListItemValid())
 	{
@@ -111,8 +111,8 @@ void UModioCommonGenericModEntry::NativeOnMouseLeave(const FPointerEvent& InMous
 		{
 			if (UWorld* World = GetWorld()) 
 			{
-				World->GetTimerManager().ClearTimer(DelesectTimerHandle);
-				World->GetTimerManager().SetTimer(DelesectTimerHandle, FTimerDelegate::CreateWeakLambda(this, [this]() 
+				World->GetTimerManager().ClearTimer(DeselectTimerHandle);
+				World->GetTimerManager().SetTimer(DeselectTimerHandle, FTimerDelegate::CreateWeakLambda(this, [this]() 
 				{ 
 					DeselectModListItem();								
 				}), UISettings->ModEntryParams.DeselectionDelay, false);

@@ -234,16 +234,18 @@ int64 UModioCommonModOperationTrackerWidget::GetPreviewTotal() const
 {
 #if WITH_EDITOR
 	return PreviewTotal;
-#endif
+#else
 	return 0;
+#endif
 }
 
 int64 UModioCommonModOperationTrackerWidget::GetPreviewCurrent() const
 {
 #if WITH_EDITOR
 	return PreviewCurrent;
-#endif
+#else
 	return 0;
+#endif
 }
 
 void UModioCommonModOperationTrackerWidget::OnWidgetRebuilt()

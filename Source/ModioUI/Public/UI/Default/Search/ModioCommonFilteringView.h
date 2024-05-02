@@ -40,6 +40,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = true), Category = "Mod.io Common UI")
 	TSubclassOf<UModioCommonModTagGroupList> TagGroupListClass;
 
+	/**
+	 * The maximum number of tags that can be selected
+	 * If the number of selected tags exceeds this value, the oldest selected tags will be skipped in GetFilterParamsWrapper
+	 * 20 by default (mod.io API limit)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mod.io Common UI")
+	int32 MaxNumOfTags = 20;
+
 #if WITH_EDITORONLY_DATA
 	/** Preview of the mod tag info options (editor only) */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Mod.io Common UI|Preview")

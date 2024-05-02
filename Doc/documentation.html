@@ -765,12 +765,12 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_getting_started">Getting started</a>
 <ul class="sectlevel2">
 <li><a href="#_installation_and_configuration">Installation and configuration</a></li>
-<li><a href="#_configuration">Configuration</a>
+<li><a href="#_plugin_configuration">Plugin Configuration</a>
 <ul class="sectlevel3">
-<li><a href="#_endpoint_environment">Endpoint Environment</a></li>
 <li><a href="#_using_background_thread">Using background thread</a></li>
 </ul>
 </li>
+<li><a href="#_setting_up_your_game">Setting up your game</a></li>
 <li><a href="#_plugin_structure_and_concepts">Plugin structure and concepts</a>
 <ul class="sectlevel3">
 <li><a href="#modio_subsystem">ModioSubsystem</a></li>
@@ -820,13 +820,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_list_muted_users">List muted users</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a href="#_mod_io_mod_browser_ui">mod.io Mod Browser UI</a>
-<ul class="sectlevel2">
-<li><a href="#_ui_specific_plugin_modules">UI-Specific Plugin Modules</a></li>
-<li><a href="#_displaying_the_mod_browser">Displaying the Mod Browser</a></li>
-<li><a href="#_closing_the_mod_browser">Closing the Mod Browser</a></li>
 <li><a href="#_how_to_set_up_common_ui_for_project_to_use_mod_io_ue5_ui">How to Set Up Common UI for Project to Use Mod.io UE5 UI</a>
 <ul class="sectlevel3">
 <li><a href="#_enable_common_ui_plugin">Enable Common UI plugin</a></li>
@@ -1562,7 +1555,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiocommonreportmessageparamssettings">ModioCommonReportMessageParamsSettings</a></li>
 <li><a href="#_modiocommonreportsummaryparamssettings">ModioCommonReportSummaryParamsSettings</a></li>
 <li><a href="#_modiocommonsearchparamssettings">ModioCommonSearchParamsSettings</a></li>
-<li><a href="#_modiocommonstoragespacetrackerparamssettings">ModioCommonStorageSpaceTrackerParamsSettings</a></li>
 <li><a href="#_modiocommonuserprofilewidgetparamssettings">ModioCommonUserProfileWidgetParamsSettings</a></li>
 </ul>
 </li>
@@ -1694,6 +1686,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_emodiouimediadownloadeventtype"> EModioUIMediaDownloadEventType</a></li>
 <li><a href="#_emodiouimodinfoeventtype"> EModioUIModInfoEventType</a></li>
 <li><a href="#_emodioenabledfiltertype"> EModioEnabledFilterType</a></li>
+<li><a href="#_emodioqueuedfiltertype"> EModioQueuedFilterType</a></li>
 <li><a href="#_emodioinstalledfiltertype"> EModioInstalledFilterType</a></li>
 <li><a href="#_emodiomanualsorttype"> EModioManualSortType</a></li>
 <li><a href="#_emodiocommondialogbuttontype"> EModioCommonDialogButtonType</a></li>
@@ -1727,7 +1720,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_configuration">Configuration</h3>
+<h3 id="_plugin_configuration">Plugin Configuration</h3>
 <div class="paragraph">
 <p>The plugin requires some configuration information to behave correctly. You can access the configuration settings in the Project Settings window:</p>
 </div>
@@ -1747,15 +1740,15 @@ table.stripes-odd tr:nth-of-type(odd) {
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Game Id</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Your mod.io-provided Game Id for the target environment (Live, or Test)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Your mod.io-provided Game Id for the target environment</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">API Key</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Your mod.io-provided Game Id for the target environment (Live, or Test)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Your mod.io-provided API key for the target environment</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Environment</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Your current environment, Live or Test (check difference below)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Your current environment, Live or Test</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Log Level</span></p></td>
@@ -1771,33 +1764,17 @@ table.stripes-odd tr:nth-of-type(odd) {
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>You can find your Game ID and API Key by going to the applicable mod.io environment, going to your Profile and selecting "API Access" from the navigation bar.</p>
-</div>
-<div class="sect3">
-<h4 id="_endpoint_environment">Endpoint Environment</h4>
-<div class="paragraph">
-<p>The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.</p>
-</div>
-<div class="paragraph">
-<p>Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game&#8217;s modding capabilities.</p>
-</div>
-<div class="paragraph">
-<p>In summary, here are the three steps:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Test Environment: Used for integration between your game and mod.io</p>
-</li>
-<li>
-<p>Live Environment, Hidden: Used for quality assurance and pre-release mods</p>
-</li>
-<li>
-<p>Live Environment, Public: It is open for everyone to see.</p>
-</li>
-</ul>
-</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+The Test environment is available for usage in limited circumstances. All games should be setup on the Live environment. If you require access to Test, please contact us.
+</td>
+</tr>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_using_background_thread">Using background thread</h4>
@@ -1808,6 +1785,12 @@ table.stripes-odd tr:nth-of-type(odd) {
 <p>Calling methods from the ModioSubsystem will marshall all callbacks back to the game thread, and all other plugin call guarantees remain the same.</p>
 </div>
 <hr>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setting_up_your_game">Setting up your game</h3>
+<div class="paragraph">
+<p>Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game’s modding capabilities.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1929,7 +1912,7 @@ Even if the plugin is shut down while asynchronous operations are in-flight, you
 <p>In order to provide a non-blocking implementation, the plugin operates an internal event loop. This event loop, will only ever run on the thread which calls <a href="#RunPendingHandlers">Run Pending Handlers</a>, which is the function we provide to allow you to 'tick' the event loop and process any pending work the Plugin needs to perform.</p>
 </div>
 <div class="paragraph">
-<p>You should either enable the <a href="#_configuration">Configuration</a> setting to allow the plugin to manage a background thread for you which will call <a href="#RunPendingHandlers">Run Pending Handlers</a>, or else invoke it on Tick on the game thread yourself.</p>
+<p>You should either enable the <a href="#Configuration">[Configuration]</a> setting to allow the plugin to manage a background thread for you which will call <a href="#RunPendingHandlers">Run Pending Handlers</a>, or else invoke it on Tick on the game thread yourself.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2090,7 +2073,7 @@ For best performance it should be called at least once per frame, so it should e
 </div>
 </div>
 <div class="paragraph">
-<p>When you are ready to initialize the plugin for the current user, you&#8217;ll need to call <a href="#K2_InitializeAsync">InitializeAsync</a>, passing in an instance of <code>FModioInitializeOptions</code>, and a delegate so you know when the plugin is initialized correctly.</p>
+<p>When you are ready to initialize the plugin for the current user, you&#8217;ll need to call <a href="#K2_InitializeAsync">InitializeAsync</a>, passing in an instance of <code>FModioInitializeOptions</code>, and a delegate so you know when the plugin is initialized correctly. Here, you can specify your Game ID, API Key, Environment, and <a href="https://docs.mod.io/#targeting-a-portal">Portal</a>. You can get the default portal for the current platform using <a href="#GetDefaultPortalForCurrentPlatform">Get Default Portal for Current Platform</a> function.</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2098,7 +2081,7 @@ For best performance it should be called at least once per frame, so it should e
 </div>
 </div>
 <div class="paragraph">
-<p>If you have configured your game&#8217;s API Key, ID and environment via the Plugin Settings window as in <a href="#_configuration">Configuration</a>, you can use the convenience function <a href="#Get Project Initialize Options For Session Id">[Get Project Initialize Options For Session Id]</a>:</p>
+<p>If you have configured your game&#8217;s API Key, ID and environment via the Plugin Settings window as in <a href="#Configuration">[Configuration]</a>, you can use the convenience function <a href="#Get Project Initialize Options For Session Id">[Get Project Initialize Options For Session Id]</a>:</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2320,13 +2303,19 @@ For best performance it should be called at least once per frame, so it should e
 <div class="ulist">
 <ul>
 <li>
-<p>Xbox Live</p>
+<p>Apple</p>
 </li>
 <li>
-<p>Steam</p>
+<p>Discord</p>
+</li>
+<li>
+<p>Epic Games Store</p>
 </li>
 <li>
 <p>GoG</p>
+</li>
+<li>
+<p>Google</p>
 </li>
 <li>
 <p>itch.io</p>
@@ -2335,13 +2324,13 @@ For best performance it should be called at least once per frame, so it should e
 <p>Nintendo Switch</p>
 </li>
 <li>
-<p>Discord</p>
-</li>
-<li>
 <p>PlayStation Network (PSN)</p>
 </li>
 <li>
-<p>Epic Games</p>
+<p>Steam</p>
+</li>
+<li>
+<p>Xbox Live</p>
 </li>
 <li>
 <p>OpenID</p>
@@ -2360,13 +2349,13 @@ For best performance it should be called at least once per frame, so it should e
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Call <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a> , passing in any provider-specific parameters, setting <code>AuthenticationParams::bUserHasAcceptedTerms</code> to false, and indicating which authentication provider you wish to use</p>
+<p>Call <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a> , passing in any provider-specific parameters, setting <code>AuthenticationParams::bUserHasAcceptedTerms</code> to false, and indicating which authentication provider you wish to use. You could use the <a href="#UModioPlatformHelpersLibrary::GetDefaultAuthProviderForCurrentPlatform">[UModioPlatformHelpersLibrary::GetDefaultAuthProviderForCurrentPlatform]</a> to get the default provider for the current platform, which is, for example, Steam for Windows. Alternatively, you can specify the provider manually.</p>
 </li>
 <li>
-<p>Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call <a href="#K2_GetTermsOfUseAsync">GetTermsOfUseAsync</a> and display the provided information to your user</p>
+<p>Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call <a href="#K2_GetTermsOfUseAsync">GetTermsOfUseAsync</a> and display the provided information to your user.</p>
 </li>
 <li>
-<p>If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting <code>AuthenticationParams::bUserHasAcceptedTerms</code> to <strong>true</strong></p>
+<p>If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting <code>AuthenticationParams::bUserHasAcceptedTerms</code> to <strong>true</strong>.</p>
 </li>
 <li>
 <p>Check the error code in the callback - a false-y error code indicates that authentication was successful, and users can now install and manage mods and subscriptions.</p>
@@ -2508,17 +2497,42 @@ For best performance it should be called at least once per frame, so it should e
 <div class="sect3">
 <h4 id="_mod_subscriptions">Mod subscriptions</h4>
 <div class="paragraph">
-<p>A user indicates that they want to have a mod installed by 'subscribing' to it. Subscriptions are stored on the mod.io servers and associated to a user&#8217;s mod.io account.</p>
+<p>A user indicates that they want to have a mod installed by 'subscribing' to it. Subscriptions are stored on the mod.io servers and associated to a user&#8217;s mod.io account.
+When a user 'unsubscribes' to a mod, they&#8217;re indicating they&#8217;d like to have that mod uninstalled from any device they&#8217;re logged in on.</p>
 </div>
 <div class="paragraph">
-<p>When a user 'unsubscribes' to a mod, they&#8217;re indicating they&#8217;d like to have that mod uninstalled from any device they&#8217;re logged in on.</p>
+<p>The API for managing subscriptions is simple and consists of a call to either <a href="#K2_SubscribeToModAsync">SubscribeToModAsync</a> or <a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a callback to receive the status of the request:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+To subscribe to a mod, <a href="#K2_EnableModManagement">EnableModManagement</a> must be called beforehand.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>When subscribing to a mod, you can also pass in a bool to indicate if you want to subscribe to all dependencies for the given mod. If dependencies are also subscribed, the mod.io servers will also associate them with the current user.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Currently when dependencies are included during subscription, they will not automatically be downloaded. To ensure the latest content is downloaded, <a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a> must be called after subscribing.
+</td>
+</tr>
+</table>
 </div>
 <details>
 <summary class="title">Blueprint Example</summary>
 <div class="content">
-<div class="paragraph">
-<p>The API for managing subscriptions is simple and consists of a call to either <a href="#K2_SubscribeToModAsync">SubscribeToModAsync</a> or <a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a> with the ID of the mod in question and a delegate to receive the status of the request:</p>
-</div>
 <div class="imageblock">
 <div class="content">
 <img src="img/subscribe_to_mod.png" alt="subscribe to mod">
@@ -2536,11 +2550,11 @@ For best performance it should be called at least once per frame, so it should e
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">SubscribeToMod</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModId</span><span class="p">)</span>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">SubscribeToMod</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModToSubscribeTo</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">IncludeDependencies</span><span class="p">)</span>
 <span class="p">{</span>
 	<span class="k">if</span> <span class="p">(</span><span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">())</span>
 	<span class="p">{</span>
-		<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">ModId</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegateFast</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">UModioManager</span><span class="o">::</span><span class="n">OnSubscribeToModCallback</span><span class="p">,</span> <span class="n">ModId</span><span class="p">));</span>
+		<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">SubscribeToModAsync</span><span class="p">(</span><span class="n">ModId</span><span class="p">,</span> <span class="n">IncludeDependencies</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegateFast</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">UModioManager</span><span class="o">::</span><span class="n">OnSubscribeToModCallback</span><span class="p">,</span> <span class="n">ModId</span><span class="p">));</span>
 	<span class="p">}</span>
 <span class="p">}</span>
 
@@ -2565,9 +2579,6 @@ For best performance it should be called at least once per frame, so it should e
 </div>
 </div>
 </details>
-<div class="paragraph">
-<p>Note that in order for a user to be able to subscribe or unsubscribe from mods, mod management has to be enabled.</p>
-</div>
 <div class="sect4">
 <h5 id="_external_subscription_changes">External subscription changes</h5>
 <div class="paragraph">
@@ -3211,207 +3222,6 @@ To perform any of these actions, the muting user must be authenticated.
 </div>
 </details>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_mod_io_mod_browser_ui">mod.io Mod Browser UI</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_ui_specific_plugin_modules">UI-Specific Plugin Modules</h3>
-<div class="paragraph">
-<p>The mod.io UE Plugin also includes a series of additional modules which provide an embedded mod browser and manager you can include in your own game.</p>
-</div>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-<col style="width: 1%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Module Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Module Type</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ModioUI</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">UI module containing all Slate and UMG widgets for the UE5 Common UI</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ModioUICore</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Core UI module containing all shared entities for UE5 UIs</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ModioUIEditor</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Editor details customization and asset factories for UE5 UI classes</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Editor</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">MSDFSupport</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Module containing material expression for rendering MSDF textures as pseudo-vectors</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Runtime</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">MSDFSupportEditor</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Importer for SVGs that will convert them to MSDF textures the UI can render</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Editor</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>These modules are optional - you can remove them, the UI folder in the Plugin Content directory, and the associated entries in the modio.uplugin file, and the core functionality from the Modio module will remain available in your project.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_displaying_the_mod_browser">Displaying the Mod Browser</h3>
-<div class="paragraph">
-<p>The main Mod Browser widget is located at <code>Modio/Content/UI5/Default/Widgets/ModBrowser/W_ModioCommonModBrowser</code>. After the Plugin has been initialized, you can show the Mod Browser via a new UI-focused subsystem <code>UModioUISubsystem</code> using the function <code>ShowModBrowserUIForPlayer()</code>.
-Currently the mod browser does not support being embedded inside your own UI hierarchy, so you must load it directly (for instance, from a button on your main menu).</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-When showing the Mod Browser UI, you can pass in a <code>FOnModBrowserCloseRequested</code> delegate. You can use this delegate first to check conditions before finally closing the browser, more details below in <a href="#_closing_the_mod_browser">Closing the Mod Browser</a>.
-</td>
-</tr>
-</table>
-</div>
-<details>
-<summary class="title">Blueprint Example</summary>
-<div class="content">
-<div class="paragraph">
-<p>From Blueprint, you can use the <a href="#ShowModBrowserUIForPlayer">Show Mod Browser UIFor Player</a> node.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_showforplayer.png" alt="plugin ui showforplayer">
-</div>
-</div>
-</div>
-</details>
-<details>
-<summary class="title">C++ Example</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="c1">// After you've called <a href="#K2_InitializeAsync">InitializeAsync</a> and the plugin is initialized successfully:</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="n">UModioUISubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioUISubsystem</span><span class="o">&gt;</span><span class="p">())</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">UWorld</span><span class="o">*</span> <span class="n">CurrentWorld</span> <span class="o">=</span> <span class="n">GetWorld</span><span class="p">())</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">APlayerController</span><span class="o">*</span> <span class="n">PC</span> <span class="o">=</span> <span class="n">CurrentWorld</span><span class="o">-&gt;</span><span class="n">GetFirstPlayerController</span><span class="p">())</span>
-        <span class="p">{</span>
-            <span class="c1">// Create and bind a delegate to be invoked when the browser is closed</span>
-            <span class="n">FOnModBrowserCloseRequested</span> <span class="n">OnBrowserCloseRequestedDelegate</span><span class="p">;</span>
-            <span class="c1">// OnModBrowserCloseRequested needs to be marked UFUNCTION()</span>
-            <span class="n">OnBrowserCloseRequestedDelegate</span><span class="p">.</span><span class="n">BindDynamic</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ASomeActor</span><span class="o">::</span><span class="n">OnModBrowserCloseRequested</span><span class="p">);</span>
-
-            <span class="c1">// Get a reference to the mod browser implementation (this will be exposed in the UI Settings object</span>
-            <span class="c1">// in a future release)</span>
-            <span class="n">FSoftClassPath</span> <span class="n">MenuClassReference</span> <span class="o">=</span>
-                <span class="s">"/modio/UI/Browser/Views/ModioModBrowserWidget.ModioModBrowserWidget_C"</span><span class="p">;</span>
-            <span class="n">UClass</span><span class="o">*</span> <span class="n">ReferencedClass</span> <span class="o">=</span> <span class="n">MenuClassReference</span><span class="p">.</span><span class="n">ResolveClass</span><span class="p">();</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">ReferencedClass</span><span class="p">)</span>
-            <span class="p">{</span>
-                <span class="c1">// Request the browser widget be instantiated and displayed</span>
-                <span class="n">UModioMenu</span><span class="o">*</span> <span class="n">MenuWidget</span> <span class="o">=</span>
-                    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">ShowModBrowserUIForPlayer</span><span class="p">(</span><span class="n">ReferencedClass</span><span class="p">,</span> <span class="n">PC</span><span class="p">,</span> <span class="n">OnBrowserCloseRequestedDelegate</span><span class="p">);</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">MenuWidget</span><span class="p">)</span>
-                <span class="p">{</span>
-                    <span class="c1">// Focus the user on the browser</span>
-                    <span class="n">UWidgetBlueprintLibrary</span><span class="o">::</span><span class="n">SetInputMode_UIOnlyEx</span><span class="p">(</span><span class="n">PC</span><span class="p">,</span> <span class="n">MenuWidget</span><span class="p">);</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span></code></pre>
-</div>
-</div>
-</div>
-</details>
-</div>
-<div class="sect2">
-<h3 id="_closing_the_mod_browser">Closing the Mod Browser</h3>
-<div class="paragraph">
-<p>The Mod Browser can currently be closed from within the Quick Access tab - accessed by via the user profile icon at the top right of the window - and clicking on the 'Main Game Menu' button.
-This widget is located at <code>/Modio/Content/UI5/Default/Widgets/QuickAccess/W_ModioCommonQuickAccessTabView</code>, containing a <code>MainGameMenuButton</code> button, the input action for which can be customized in:</p>
-</div>
-<div class="paragraph">
-<p><code>Project Settings &#8594; Modio Common UI Settings &#8594; QuickAccess &#8594; Quick Access Params &#8594; MainGameMenuInputAction</code></p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_browserquickaccess.png" alt="plugin ui browserquickaccess">
-</div>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-As mentioned in the <a href="#_displaying_the_mod_browser">Displaying the Mod Browser</a> section a <code>FOnModBrowserCloseRequested</code> delegate is passed in, which is what is being called by the back button above.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The Mod Browser can be closed by calling <code>CloseModBrowserUI()</code> on the ModioUISubsystem, or conditionally after receiving the <code>FOnModBrowserCloseRequested</code> delegate callback.</p>
-</div>
-<details>
-<summary class="title">Blueprint Example</summary>
-<div class="content">
-<div class="paragraph">
-<p>From Blueprint, you can use the <a href="#CloseModBrowserUI">Close Mod Browser UI</a> node to manually close the mod browser.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_closemodbrowser.png" alt="plugin ui closemodbrowser">
-</div>
-</div>
-<div class="paragraph">
-<p>Or to perform the same logic being done with the back button, use <a href="#ExecuteOnModBrowserCloseRequestedDelegate">Execute on Mod Browser Close Requested Delegate</a> and then handle that callback to finally close the UI as above.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/plugin_ui_closemodbrowser_2.png" alt="plugin ui closemodbrowser 2">
-</div>
-</div>
-</div>
-</details>
-<details>
-<summary class="title">C++ Example</summary>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">UModioUISubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioUISubsystem</span><span class="o">&gt;</span><span class="p">())</span>
-<span class="p">{</span>
-    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">CloseModBrowserUI</span><span class="p">();</span>
-<span class="p">}</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Or to perform the same logic being done with the back button, use <a href="#ExecuteOnModBrowserCloseRequestedDelegate">Execute on Mod Browser Close Requested Delegate</a> and then handle that callback to finally close the UI as above.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">UModioUISubsystem</span><span class="o">*</span> <span class="n">Subsystem</span> <span class="o">=</span> <span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioUISubsystem</span><span class="o">&gt;</span><span class="p">())</span>
-<span class="p">{</span>
-    <span class="n">Subsystem</span><span class="o">-&gt;</span><span class="n">ExecuteOnModBrowserCloseRequestedDelegate</span><span class="p">();</span>
-<span class="p">}</span></code></pre>
-</div>
-</div>
-</div>
-</details>
 </div>
 <div class="sect2">
 <h3 id="_how_to_set_up_common_ui_for_project_to_use_mod_io_ue5_ui">How to Set Up Common UI for Project to Use Mod.io UE5 UI</h3>
@@ -10372,7 +10182,7 @@ As mentioned in the <a href="#_displaying_the_mod_browser">Displaying the Mod Br
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_SubscribeToModAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModToSubscribeTo</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegate</span> <span class="n">OnSubscribeComplete</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_SubscribeToModAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModToSubscribeTo</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">IncludeDependencies</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegate</span> <span class="n">OnSubscribeComplete</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -10406,6 +10216,10 @@ As mentioned in the <a href="#_displaying_the_mod_browser">Displaying the Mod Br
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod to Subscribe To</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Mod ID of the mod requiring a subscription.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Include Dependencies</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Subscribe to all dependencies as well.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">On Subscribe Complete</span></p></td>
@@ -12040,7 +11854,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_GetModDependenciesAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="n">FOnGetModDependenciesDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_GetModDependenciesAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">Recursive</span><span class="p">,</span> <span class="n">FOnGetModDependenciesDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -12083,6 +11897,10 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod ID</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The mod to retrieve dependencies for</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Recursive</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fetches dependencies recursively up to a depth of 5</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
@@ -13271,7 +13089,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">RequestSubscriptionForModID</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ID</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">RequestSubscriptionForModID</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ID</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">IncludeDependencies</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <hr>
@@ -14048,6 +13866,11 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioObjectVisibilityFlags">EModioObjectVisibilityFlags</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Enum parameter to signal the backend if the mod to upload would be publicly visible.   Default value is Public</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#bool">bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Dependencies</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">If this mod has any dependencies</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
@@ -15008,6 +14831,11 @@ This class is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioQueuedFilterType">EModioQueuedFilterType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">QueuedField</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioEnabledFilterType">EModioEnabledFilterType</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EnabledFilter</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -15221,10 +15049,6 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocommonsearchparamssettings">ModioCommonSearchParamsSettings</h3>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_modiocommonstoragespacetrackerparamssettings">ModioCommonStorageSpaceTrackerParamsSettings</h3>
 <hr>
 </div>
 <div class="sect2">
@@ -19111,8 +18935,33 @@ return empty string if you are not on Windows</p></td>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_emodioinstalledfiltertype"><a id="EModioInstalledFilterType"></a> EModioInstalledFilterType</h3>
+<h3 id="_emodioqueuedfiltertype"><a id="EModioQueuedFilterType"></a> EModioQueuedFilterType</h3>
 <h4 id="_values_34" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Queued</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NotQueued</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodioinstalledfiltertype"><a id="EModioInstalledFilterType"></a> EModioInstalledFilterType</h3>
+<h4 id="_values_35" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19137,7 +18986,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div class="sect2">
 <h3 id="_emodiomanualsorttype"><a id="EModioManualSortType"></a> EModioManualSortType</h3>
-<h4 id="_values_35" class="discrete">Values</h4>
+<h4 id="_values_36" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19166,7 +19015,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div class="sect2">
 <h3 id="_emodiocommondialogbuttontype"><a id="EModioCommonDialogButtonType"></a> EModioCommonDialogButtonType</h3>
-<h4 id="_values_36" class="discrete">Values</h4>
+<h4 id="_values_37" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19199,7 +19048,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div class="sect2">
 <h3 id="_emodiocommonsearchviewtype"><a id="EModioCommonSearchViewType"></a> EModioCommonSearchViewType</h3>
-<h4 id="_values_37" class="discrete">Values</h4>
+<h4 id="_values_38" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19220,7 +19069,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div class="sect2">
 <h3 id="_emodiocommonrichtextstyletextimageorder"><a id="EModioCommonRichTextStyleTextImageOrder"></a> EModioCommonRichTextStyleTextImageOrder</h3>
-<h4 id="_values_38" class="discrete">Values</h4>
+<h4 id="_values_39" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19243,7 +19092,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-04-03 15:25:25 +1100
+Last updated 2024-05-02 12:13:43 +1000
 </div>
 </div>
 </body>

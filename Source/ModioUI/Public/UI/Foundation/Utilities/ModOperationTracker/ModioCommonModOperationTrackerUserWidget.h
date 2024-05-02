@@ -123,6 +123,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mod Operation Tracker")
 	bool GetCurrentDownloadingMod(FModioModCollectionEntry& OutDownloadingMod);
 
+protected:
+	//~ Begin IModioUIUserChangedReceiver Interface
+	virtual void NativeUserChanged(TOptional<FModioUser> NewUser) override;
+	//~ End IModioUIUserChangedReceiver Interface
+
 	//~ Begin IModioUIModManagementEventReceiver Interface
 	virtual void NativeOnModManagementEvent(FModioModManagementEvent Event) override;
 	//~ End IModioUIModManagementEventReceiver Interface

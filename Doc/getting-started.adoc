@@ -11,8 +11,7 @@ image::img/plugin_window.png[]
 Once this is done, you can configure the plugin and get started.
 
 '''
-
-=== Configuration
+=== Plugin Configuration
 
 The plugin requires some configuration information to behave correctly. You can access the configuration settings in the Project Settings window:
 
@@ -22,28 +21,15 @@ The settings have the following parameters:
 
 [.stretch,stripes=odd,frame=none, cols="25%,~"]
 |===
-|[.paramname]#Game Id#|Your mod.io-provided Game Id for the target environment (Live, or Test)
-|[.paramname]#API Key#|Your mod.io-provided Game Id for the target environment (Live, or Test)
-|[.paramname]#Environment#|Your current environment, Live or Test (check difference below)
+|[.paramname]#Game Id#|Your mod.io-provided Game Id for the target environment
+|[.paramname]#API Key#|Your mod.io-provided API key for the target environment
+|[.paramname]#Environment#|Your current environment, Live or Test
 |[.paramname]#Log Level#|The default logging level to use. Messages with a lower log level will be silently discarded.
 |[.paramname]#Portal#|The default portal to use. This usually corresponds to the store your game will be being distributed through.
 |[.paramname]#Use Background Thread#|Run the mod.io plugin on a managed background thread.
-
 |===
 
-You can find your Game ID and API Key by going to the applicable mod.io environment, going to your Profile and selecting "API Access" from the navigation bar.
-
-==== Endpoint Environment
-
-The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.
-
-Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game's modding capabilities.
-
-In summary, here are the three steps:
-
-* Test Environment: Used for integration between your game and mod.io
-* Live Environment, Hidden: Used for quality assurance and pre-release mods
-* Live Environment, Public: It is open for everyone to see.
+NOTE: The Test environment is available for usage in limited circumstances. All games should be setup on the Live environment. If you require access to Test, please contact us.
 
 ==== Using background thread
 
@@ -52,6 +38,11 @@ The mod.io plugin can be run on a background thread. Rather than calling <<RunPe
 Calling methods from the ModioSubsystem will marshall all callbacks back to the game thread, and all other plugin call guarantees remain the same.
 
 '''
+
+=== Setting up your game
+
+Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game’s modding capabilities.
+
 
 === Plugin structure and concepts
 
@@ -189,7 +180,7 @@ For best performance it should be called at least once per frame, so it should e
 
 image::img/run_pending_handlers.png[]
 
-When you are ready to initialize the plugin for the current user, you'll need to call <<K2_InitializeAsync>>, passing in an instance of `FModioInitializeOptions`, and a delegate so you know when the plugin is initialized correctly. 
+When you are ready to initialize the plugin for the current user, you'll need to call <<K2_InitializeAsync>>, passing in an instance of `FModioInitializeOptions`, and a delegate so you know when the plugin is initialized correctly. Here, you can specify your Game ID, API Key, Environment, and https://docs.mod.io/#targeting-a-portal[Portal]. You can get the default portal for the current platform using <<GetDefaultPortalForCurrentPlatform>> function.
 
 image::img/initasync_customoptions.png[]
 
@@ -377,14 +368,16 @@ Once this completes successfully, the user is authenticated and you can then man
 
 mod.io features single sign on authentication from a number of external providers. This currently includes:
 
-    * Xbox Live
-    * Steam
+    * Apple
+    * Discord
+    * Epic Games Store
     * GoG
+    * Google
     * itch.io
     * Nintendo Switch
-    * Discord
     * PlayStation Network (PSN)
-    * Epic Games
+    * Steam
+    * Xbox Live
     * OpenID
 
 Please note that the ability to authenticate players using OpenID is feature for advanced partners only. If you are interested in becoming an advanced partner, please contact developers@mod.io
@@ -393,9 +386,9 @@ To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in ord
 
 This means the external authentication flow is the following:
 
-    1. Call <<K2_AuthenticateUserExternalAsync>> , passing in any provider-specific parameters, setting `AuthenticationParams::bUserHasAcceptedTerms` to false, and indicating which authentication provider you wish to use
-    2. Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call <<K2_GetTermsOfUseAsync>> and display the provided information to your user
-    3. If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting `AuthenticationParams::bUserHasAcceptedTerms` to *true*
+    1. Call <<K2_AuthenticateUserExternalAsync>> , passing in any provider-specific parameters, setting `AuthenticationParams::bUserHasAcceptedTerms` to false, and indicating which authentication provider you wish to use. You could use the <<UModioPlatformHelpersLibrary::GetDefaultAuthProviderForCurrentPlatform>> to get the default provider for the current platform, which is, for example, Steam for Windows. Alternatively, you can specify the provider manually.
+    2. Check the error code in the callback - if it indicates the user has not yet created an account or accepted the terms, call <<K2_GetTermsOfUseAsync>> and display the provided information to your user.
+    3. If the user clicks the OK/affirmative button on your screen displaying the terms of use, repeat the call in step 1 but setting `AuthenticationParams::bUserHasAcceptedTerms` to *true*.
     4. Check the error code in the callback - a false-y error code indicates that authentication was successful, and users can now install and manage mods and subscriptions.
 
 Here's what steps 1 and 2 might look like in Blueprint:
@@ -510,15 +503,20 @@ So you've shown the user some mods based on a query they've submitted through yo
 ==== Mod subscriptions
 
 A user indicates that they want to have a mod installed by 'subscribing' to it. Subscriptions are stored on the mod.io servers and associated to a user's mod.io account. 
+When a user 'unsubscribes' to a mod, they're indicating they'd like to have that mod uninstalled from any device they're logged in on.
 
-When a user 'unsubscribes' to a mod, they're indicating they'd like to have that mod uninstalled from any device they're logged in on. 
+The API for managing subscriptions is simple and consists of a call to either <<SubscribeToModAsync>> or <<UnsubscribeFromModAsync>> with the ID of the mod in question and a callback to receive the status of the request:
+
+NOTE: To subscribe to a mod, <<EnableModManagement>> must be called beforehand.
+
+When subscribing to a mod, you can also pass in a bool to indicate if you want to subscribe to all dependencies for the given mod. If dependencies are also subscribed, the mod.io servers will also associate them with the current user.
+
+NOTE: Currently when dependencies are included during subscription, they will not automatically be downloaded. To ensure the latest content is downloaded, <<FetchExternalUpdatesAsync>> must be called after subscribing.
+
 
 .Blueprint Example
 [%collapsible]
 ====
-
-
-The API for managing subscriptions is simple and consists of a call to either <<K2_SubscribeToModAsync>> or <<K2_UnsubscribeFromModAsync>> with the ID of the mod in question and a delegate to receive the status of the request:
 
 image::img/subscribe_to_mod.png[]
 
@@ -533,11 +531,11 @@ image::img/unsubscribe_from_mod.png[]
 [source,c++]
 ----
 
-void UModioManager::SubscribeToMod(FModioModID ModId)
+void UModioManager::SubscribeToMod(FModioModID ModToSubscribeTo, bool IncludeDependencies)
 {
 	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
-		GEngine->GetEngineSubsystem<UModioSubsystem>()->SubscribeToModAsync(ModId, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::OnSubscribeToModCallback, ModId));
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->SubscribeToModAsync(ModId, IncludeDependencies, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::OnSubscribeToModCallback, ModId));
 	}
 }
 
@@ -561,9 +559,6 @@ void UModioManager::OnUnsubscribeFromModCallback(FModioErrorCode ErrorCode, FMod
 
 ----
 ====
-
-
-Note that in order for a user to be able to subscribe or unsubscribe from mods, mod management has to be enabled.
 
 
 ===== External subscription changes

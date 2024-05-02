@@ -86,6 +86,13 @@ bool UModioCommonModOperationTrackerUserWidget::GetCurrentDownloadingMod(FModioM
 	return false;
 }
 
+void UModioCommonModOperationTrackerUserWidget::NativeUserChanged(TOptional<FModioUser> NewUser)
+{
+	IModioUIUserChangedReceiver::NativeUserChanged(NewUser);
+	UpdateQueuedOperationNumber();
+	SynchronizeProperties();
+}
+
 void UModioCommonModOperationTrackerUserWidget::NativeOnModManagementEvent(FModioModManagementEvent Event)
 {
 	IModioUIModManagementEventReceiver::NativeOnModManagementEvent(Event);

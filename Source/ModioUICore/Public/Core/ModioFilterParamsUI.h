@@ -47,6 +47,14 @@ enum class EModioEnabledFilterType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EModioQueuedFilterType : uint8
+{
+	None,
+	Queued,
+	NotQueued,
+};
+
+UENUM(BlueprintType)
 enum class EModioInstalledFilterType : uint8
 {
 	None,
@@ -108,6 +116,9 @@ struct MODIOUICORE_API FModioModCategoryParams
 	EModioInstalledFilterType InstalledField = EModioInstalledFilterType::None;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom")
+	EModioQueuedFilterType QueuedField = EModioQueuedFilterType::None;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom")
 	EModioEnabledFilterType EnabledFilter = EModioEnabledFilterType::None;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom")
@@ -123,6 +134,7 @@ struct MODIOUICORE_API FModioModCategoryParams
 			   Count == Other.Count &&
 			   SearchKeywords == Other.SearchKeywords &&
 			   InstalledField == Other.InstalledField &&
+			   QueuedField == Other.QueuedField &&
 			   EnabledFilter == Other.EnabledFilter &&
 			   ManualSortField == Other.ManualSortField;
 	}
@@ -177,6 +189,11 @@ struct MODIOUICORE_API FModioModCategoryParams
 		}
 
 		if (InstalledField != Other.InstalledField)
+		{
+			++NumOfDifferences;
+		}
+
+		if (QueuedField != Other.QueuedField)
 		{
 			++NumOfDifferences;
 		}

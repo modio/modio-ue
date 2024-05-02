@@ -59,7 +59,8 @@ void UModioCommonCollectionView::UpdateMods_Implementation()
 	TArray<FModioModCollectionEntry> QueuedEntries = QueuedDownloadingEntries;
 	QueuedEntries.RemoveAll([](const FModioModCollectionEntry& Entry) {
 		return Entry.GetModState() != EModioModState::UpdatePending
-			   && Entry.GetModState() != EModioModState::InstallationPending;
+		       && Entry.GetModState() != EModioModState::InstallationPending
+		       && Entry.GetModState() != EModioModState::UninstallPending;
 	});
 
 	TArray<FModioModCollectionEntry> DownloadingEntries = QueuedDownloadingEntries;
@@ -490,6 +491,22 @@ void UModioCommonCollectionView::ApplySortingAndFiltering(TArray<FModioModCollec
 			else if (!bRemove && FilterParams.InstalledField == EModioInstalledFilterType::AnotherUser)
 			{
 				bRemove |= UserSubscriptions.Contains(Entry.GetID());
+			}
+		}
+
+		if (!bRemove && FilterParams.QueuedField != EModioQueuedFilterType::None)
+		{
+			if (!bRemove && FilterParams.QueuedField == EModioQueuedFilterType::Queued)
+			{
+				bRemove |= Entry.GetModState() != EModioModState::UpdatePending
+					&& Entry.GetModState() != EModioModState::InstallationPending
+					&& Entry.GetModState() != EModioModState::UninstallPending;
+			}
+			else if (!bRemove && FilterParams.QueuedField == EModioQueuedFilterType::NotQueued)
+			{
+				bRemove |= Entry.GetModState() == EModioModState::UpdatePending
+					|| Entry.GetModState() == EModioModState::InstallationPending
+					|| Entry.GetModState() == EModioModState::UninstallPending;
 			}
 		}
 

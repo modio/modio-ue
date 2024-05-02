@@ -324,6 +324,11 @@ void UModioCommonModDetailsView::NativeOnInitialized()
 		HideProgress();
 	}
 
+	if (Execute_IsModInQueue(this))
+	{
+		ShowStatus();
+	}
+
 	if (ErrorWithRetryWidget)
 	{
 		ErrorWithRetryWidget->RetryClickedDelegate.AddWeakLambda(this, [this]() {
@@ -740,7 +745,7 @@ void UModioCommonModDetailsView::NativeOnSetDataSource()
 	else
 	{
 		HideProgress();
-		if (Execute_IsModSubscribed(this)) 
+		if (Execute_IsModSubscribed(this) || Execute_IsModInQueue(this))
 		{
 			ShowStatus();
 		}

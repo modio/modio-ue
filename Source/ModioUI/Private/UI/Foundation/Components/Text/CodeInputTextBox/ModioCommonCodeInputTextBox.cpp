@@ -238,17 +238,6 @@ FString SModioCommonCodeInputTextBox::GetCodeString() const
 void SModioCommonCodeInputTextBox::SetCodeString(const FString& NewCodeString)
 {
 	OnInputTextChanged(FText::FromString(NewCodeString));
-	for (int32 Index = 0; Index < GetNumOfCharacters(); ++Index)
-	{
-		if (CharacterWidgets.IsValidIndex(Index) && CharacterWidgets[Index])
-		{
-			CharacterWidgets[Index]->SetText(GetCharacterAtIndex(Index));
-		}
-		else
-		{
-			UE_LOG(ModioUI, Error, TEXT("Unable to set code string '%s' in SModioCommonCodeInputTextBox: CharacterWidgets[%d] is not valid"), *NewCodeString, Index);
-		}
-	}
 }
 
 void UModioCommonCodeInputTextBox::SetStyle(TSubclassOf<UModioCommonCodeInputTextBoxStyle> InStyle)

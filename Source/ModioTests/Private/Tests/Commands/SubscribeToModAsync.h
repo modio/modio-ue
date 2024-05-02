@@ -16,19 +16,20 @@
 class FModioSubscribeToModAsyncCommand : public FModioTestLatentCommandBaseExpectedResult
 {
 	FModioModID ModID;
+	bool IncludeDependencies;
 
 public:
-	FModioSubscribeToModAsyncCommand(FAutomationTestBase* AssociatedTest, FModioModID ModID,
+	FModioSubscribeToModAsyncCommand(FAutomationTestBase* AssociatedTest, FModioModID ModID, bool IncludeDependencies,
 									 EModioErrorCondition ExpectedResult)
 		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, ExpectedResult),
-		  ModID(ModID)
+		  ModID(ModID), IncludeDependencies(IncludeDependencies)
 	{}
 
 	using FModioTestLatentCommandBase::Update;
 	virtual void Start() override
 	{
 		Modio->SubscribeToModAsync(
-			ModID, FOnErrorOnlyDelegateFast::CreateSP(this, &FModioSubscribeToModAsyncCommand::Callback));
+			ModID, IncludeDependencies, FOnErrorOnlyDelegateFast::CreateSP(this, &FModioSubscribeToModAsyncCommand::Callback));
 	}
 	void Callback(FModioErrorCode ec)
 	{

@@ -28,6 +28,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FModioAddNewSubTestNoInit, "Modio.Subscription.
 bool FModioAddNewSubTestNoInit::RunTest(const FString& Parameters)
 {
 	ADD_LATENT_AUTOMATION_COMMAND(FModioSubscribeToModAsyncCommand(this, UModioTestsFunctionLibrary::GetTestModID(),
+																   false,
 																   EModioErrorCondition::SDKNotInitialized));
 
 	return true;
@@ -45,6 +46,7 @@ bool FModioAddNewSubTest::RunTest(const FString& Parameters)
 		this, FOnModManagementDelegateFast::CreateLambda([](FModioModManagementEvent Event) {})));
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioSubscribeToModAsyncCommand(this, UModioTestsFunctionLibrary::GetTestModID(),
+																   false,
 																   EModioErrorCondition::NoError));
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));
@@ -88,9 +90,11 @@ bool FModioDuplicateSubTest::RunTest(const FString& Parameters)
 	ADD_LATENT_AUTOMATION_COMMAND(FModioEnableModManagementCommand(
 		this, FOnModManagementDelegateFast::CreateLambda([](FModioModManagementEvent Event) {})));
 	ADD_LATENT_AUTOMATION_COMMAND(FModioSubscribeToModAsyncCommand(this, UModioTestsFunctionLibrary::GetTestModID(),
+																   false,
 																   EModioErrorCondition::NoError));
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioSubscribeToModAsyncCommand(this, UModioTestsFunctionLibrary::GetTestModID(),
+																   false,
 																   EModioErrorCondition::NoError));
 
 	ADD_LATENT_AUTOMATION_COMMAND(FModioShutdownAsyncCommand(this));

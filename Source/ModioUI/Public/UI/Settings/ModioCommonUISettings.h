@@ -23,7 +23,6 @@
 #include "Params/ModioCommonQuickAccessParams.h"
 #include "Params/ModioCommonReportParams.h"
 #include "Params/ModioCommonSearchParams.h"
-#include "Params/ModioCommonStorageSpaceTrackerParams.h"
 #include "Params/ModioCommonUserProfileWidgetParams.h"
 #include "UI/Settings/ModioCommonDefines.h"
 
@@ -101,9 +100,6 @@ public:
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|Search")
 	FModioCommonSearchParamsSettings SearchParams;
-
-	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|StorageSpaceTracker")
-	FModioCommonStorageSpaceTrackerParamsSettings StorageSpaceTrackerParams;
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Settings|UserProfile")
 	FModioCommonUserProfileWidgetParamsSettings UserProfileParams;

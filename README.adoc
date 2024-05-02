@@ -8,7 +8,7 @@ image:https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=d
 image:https://img.shields.io/badge/docs-master-green.svg[alt="Master Docs", link="https://go.mod.io/ue-docs"]
 image:https://img.shields.io/badge/Unreal-4.26%2B-dea309[alt="Unreal Engine", link="https://www.unrealengine.com"]
 
-Welcome to the mod.io Unreal Engine plugin repository. It allows game developers to host and automatically install user-created mods in their games which use *UE 4.26*, *UE 5.0* or newer. It provides a UI for mod discovery, installation and collection management, and a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API]. We have a https://test.mod.io[test environment] available, and developers can create a game profile there to evaluate the plugin with. 
+Welcome to the mod.io Unreal Engine plugin repository. It allows game developers to host and automatically install user-created mods in their Unreal Engine games. It provides a UI for mod discovery, installation and collection management, and a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API].
 
 ++++
 <!--- <p align="center"><a href="https://www.unrealengine.com/marketplace/en-US/slug/mod-browser-manager"><img src="https://image.mod.io/members/c4ca/1/profileguides/unreal.png" alt="unreal" width="380" height="133"></a></p> --->
@@ -32,7 +32,7 @@ The mod.io plugin is generally maintained to support the 3 most recent versions 
 
 ### Platform compatability
 
-The mod.io plugin supports Windows, Linux, iOS and Mac as part of the public release.
+The mod.io plugin supports Windows, Linux, Mac, iOS and Android as part of the public release.
 
 For access to Windows (GDK), XBox, Playstation 4, Playstation 5 or Switch, please <<contact-us,(Contact Us)>>.
 
@@ -83,35 +83,19 @@ The settings have the following parameters:
 
 [.stretch,stripes=odd,frame=none, cols="25%,~"]
 |===
-|[.paramname]#Game Id#|Your mod.io-provided Game Id for the target environment (Live, or Test)
-|[.paramname]#API Key#|Your mod.io-provided API key for the target environment (Live, or Test)
-|[.paramname]#Environment#|Your current environment, Live or Test (check difference below)
+|[.paramname]#Game Id#|Your mod.io-provided Game Id for the target environment
+|[.paramname]#API Key#|Your mod.io-provided API key for the target environment
+|[.paramname]#Environment#|Your current environment, Live or Test
 |[.paramname]#Log Level#|The default logging level to use. Messages with a lower log level will be silently discarded.
 |[.paramname]#Portal#|The default portal to use. This usually corresponds to the store your game will be being distributed through.
 |[.paramname]#Use Background Thread#|Run the mod.io plugin on a managed background thread.
 |===
 
-==== Endpoint Environment
+NOTE: The Test environment is available for usage in limited circumstances. All games should be setup on the Live environment. If you require access to Test, please contact us.
 
-The mod.io plugin can connect to different endpoint environments depending on the development stage your game is in. The 'test' environment is intended for use by developers while they perform initial integration of mod.io into their title.
+=== Setting up your game
 
-Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game's modding capabilities.
-
-In summary, here are the three steps:
-
-* Test Environment: Used for integration between your game and mod.io
-* Live Environment, Hidden: Used for quality assurance and pre-release mods
-* Live Environment, Public: It is open for everyone to see.
-
-== Setting up the Browser UI
-If you do not wish to create your own UI implementation you can use our default UI that comes built in to the plugin.
-
-* For UE 4, examples of how the UI looks are provided below, which can be themed by changing the colors.
-* For UE 5, a modular UI framework using Common UI is currently being developed.
-
-image::Doc/img/promo-plugin-ui.png[]
-
-image::Doc/img/promo-plugin-ui-collection.png[]
+Before release, you will be able to setup a "hidden" Live environment that will allow you to perform QA against the production environment before release, without exposing your title to the public. At this stage, only selected accounts are able to see your game page, and mods that are uploaded for your title. Once you are ready, you can change the state from "hidden" to "public" to make a full release of your game’s modding capabilities.
 
 == Further reading
 
@@ -125,7 +109,7 @@ To begin using the Plugin, either from Blueprint or from C++, please read our ht
 
 === User Interface
 
-The plugin ships with a fully functional UI, featuring mod browsing, searching and collection management. If you want to use the UI in the game, you can read the link:Doc/ui-documentation.adoc[UI Documentation]
+The plugin ships with a fully functional UI, featuring mod browsing, searching and collection management. If you want to use the UI in the game, you can read the link:Doc/ui5-documentation.adoc[UI Documentation]
 
 === Profiling
 
@@ -133,9 +117,7 @@ The mod.io SDK ships with some profiling features that are integrated into Unrea
 
 === Sample Projects
 
-A UE4.26 and UE4.27-compatible sample is available at link:https://go.mod.io/ue-samples[this location].
-
-For UE5.0 and 5.1, you can find a sample project at link:https://go.mod.io/ue5-sample[this location].
+You can find a sample project demonstrating basic mod.io functionality link:https://go.mod.io/ue5-sample[here].
 
 == Game studios and Publishers [[contact-us]]
 

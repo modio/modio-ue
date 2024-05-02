@@ -184,7 +184,7 @@ public:
 									   FOnErrorOnlyDelegateFast DedicatedCallback);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
-	void RequestSubscriptionForModID(FModioModID ID);
+	void RequestSubscriptionForModID(FModioModID ID, bool IncludeDependencies = false);
 
 	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
 	void RequestRemoveSubscriptionForModID(FModioModID ID);

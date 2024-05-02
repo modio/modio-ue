@@ -13,6 +13,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "Styling/SlateTypes.h"	
+#include "Styling/CoreStyle.h"
 #include "ModioCommonCodeInputTextBoxStyle.generated.h"
 
 /**
@@ -23,6 +24,36 @@ USTRUCT(BlueprintType)
 struct MODIOUI_API FModioCommonCodeInputTextBoxInputStyle : public FTextBlockStyle
 {
 	GENERATED_BODY()
+	
+	FModioCommonCodeInputTextBoxInputStyle()
+	{
+		SetFont(FCoreStyle::GetDefaultFontStyle("Bold", 18));
+		SetColorAndOpacity(FLinearColor::White);
+		SetShadowOffset(FVector2D(1, 1));
+		SetShadowColorAndOpacity(FLinearColor::Transparent);
+		TransformPolicy = ETextTransformPolicy::None;
+
+		UObject* UnderlineMaterial = FSoftObjectPath(TEXT("/Modio/UI5/Default/Materials/M_UI_Underline.M_UI_Underline")).TryLoad();
+		UObject* FakeKaretMaterial = FSoftObjectPath(TEXT("/Modio/UI5/Default/Materials/M_UI_FakeCaret.M_UI_FakeCaret")).TryLoad();
+	
+		if (UnderlineMaterial)
+		{
+			CharacterBorderBrushBase.SetResourceObject(UnderlineMaterial);
+			CharacterBorderBrushFocused.SetResourceObject(UnderlineMaterial);
+		}
+
+		if (FakeKaretMaterial)
+		{
+			FakeCaretBrush.SetResourceObject(FakeKaretMaterial);
+		}
+
+		CharacterBorderBrushBase.TintColor = FLinearColor::White;
+		CharacterBorderBrushFocused.TintColor = FLinearColor::Blue;
+		FakeCaretBrush.TintColor = FLinearColor::Blue;
+
+		CharacterPadding = FMargin(0, 0, 0, 8);
+		CharacterSpacing = FMargin(6, 0, 6, -16);
+	}
 
 	/**
 	 * Brush to use for the box around each character element, when not focused

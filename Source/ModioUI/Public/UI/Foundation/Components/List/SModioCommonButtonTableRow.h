@@ -56,7 +56,7 @@ public:
 		TSharedPtr<ITypedTableView<ItemType>> OwnerTable = this->OwnerTablePtr.Pin();
 		if (OwnerTable.IsValid())
 		{
-			if (const ItemType* MyItemPtr = OwnerTable->Private_ItemFromWidget(this))
+			if (OwnerTable->Private_ItemFromWidget(this))
 			{
 				return true;
 			}

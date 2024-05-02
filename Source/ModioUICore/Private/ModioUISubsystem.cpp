@@ -206,7 +206,7 @@ void UModioUISubsystem::RequestExternalAuthentication(EModioAuthenticationProvid
 	}
 }
 
-void UModioUISubsystem::RequestSubscriptionForModID(FModioModID ID)
+void UModioUISubsystem::RequestSubscriptionForModID(FModioModID ID, bool IncludeDependencies)
 {
 	if (UModioSubsystem* ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
@@ -224,7 +224,7 @@ void UModioUISubsystem::RequestSubscriptionForModID(FModioModID ID)
 	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
 	{
 		Subsystem->SubscribeToModAsync(
-			ID, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioUISubsystem::SubscriptionHandler, ID));
+			ID, IncludeDependencies, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioUISubsystem::SubscriptionHandler, ID));
 	}
 }
 

@@ -263,5 +263,5 @@ private:
 	bool bObtainedModImage = false;
 
 	/** Deselection timer used to reduce flickering between focus changing */
-	FTimerHandle DelesectTimerHandle;
+	FTimerHandle DeselectTimerHandle;
 };

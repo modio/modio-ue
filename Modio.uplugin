@@ -51,7 +51,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"PlatformAllowList": [
-				"Linux"
+				"Linux",
+				"Android"
 			]
 		},
 		{

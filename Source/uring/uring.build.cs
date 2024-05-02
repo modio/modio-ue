@@ -23,57 +23,53 @@ public class uring : ModuleRules
 {
 	public uring(ReadOnlyTargetRules Target) : base(Target)
 	{
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        string GeneratedSourcePath = Path.Combine(ModuleDirectory, "Private", "GeneratedSource");
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine" });
-        PublicIncludePaths.AddRange(new string[] {Path.Combine(ModuleDirectory, "Public"), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src/include")});
-		PrivateIncludePaths.AddRange(new string[] {Path.Combine(GeneratedSourcePath), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src")});
-        PrivateDefinitions.Add("LIBURING_INTERNAL=1");
-        if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")) || Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")))
-        {
-            // Clean the generated source directory
-            if (Directory.Exists(GeneratedSourcePath))
-            {
-                Directory.Delete(GeneratedSourcePath, true);
-            }
-            Directory.CreateDirectory(GeneratedSourcePath); 
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-            {
-                List<string> CFiles = new List<string>(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src"), "*.c", SearchOption.AllDirectories));
+		string GeneratedSourcePath = Path.Combine(ModuleDirectory, "../ThirdParty", "GeneratedUringSource");
 
-                foreach (string CFile in CFiles)
-                {
-                    //Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
-                    ExternalDependencies.Add(CFile);
-                    string DestinationPath = Path.Combine(GeneratedSourcePath, Path.GetFileName(CFile));
-                    File.Copy(CFile, DestinationPath, true);
-                }
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine" });
+		PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Public"), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src/include") });
+		PrivateIncludePaths.AddRange(new string[] { Path.Combine(GeneratedSourcePath), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src") });
+		PrivateDefinitions.Add("LIBURING_INTERNAL=1");
+		if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")) || Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")))
+		{
+			string OldGeneratedSourcePath = Path.Combine(ModuleDirectory, "Private", "GeneratedSource");
 
-                if (File.Exists(Path.Combine(GeneratedSourcePath,"nolibc.c")))
-                {
-                    File.Delete(Path.Combine(GeneratedSourcePath, "nolibc.c"));
-                }
+			// Delete the old Generated Source path if its present, as it may conflict with the new way we add GeneratedSource for this module
+			if (Directory.Exists(OldGeneratedSourcePath))
+			{
+				Directory.Delete(OldGeneratedSourcePath, true);
+			}
 
-                if (Target.bBuildEditor == true)
-                {
-                    DirectoryReference[] Directories = GetAllModuleDirectories();
-#if !UE_5_0_OR_LATER
-                    DirectoryReference DirRef = new Tools.DotNETCommon.DirectoryReference(GeneratedSourcePath);
-#else
-                    DirectoryReference DirRef = new EpicGames.Core.DirectoryReference(GeneratedSourcePath);
-#endif //!UE_5_0_OR_LATER
-                    int Position = Array.IndexOf(Directories, DirRef);
-                    if (Position < 0)
-                    {
-                        // This line makes sure that the UAT UE4Editor build does not skip the files inside and that native
-                        // Linux compilation works, to avoid any "liker errors". UE4Game does not complain about linking.
-                        ConditionalAddModuleDirectory(DirRef);
-                    }
-                }
+			// Set up the new GeneratedSourcePath. This folder sits outside the module directory so we can use
+			// ConditionalAddModuleDirectory. Relying on UBT to pull in files that we have copied via this script
+			// is unreliable and causes intermittent build issues.
+			if (Directory.Exists(GeneratedSourcePath))
+			{
+				Directory.Delete(GeneratedSourcePath, true);
+			}
 
-            }
-            {
-                string CompatHeader = @"/* SPDX-License-Identifier: MIT */
+			Directory.CreateDirectory(GeneratedSourcePath);
+
+			List<string> CFiles = new List<string>(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src"), "*.c", SearchOption.AllDirectories));
+
+			foreach (string CFile in CFiles)
+			{
+				//Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
+				ExternalDependencies.Add(CFile);
+				string DestinationPath = Path.Combine(GeneratedSourcePath, Path.GetFileName(CFile));
+				File.Copy(CFile, DestinationPath, true);
+			}
+
+			if (File.Exists(Path.Combine(GeneratedSourcePath, "nolibc.c")))
+			{
+				File.Delete(Path.Combine(GeneratedSourcePath, "nolibc.c"));
+			}
+
+			ConditionalAddModuleDirectory(new DirectoryReference(GeneratedSourcePath));
+
+			{
+				string CompatHeader = @"/* SPDX-License-Identifier: MIT */
 #ifndef LIBURING_COMPAT_H
 #define LIBURING_COMPAT_H
 
@@ -101,10 +97,10 @@ struct __kernel_timespec
 
 #endif
 ";
-                string CompatHeaderPath = Path.Combine(ModuleDirectory, "Public", "liburing");
-                Directory.CreateDirectory(CompatHeaderPath);
-                File.WriteAllText(Path.Combine(CompatHeaderPath, "compat.h"), CompatHeader);
-            }
-        }
-    }
+				string CompatHeaderPath = Path.Combine(ModuleDirectory, "Public", "liburing");
+				Directory.CreateDirectory(CompatHeaderPath);
+				File.WriteAllText(Path.Combine(CompatHeaderPath, "compat.h"), CompatHeader);
+			}
+		}
+	}
 }

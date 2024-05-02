@@ -54,6 +54,13 @@ const TMap<EModioInstalledFilterType, FText> InstalledFilterFieldMap = []() {
 	return InternalInstalledFilterFieldMap;
 }();
 
+const TMap<EModioQueuedFilterType, FText> QueuedFieldMap = []() {
+	TMap<EModioQueuedFilterType, FText> InternalQueuedFieldMap;
+	InternalQueuedFieldMap.Add(EModioQueuedFilterType::Queued, NSLOCTEXT("Modio", "Queued", "Queued"));
+	InternalQueuedFieldMap.Add(EModioQueuedFilterType::NotQueued, NSLOCTEXT("Modio", "NotQueued", "Not Queued"));
+	return InternalQueuedFieldMap;
+}();
+
 const FModioModTagInfo SortFieldAndSortDirectionTagInfo = []() {
 	FModioModTagInfo InternalSortFieldAndSortDirectionTagInfo;
 	InternalSortFieldAndSortDirectionTagInfo.bAllowMultipleSelection = false;
@@ -96,6 +103,17 @@ const FModioModTagInfo InstalledByCurrentAndAnotherUserTagInfo = []() {
 		InternalInstalledByCurrentAndAnotherUserTagInfo.TagGroupValues.Add(SortField.Value.ToString());
 	}
 	return InternalInstalledByCurrentAndAnotherUserTagInfo;
+}();
+
+const FModioModTagInfo QueuedTagInfo = []() {
+	FModioModTagInfo InternalQueuedTagInfo;
+	InternalQueuedTagInfo.bAllowMultipleSelection = false;
+	InternalQueuedTagInfo.TagGroupName = NSLOCTEXT("Modio", "QueuedTagGroupName", "Queued").ToString();
+	for (auto& QueuedField : QueuedFieldMap)
+	{
+		InternalQueuedTagInfo.TagGroupValues.Add(QueuedField.Value.ToString());
+	}
+	return InternalQueuedTagInfo;
 }();
 
 UModioCommonFilteringView::UModioCommonFilteringView()
@@ -181,6 +199,15 @@ FModioModCategoryParams UModioCommonFilteringView::GetFilterParamsWrapper_Implem
 			FilterParams.InstalledField = EModioInstalledFilterType::AnotherUser;
 		}
 
+		if (SelectedTagGroupValuesSet.Remove(QueuedFieldMap.FindChecked(EModioQueuedFilterType::Queued).ToString()) > 0)
+		{
+			FilterParams.QueuedField = EModioQueuedFilterType::Queued;
+		}
+		else if (SelectedTagGroupValuesSet.Remove(QueuedFieldMap.FindChecked(EModioQueuedFilterType::NotQueued).ToString()) > 0)
+		{
+			FilterParams.QueuedField = EModioQueuedFilterType::NotQueued;
+		}
+
 		for (auto& SortField : ManualSortFieldMap)
 		{
 			if (SelectedTagGroupValuesSet.Remove(SortField.Value.ToString()) > 0)
@@ -192,6 +219,10 @@ FModioModCategoryParams UModioCommonFilteringView::GetFilterParamsWrapper_Implem
 	}
 
 	FilterParams.Tags = SelectedTagGroupValuesSet.Array();
+	if (MaxNumOfTags > 0 && FilterParams.Tags.Num() > MaxNumOfTags)
+	{
+		FilterParams.Tags.RemoveAt(0, FilterParams.Tags.Num() - MaxNumOfTags);
+	}
 	return FilterParams;
 }
 
@@ -258,6 +289,11 @@ void UModioCommonFilteringView::SynchronizeFilterParams_Implementation(const TAr
 		if (FilterParams.InstalledField != EModioInstalledFilterType::None)
 		{
 			SetSelectedTagGroupValues({InstalledFilterFieldMap[FilterParams.InstalledField].ToString()}, true);
+		}
+
+		if (FilterParams.QueuedField != EModioQueuedFilterType::None)
+		{
+			SetSelectedTagGroupValues({QueuedFieldMap[FilterParams.QueuedField].ToString()}, true);
 		}
 
 		SetSelectedTagGroupValues({ManualSortFieldMap[FilterParams.ManualSortField].ToString()}, true);
@@ -349,6 +385,7 @@ void UModioCommonFilteringView::SynchronizeProperties()
 						UE_LOG(ModioUI, Error, TEXT("Unable to add enabled/disabled tag info to '%s' since modio UI subsystem is not available"), *GetName());
 					}
 					AddModTagInfo(InstalledByCurrentAndAnotherUserTagInfo);
+					AddModTagInfo(QueuedTagInfo);
 				}
 				if (!ErrorCode && Options.IsSet())
 				{
