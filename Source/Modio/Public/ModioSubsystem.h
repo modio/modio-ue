@@ -66,6 +66,10 @@ DECLARE_DELEGATE_TwoParams(FOnSubmitNewModDelegateFast, FModioErrorCode, TOption
 DECLARE_DELEGATE_TwoParams(FOnMuteUsersDelegateFast, FModioErrorCode, TOptional<FModioUserList>);
 DECLARE_DELEGATE_TwoParams(FOnListUserCreatedModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegateFast, FModioErrorCode, TOptional<FModioMapPreview>);
+DECLARE_DELEGATE_TwoParams(FOnPurchaseModDelegateFast, FModioErrorCode, TOptional<FModioTransactionRecord>)
+DECLARE_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegateFast, FModioErrorCode, TOptional<uint64_t>);
+DECLARE_DELEGATE_OneParam(FOnFetchUserPurchasesDelegateFast, FModioErrorCode);
+DECLARE_DELEGATE_TwoParams(FOnGetUserDerivedTokenDelegateFast, FModioErrorCode, FString);
 
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 
@@ -106,6 +110,14 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCo
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErrorCode, ErrorCode,
 								   FModioOptionalMapPreview, ModioPreviewMap);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPurchaseModDelegate, FModioErrorCode, ErrorCode, FModioOptionalTransactionRecord, Transaction);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegate, FModioErrorCode, ErrorCode, FModioOptionalUInt64, WalletBalance);
+
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnFetchUserPurchasesDelegate, FModioErrorCode, ErrorCode);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserDerivedTokenDelegate, FModioErrorCode, ErrorCode, FString, Token);
 
 class UModioSubsystem;
 
@@ -711,6 +723,65 @@ public:
 	 **/
 	MODIO_API void GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
 
+	/**
+	 * @docpublic
+	 * @brief Purchases a mod for the current player
+	 * @param ModID ID of the mod to purchase
+	 * @param ExpectedPrice The price the user is expected to pay for the mod, generally ModInfo.Price. This ensures that
+	 * there is consistency between the displayed price and the price in the backend. If there is a mismatch, the purchase will fail.
+	 * @param Callback Callback invoked with purchase information once the purchase is completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	MODIO_API void PurchaseModAsync(FModioModID ModID, uint64_t ExpectedPrice, FOnPurchaseModDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Gets the users current wallet balance. This will also create a wallet for a user if one does not exist.
+	 * You should ensure this is called prior to calling PurchaseModAsync
+	 * purchase will fail.
+	 * @param Callback Callback invoked with the users wallet balance
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	MODIO_API void GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Fetches the user's purchases. This populates a runtime cache of purchase information
+	 * that can be accessed using QueryUserPurchasedMods.
+	 * @param Callback Callback invoked once the call has been completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	MODIO_API void FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Get a UserDerivedToken that can be used for S2S service calls
+	 * @param Callback Callback invoked once the call has been completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	MODIO_API void GetUserDerivedTokenAsync(FOnGetUserDerivedTokenDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Returns the users purchased mods. You must call FetchUserPurchasesAsync to populate the cache/.
+	 * @return Map of FModioModID to FModioModInfo for all purchases a user has made.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	UFUNCTION(BlueprintPure, Category = "mod.io|Monetization")
+	MODIO_API TMap<FModioModID, FModioModInfo> QueryUserPurchasedMods();
+
+
+
 private:
 	TMap<EModioAvatarSize, FOnGetMediaMulticastDelegateFast> PendingUserMediaRequests;
 
@@ -853,6 +924,66 @@ public:
 	 * @return The default mod installation directory for the specified game on the current platform
 	 */
 	static MODIO_API FString GetDefaultModInstallationDirectory(int64 GameID);
+
+	/**
+	 * @brief Install every temp mod given in the param if they are not already subbed.
+	 * @param TArray of ModID to install as temp mod
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 */
+	MODIO_API FModioErrorCode InitTempModSet(TArray<FModioModID> ModIds);
+
+
+	/**
+	 * @brief  Add mods to a Temp Mod Set, install every temp mod given in the param if they are not already subbed.
+	 * @param TArray of ModID to install as temp mod
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @requires TempModSet initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 * @errorcategory TempModSetNotInitialize| TempModSet not initialized
+	 */
+	MODIO_API FModioErrorCode AddToTempModSet(TArray<FModioModID> ModIds);
+
+
+	/**
+	 * @brief  Remove mods from a Temp Mod Set, uninstall every temp mod given in the param if they are not already subbed.
+	 * @param TArray of ModID to install as temp mod
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @requires TempModSet initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 * @errorcategory TempModSetNotInitialize| TempModSet not initialized
+	 */
+	MODIO_API FModioErrorCode RemoveFromTempModSet(TArray<FModioModID> ModIds);
+
+
+	/**
+	 * @brief  Uninstall every temp mod.
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @requires TempModSet initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 * @errorcategory TempModSetNotInitialize| TempModSet not initialized
+	 */
+	MODIO_API FModioErrorCode CloseTempModSet();
+
+
+	/**
+	 * @brief	Query every System and Temp Mod in TempModSet
+	  * @return TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods 
+	 * in TempModSet
+	 */
+	MODIO_API TMap<FModioModID, FModioModCollectionEntry> QueryTempModSet();
 
 private:
 	TUniquePtr<struct FModioImageCache> ImageCache;
@@ -1449,6 +1580,120 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetDefaultModInstallationDirectory", Category = "mod.io|Mods")
 	static MODIO_API FString K2_GetDefaultModInstallationDirectory(FModioGameID GameID);
+
+	
+	/**
+	 * @brief Install every temp mod given in the param if they are not already subbed.
+	 * @param TArray of ModID to install as temp mod
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "InitTempModSet", Category = "mod.io|Mods")
+	MODIO_API FModioErrorCode K2_InitTempModSet(TArray<FModioModID> ModIds);
+
+	/**
+	 * @brief  Add mods to a Temp Mod Set, install every temp mod given in the param if they are not already subbed.
+	 * @param TArray of ModID to install as temp mod
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @requires TempModSet initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 * @errorcategory TempModSetNotInitialize| TempModSet not initialized
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "AddToTempModSet", Category = "mod.io|Mods")
+	MODIO_API FModioErrorCode K2_AddToTempModSet(TArray<FModioModID> ModIds);
+
+	/**
+	 * @brief  Remove mods from a Temp Mod Set, uninstall every temp mod given in the param if they are not already
+	 * subbed.
+	 * @param TArray of ModID to install as temp mod
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @requires TempModSet initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 * @errorcategory TempModSetNotInitialize| TempModSet not initialized
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "RemoveFromTempModSet", Category = "mod.io|Mods")
+	MODIO_API FModioErrorCode K2_RemoveFromTempModSet(TArray<FModioModID> ModIds);
+
+	/**
+	 * @brief  Uninstall every temp mod.
+	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
+	 * @requires initialized-sdk
+	 * @requires modmanagement enabled
+	 * @requires TempModSet initialized
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory ModManagementDisabled|ModManagement not enable
+	 * @errorcategory TempModSetNotInitialize| TempModSet not initialized
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "CloseTempModSet", Category = "mod.io|Mods")
+	MODIO_API FModioErrorCode K2_CloseTempModSet();
+
+	/**
+	 * @brief	Query every System and Temp Mod in TempModSet
+	 * @return TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods
+	 * in TempModSet
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "QueryTempModSet", Category = "mod.io|Mods")
+	MODIO_API TMap<FModioModID, FModioModCollectionEntry> K2_QueryTempModSet();
+
+	/**
+	 * @docpublic
+	 * @brief Purchases a mod for the current player
+	 * @param ModID ID of the mod to purchase
+	 * @param ExpectedPrice The price the user is expected to pay for the mod, generally ModInfo.Price. This ensures
+	 *that there is consistency between the displayed price and the price in the backend. If there is a mismatch, the
+	 *purchase will fail.
+	 * @param Callback Callback invoked with purchase information once the purchase is completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "PurchaseModAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_PurchaseModAsync(FModioModID ModID, int ExpectedPrice, FOnPurchaseModDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Get a User Derived Token that can be used for S2S service calls 
+	 * @param Callback Callback invoked with purchase information once the purchase is completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "GetUserDerivedTokenAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_GetUserDerivedTokenAsync(FOnGetUserDerivedTokenDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Gets the users current wallet balance. This will also create a wallet for a user if one does not exist.
+	 * You should ensure this is called prior to calling PurchaseModAsync
+	 * purchase will fail.
+	 * @param Callback Callback invoked with the users wallet balance
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "GetUserWalletBalanceAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Fetches the user's purchases. This populates a runtime cache of purchase information
+	 * that can be accessed using QueryUserPurchasedMods.
+	 * @param Callback Callback invoked once the call has been completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "FetchUserPurchasesAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegate Callback);
 
 #pragma endregion
 

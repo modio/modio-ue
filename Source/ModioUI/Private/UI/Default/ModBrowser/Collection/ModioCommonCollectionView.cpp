@@ -530,7 +530,7 @@ void UModioCommonCollectionView::ApplySortingAndFiltering(TArray<FModioModCollec
 			{
 				for (const FString& Tag : FilterParams.Tags)
 				{
-					if (!EntryTags.Contains(FModioModTag{Tag}))
+					if (!EntryTags.Contains(FModioModTag(Tag)))
 					{
 						bRemove = true;
 						break;

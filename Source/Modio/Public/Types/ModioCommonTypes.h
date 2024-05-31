@@ -53,7 +53,6 @@ enum class EModioPortal : uint8
 	PSN,
 	Steam,
 	XboxLive,
-	Android
 };
 
 /**
@@ -342,6 +341,21 @@ struct MODIO_API FModioOptionalModID
 	 **/
 	TOptional<FModioModID> Internal;
 };
+
+/**
+ * Strong type struct to wrap ModID as an optional value
+ **/
+USTRUCT(BlueprintType)
+struct MODIO_API FModioOptionalUInt64
+{
+	GENERATED_BODY()
+
+	/**
+	 * Stored optional uint64
+	 **/
+	TOptional<uint64_t> Internal;
+};
+
 
 /**
  * Strong type struct to wrap a GameID to uniquely identify a single game in mod.io

@@ -63,6 +63,29 @@ void UModioCommonExpandableArea::ReleaseSlateResources(bool bReleaseChildren)
 	CachedAppliedModioStyle = nullptr;
 }
 
+bool FindTextBlockInPanel(UPanelWidget* PanelWidget, UModioCommonTextBlock*& OutTextBlock)
+{
+	TArray<UWidget*> AllChildren = PanelWidget->GetAllChildren();
+	for (UWidget* Child : AllChildren)
+	{
+		if (UModioCommonTextBlock* TextBlock = Cast<UModioCommonTextBlock>(Child))
+		{
+			OutTextBlock = TextBlock;
+			return true;
+		}
+
+		if (UPanelWidget* ChildPanel = Cast<UPanelWidget>(Child))
+		{
+			if (FindTextBlockInPanel(ChildPanel, OutTextBlock))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 bool UModioCommonExpandableArea::GetAttachedLabelTextBlock(UModioCommonTextBlock*& AttachedTextBlock)
 {
 	// If the header content is directly a text block, use that
@@ -75,14 +98,8 @@ bool UModioCommonExpandableArea::GetAttachedLabelTextBlock(UModioCommonTextBlock
 	// If the header content is a panel, search for a text block in the children
 	if (UPanelWidget* PanelWidget = Cast<UPanelWidget>(HeaderContent))
 	{
-		TArray<UWidget*> AllChildren = PanelWidget->GetAllChildren();
-		UWidget** FoundWidgetPtr = Algo::FindByPredicate(AllChildren, [](const UWidget* Child) {
-			return Child && Child->IsA<UModioCommonTextBlock>();
-		});
-
-		if (FoundWidgetPtr)
+		if (FindTextBlockInPanel(PanelWidget, AttachedTextBlock))
 		{
-			AttachedTextBlock = Cast<UModioCommonTextBlock>(*FoundWidgetPtr);
 			return true;
 		}
 	}
@@ -143,6 +160,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 #endif
 
 		TSubclassOf<UModioCommonTextStyle> LabelTextStyle = bIsFocused ? StyleCDO->SelectedLabelTextStyle : StyleCDO->NormalLabelTextStyle;
+
 		if (LabelTextStyle && HeaderContent)
 		{
 			UModioCommonTextBlock* TextBlock;

@@ -742,4 +742,21 @@ bool UModioUISubsystem::IsUserAuthenticated()
 	return false;
 }
 
+void UModioUISubsystem::PrioritizeTransferForMod(FModioModID ModToPrioritize)
+{
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		FModioErrorCode ErrorCode = Subsystem->PrioritizeTransferForMod(ModToPrioritize);
+		Subsystem->GetModInfoAsync(
+			ModToPrioritize,
+			FOnGetModInfoDelegateFast::CreateWeakLambda(
+				this, [this](FModioErrorCode ErrorCode, TOptional<FModioModInfo> ModInfo) {
+					UModioModInfoUI* ModInfoObj = NewObject<UModioModInfoUI>();
+					ModInfoObj->Underlying = ModInfo.Get(FModioModInfo());
+					DisplayNotificationParams(
+						UModioNotificationParamsLibrary::CreatePrioritizeTransferForModNotification(ErrorCode, ModInfoObj));
+				}));
+	}
+}
+
 #include "Loc/EndModioLocNamespace.h"

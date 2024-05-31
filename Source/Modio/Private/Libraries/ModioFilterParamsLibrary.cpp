@@ -10,6 +10,16 @@
 
 #include "Libraries/ModioFilterParamsLibrary.h"
 
+FModioFilterParams& UModioFilterParamsLibrary::MatchingAuthor(FModioFilterParams& Filter, const FModioUserID& ID)
+{
+	return Filter.MatchingAuthor(ID);
+}
+
+FModioFilterParams& UModioFilterParamsLibrary::MatchingAuthors(FModioFilterParams& Filter, const TArray<FModioUserID>& IDs)
+{
+	return Filter.MatchingAuthors(IDs);
+}
+
 FModioFilterParams& UModioFilterParamsLibrary::SortBy(FModioFilterParams& Filter, EModioSortFieldType ByField,
 													  EModioSortDirection ByDirection)
 {

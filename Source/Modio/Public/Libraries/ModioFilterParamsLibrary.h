@@ -23,6 +23,22 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 	/**
+	 * @brief Only include mods with the specified author User ID
+	 * @param ID The User ID to filter on
+	 * @return *this
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
+	static FModioFilterParams& MatchingAuthor(UPARAM(ref) FModioFilterParams& Filter, const FModioUserID& ID);
+
+	/**
+	 * @brief Only include mods with the specified author User IDs
+	 * @param IDs The list of User IDs to filter on
+	 * @return *this
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
+	static FModioFilterParams& MatchingAuthors(UPARAM(ref) FModioFilterParams& Filter, const TArray<FModioUserID>& IDs);
+
+	/**
 	 * @brief Indicates the filter should only include the specified mods
 	 * @param IDs the set of mods to match
 	 * @return *this

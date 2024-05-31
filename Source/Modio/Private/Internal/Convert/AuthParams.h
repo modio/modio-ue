@@ -43,6 +43,10 @@ FORCEINLINE Modio::AuthenticationProvider ToModio(EModioAuthenticationProvider P
 			return Modio::AuthenticationProvider::Oculus;
 		case EModioAuthenticationProvider::OpenID:
 			return Modio::AuthenticationProvider::OpenID;
+		case EModioAuthenticationProvider::GoogleIDToken:
+			return Modio::AuthenticationProvider::GoogleIDToken;
+		case EModioAuthenticationProvider::GoogleServerSideToken:
+			return Modio::AuthenticationProvider::GoogleServerSideToken;
 	}
 
 	return Modio::AuthenticationProvider::Steam;

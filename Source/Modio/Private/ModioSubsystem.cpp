@@ -31,6 +31,7 @@
 #include "Internal/Convert/ModProgressInfo.h"
 #include "Internal/Convert/ModTagInfo.h"
 #include "Internal/Convert/ModTagOptions.h"
+#include "Internal/Convert/ModTagLocalization.h"
 #include "Internal/Convert/Rating.h"
 #include "Internal/Convert/ReportParams.h"
 #include "Internal/Convert/Terms.h"
@@ -1182,6 +1183,57 @@ FString UModioSubsystem::K2_GetDefaultModInstallationDirectory(FModioGameID Game
 	return GetDefaultModInstallationDirectory(GameID);
 }
 
+FModioErrorCode UModioSubsystem::InitTempModSet(TArray<FModioModID> ModIds)
+{
+	return Modio::InitTempModSet(ToModio(ModIds));
+}
+
+FModioErrorCode UModioSubsystem::AddToTempModSet(TArray<FModioModID> ModIds)
+{
+	return Modio::AddToTempModSet(ToModio(ModIds));
+}
+
+FModioErrorCode UModioSubsystem::RemoveFromTempModSet(TArray<FModioModID> ModIds)
+{
+	return Modio::RemoveFromTempModSet(ToModio(ModIds));
+}
+
+FModioErrorCode UModioSubsystem::CloseTempModSet()
+{
+	return Modio::CloseTempModSet();
+}
+
+TMap<FModioModID, FModioModCollectionEntry> UModioSubsystem::QueryTempModSet()
+{
+	return ToUnreal<FModioModID, FModioModCollectionEntry>(Modio::QueryTempModSet());
+}
+
+
+FModioErrorCode UModioSubsystem::K2_InitTempModSet(TArray<FModioModID> ModIds)
+{
+	return InitTempModSet(ModIds);
+}
+
+FModioErrorCode UModioSubsystem::K2_AddToTempModSet(TArray<FModioModID> ModIds)
+{
+	return AddToTempModSet(ModIds);
+}
+
+FModioErrorCode UModioSubsystem::K2_RemoveFromTempModSet(TArray<FModioModID> ModIds)
+{
+	return RemoveFromTempModSet(ModIds);
+}
+
+FModioErrorCode UModioSubsystem::K2_CloseTempModSet()
+{
+	return CloseTempModSet();
+}
+
+TMap<FModioModID, FModioModCollectionEntry> UModioSubsystem::K2_QueryTempModSet()
+{
+	return QueryTempModSet();
+}
+
 EModioLanguage UModioSubsystem::ConvertLanguageCodeToModio(FString LanguageCode)
 {
 	if (LanguageMap.Contains(LanguageCode))
@@ -1194,6 +1246,87 @@ EModioLanguage UModioSubsystem::ConvertLanguageCodeToModio(FString LanguageCode)
 			   *LanguageCode);
 		return EModioLanguage::English;
 	}
+}
+
+void UModioSubsystem::FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegateFast Callback)
+{
+	Modio::FetchUserPurchasesAsync([Callback](Modio::ErrorCode ec) {
+		AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ec); }));
+	});
+}
+
+void UModioSubsystem::K2_FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegate Callback)
+{
+	FetchUserPurchasesAsync(
+		FOnFetchUserPurchasesDelegateFast::CreateLambda([Callback](FModioErrorCode ec) {
+			Callback.ExecuteIfBound(ec);
+		}));
+}
+
+void UModioSubsystem::GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegateFast Callback)
+{
+	Modio::GetUserWalletBalanceAsync([Callback](Modio::ErrorCode ec, Modio::Optional<uint64_t> WalletBalance) {
+		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, WalletBalance]() {
+					  if (WalletBalance.has_value())
+					  {
+						  Callback.ExecuteIfBound(ec, static_cast<uint64_t>(WalletBalance.value()));			  
+					  } else
+					  {
+						  Callback.ExecuteIfBound(ec, {});			  
+					  }
+			
+		}));	
+	});
+}
+
+void UModioSubsystem::K2_GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegate Callback)
+{
+	GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegateFast::CreateLambda(
+		[Callback](FModioErrorCode ec, TOptional<uint64_t> WalletBalance) { Callback.ExecuteIfBound(ec, ToBP<FModioOptionalUInt64>(WalletBalance));}));
+}
+
+
+TMap<FModioModID, FModioModInfo> UModioSubsystem::QueryUserPurchasedMods()
+{
+	return ToUnreal<FModioModID, FModioModInfo>(Modio::QueryUserPurchasedMods());
+}
+
+
+void UModioSubsystem::PurchaseModAsync(FModioModID ModID, uint64_t ExpectedPrice, FOnPurchaseModDelegateFast Callback)
+{
+	Modio::PurchaseModAsync(ToModio(ModID), ExpectedPrice, [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::TransactionRecord> TransactionRecord) {
+		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, TransactionRecord]() {
+					  Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioTransactionRecord>(TransactionRecord));
+				  }));
+	});
+}
+
+void UModioSubsystem::K2_PurchaseModAsync(FModioModID ModID, int ExpectedPrice, FOnPurchaseModDelegate Callback)
+{
+	PurchaseModAsync(
+		ModID, ExpectedPrice,
+		FOnPurchaseModDelegateFast::CreateLambda(
+								 [Callback](FModioErrorCode ec, TOptional<FModioTransactionRecord> TransactionRecord) {
+							 Callback.ExecuteIfBound(ec, ToBP<FModioOptionalTransactionRecord>(TransactionRecord));
+								 }));
+}
+
+void UModioSubsystem::GetUserDerivedTokenAsync(FOnGetUserDerivedTokenDelegateFast Callback)
+{
+	Modio::GetUserDerivedTokenAsync(
+		[Callback](Modio::ErrorCode ec, std::string Token) {
+			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Token]() {
+						  Callback.ExecuteIfBound(ec, ToUnreal(Token));
+					  }));
+		});
+}
+
+void UModioSubsystem::K2_GetUserDerivedTokenAsync(FOnGetUserDerivedTokenDelegate Callback)
+{
+	GetUserDerivedTokenAsync(FOnGetUserDerivedTokenDelegateFast::CreateLambda(
+						 [Callback](FModioErrorCode ec, FString Token) {
+							 Callback.ExecuteIfBound(ec, Token);
+						 }));
 }
 
 /// File scope implementations

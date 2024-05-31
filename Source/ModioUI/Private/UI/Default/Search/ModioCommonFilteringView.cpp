@@ -65,10 +65,13 @@ const FModioModTagInfo SortFieldAndSortDirectionTagInfo = []() {
 	FModioModTagInfo InternalSortFieldAndSortDirectionTagInfo;
 	InternalSortFieldAndSortDirectionTagInfo.bAllowMultipleSelection = false;
 	InternalSortFieldAndSortDirectionTagInfo.TagGroupName = NSLOCTEXT("Modio", "SortFieldAndSortDirectionTagGroupName", "Sort by").ToString();
+	InternalSortFieldAndSortDirectionTagInfo.LocalizedTagCategoryDataCurrentLocale.GroupName = InternalSortFieldAndSortDirectionTagInfo.TagGroupName;
+	InternalSortFieldAndSortDirectionTagInfo.TagGroupValues.Reserve(SortFieldAndSortDirectionMap.Num());
 	for (auto& SortFieldAndDirection : SortFieldAndSortDirectionMap)
 	{
 		InternalSortFieldAndSortDirectionTagInfo.TagGroupValues.Add(SortFieldAndDirection.Value.ToString());
 	}
+	InternalSortFieldAndSortDirectionTagInfo.LocalizedTagCategoryDataCurrentLocale.Tags = InternalSortFieldAndSortDirectionTagInfo.TagGroupValues;
 	return InternalSortFieldAndSortDirectionTagInfo;
 }();
 
@@ -76,10 +79,13 @@ const FModioModTagInfo ManualSortFieldTagInfo = []() {
 	FModioModTagInfo InternalManualSortFieldTagInfo;
 	InternalManualSortFieldTagInfo.bAllowMultipleSelection = false;
 	InternalManualSortFieldTagInfo.TagGroupName = NSLOCTEXT("Modio", "ManualSortFieldTagGroupName", "Sort by").ToString();
+	InternalManualSortFieldTagInfo.LocalizedTagCategoryDataCurrentLocale.GroupName = InternalManualSortFieldTagInfo.TagGroupName;
+	InternalManualSortFieldTagInfo.TagGroupValues.Reserve(ManualSortFieldMap.Num());
 	for (auto& SortField : ManualSortFieldMap)
 	{
 		InternalManualSortFieldTagInfo.TagGroupValues.Add(SortField.Value.ToString());
 	}
+	InternalManualSortFieldTagInfo.LocalizedTagCategoryDataCurrentLocale.Tags = InternalManualSortFieldTagInfo.TagGroupValues;
 	return InternalManualSortFieldTagInfo;
 }();
 
@@ -87,10 +93,13 @@ const FModioModTagInfo EnabledDisabledTagInfo = []() {
 	FModioModTagInfo InternalEnabledDisabledTagInfo;
 	InternalEnabledDisabledTagInfo.bAllowMultipleSelection = false;
 	InternalEnabledDisabledTagInfo.TagGroupName = NSLOCTEXT("Modio", "EnabledDisabledTagGroupName", "Enabled/Disabled").ToString();
+	InternalEnabledDisabledTagInfo.LocalizedTagCategoryDataCurrentLocale.GroupName = InternalEnabledDisabledTagInfo.TagGroupName;
+	InternalEnabledDisabledTagInfo.TagGroupValues.Reserve(EnabledFilterFieldMap.Num());
 	for (auto& SortField : EnabledFilterFieldMap)
 	{
 		InternalEnabledDisabledTagInfo.TagGroupValues.Add(SortField.Value.ToString());
 	}
+	InternalEnabledDisabledTagInfo.LocalizedTagCategoryDataCurrentLocale.Tags = InternalEnabledDisabledTagInfo.TagGroupValues;
 	return InternalEnabledDisabledTagInfo;
 }();
 
@@ -98,10 +107,13 @@ const FModioModTagInfo InstalledByCurrentAndAnotherUserTagInfo = []() {
 	FModioModTagInfo InternalInstalledByCurrentAndAnotherUserTagInfo;
 	InternalInstalledByCurrentAndAnotherUserTagInfo.bAllowMultipleSelection = false;
 	InternalInstalledByCurrentAndAnotherUserTagInfo.TagGroupName = NSLOCTEXT("Modio", "InstalledByCurrentAndAnotherUserTagGroupName", "Installed By").ToString();
+	InternalInstalledByCurrentAndAnotherUserTagInfo.LocalizedTagCategoryDataCurrentLocale.GroupName = InternalInstalledByCurrentAndAnotherUserTagInfo.TagGroupName;
+	InternalInstalledByCurrentAndAnotherUserTagInfo.TagGroupValues.Reserve(InstalledFilterFieldMap.Num());
 	for (auto& SortField : InstalledFilterFieldMap)
 	{
 		InternalInstalledByCurrentAndAnotherUserTagInfo.TagGroupValues.Add(SortField.Value.ToString());
 	}
+	InternalInstalledByCurrentAndAnotherUserTagInfo.LocalizedTagCategoryDataCurrentLocale.Tags = InternalInstalledByCurrentAndAnotherUserTagInfo.TagGroupValues;
 	return InternalInstalledByCurrentAndAnotherUserTagInfo;
 }();
 
@@ -109,10 +121,13 @@ const FModioModTagInfo QueuedTagInfo = []() {
 	FModioModTagInfo InternalQueuedTagInfo;
 	InternalQueuedTagInfo.bAllowMultipleSelection = false;
 	InternalQueuedTagInfo.TagGroupName = NSLOCTEXT("Modio", "QueuedTagGroupName", "Queued").ToString();
+	InternalQueuedTagInfo.LocalizedTagCategoryDataCurrentLocale.GroupName = InternalQueuedTagInfo.TagGroupName;
+	InternalQueuedTagInfo.TagGroupValues.Reserve(QueuedFieldMap.Num());
 	for (auto& QueuedField : QueuedFieldMap)
 	{
 		InternalQueuedTagInfo.TagGroupValues.Add(QueuedField.Value.ToString());
 	}
+	InternalQueuedTagInfo.LocalizedTagCategoryDataCurrentLocale.Tags = InternalQueuedTagInfo.TagGroupValues;
 	return InternalQueuedTagInfo;
 }();
 

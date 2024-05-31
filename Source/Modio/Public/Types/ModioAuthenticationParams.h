@@ -27,7 +27,9 @@ enum class EModioAuthenticationProvider : uint8
 	PSN, 
 	Epic,
 	Oculus,
-	OpenID
+	OpenID,
+	GoogleIDToken,
+	GoogleServerSideToken
 };
 
 /** @brief Simple struct to encapsulate data passed to external authentication systems */

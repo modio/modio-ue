@@ -10,6 +10,9 @@
 
 #include "Types/ModioGameInfoList.h"
 
+
+#include "Internal/Convert/ModTagLocalization.h"
+#include "Internal/Convert/ModTagInfo.h"
 #include "Internal/Convert/GameInfo.h"
 
 #include "Internal/Convert/List.h"

@@ -19,6 +19,7 @@
 #include "Types/ModioOtherUrl.h"
 #include "Types/ModioTheme.h"
 #include "Types/ModioGamePlatform.h"
+#include "Types/ModioModTagOptions.h"
 
 #include "ModioGameInfo.generated.h"
 
@@ -153,6 +154,10 @@ struct MODIO_API FModioGameInfo
 	/** @brief Platforms that are supported by this title */
 	UPROPERTY(BlueprintReadOnly, Category="mod.io|GameInfo")
 	TArray<FModioGamePlatform> PlatformSupport = {};
+
+	/** @brief Tags available for this game */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	TArray<FModioModTagInfo> TagOptions;
 	
 	friend struct FModioGameInfo ToUnreal(const struct Modio::GameInfo& In);
 };

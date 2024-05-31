@@ -62,6 +62,20 @@ struct MODIO_API FModioFilterParams
 	GENERATED_BODY()
 
 	/**
+	 * @brief Only include mods with the specified author User ID
+	 * @param UserID The User ID to filter on
+	 * @return *this
+	 */
+	FModioFilterParams& MatchingAuthor(const FModioUserID& UserID);
+
+	/**
+	 * @brief Only include mods with the specified author User IDs
+	 * @param UserIDs The list of User IDs to filter on
+	 * @return *this
+	 */
+	FModioFilterParams& MatchingAuthors(const TArray<FModioUserID>& UserIDs);
+
+	/**
 	 * @brief Indicates the filter should only include the specified mods
 	 * @param IDs the set of mods to match
 	 * @return *this
@@ -203,6 +217,7 @@ public:
 	TOptional<FDateTime> DateRangeEnd;
 	TArray<FString> Tags;
 	TArray<FString> ExcludedTags;
+	TArray<FModioUserID> AuthorUserIds;
 	TArray<FModioModID> IncludedIDs;
 	TArray<FModioModID> ExcludedIDs;
 	TOptional<FString> MetadataBlobSearchString;

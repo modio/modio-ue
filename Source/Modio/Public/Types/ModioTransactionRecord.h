@@ -44,7 +44,7 @@ struct MODIO_API FModioTransactionRecord
 	 * The mod the purchase was for
 	 **/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Monetization|TransactionRecord")
-	FModioModID AssociatedMod;
+	FModioModID AssociatedModID;
 
 	/**
 	 * The price the mod was purchased for

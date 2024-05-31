@@ -40,6 +40,9 @@ struct MODIOUI_API FModioCommonModEntryParamsSettings
 
 		ForceUninstallInputAction.RowName = "LeftTabSecondary";
 		ForceUninstallInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
+
+		PrioritizeTransferInputAction.RowName = "LeftTabSecondary";
+		PrioritizeTransferInputAction.DataTable = Cast<UDataTable>(FSoftObjectPath(ModioInputActionDataTablePath).TryLoad());
 	}
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
@@ -62,6 +65,9 @@ struct MODIOUI_API FModioCommonModEntryParamsSettings
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText OpenModDetailsLabel = NSLOCTEXT("Modio", "OpenModDetails", "Mod Details");
+
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
+	FText PrioritizeTransferLabel = NSLOCTEXT("Modio", "PrioritizeTransfer", "Prioritize Transfer");
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Text")
 	FText OpenReportLabel = NSLOCTEXT("Modio", "OpenReport", "Report");
@@ -104,4 +110,7 @@ struct MODIOUI_API FModioCommonModEntryParamsSettings
 
 	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
 	FDataTableRowHandle ForceUninstallInputAction;
+
+	UPROPERTY(Config, EditDefaultsOnly, meta = (RowType = "/Script/CommonUI.CommonInputActionDataBase"), Category = "Actions")
+	FDataTableRowHandle PrioritizeTransferInputAction;
 };

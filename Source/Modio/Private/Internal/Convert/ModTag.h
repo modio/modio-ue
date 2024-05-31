@@ -17,5 +17,7 @@ FORCEINLINE FModioModTag ToUnreal(const Modio::ModTag& In)
 {
 	FModioModTag Out;
 	Out.Tag = ToUnreal(In.Tag);
+	Out.TagLocalized = ToUnrealText(In.TagLocalized);
+
 	return Out;
 }

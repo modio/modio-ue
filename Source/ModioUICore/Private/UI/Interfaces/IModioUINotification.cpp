@@ -79,4 +79,15 @@ FModioNotificationParams UModioNotificationParamsLibrary::CreateInstallationNoti
 	return NewParams;
 }
 
+FModioNotificationParams UModioNotificationParamsLibrary::CreatePrioritizeTransferForModNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo)
+{
+	FModioNotificationParams NewParams;
+	if (ModInfo.GetObject())
+	{
+		const FModioModInfo FullModInfo = ModInfo->Execute_GetFullModInfo(ModInfo.GetObject());
+		NewParams = CreateNotificationParams(StatusCode, FText::FromString(FullModInfo.ProfileName), LOCTEXT("PrioritizeTransferSuccess", "Prioritized for download"), LOCTEXT("PrioritizeTransferFailed", "Failed to prioritize for download"));
+	}
+	return NewParams;
+}
+
 #include "Loc/EndModioLocNamespace.h"

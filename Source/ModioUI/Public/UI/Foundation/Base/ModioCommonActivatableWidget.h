@@ -43,11 +43,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mod.io Common UI")
 	void FocusOnDesiredWidget();
 
-	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCommonWidgetFocusChangedFast, bool /* bIsFocused */);
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCommonWidgetFocusChangedFast, bool /* bIsFocused */, UObject* /* Object */);
 	/** Broadcasts when this or underlying widgets gain or lose focus */
 	FOnCommonWidgetFocusChangedFast OnFocusChangedFast;
 	
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCommonWidgetFocusChanged, bool, bIsFocused);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCommonWidgetFocusChanged, bool, bIsFocused, UObject*, Object);
 	/** Broadcasts when this or underlying widgets gain or lose focus. Suitable for Blueprints */
 	UPROPERTY(BlueprintAssignable, Category = "Mod.io Common UI")
 	FOnCommonWidgetFocusChanged OnFocusChanged;

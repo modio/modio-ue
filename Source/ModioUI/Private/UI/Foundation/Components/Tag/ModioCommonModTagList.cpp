@@ -20,7 +20,7 @@
 void UModioCommonModTagList::SetTags_Implementation(const TArray<FModioModTag>& ModTags)
 {
 	TArray<FString> Tags;
-	Algo::Transform(ModTags, Tags, [](const FModioModTag& Tag) { return Tag.Tag; });
+	Algo::Transform(ModTags, Tags, [](const FModioModTag& Tag) { return Tag.TagLocalized.ToString(); });
 	SetTagsString(Tags);
 }
 

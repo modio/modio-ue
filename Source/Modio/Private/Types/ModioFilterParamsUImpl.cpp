@@ -11,6 +11,20 @@
 #include "Internal/Convert/FilterParams.h"
 #include "Types/ModioFilterParams.h"
 
+
+FModioFilterParams& FModioFilterParams::MatchingAuthor(const FModioUserID& UserID)
+{
+	AuthorUserIds.Empty();
+	AuthorUserIds.Add(UserID);
+	return *this;
+}
+
+FModioFilterParams& FModioFilterParams::MatchingAuthors(const TArray<FModioUserID>& UserIDs)
+{
+	AuthorUserIds = UserIDs;
+	return *this;
+}
+
 FModioFilterParams& FModioFilterParams::MatchingIDs(const TArray<FModioModID>& IDs)
 {
 	IncludedIDs = IDs;

@@ -27,12 +27,14 @@ bool ToUnreal(bool Value);
 uint64 ToUnreal(std::size_t Value);
 FString ToUnreal(const std::string& String);
 FDateTime ToUnrealDateTime(std::int64_t UnixTimestamp);
+FText ToUnrealText(const std::string& String);
 
 struct FModioModID ToUnreal(Modio::ModID Value);
 struct FModioFileMetadataID ToUnreal(Modio::FileMetadataID Value);
 struct FModioModTagInfo ToUnreal(const Modio::ModTagInfo& In);
 struct FModioMetadata ToUnreal(const Modio::Metadata& In);
 struct FModioModTag ToUnreal(const Modio::ModTag& In);
+struct FModioModTagLocalizationData ToUnreal(const Modio::ModTagLocalizationData& In);
 struct FModioModInfo ToUnreal(const Modio::ModInfo& In);
 struct FModioModDependency ToUnreal(const Modio::ModDependency& In);
 struct FModioUnsigned64 ToUnreal(const Modio::FileSize& In);
@@ -50,6 +52,7 @@ EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
+std::vector<Modio::ModID> ToModio(const TArray<FModioModID>& ModIDArray);
 std::map<std::string, std::string> ToModio(const TMap<FString, FString>& StringMap);
 std::chrono::system_clock::time_point ToModioDateTime(FDateTime Time);
 Modio::ApiKey ToModio(const FModioApiKey& In);
@@ -105,6 +108,20 @@ TArray<DestValueType> ToUnreal(const std::vector<SourceValueType, OtherParams...
 	for (const auto& It : OriginalArray)
 	{
 		Result.Emplace(ToUnreal(It));
+	}
+
+	return Result;
+}
+
+template<typename DestKeyType, typename DestValueType, typename SourceKeyType, typename SourceValueType,
+		 typename... OtherParams>
+TMap<DestKeyType, DestValueType> ToUnreal(const std::map<SourceKeyType, SourceValueType, OtherParams...>& OriginalMap)
+{
+	TMap<DestKeyType, DestValueType> Result;
+
+	for (const auto& [Key, Value] : OriginalMap)
+	{
+		Result.Append(ToUnreal(Key), ToUnreal(Value));
 	}
 
 	return Result;

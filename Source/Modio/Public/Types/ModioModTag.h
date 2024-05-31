@@ -28,6 +28,30 @@ struct MODIO_API FModioModTag
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModTag")
 	FString Tag;
 
+	/**
+	 * A localized tag string
+	 **/
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModTag")
+	FText TagLocalized;
+
+	FModioModTag()
+	{
+		Tag = "";
+		TagLocalized = FText();
+	}
+
+	FModioModTag(const FString& InTag)
+	{
+		Tag = InTag;
+		TagLocalized = FText();
+	}
+
+	FModioModTag(const FString& InTag, const FText& InTagLoc)
+	{
+		Tag = InTag;
+		TagLocalized = InTagLoc;
+	}
+
 	bool operator==(const FModioModTag& Other) const
 	{
 		return Tag == Other.Tag;

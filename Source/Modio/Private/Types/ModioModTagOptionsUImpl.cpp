@@ -10,6 +10,7 @@
 
 #include "Types/ModioModTagOptions.h"
 
+#include "Internal/Convert/ModTagLocalization.h"
 #include "Internal/Convert/ModTagInfo.h"
 
 #include "Internal/Convert/List.h"

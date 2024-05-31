@@ -112,6 +112,7 @@ FORCEINLINE Modio::FilterParams ToModio(const FModioFilterParams& In)
 
 	return Out.SortBy(ToModio(In.SortField), ToModio(In.Direction))
 		.NameContains(ToModio(In.SearchKeywords))
+		.MatchingAuthors(ToModio<Modio::UserID>(In.AuthorUserIds))
 		.MatchingIDs(ToModio<Modio::ModID>(In.IncludedIDs))
 		.ExcludingIDs(ToModio<Modio::ModID>(In.ExcludedIDs))
 		.WithTags(ToModio(In.Tags))

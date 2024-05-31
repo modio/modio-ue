@@ -306,7 +306,7 @@ void UModioCommonModDetailsView::NativeOnInitialized()
 
 	if (TagsWidget)
 	{
-		TagsWidget->OnFocusChangedFast.AddWeakLambda(this, [this](bool bIsFocused)
+		TagsWidget->OnFocusChangedFast.AddWeakLambda(this, [this](bool bIsFocused, UObject*)
 		{
 			if (bIsFocused)
 			{

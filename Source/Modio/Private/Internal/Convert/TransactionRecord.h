@@ -16,7 +16,7 @@
 FORCEINLINE FModioTransactionRecord ToUnreal(const Modio::TransactionRecord& In)
 {
 	FModioTransactionRecord Out;
-	Out.AssociatedMod = ToUnreal(In.AssociatedMod);
+	Out.AssociatedModID = ToUnreal(In.AssociatedModID);
 	Out.Price.Underlying = In.Price;
 	Out.UpdatedUserWalletBalance.Underlying = In.UpdatedUserWalletBalance;
 	return Out;

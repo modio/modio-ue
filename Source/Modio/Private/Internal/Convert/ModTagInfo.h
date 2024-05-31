@@ -19,5 +19,25 @@ FORCEINLINE FModioModTagInfo ToUnreal(const Modio::ModTagInfo& In)
 	Out.TagGroupName = ToUnreal(In.TagGroupName);
 	Out.TagGroupValues = ToUnreal<FString>(In.TagGroupValues);
 	Out.bAllowMultipleSelection = ToUnreal(In.bAllowMultipleSelection);
+
+	for(const auto& Value : In.TagGroupValueLocData)
+	{
+		Out.TagGroupValueLocalizationData.Add(ToUnreal(Value));
+	}
+
+	for (const auto& [Key, Value] : In.TagGroupNameLocData)
+	{
+		Out.TagGroupNameLocalizationData.Add(ToUnreal(Key), ToUnrealText(Value));
+	}
+
+	Modio::LocalizedTagCategory LocTags = In.GetLocalizedTags();
+
+	Out.LocalizedTagCategoryDataCurrentLocale.GroupName = ToUnreal(LocTags.GroupName);
+
+	for (const auto& Value : LocTags.Tags)
+	{
+		Out.LocalizedTagCategoryDataCurrentLocale.Tags.Add(ToUnreal(Value));
+	}
+
 	return Out;
 }

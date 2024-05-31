@@ -140,6 +140,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
 	static FModioNotificationParams CreateInstallationNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo);
 
+	/**
+	 * Create a notification parameters instance using an error code
+	 * Intended to be used for PrioritizeTransferForMod notifications
+	 * @param StatusCode The modio error code to store
+	 * @param ModInfo A class interface related to ModInfoUIDetails
+	 * @return FModioNotificationParams instance
+	 */
+	UFUNCTION(BlueprintCallable, Category = "ModioNotificationParams")
+	static FModioNotificationParams CreatePrioritizeTransferForModNotification(FModioErrorCode StatusCode, const TScriptInterface<IModioModInfoUIDetails>& ModInfo);
+
 
 	/**
 	* Add format text to the notification parameter

@@ -302,6 +302,13 @@ public:
 
 	bool IsUserAuthenticated();
 
+	/**
+	 * Equivalent to UModioSubsystem::PrioritizeTransferForMod but with UI notifications
+	 * @param ModToPrioritize The ID for the mod to prioritize
+	 */
+	UFUNCTION(BlueprintCallable, Category = "ModioUISubsystem")
+	void PrioritizeTransferForMod(FModioModID ModToPrioritize);
+
 	TArray<FModioModID> ModsDownloadedThisSession;
 
 	FModioErrorCode LastSubscriptionErrorCode;

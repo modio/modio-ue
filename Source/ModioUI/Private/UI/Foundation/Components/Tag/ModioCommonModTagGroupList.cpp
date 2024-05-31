@@ -58,13 +58,13 @@ void UModioCommonModTagGroupList::SetTagsGroup_Implementation(const FModioModTag
 {
 	if (TagGroupNameTextBlock)
 	{
-		TagGroupNameTextBlock->SetText(FText::FromString(TagInfo.TagGroupName));
+		TagGroupNameTextBlock->SetText(FText::FromString(TagInfo.LocalizedTagCategoryDataCurrentLocale.GroupName));
 	}
 
 	if (TagsContainer && TagEntryClass)
 	{
 		TagsContainer->ClearChildren();
-		for (const FString& Tag : TagInfo.TagGroupValues)
+		for (const FString& Tag : TagInfo.LocalizedTagCategoryDataCurrentLocale.Tags)
 		{
 			UModioCommonModTagEntry* Entry = CreateWidget<UModioCommonModTagEntry>(TagsContainer.Get(), TagEntryClass);
 			if (Entry) 

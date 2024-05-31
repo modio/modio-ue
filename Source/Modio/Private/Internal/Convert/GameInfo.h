@@ -19,6 +19,7 @@
 #include "Internal/ModioConvert.h"
 #include "ModioSDK.h"
 #include "Types/ModioGameInfo.h" 
+#include "Types/ModioModTagOptions.h"
 
 FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 {
@@ -45,6 +46,7 @@ FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 	Out.GameMaturityOptions = ToUnreal<EGameMaturityFlags, Modio::GameMaturityOptions>(In.MaturityOptions);
 	Out.VirtualTokenName = ToUnreal(In.VirtualTokenName);
 	Out.PlatformSupport = ToUnreal<FModioGamePlatform>(In.PlatformSupport);
+	Out.TagOptions = ToUnreal<FModioModTagInfo>(In.TagOptions);
 
 	return Out;
 }

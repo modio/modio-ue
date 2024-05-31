@@ -12,7 +12,7 @@
 #include "ModioSDK.h"
 
 FModioTransactionRecord::FModioTransactionRecord(const Modio::TransactionRecord& Other)
-	: AssociatedMod(Other.AssociatedMod),
+	: AssociatedModID(Other.AssociatedModID),
 	  Price(Other.Price),
 	  UpdatedUserWalletBalance(Other.UpdatedUserWalletBalance)
 {}

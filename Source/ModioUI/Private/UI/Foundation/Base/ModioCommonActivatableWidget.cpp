@@ -263,15 +263,15 @@ void UModioCommonActivatableWidget::NativeOnInitialized()
 void UModioCommonActivatableWidget::NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent)
 {
 	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
-	OnFocusChangedFast.Broadcast(false);
-	OnFocusChanged.Broadcast(false);
+	OnFocusChangedFast.Broadcast(false, this);
+	OnFocusChanged.Broadcast(false, this);
 }
 
 void UModioCommonActivatableWidget::NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent)
 {
 	Super::NativeOnAddedToFocusPath(InFocusEvent);
-	OnFocusChangedFast.Broadcast(true);
-	OnFocusChanged.Broadcast(true);
+	OnFocusChangedFast.Broadcast(true, this);
+	OnFocusChanged.Broadcast(true, this);
 }
 
 void UModioCommonActivatableWidget::NativeOnActivated()

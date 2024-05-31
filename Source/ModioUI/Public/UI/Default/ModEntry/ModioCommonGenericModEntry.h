@@ -114,6 +114,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
 	TObjectPtr<UModioCommonButtonBase> ForceUninstallButton;
+	
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
+	TObjectPtr<UModioCommonButtonBase> PrioritizeTransferButton;
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidgetOptional), Category = "Mod.io Common UI|Widgets|Buttons")
 	TObjectPtr<UModioCommonRichTextBlock> PercentProgressTextBlock;
@@ -257,6 +260,9 @@ protected:
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
 	void HandleForceUninstallClicked();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mod.io Common UI|Handle")
+	void HandlePrioritizeTransferClicked();
 
 private:
 	/** Whether the mod image has been obtained or not yet */

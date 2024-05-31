@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.20">
+<meta name="generator" content="Asciidoctor 2.0.23">
 <title>mod.io Unreal Engine Plugin Documentation</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -140,7 +140,7 @@ p a>code:hover{color:rgba(0,0,0,.9)}
 #content::before{content:none}
 #header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
 #header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
-#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header>h1:only-child{border-bottom:1px solid #dddddf;padding-bottom:8px}
 #header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:flex;flex-flow:row wrap}
 #header .details span:first-child{margin-left:-.125em}
 #header .details span.email a{color:rgba(0,0,0,.85)}
@@ -162,6 +162,7 @@ p a>code:hover{color:rgba(0,0,0,.9)}
 #toctitle{color:#7a2518;font-size:1.2em}
 @media screen and (min-width:768px){#toctitle{font-size:1.375em}
 body.toc2{padding-left:15em;padding-right:0}
+body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
 #toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
 #toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
 #toc.toc2>ul{font-size:.9em;margin-bottom:0}
@@ -327,7 +328,7 @@ a.image{text-decoration:none;display:inline-block}
 a.image object{pointer-events:none}
 sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
 sup.footnote a,sup.footnoteref a{text-decoration:none}
-sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+sup.footnote a:active,sup.footnoteref a:active,#footnotes .footnote a:first-of-type:active{text-decoration:underline}
 #footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
 #footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
 #footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
@@ -649,12 +650,23 @@ pre.rouge .nt {
 }
 </style>
 <style>
+@font-face {
+
+    font-family: "Euclid Circular B";
+    src: url(https://assets.modcdn.io/fonts/EuclidCircularB-Regular-WebS.woff2) format("woff2");
+    font-weight: normal;
+}
+@font-face {
+
+    font-family: "Euclid Circular B";
+    src: url(https://assets.modcdn.io/fonts/EuclidCircularB-Regular-WebS.woff2) format("woff2");
+    font-weight: bold;
+}
 body,#toc.toc2 {
 
-    background          : #2d2d3f;
-    color               : #f5f5f5;
-    font-family         : -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-
+    background          : #000000;
+    color               : #ffffff;
+    font-family         : "Euclid Circular B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 #toc.toc2 {
 
@@ -674,29 +686,32 @@ body,#toc.toc2 {
 }
 #header>h1:first-child {
     
-    color               : #44bfd5;
+    color               : #07c1d8;
     font-weight         : 500;
+    font-family         : "Euclid Circular B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 #toctitle,h1,h2,h3,h4,h5,h6 {
 
-    color               : #44bfd5;
+    color               : #07c1d8;
     font-weight         : 500;
+    font-family         : "Euclid Circular B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 div.title {
 
-    color               : #44bfd5;
+    color               : #07c1d8;
 }
 #content a {
     
-    color               : #44bfd5;
+    color               : #07c1d8;
 }
 #toc a {
 
-    color               : #f5f5f5;
+    color               : #ffffff;
+    font-family         : "Euclid Circular B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 #toc ul {
     
-    font-family         : -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-family         : "Euclid Circular B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 .variablename {
     font-family         :"Droid Sans Mono","DejaVu Sans Mono",monospace;
@@ -715,15 +730,11 @@ div.title {
 }
 table {
 
-    background          : #2d2d3f;
+    background          : #000000;
 }
 table tr td {
 
-    color               : #f5f5f5;
-}
-table thead tr th {
-
-    color               : #f5f5f5;
+    color               : #ffffff;
 }
 table.stripes-odd .tableblock {
 
@@ -731,28 +742,30 @@ table.stripes-odd .tableblock {
 }
 table.stripes-odd tr:nth-of-type(odd) {
     
-    background          :#242433;
+    background          :#29292B;
 }
 .sect1+.sect1 {
     border-top          :none;
 }
 .admonitionblock>table td.content {
 
-    color               : #f5f5f5;
+    color               : #ffffff;
 }
 .admonitionblock>table td.icon .title
 {
-    color               : #f5f5f5;
+    color               : #ffffff;
+    font-family         : "Euclid Circular B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 :not(pre):not([class^=L])>code {
 
-    background          :#242433;
-    color               :#f92672;
+    background          :#29292B;
+    color               :#d96bab;
 }
 
 .ulist>.title {
 
-    color               : #44bfd5;
+    color               : #07c1d8;
+    font-family         : "Euclid Circular B", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 </style>
 </head>
@@ -818,6 +831,11 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_mute_a_user">Mute a user</a></li>
 <li><a href="#_unmute_a_user">Unmute a user</a></li>
 <li><a href="#_list_muted_users">List muted users</a></li>
+</ul>
+</li>
+<li><a href="#_sdk_quick_start_temporary_mod_sets">SDK quick-start: Temporary Mod Sets</a>
+<ul class="sectlevel3">
+<li><a href="#_installing_temporary_mods">Installing Temporary Mods</a></li>
 </ul>
 </li>
 <li><a href="#_how_to_set_up_common_ui_for_project_to_use_mod_io_ue5_ui">How to Set Up Common UI for Project to Use Mod.io UE5 UI</a>
@@ -1022,6 +1040,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#OnRatingSubmissionComplete">On Rating Submission Complete</a></li>
 <li><a href="#HandleSwitchEnabledClicked">Handle Switch Enabled Clicked</a></li>
 <li><a href="#HandleSubscribeClicked">Handle Subscribe Clicked</a></li>
+<li><a href="#HandlePrioritizeTransferClicked">Handle Prioritize Transfer Clicked</a></li>
 <li><a href="#HandleOpenModDetailsClicked">Handle Open Mod Details Clicked</a></li>
 <li><a href="#HandleForceUninstallClicked">Handle Force Uninstall Clicked</a></li>
 <li><a href="#HandleCancelClicked">Handle Cancel Clicked</a></li>
@@ -1342,6 +1361,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#SetLogLevel">Set Log Level</a></li>
 <li><a href="#RunPendingHandlers">Run Pending Handlers</a></li>
 <li><a href="#QueryUserSubscriptions">Query User Subscriptions</a></li>
+<li><a href="#QueryUserPurchasedMods">Query User Purchased Mods</a></li>
 <li><a href="#QueryUserInstallations">Query User Installations</a></li>
 <li><a href="#QuerySystemInstallations">Query System Installations</a></li>
 <li><a href="#PrioritizeTransferForMod">Prioritize Transfer for Mod</a></li>
@@ -1358,15 +1378,21 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#K2_SetLanguage">SetLanguage</a></li>
 <li><a href="#K2_RequestEmailAuthCodeAsync">RequestEmailAuthCodeAsync</a></li>
 <li><a href="#K2_ReportContentAsync">ReportContentAsync</a></li>
+<li><a href="#K2_RemoveFromTempModSet">RemoveFromTempModSet</a></li>
 <li><a href="#K2_QueryUserProfile">QueryUserProfile</a></li>
+<li><a href="#K2_QueryTempModSet">QueryTempModSet</a></li>
 <li><a href="#K2_QueryCurrentModUpdate">QueryCurrentModUpdate</a></li>
+<li><a href="#K2_PurchaseModAsync">PurchaseModAsync</a></li>
 <li><a href="#K2_PreviewExternalUpdatesAsync">PreviewExternalUpdatesAsync</a></li>
 <li><a href="#K2_MuteUserAsync">MuteUserAsync</a></li>
 <li><a href="#K2_ListUserGamesAsync">ListUserGamesAsync</a></li>
 <li><a href="#K2_ListUserCreatedModsAsync">ListUserCreatedModsAsync</a></li>
 <li><a href="#K2_ListAllModsAsync">ListAllModsAsync</a></li>
+<li><a href="#K2_InitTempModSet">InitTempModSet</a></li>
 <li><a href="#K2_InitializeAsync">InitializeAsync</a></li>
+<li><a href="#K2_GetUserWalletBalanceAsync">GetUserWalletBalanceAsync</a></li>
 <li><a href="#K2_GetUserMediaAvatarAsync">GetUserMediaAsync (Avatar)</a></li>
+<li><a href="#K2_GetUserDerivedTokenAsync">GetUserDerivedTokenAsync</a></li>
 <li><a href="#K2_GetTermsOfUseAsync">GetTermsOfUseAsync</a></li>
 <li><a href="#K2_GetMutedUsersAsync">GetMutedUsersAsync</a></li>
 <li><a href="#K2_GetModTagOptionsAsync">GetModTagOptionsAsync</a></li>
@@ -1378,12 +1404,15 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#K2_GetModCreationHandle">GetModCreationHandle</a></li>
 <li><a href="#K2_GetGameInfoAsync">GetGameInfoAsync</a></li>
 <li><a href="#K2_ForceUninstallModAsync">ForceUninstallModAsync</a></li>
+<li><a href="#K2_FetchUserPurchasesAsync">FetchUserPurchasesAsync</a></li>
 <li><a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a></li>
 <li><a href="#K2_EnableModManagement">EnableModManagement</a></li>
+<li><a href="#K2_CloseTempModSet">CloseTempModSet</a></li>
 <li><a href="#K2_ClearUserDataAsync">ClearUserDataAsync</a></li>
 <li><a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a></li>
 <li><a href="#K2_AuthenticateUserEmailAsync">AuthenticateUserEmailAsync</a></li>
 <li><a href="#K2_ArchiveModAsync">ArchiveModAsync</a></li>
+<li><a href="#K2_AddToTempModSet">AddToTempModSet</a></li>
 <li><a href="#IsUsingBackgroundThread">Is Using Background Thread</a></li>
 <li><a href="#IsModManagementBusy">Is Mod Management Busy</a></li>
 <li><a href="#GetLastValidationError">Get Last Validation Error</a></li>
@@ -1448,6 +1477,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#RequestExternalAuthentication">Request External Authentication</a></li>
 <li><a href="#RequestEmailAuthentication">Request Email Authentication</a></li>
 <li><a href="#QueryIsModEnabled">Query Is Mod Enabled</a></li>
+<li><a href="#PrioritizeTransferForMod">Prioritize Transfer for Mod</a></li>
 <li><a href="#HideModBrowserUI">Hide Mod Browser UI</a></li>
 <li><a href="#GetIsCollectionModDisableUIEnabled">Get Is Collection Mod Disable UIEnabled</a></li>
 <li><a href="#GetCurrentDPIScaleValue">Get Current DPIScale Value</a></li>
@@ -1466,6 +1496,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 <ul class="sectlevel2">
 <li><a href="#_modiogameinfolist">ModioGameInfoList</a></li>
 <li><a href="#_modiogameinfo">ModioGameInfo</a></li>
+<li><a href="#_modiomodtaginfo">ModioModTagInfo</a></li>
+<li><a href="#_modiolocalizedtagcategory">ModioLocalizedTagCategory</a></li>
+<li><a href="#_modiomodtaglocalizationdata">ModioModTagLocalizationData</a></li>
 <li><a href="#_modiogameplatform">ModioGamePlatform</a></li>
 <li><a href="#_modiootherurl">ModioOtherUrl</a></li>
 <li><a href="#_modiogamestats">ModioGameStats</a></li>
@@ -1488,7 +1521,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiouser">ModioUser</a></li>
 <li><a href="#_modiouserid">ModioUserID</a></li>
 <li><a href="#_modiomodtagoptions">ModioModTagOptions</a></li>
-<li><a href="#_modiomodtaginfo">ModioModTagInfo</a></li>
 <li><a href="#_modioerrorcode">ModioErrorCode</a></li>
 <li><a href="#_modiooptionalgameinfo">ModioOptionalGameInfo</a></li>
 <li><a href="#_modiooptionalimage">ModioOptionalImage</a></li>
@@ -1496,11 +1528,13 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiooptionalmodinfo">ModioOptionalModInfo</a></li>
 <li><a href="#_modiooptionalmodtagoptions">ModioOptionalModTagOptions</a></li>
 <li><a href="#_modiooptionalterms">ModioOptionalTerms</a></li>
+<li><a href="#_modiooptionaluint64">ModioOptionalUInt64</a></li>
 <li><a href="#_modiooptionalmodinfolist">ModioOptionalModInfoList</a></li>
 <li><a href="#_modiooptionalgameinfolist">ModioOptionalGameInfoList</a></li>
 <li><a href="#_modiomodmanagementevent">ModioModManagementEvent</a></li>
 <li><a href="#_modiooptionaluserlist">ModioOptionalUserList</a></li>
 <li><a href="#_modiooptionalmappreview">ModioOptionalMapPreview</a></li>
+<li><a href="#_modiooptionaltransactionrecord">ModioOptionalTransactionRecord</a></li>
 <li><a href="#_modiooptionalmodid">ModioOptionalModID</a></li>
 <li><a href="#_modiofilterparams">ModioFilterParams</a></li>
 <li><a href="#_modioauthenticationparams">ModioAuthenticationParams</a></li>
@@ -1525,7 +1559,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modioterms">ModioTerms</a></li>
 <li><a href="#_modiotransactionrecord">ModioTransactionRecord</a></li>
 <li><a href="#_modiounsigned64">ModioUnsigned64</a></li>
-<li><a href="#_modiooptionaltransactionrecord">ModioOptionalTransactionRecord</a></li>
 <li><a href="#_modiooptionaluser">ModioOptionalUser</a></li>
 <li><a href="#_modiouserlist">ModioUserList</a></li>
 <li><a href="#_modiovalidationerror">ModioValidationError</a></li>
@@ -1641,6 +1674,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#CreateUninstallNotification">Create Uninstall Notification</a></li>
 <li><a href="#CreateSubscriptionNotification">Create Subscription Notification</a></li>
 <li><a href="#CreateRatingNotification">Create Rating Notification</a></li>
+<li><a href="#CreatePrioritizeTransferForModNotification">Create Prioritize Transfer for Mod Notification</a></li>
 <li><a href="#CreateNotificationParams">Create Notification Params</a></li>
 <li><a href="#CreateInstallationNotification">Create Installation Notification</a></li>
 <li><a href="#AddFormatText">Add Format Text</a></li>
@@ -2017,7 +2051,7 @@ On console platforms, we suggest that this be a string representation of the pla
 <p>On first run of a game using the plugin, <code>${FOLDERID_LocalAppData}/mod.io/globalsettings.json</code> will be created.</p>
 </div>
 <div class="paragraph">
-<p>This JSON object contains a <code>RootLocalDataPath</code> element - changing the string here to a valid path on disk will globally redirect the mod installation directory for <strong>ALL</strong> games using the mod.io Unreal Engine Plugin or Native SDK for the current system account.</p>
+<p>This JSON object contains a <code>RootLocalStoragePath</code> element - changing the string here to a valid path on disk will globally redirect the mod installation directory for <strong>ALL</strong> games using the mod.io Unreal Engine Plugin or Native SDK for the current system account.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2038,7 +2072,7 @@ Changing this value while the SDK is initialized is not supported and behaviour 
 <p>Per-game settings are stored in <code>${FOLDERID_LocalAppData}/mod.io/${GameId}/${mod.io user string}/user.json</code>.</p>
 </div>
 <div class="paragraph">
-<p><strong>Adding</strong> a <code>RootLocalDataPath</code> element to this file will redirect the mod installation directory for this specific game only, for the current system account. Removing this value will cause the game to revert back to the global value in <code>globalsettings.json</code>.</p>
+<p><strong>Adding</strong> a <code>RootLocalStoragePath</code> element to this file will redirect the mod installation directory for this specific game only, for the current system account. Removing this value will cause the game to revert back to the global value in <code>globalsettings.json</code>.</p>
 </div>
 </li>
 </ul>
@@ -2324,7 +2358,7 @@ For best performance it should be called at least once per frame, so it should e
 <p>Nintendo Switch</p>
 </li>
 <li>
-<p>PlayStation Network (PSN)</p>
+<p>PlayStation&#8482; Network</p>
 </li>
 <li>
 <p>Steam</p>
@@ -3221,6 +3255,66 @@ To perform any of these actions, the muting user must be authenticated.
 </div>
 </div>
 </details>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sdk_quick_start_temporary_mod_sets">SDK quick-start: Temporary Mod Sets</h3>
+<div class="paragraph">
+<p>In some situations, you may want mods to only exist on a temporary basis - for instance, in Multiplayer environments where you don&#8217;t want to subscribe a user to a piece of content. Temporary Mod Sets allow management of these more transient pieces of content separately from subscriptions. Temp Mod Sets do not require authentication to be used, however Mod Management must still be enabled to use Temp Mods.</p>
+</div>
+<div class="paragraph">
+<p>Temp Mods are downloaded in a folder separately from subscriptions, and are not updated or handled when you call <code>FetchExternalUpdatesAsync</code>. That means you can prioritize download and installation of Temp Mods outside of the regular subscription flow.</p>
+</div>
+<div class="paragraph">
+<p>To use Temp Mods, you can start a TempModSet by calling <code>InitTempModSet</code> and passing a list of Mod IDs to be downloaded and extracted. At anytime while a TempModSet is open, you can call <a href="#K2_AddToTempModSet">AddToTempModSet</a> to add mods to the set (which will be instantly downloaded and extracted). If you no longer need a mod, you can call <a href="#K2_RemoveFromTempModSet">RemoveFromTempModSet</a> which will remove the file. Once you have finished with a TempModSet, you can call <a href="#K2_CloseTempModSet">CloseTempModSet</a> which will delete all temporary mods. Temporary mods are also deleted the next time you re-initialize the SDK.</p>
+</div>
+<div class="paragraph">
+<p>Like regular mods, Temp Mods can be queried using <a href="#K2_QueryTempModSet">QueryTempModSet</a> to get a ModCollectionEntry with an installation path.</p>
+</div>
+<div class="sect3">
+<h4 id="_installing_temporary_mods">Installing Temporary Mods</h4>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<img src="img/temp_mod_init.png" alt="temp mod init">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">Modio</span><span class="o">::</span><span class="n">EnableModManagement</span><span class="p">([](</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span> <span class="n">ModEvent</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ModEvent</span><span class="p">.</span><span class="n">Status</span> <span class="o">&amp;&amp;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">Event</span> <span class="o">==</span> <span class="n">Modio</span><span class="o">::</span><span class="n">ModManagementEvent</span><span class="o">::</span><span class="n">EventType</span><span class="o">::</span><span class="n">Installed</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Mod with ID: "</span> <span class="o">&lt;&lt;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">ID</span> <span class="o">&lt;&lt;</span> <span class="s">" is installed"</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Mod with ID: "</span> <span class="o">&lt;&lt;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">ID</span> <span class="o">&lt;&lt;</span> <span class="s">" failed to install: "</span> <span class="o">&lt;&lt;</span> <span class="n">ModEvent</span><span class="p">.</span><span class="n">Status</span><span class="p">.</span><span class="n">message</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Modio</span><span class="o">::</span><span class="n">ModID</span><span class="o">&gt;</span> <span class="n">ModIds</span> <span class="o">=</span> <span class="p">{</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">};</span>
+<span class="n">Modio</span><span class="o">::</span><span class="n">InitTempModSet</span><span class="p">(</span><span class="n">ModIds</span><span class="p">);</span>
+<span class="k">while</span><span class="p">(</span><span class="n">Modio</span><span class="o">::</span><span class="n">IsModManagementBusy</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="n">Modio</span><span class="o">::</span><span class="n">RunPendingHandlers</span><span class="p">();</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>This call will start a TempModSet and install Mods with IDs 8, 4 and 5.</p>
+</div>
+<div class="paragraph">
+<p>Note | If you add an already subscribed mod to TempModSet, it will not download be downloaded as the player will already have that content. If you try to unsubscribe from it while it&#8217;s in TempModSet, the SDK it will wait for it to be removed from TempModSet before processing the unsubscribe.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -5912,6 +6006,20 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">HandleSubscribeClicked</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="HandlePrioritizeTransferClicked">Handle Prioritize Transfer Clicked</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_HandlePrioritizeTransferClicked.png" alt="nd img HandlePrioritizeTransferClicked">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">HandlePrioritizeTransferClicked</span><span class="p">()</span></code></pre>
 </div>
 </div>
 <hr>
@@ -9794,6 +9902,58 @@ To perform any of these actions, the muting user must be authenticated.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="QueryUserPurchasedMods">Query User Purchased Mods</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_QueryUserPurchasedMods.png" alt="nd img QueryUserPurchasedMods">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">TMap</span><span class="o">&lt;</span><span class="n">FModioModID</span><span class="p">,</span><span class="n">FModioModInfo</span><span class="o">&gt;</span> <span class="n">QueryUserPurchasedMods</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Returns the users purchased mods. You must call FetchUserPurchasesAsync to populate the cache/.</p>
+</div>
+<h5 id="_requirements_2" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+<li>
+<p><em>no-rate-limiting</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_119" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Map of FModioModID to FModioModInfo for all purchases a user has made.</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_returns_39" class="discrete">Returns</h5>
+<div class="paragraph">
+<p>Map of FModioModID to FModioModInfo for all purchases a user has made.</p>
+</div>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="QueryUserInstallations">Query User Installations</h4>
 <div class="imageblock">
 <div class="content">
@@ -9808,7 +9968,7 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="paragraph">
 <p>Fetches the subset of the user&#8217;s subscribed mods that are installed and therefore ready for loading</p>
 </div>
-<h5 id="_parameters_119" class="discrete">Parameters</h5>
+<h5 id="_parameters_120" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9829,7 +9989,7 @@ To perform any of these actions, the muting user must be authenticated.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_39" class="discrete">Returns</h5>
+<h5 id="_returns_40" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>TMap&lt;FModioID, FModioModCollectionEntry&gt; providing information about the subscribed mods</p>
 </div>
@@ -9850,7 +10010,7 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="paragraph">
 <p>Fetches all mods installed on the system such that a consuming application can present the information in a UI in order to free up space by uninstalling mods</p>
 </div>
-<h5 id="_parameters_120" class="discrete">Parameters</h5>
+<h5 id="_parameters_121" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9867,7 +10027,7 @@ To perform any of these actions, the muting user must be authenticated.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_40" class="discrete">Returns</h5>
+<h5 id="_returns_41" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods installed on the system regardless of which user installed them</p>
 </div>
@@ -9888,7 +10048,7 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="paragraph">
 <p>Cancels or suspends the current mod update, installation, or upload, and begins processing a pending operation for the specified mod ID</p>
 </div>
-<h5 id="_requirements_2" class="discrete">Requirements</h5>
+<h5 id="_requirements_3" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -9899,7 +10059,7 @@ To perform any of these actions, the muting user must be authenticated.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_121" class="discrete">Parameters</h5>
+<h5 id="_parameters_122" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9920,7 +10080,7 @@ To perform any of these actions, the muting user must be authenticated.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_41" class="discrete">Returns</h5>
+<h5 id="_returns_42" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Error code indicating the status of the prioritization request. Will be empty if the prioritization was successful or if the mod was already being processed</p>
 </div>
@@ -9968,7 +10128,7 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="paragraph">
 <p>Queries the server to verify the state of the currently authenticated user if there is one present. An empty ErrorCode is passed to the callback to indicate successful verification, i.e. the mod.io server was contactable and the user&#8217;s authentication remains valid.</p>
 </div>
-<h5 id="_requirements_3" class="discrete">Requirements</h5>
+<h5 id="_requirements_4" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -9982,7 +10142,7 @@ To perform any of these actions, the muting user must be authenticated.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_122" class="discrete">Parameters</h5>
+<h5 id="_parameters_123" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10037,7 +10197,7 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="paragraph">
 <p>Sends a request to the mod.io server to remove the specified mod from the user&#8217;s list of subscriptions. If no other local users are subscribed to the specified mod this function will also mark the mod for uninstallation by the SDK.</p>
 </div>
-<h5 id="_requirements_4" class="discrete">Requirements</h5>
+<h5 id="_requirements_5" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10051,7 +10211,7 @@ To perform any of these actions, the muting user must be authenticated.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_123" class="discrete">Parameters</h5>
+<h5 id="_parameters_124" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10118,7 +10278,7 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="paragraph">
 <p>Unmute a user. This will allow mod.io to mods authored by the previously muted user. when performing searches.</p>
 </div>
-<h5 id="_requirements_5" class="discrete">Requirements</h5>
+<h5 id="_requirements_6" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10129,7 +10289,7 @@ To perform any of these actions, the muting user must be authenticated.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_124" class="discrete">Parameters</h5>
+<h5 id="_parameters_125" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10188,7 +10348,7 @@ To perform any of these actions, the muting user must be authenticated.
 <div class="paragraph">
 <p>Sends a request to the mod.io server to add the specified mod to the user&#8217;s list of subscriptions, and marks the mod for local installation by the SDK</p>
 </div>
-<h5 id="_requirements_6" class="discrete">Requirements</h5>
+<h5 id="_requirements_7" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10202,7 +10362,7 @@ To perform any of these actions, the muting user must be authenticated.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_125" class="discrete">Parameters</h5>
+<h5 id="_parameters_126" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10285,7 +10445,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h5 id="_requirements_7" class="discrete">Requirements</h5>
+<h5 id="_requirements_8" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10299,7 +10459,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_126" class="discrete">Parameters</h5>
+<h5 id="_parameters_127" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10366,7 +10526,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h5 id="_requirements_8" class="discrete">Requirements</h5>
+<h5 id="_requirements_9" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10380,7 +10540,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_127" class="discrete">Parameters</h5>
+<h5 id="_parameters_128" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10447,7 +10607,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this user.</p>
 </div>
-<h5 id="_requirements_9" class="discrete">Requirements</h5>
+<h5 id="_requirements_10" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10461,7 +10621,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_128" class="discrete">Parameters</h5>
+<h5 id="_parameters_129" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10532,7 +10692,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Edits the parameters of a mod, by updating any fields set in the Params object to match the passed-in values. Fields left empty on the Params object will not be updated.</p>
 </div>
-<h5 id="_requirements_10" class="discrete">Requirements</h5>
+<h5 id="_requirements_11" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10546,7 +10706,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_129" class="discrete">Parameters</h5>
+<h5 id="_parameters_130" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10617,7 +10777,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with an OperationCanceled error category. This function will NOT block while the deinitialization occurs.</p>
 </div>
-<h5 id="_parameters_130" class="discrete">Parameters</h5>
+<h5 id="_parameters_131" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10651,7 +10811,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Set language to get corresponding data from the server</p>
 </div>
-<h5 id="_parameters_131" class="discrete">Parameters</h5>
+<h5 id="_parameters_132" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10685,7 +10845,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Begins email authentication for the current session by requesting a one-time code be sent to the specified email address if it is associated with a mod.io account</p>
 </div>
-<h5 id="_requirements_11" class="discrete">Requirements</h5>
+<h5 id="_requirements_12" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10699,7 +10859,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_132" class="discrete">Parameters</h5>
+<h5 id="_parameters_133" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10758,7 +10918,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Sends a content report to mod.io. When using this function, please inform your users that if they provide their contact name or details in the Report parameter, that those may be shared with the person responsible for the content being reported. For more information on what data in a report will be shared with whom, please see <a href="https://mod.io/report/widget">our website&#8217;s report form</a> for more information.</p>
 </div>
-<h5 id="_requirements_12" class="discrete">Requirements</h5>
+<h5 id="_requirements_13" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10766,7 +10926,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_133" class="discrete">Parameters</h5>
+<h5 id="_parameters_134" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10811,6 +10971,83 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="K2_RemoveFromTempModSet">RemoveFromTempModSet</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_RemoveFromTempModSet.png" alt="nd img K2 RemoveFromTempModSet">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioErrorCode</span> <span class="n">K2_RemoveFromTempModSet</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModID</span><span class="o">&gt;</span> <span class="n">ModIds</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Remove mods from a Temp Mod Set, uninstall every temp mod given in the param if they are not already subbed.</p>
+</div>
+<h5 id="_requirements_14" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>modmanagement enabled</em></p>
+</li>
+<li>
+<p><em>TempModSet initialized</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_135" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Ids</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Error code indicating the status of the TempModSet. Will be empty if it was successful</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_returns_43" class="discrete">Returns</h5>
+<div class="paragraph">
+<p>Error code indicating the status of the TempModSet. Will be empty if it was successful</p>
+</div>
+<h5 id="_error_values_13" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagementDisabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagement not enable</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TempModSetNotInitialize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TempModSet not initialized</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="K2_QueryUserProfile">QueryUserProfile</h4>
 <div class="imageblock">
 <div class="content">
@@ -10825,7 +11062,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Fetches the currently authenticated mod.io user profile if there is one associated with the current platform user</p>
 </div>
-<h5 id="_parameters_134" class="discrete">Parameters</h5>
+<h5 id="_parameters_136" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10842,9 +11079,47 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_42" class="discrete">Returns</h5>
+<h5 id="_returns_44" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>FModioOptionalUser object containing profile information</p>
+</div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="K2_QueryTempModSet">QueryTempModSet</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_QueryTempModSet.png" alt="nd img K2 QueryTempModSet">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">TMap</span><span class="o">&lt;</span><span class="n">FModioModID</span><span class="p">,</span><span class="n">FModioModCollectionEntry</span><span class="o">&gt;</span> <span class="n">K2_QueryTempModSet</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Query every System and Temp Mod in TempModSet</p>
+</div>
+<h5 id="_parameters_137" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods in TempModSet</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_returns_45" class="discrete">Returns</h5>
+<div class="paragraph">
+<p>TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods in TempModSet</p>
 </div>
 <hr>
 </div>
@@ -10863,7 +11138,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Provides progress information for a mod installation or update operation if one is currently in progress.</p>
 </div>
-<h5 id="_parameters_135" class="discrete">Parameters</h5>
+<h5 id="_parameters_138" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10880,10 +11155,66 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_43" class="discrete">Returns</h5>
+<h5 id="_returns_46" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Optional ModProgressInfo object containing information regarding the progress of the installation operation.</p>
 </div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="K2_PurchaseModAsync">PurchaseModAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_PurchaseModAsync.png" alt="nd img K2 PurchaseModAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_PurchaseModAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="n">int32</span> <span class="n">ExpectedPrice</span><span class="p">,</span> <span class="n">FOnPurchaseModDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Purchases a mod for the current player</p>
+</div>
+<h5 id="_requirements_15" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+<li>
+<p><em>no-rate-limiting</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_139" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod ID</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the mod to purchase</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Expected Price</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The price the user is expected to pay for the mod, generally ModInfo.Price. This ensures that there is consistency between the displayed price and the price in the backend. If there is a mismatch, the purchase will fail.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback invoked with purchase information once the purchase is completed.</p></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 <div class="sect3">
@@ -10901,7 +11232,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieve a list of updates between the users local mod state, and the server-side state. This allows you to identify which mods will be modified by the next call to <a href="#K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</a> in order to perform any content management (such as unloading files) that might be required.</p>
 </div>
-<h5 id="_parameters_136" class="discrete">Parameters</h5>
+<h5 id="_parameters_140" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10935,7 +11266,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Mute a user. This will prevent mod.io from returning mods authored by the muted user. when performing searches.</p>
 </div>
-<h5 id="_requirements_13" class="discrete">Requirements</h5>
+<h5 id="_requirements_16" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -10946,7 +11277,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_137" class="discrete">Parameters</h5>
+<h5 id="_parameters_141" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10967,7 +11298,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_13" class="discrete">Error Values</h5>
+<h5 id="_error_values_14" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11005,7 +11336,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Provides a list of games for the current user, that match the parameters specified in the filter</p>
 </div>
-<h5 id="_requirements_14" class="discrete">Requirements</h5>
+<h5 id="_requirements_17" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11019,7 +11350,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_138" class="discrete">Parameters</h5>
+<h5 id="_parameters_142" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11040,7 +11371,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_14" class="discrete">Error Values</h5>
+<h5 id="_error_values_15" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11078,7 +11409,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Provides a list of mods that the user has submitted, or is a team member for, for the current game, applying the parameters specified in the filter.</p>
 </div>
-<h5 id="_requirements_15" class="discrete">Requirements</h5>
+<h5 id="_requirements_18" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11092,7 +11423,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_139" class="discrete">Parameters</h5>
+<h5 id="_parameters_143" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11113,7 +11444,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_15" class="discrete">Error Values</h5>
+<h5 id="_error_values_16" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11151,7 +11482,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Provides a list of mods for the current game, that match the parameters specified in the filter</p>
 </div>
-<h5 id="_requirements_16" class="discrete">Requirements</h5>
+<h5 id="_requirements_19" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11162,7 +11493,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_140" class="discrete">Parameters</h5>
+<h5 id="_parameters_144" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11183,7 +11514,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_16" class="discrete">Error Values</h5>
+<h5 id="_error_values_17" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11197,6 +11528,76 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">SDKNotInitialized</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="K2_InitTempModSet">InitTempModSet</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_InitTempModSet.png" alt="nd img K2 InitTempModSet">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioErrorCode</span> <span class="n">K2_InitTempModSet</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModID</span><span class="o">&gt;</span> <span class="n">ModIds</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Install every temp mod given in the param if they are not already subbed.</p>
+</div>
+<h5 id="_requirements_20" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>modmanagement enabled</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_145" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Ids</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Error code indicating the status of the TempModSet. Will be empty if it was successful</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_returns_47" class="discrete">Returns</h5>
+<div class="paragraph">
+<p>Error code indicating the status of the TempModSet. Will be empty if it was successful</p>
+</div>
+<h5 id="_error_values_18" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagementDisabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagement not enable</p></td>
 </tr>
 </tbody>
 </table>
@@ -11217,7 +11618,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the set of mods the specified user has installed on this device</p>
 </div>
-<h5 id="_parameters_141" class="discrete">Parameters</h5>
+<h5 id="_parameters_146" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11238,7 +11639,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_17" class="discrete">Error Values</h5>
+<h5 id="_error_values_19" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11266,6 +11667,54 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="K2_GetUserWalletBalanceAsync">GetUserWalletBalanceAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_GetUserWalletBalanceAsync.png" alt="nd img K2 GetUserWalletBalanceAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_GetUserWalletBalanceAsync</span><span class="p">(</span><span class="n">FOnGetUserWalletBalanceDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Gets the users current wallet balance. This will also create a wallet for a user if one does not exist. You should ensure this is called prior to calling PurchaseModAsync purchase will fail.</p>
+</div>
+<h5 id="_requirements_21" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+<li>
+<p><em>no-rate-limiting</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_147" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback invoked with the users wallet balance</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="K2_GetUserMediaAvatarAsync">GetUserMediaAsync (Avatar)</h4>
 <div class="imageblock">
 <div class="content">
@@ -11280,7 +11729,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Downloads the avatar of the currently authenticated user. Will only perform a download if there is no local cache of the avatar or if that cached copy is out-of-date.</p>
 </div>
-<h5 id="_requirements_17" class="discrete">Requirements</h5>
+<h5 id="_requirements_22" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11294,7 +11743,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_142" class="discrete">Parameters</h5>
+<h5 id="_parameters_148" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11315,7 +11764,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_18" class="discrete">Error Values</h5>
+<h5 id="_error_values_20" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11339,6 +11788,54 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="K2_GetUserDerivedTokenAsync">GetUserDerivedTokenAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_GetUserDerivedTokenAsync.png" alt="nd img K2 GetUserDerivedTokenAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_GetUserDerivedTokenAsync</span><span class="p">(</span><span class="n">FOnGetUserDerivedTokenDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Get a User Derived Token that can be used for S2S service calls</p>
+</div>
+<h5 id="_requirements_23" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+<li>
+<p><em>no-rate-limiting</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_149" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback invoked with purchase information once the purchase is completed.</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="K2_GetTermsOfUseAsync">GetTermsOfUseAsync</h4>
 <div class="imageblock">
 <div class="content">
@@ -11353,7 +11850,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>This function retrieves the information required for a game to display the mod.io terms of use to a player who wishes to create a mod.io account</p>
 </div>
-<h5 id="_requirements_18" class="discrete">Requirements</h5>
+<h5 id="_requirements_24" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11361,7 +11858,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_143" class="discrete">Parameters</h5>
+<h5 id="_parameters_150" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11378,7 +11875,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_19" class="discrete">Error Values</h5>
+<h5 id="_error_values_21" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11412,7 +11909,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>List all the users that have been muted by the current user.</p>
 </div>
-<h5 id="_requirements_19" class="discrete">Requirements</h5>
+<h5 id="_requirements_25" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11423,7 +11920,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_144" class="discrete">Parameters</h5>
+<h5 id="_parameters_151" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11440,7 +11937,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_20" class="discrete">Error Values</h5>
+<h5 id="_error_values_22" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11474,7 +11971,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Fetches the available tags used on mods for the current game. These tags can them be used in conjunction with the FilterParams passed to ListAllMods Will be cached when first received</p>
 </div>
-<h5 id="_requirements_20" class="discrete">Requirements</h5>
+<h5 id="_requirements_26" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11485,7 +11982,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_145" class="discrete">Parameters</h5>
+<h5 id="_parameters_152" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11502,7 +11999,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_21" class="discrete">Error Values</h5>
+<h5 id="_error_values_23" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11536,7 +12033,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Downloads the logo for the specified mod. Will use existing file if it is already present on disk</p>
 </div>
-<h5 id="_requirements_21" class="discrete">Requirements</h5>
+<h5 id="_requirements_27" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11547,7 +12044,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_146" class="discrete">Parameters</h5>
+<h5 id="_parameters_153" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11572,7 +12069,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_22" class="discrete">Error Values</h5>
+<h5 id="_error_values_24" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11618,7 +12115,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get a gallery image for the specified mod ID. If it already exists on disk the file will be reused unless it is outdated</p>
 </div>
-<h5 id="_requirements_22" class="discrete">Requirements</h5>
+<h5 id="_requirements_28" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11629,7 +12126,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_147" class="discrete">Parameters</h5>
+<h5 id="_parameters_154" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11658,7 +12155,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_23" class="discrete">Error Values</h5>
+<h5 id="_error_values_25" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11704,7 +12201,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Downloads the creator avatar for a specified mod. Will use existing file if it is already present on disk and not outdated</p>
 </div>
-<h5 id="_requirements_23" class="discrete">Requirements</h5>
+<h5 id="_requirements_29" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11715,7 +12212,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_148" class="discrete">Parameters</h5>
+<h5 id="_parameters_155" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11740,7 +12237,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_24" class="discrete">Error Values</h5>
+<h5 id="_error_values_26" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11786,7 +12283,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Fetches detailed information about the specified mod, including description and file metadata for the most recent release</p>
 </div>
-<h5 id="_requirements_24" class="discrete">Requirements</h5>
+<h5 id="_requirements_30" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11797,7 +12294,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_149" class="discrete">Parameters</h5>
+<h5 id="_parameters_156" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11818,7 +12315,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_25" class="discrete">Error Values</h5>
+<h5 id="_error_values_27" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11872,7 +12369,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h5 id="_requirements_25" class="discrete">Requirements</h5>
+<h5 id="_requirements_31" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -11883,7 +12380,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_150" class="discrete">Parameters</h5>
+<h5 id="_parameters_157" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11908,7 +12405,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_26" class="discrete">Error Values</h5>
+<h5 id="_error_values_28" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11958,7 +12455,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h5 id="_parameters_151" class="discrete">Parameters</h5>
+<h5 id="_parameters_158" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11992,7 +12489,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Fetches detailed information about the specified game</p>
 </div>
-<h5 id="_requirements_26" class="discrete">Requirements</h5>
+<h5 id="_requirements_32" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -12003,7 +12500,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_152" class="discrete">Parameters</h5>
+<h5 id="_parameters_159" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12024,7 +12521,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_27" class="discrete">Error Values</h5>
+<h5 id="_error_values_29" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12066,7 +12563,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Forcibly uninstalls a mod from the system. This can be used when the host application requires additional space for other mods. The current user must not be subscribed to the mod to force uninstall. To remove a mod the current user is subscribed to, first use <a href="#K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a>. If the mod does not uninstall (due to a different user on the same system remaining subscribed), ForceUninstallModAsync can be called next.</p>
 </div>
-<h5 id="_parameters_153" class="discrete">Parameters</h5>
+<h5 id="_parameters_160" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12087,7 +12584,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_28" class="discrete">Error Values</h5>
+<h5 id="_error_values_30" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12115,6 +12612,54 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="K2_FetchUserPurchasesAsync">FetchUserPurchasesAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_FetchUserPurchasesAsync.png" alt="nd img K2 FetchUserPurchasesAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_FetchUserPurchasesAsync</span><span class="p">(</span><span class="n">FOnFetchUserPurchasesDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Fetches the user&#8217;s purchases. This populates a runtime cache of purchase information that can be accessed using QueryUserPurchasedMods.</p>
+</div>
+<h5 id="_requirements_33" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>authenticated-user</em></p>
+</li>
+<li>
+<p><em>no-rate-limiting</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_161" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback invoked once the call has been completed.</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="K2_FetchExternalUpdatesAsync">FetchExternalUpdatesAsync</h4>
 <div class="imageblock">
 <div class="content">
@@ -12129,7 +12674,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Synchronises the local list of the current user&#8217;s subscribed mods with the server. Any mods that have been externally subscribed will be automatically marked for installation, and mods that have been externally removed from the user&#8217;s subscriptions may be uninstalled if no other local users have a current subscription.</p>
 </div>
-<h5 id="_parameters_154" class="discrete">Parameters</h5>
+<h5 id="_parameters_162" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12163,7 +12708,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enables the automatic management of installed mods on the system based on the user&#8217;s subscriptions.</p>
 </div>
-<h5 id="_parameters_155" class="discrete">Parameters</h5>
+<h5 id="_parameters_163" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12187,6 +12732,79 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="K2_CloseTempModSet">CloseTempModSet</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_CloseTempModSet.png" alt="nd img K2 CloseTempModSet">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioErrorCode</span> <span class="n">K2_CloseTempModSet</span><span class="p">()</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Uninstall every temp mod.</p>
+</div>
+<h5 id="_requirements_34" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>modmanagement enabled</em></p>
+</li>
+<li>
+<p><em>TempModSet initialized</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_164" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Error code indicating the status of the TempModSet. Will be empty if it was successful</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_returns_48" class="discrete">Returns</h5>
+<div class="paragraph">
+<p>Error code indicating the status of the TempModSet. Will be empty if it was successful</p>
+</div>
+<h5 id="_error_values_31" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagementDisabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagement not enable</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TempModSetNotInitialize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TempModSet not initialized</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="K2_ClearUserDataAsync">ClearUserDataAsync</h4>
 <div class="imageblock">
 <div class="content">
@@ -12201,7 +12819,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>De-authenticates the current mod.io user for the current session, and clears all user-specific data stored on the current device. Any subscribed mods that are installed but do not have other local users subscribed will be uninstalled</p>
 </div>
-<h5 id="_requirements_27" class="discrete">Requirements</h5>
+<h5 id="_requirements_35" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -12215,7 +12833,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_156" class="discrete">Parameters</h5>
+<h5 id="_parameters_165" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12232,7 +12850,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_29" class="discrete">Error Values</h5>
+<h5 id="_error_values_32" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12266,7 +12884,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Uses platform-specific authentication to associate a mod.io user account with the current platform user</p>
 </div>
-<h5 id="_requirements_28" class="discrete">Requirements</h5>
+<h5 id="_requirements_36" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -12280,7 +12898,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_157" class="discrete">Parameters</h5>
+<h5 id="_parameters_166" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12305,7 +12923,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_30" class="discrete">Error Values</h5>
+<h5 id="_error_values_33" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12343,7 +12961,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Completes email authentication for the current session by submitting the one-time code sent to the user&#8217;s email address</p>
 </div>
-<h5 id="_requirements_29" class="discrete">Requirements</h5>
+<h5 id="_requirements_37" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -12357,7 +12975,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_158" class="discrete">Parameters</h5>
+<h5 id="_parameters_167" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12378,7 +12996,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_31" class="discrete">Error Values</h5>
+<h5 id="_error_values_34" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12416,7 +13034,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still exist should you choose to restore it at a later date. Archiving is restricted to team managers and administrators only. Note that restoration and permanent deletion of a mod is possible only via web interface.</p>
 </div>
-<h5 id="_requirements_30" class="discrete">Requirements</h5>
+<h5 id="_requirements_38" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -12430,7 +13048,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_159" class="discrete">Parameters</h5>
+<h5 id="_parameters_168" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12451,7 +13069,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_32" class="discrete">Error Values</h5>
+<h5 id="_error_values_35" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12477,6 +13095,83 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">InvalidArgsError</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The supplied mod ID is invalid</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="K2_AddToTempModSet">AddToTempModSet</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_K2_AddToTempModSet.png" alt="nd img K2 AddToTempModSet">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioErrorCode</span> <span class="n">K2_AddToTempModSet</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModID</span><span class="o">&gt;</span> <span class="n">ModIds</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add mods to a Temp Mod Set, install every temp mod given in the param if they are not already subbed.</p>
+</div>
+<h5 id="_requirements_39" class="discrete">Requirements</h5>
+<div class="ulist">
+<ul>
+<li>
+<p><em>initialized-sdk</em></p>
+</li>
+<li>
+<p><em>modmanagement enabled</em></p>
+</li>
+<li>
+<p><em>TempModSet initialized</em></p>
+</li>
+</ul>
+</div>
+<h5 id="_parameters_169" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio Subsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Ids</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Error code indicating the status of the TempModSet. Will be empty if it was successful</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_returns_49" class="discrete">Returns</h5>
+<div class="paragraph">
+<p>Error code indicating the status of the TempModSet. Will be empty if it was successful</p>
+</div>
+<h5 id="_error_values_36" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagementDisabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModManagement not enable</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TempModSetNotInitialize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TempModSet not initialized</p></td>
 </tr>
 </tbody>
 </table>
@@ -12511,7 +13206,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the automatic management process is currently installing or removing mods</p>
 </div>
-<h5 id="_parameters_160" class="discrete">Parameters</h5>
+<h5 id="_parameters_170" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12528,7 +13223,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_44" class="discrete">Returns</h5>
+<h5 id="_returns_50" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>True if automatic management is currently performing an operation</p>
 </div>
@@ -12549,7 +13244,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>If the last request to the mod.io servers returned a validation failure, this function returns extended information describing the fields that failed validation.</p>
 </div>
-<h5 id="_requirements_31" class="discrete">Requirements</h5>
+<h5 id="_requirements_40" class="discrete">Requirements</h5>
 <div class="ulist">
 <ul>
 <li>
@@ -12557,7 +13252,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_161" class="discrete">Parameters</h5>
+<h5 id="_parameters_171" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12574,7 +13269,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_45" class="discrete">Returns</h5>
+<h5 id="_returns_51" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Collection of FModioValidationError objects, or empty collection if there were no validation failures</p>
 </div>
@@ -12595,7 +13290,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Disables automatic installation or uninstallation of mods based on the user&#8217;s subscriptions. Allows currently processing installation to complete; will cancel any pending operations when called.</p>
 </div>
-<h5 id="_parameters_162" class="discrete">Parameters</h5>
+<h5 id="_parameters_172" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12626,7 +13321,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">TArray</span><span class="o">&lt;</span><span class="n">UModioTagInfoUI</span><span class="o">*&gt;</span> <span class="n">GetTagCategoriesForUI</span><span class="p">()</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_163" class="discrete">Parameters</h5>
+<h5 id="_parameters_173" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12643,7 +13338,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_returns_46" class="discrete">Returns</h5>
+<h5 id="_returns_52" class="discrete">Returns</h5>
 <div class="paragraph">
 <p>Array with its corresponding info tags</p>
 </div>
@@ -12714,7 +13409,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Call this to pass in a delegate that will receive operation state change notifications</p>
 </div>
-<h5 id="_parameters_164" class="discrete">Parameters</h5>
+<h5 id="_parameters_174" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12748,7 +13443,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Call this to request that the underlying widget retry the async operation</p>
 </div>
-<h5 id="_parameters_165" class="discrete">Parameters</h5>
+<h5 id="_parameters_175" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12796,7 +13491,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Call this to pass in a delegate that will receive operation state change notifications</p>
 </div>
-<h5 id="_parameters_166" class="discrete">Parameters</h5>
+<h5 id="_parameters_176" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12887,7 +13582,7 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">Configure</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h5 id="_parameters_167" class="discrete">Parameters</h5>
+<h5 id="_parameters_177" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12939,7 +13634,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Function to display an error code notification widget</p>
 </div>
-<h5 id="_parameters_168" class="discrete">Parameters</h5>
+<h5 id="_parameters_178" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -12987,7 +13682,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Function to display an arbitrary notification widget that the caller has already configured</p>
 </div>
-<h5 id="_parameters_169" class="discrete">Parameters</h5>
+<h5 id="_parameters_179" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -13218,6 +13913,37 @@ This function is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">QueryIsModEnabled</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ID</span><span class="p">)</span></code></pre>
 </div>
 </div>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="PrioritizeTransferForMod">Prioritize Transfer for Mod</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_PrioritizeTransferForMod.png" alt="nd img PrioritizeTransferForMod">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">PrioritizeTransferForMod</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModToPrioritize</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h5 id="_parameters_180" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modio UISubsystem Object Reference</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod to Prioritize</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ID for the mod to prioritize</p></td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 <div class="sect3">
@@ -13490,13 +14216,111 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PlatformSupport</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Platforms that are supported by this title</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FModioModTagInfo&gt;">TArray&lt;FModioModTagInfo&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagOptions</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tags available for this game</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiomodtaginfo">ModioModTagInfo</h3>
+<h4 id="_variables_2" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupName</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Raw unlocalized tag group name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FString&gt;">TArray&lt;FString&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValues</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Valid raw unlocalized tag values this group contains</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TMap&lt;FString,FText&gt;">TMap&lt;FString,FText&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupNameLocalizationData</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Culture code &#8594; localized tag category name mapping for all configured languages</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FModioModTagLocalizationData&gt;">TArray&lt;FModioModTagLocalizationData&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValueLocalizationData</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Localization data for this tag category&#8217;s values in all configured languages</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#bool">bool</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bAllowMultipleSelection</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">True if multiple tags from the group can be used simultaneously</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiolocalizedtagcategory">ModioLocalizedTagCategory</h3>
+<div class="paragraph">
+<p>Struct containing pre-localized display strings for a tag group</p>
+</div>
+<h4 id="_variables_3" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GroupName</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Localized display string for this tag category&#8217;s name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FString&gt;">TArray&lt;FString&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Localized display strings for all valid values in this tag category</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiomodtaglocalizationdata">ModioModTagLocalizationData</h3>
+<div class="paragraph">
+<p>Localization data for an individual tag value</p>
+</div>
+<h4 id="_variables_4" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tag</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The original raw unlocalized tag value used by the REST API</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TMap&lt;FString,FText&gt;">TMap&lt;FString,FText&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Translations</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Culture code &#8594; Localized tag value string mapping for all configured languages.</p></td>
+</tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="sect2">
 <h3 id="_modiogameplatform">ModioGamePlatform</h3>
-<h4 id="_variables_2" class="discrete">Variables</h4>
+<h4 id="_variables_5" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13525,7 +14349,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiootherurl">ModioOtherUrl</h3>
-<h4 id="_variables_3" class="discrete">Variables</h4>
+<h4 id="_variables_6" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13552,7 +14376,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Numerous aggregate stats for the game</p>
 </div>
-<h4 id="_variables_4" class="discrete">Variables</h4>
+<h4 id="_variables_7" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13605,7 +14429,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiotheme">ModioTheme</h3>
-<h4 id="_variables_5" class="discrete">Variables</h4>
+<h4 id="_variables_8" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13649,7 +14473,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modioheaderimage">ModioHeaderImage</h3>
-<h4 id="_variables_6" class="discrete">Variables</h4>
+<h4 id="_variables_9" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13673,7 +14497,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiologo">ModioLogo</h3>
-<h4 id="_variables_7" class="discrete">Variables</h4>
+<h4 id="_variables_10" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13712,7 +14536,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modioicon">ModioIcon</h3>
-<h4 id="_variables_8" class="discrete">Variables</h4>
+<h4 id="_variables_11" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13751,7 +14575,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiopagedresult">ModioPagedResult</h3>
-<h4 id="_variables_9" class="discrete">Variables</h4>
+<h4 id="_variables_12" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13794,7 +14618,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiomodinfo">ModioModInfo</h3>
-<h4 id="_variables_10" class="discrete">Variables</h4>
+<h4 id="_variables_13" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -13931,7 +14755,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Contains download stats and ratings for a mod</p>
 </div>
-<h4 id="_variables_11" class="discrete">Variables</h4>
+<h4 id="_variables_14" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14003,7 +14827,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiomodtag">ModioModTag</h3>
-<h4 id="_variables_12" class="discrete">Variables</h4>
+<h4 id="_variables_15" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14016,13 +14840,18 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tag</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FText">FText</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagLocalized</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="sect2">
 <h3 id="_modiometadata">ModioMetadata</h3>
-<h4 id="_variables_13" class="discrete">Variables</h4>
+<h4 id="_variables_16" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14049,7 +14878,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Metadata for a release archive for a mod</p>
 </div>
-<h4 id="_variables_14" class="discrete">Variables</h4>
+<h4 id="_variables_17" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14121,7 +14950,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiouser">ModioUser</h3>
-<h4 id="_variables_15" class="discrete">Variables</h4>
+<h4 id="_variables_18" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14167,35 +14996,6 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_modiomodtaginfo">ModioModTagInfo</h3>
-<h4 id="_variables_16" class="discrete">Variables</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupName</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The display name for the tag</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FString&gt;">TArray&lt;FString&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TagGroupValues</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The valid tags the group can have</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#bool">bool</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">bAllowMultipleSelection</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">True if multiple tags from the group can be used simultaneously</p></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_modioerrorcode">ModioErrorCode</h3>
 <div class="paragraph">
 <p>wrapper around Modio::ErrorCode</p>
@@ -14227,6 +15027,10 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="_modiooptionaluint64">ModioOptionalUInt64</h3>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_modiooptionalmodinfolist">ModioOptionalModInfoList</h3>
 <hr>
 </div>
@@ -14239,7 +15043,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Simple struct representing the outcome of a mod management operation</p>
 </div>
-<h4 id="_variables_17" class="discrete">Variables</h4>
+<h4 id="_variables_19" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14275,6 +15079,10 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="_modiooptionaltransactionrecord">ModioOptionalTransactionRecord</h3>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_modiooptionalmodid">ModioOptionalModID</h3>
 <hr>
 </div>
@@ -14290,7 +15098,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Simple struct to encapsulate data passed to external authentication systems</p>
 </div>
-<h4 id="_variables_18" class="discrete">Variables</h4>
+<h4 id="_variables_20" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14340,7 +15148,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocreatemodfileparams">ModioCreateModFileParams</h3>
-<h4 id="_variables_19" class="discrete">Variables</h4>
+<h4 id="_variables_21" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14359,7 +15167,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocreatemodparams">ModioCreateModParams</h3>
-<h4 id="_variables_20" class="discrete">Variables</h4>
+<h4 id="_variables_22" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14392,7 +15200,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modioimagewrapper">ModioImageWrapper</h3>
-<h4 id="_variables_21" class="discrete">Variables</h4>
+<h4 id="_variables_23" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14411,7 +15219,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modioinitializeoptions">ModioInitializeOptions</h3>
-<h4 id="_variables_22" class="discrete">Variables</h4>
+<h4 id="_variables_24" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14475,7 +15283,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h4 id="_variables_23" class="discrete">Variables</h4>
+<h4 id="_variables_25" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14511,7 +15319,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h4 id="_variables_24" class="discrete">Variables</h4>
+<h4 id="_variables_26" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14539,7 +15347,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiomodprogressinfo">ModioModProgressInfo</h3>
-<h4 id="_variables_25" class="discrete">Variables</h4>
+<h4 id="_variables_27" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14566,7 +15374,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiolink">ModioLink</h3>
-<h4 id="_variables_26" class="discrete">Variables</h4>
+<h4 id="_variables_28" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14595,7 +15403,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modioterms">ModioTerms</h3>
-<h4 id="_variables_27" class="discrete">Variables</h4>
+<h4 id="_variables_29" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14639,7 +15447,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiotransactionrecord">ModioTransactionRecord</h3>
-<h4 id="_variables_28" class="discrete">Variables</h4>
+<h4 id="_variables_30" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14649,7 +15457,7 @@ This class is part of an experimental feature and is subject to change.
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioModID">FModioModID</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AssociatedMod</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AssociatedModID</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -14674,16 +15482,12 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_modiooptionaltransactionrecord">ModioOptionalTransactionRecord</h3>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_modiooptionaluser">ModioOptionalUser</h3>
 <hr>
 </div>
 <div class="sect2">
 <h3 id="_modiouserlist">ModioUserList</h3>
-<h4 id="_variables_29" class="discrete">Variables</h4>
+<h4 id="_variables_31" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14710,7 +15514,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Wrapper struct containing information about a field validation error</p>
 </div>
-<h4 id="_variables_30" class="discrete">Variables</h4>
+<h4 id="_variables_32" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14734,7 +15538,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</h3>
-<h4 id="_variables_31" class="discrete">Variables</h4>
+<h4 id="_variables_33" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14753,7 +15557,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modionotificationparams">ModioNotificationParams</h3>
-<h4 id="_variables_32" class="discrete">Variables</h4>
+<h4 id="_variables_34" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14782,7 +15586,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiomodcategoryparams">ModioModCategoryParams</h3>
-<h4 id="_variables_33" class="discrete">Variables</h4>
+<h4 id="_variables_35" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14851,7 +15655,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocommontabdescriptor">ModioCommonTabDescriptor</h3>
-<h4 id="_variables_34" class="discrete">Variables</h4>
+<h4 id="_variables_36" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -14905,7 +15709,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocommoncodeinputtextboxinputstyle">ModioCommonCodeInputTextBoxInputStyle</h3>
-<h4 id="_variables_35" class="discrete">Variables</h4>
+<h4 id="_variables_37" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -15076,7 +15880,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the session identifier for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_170" class="discrete">Parameters</h4>
+<h4 id="_parameters_181" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15097,7 +15901,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_47" class="discrete">Returns</h4>
+<h4 id="_returns_53" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>New Initialization Options object with the session identifier set to the desired value</p>
 </div>
@@ -15118,7 +15922,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the portal for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_171" class="discrete">Parameters</h4>
+<h4 id="_parameters_182" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15139,7 +15943,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_48" class="discrete">Returns</h4>
+<h4 id="_returns_54" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>New Initialization Options object with the portal set to the desired value</p>
 </div>
@@ -15160,7 +15964,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if not equal</p>
 </div>
-<h4 id="_parameters_172" class="discrete">Parameters</h4>
+<h4 id="_parameters_183" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15198,7 +16002,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Make initialization options, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_173" class="discrete">Parameters</h4>
+<h4 id="_parameters_184" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15244,7 +16048,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a game id from a integer, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_174" class="discrete">Parameters</h4>
+<h4 id="_parameters_185" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15278,7 +16082,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create entitlement parameters</p>
 </div>
-<h4 id="_parameters_175" class="discrete">Parameters</h4>
+<h4 id="_parameters_186" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15312,7 +16116,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Creates an AuthenticationParams object</p>
 </div>
-<h4 id="_parameters_176" class="discrete">Parameters</h4>
+<h4 id="_parameters_187" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15337,7 +16141,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_49" class="discrete">Returns</h4>
+<h4 id="_returns_55" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The constructed FModioAuthenticationParams object for use with <a href="#K2_AuthenticateUserExternalAsync">AuthenticateUserExternalAsync</a></p>
 </div>
@@ -15358,7 +16162,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a ApiKey id from a string, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_177" class="discrete">Parameters</h4>
+<h4 id="_parameters_188" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15392,7 +16196,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use with care.</p>
 </div>
-<h4 id="_parameters_178" class="discrete">Parameters</h4>
+<h4 id="_parameters_189" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15409,7 +16213,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_50" class="discrete">Returns</h4>
+<h4 id="_returns_56" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The underlying value</p>
 </div>
@@ -15430,7 +16234,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if equal</p>
 </div>
-<h4 id="_parameters_179" class="discrete">Parameters</h4>
+<h4 id="_parameters_190" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15619,7 +16423,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetValue</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_180" class="discrete">Parameters</h4>
+<h4 id="_parameters_191" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15636,7 +16440,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_51" class="discrete">Returns</h4>
+<h4 id="_returns_57" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>0 if there is no error</p>
 </div>
@@ -15654,7 +16458,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetMessage</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_181" class="discrete">Parameters</h4>
+<h4 id="_parameters_192" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15671,7 +16475,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_52" class="discrete">Returns</h4>
+<h4 id="_returns_58" class="discrete">Returns</h4>
 <hr>
 </div>
 <div class="sect2">
@@ -15689,7 +16493,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the passed-in ErrorCode matches the specified error condition</p>
 </div>
-<h4 id="_parameters_182" class="discrete">Parameters</h4>
+<h4 id="_parameters_193" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15710,7 +16514,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_53" class="discrete">Returns</h4>
+<h4 id="_returns_59" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the code matches the condition</p>
 </div>
@@ -15731,7 +16535,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Runs a filter over the user&#8217;s subscription list</p>
 </div>
-<h4 id="_parameters_183" class="discrete">Parameters</h4>
+<h4 id="_parameters_194" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15846,7 +16650,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetLogoSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Logo</span><span class="p">,</span> <span class="n">EModioLogoSize</span> <span class="n">LogoSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_184" class="discrete">Parameters</h4>
+<h4 id="_parameters_195" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15867,7 +16671,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_54" class="discrete">Returns</h4>
+<h4 id="_returns_60" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the logo if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -15885,7 +16689,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetGallerySize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">GalleryImage</span><span class="p">,</span> <span class="n">EModioGallerySize</span> <span class="n">GallerySize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_185" class="discrete">Parameters</h4>
+<h4 id="_parameters_196" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15906,7 +16710,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_55" class="discrete">Returns</h4>
+<h4 id="_returns_61" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the gallery image if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -15924,7 +16728,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetAvatarSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Avatar</span><span class="p">,</span> <span class="n">EModioAvatarSize</span> <span class="n">AvatarSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_186" class="discrete">Parameters</h4>
+<h4 id="_parameters_197" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15945,7 +16749,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_56" class="discrete">Returns</h4>
+<h4 id="_returns_62" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Dimensions of the avatar if displayed in a 1:1 pixel ratio</p>
 </div>
@@ -15963,7 +16767,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetPath</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_187" class="discrete">Parameters</h4>
+<h4 id="_parameters_198" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -15980,7 +16784,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_57" class="discrete">Returns</h4>
+<h4 id="_returns_63" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Path to the mod&#8217;s installation folder on disk NOTE: If the mod is not yet installed this path may not yet exist. Check <a href="#GetModState">Get Mod State</a> before trying to load files in this location</p>
 </div>
@@ -15998,7 +16802,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioModState</span> <span class="n">GetModState</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_188" class="discrete">Parameters</h4>
+<h4 id="_parameters_199" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16015,7 +16819,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_58" class="discrete">Returns</h4>
+<h4 id="_returns_64" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>EModioModState enum representing current state of the mod</p>
 </div>
@@ -16033,7 +16837,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModInfo</span> <span class="n">GetModProfile</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_189" class="discrete">Parameters</h4>
+<h4 id="_parameters_200" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16050,7 +16854,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_59" class="discrete">Returns</h4>
+<h4 id="_returns_65" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioModInfo containing mod profile data</p>
 </div>
@@ -16068,7 +16872,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModID</span> <span class="n">GetID</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_190" class="discrete">Parameters</h4>
+<h4 id="_parameters_201" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16085,7 +16889,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_60" class="discrete">Returns</h4>
+<h4 id="_returns_66" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Mod ID</p>
 </div>
@@ -16106,7 +16910,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the total amount of progress required for the specified state.</p>
 </div>
-<h4 id="_parameters_191" class="discrete">Parameters</h4>
+<h4 id="_parameters_202" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16127,7 +16931,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_61" class="discrete">Returns</h4>
+<h4 id="_returns_67" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Modio::FileSize for total progress in bytes</p>
 </div>
@@ -16148,7 +16952,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Returns a EModioModProgressState indicating which state the mod operation is in</p>
 </div>
-<h4 id="_parameters_192" class="discrete">Parameters</h4>
+<h4 id="_parameters_203" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16182,7 +16986,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the progress value for the specified state. <code>CurrentProgress == TotalProgress</code> for states which have completed, for example if a mod is currently Extracting, then passing in Downloading would give you a value equal to the total download size because the download has completed</p>
 </div>
-<h4 id="_parameters_193" class="discrete">Parameters</h4>
+<h4 id="_parameters_204" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16203,7 +17007,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_62" class="discrete">Returns</h4>
+<h4 id="_returns_68" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioUnsigned64 containing current progress in bytes</p>
 </div>
@@ -16224,7 +17028,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get the default portal for the platform the game is running on.</p>
 </div>
-<h4 id="_parameters_194" class="discrete">Parameters</h4>
+<h4 id="_parameters_205" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16237,7 +17041,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_63" class="discrete">Returns</h4>
+<h4 id="_returns_69" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>EModioPortal of the portal to use</p>
 </div>
@@ -16258,7 +17062,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get the default Authentication Provider for the current platform the game is running on</p>
 </div>
-<h4 id="_parameters_195" class="discrete">Parameters</h4>
+<h4 id="_parameters_206" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16271,7 +17075,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_64" class="discrete">Returns</h4>
+<h4 id="_returns_70" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>EModioAuthenticationProvider to use for authentication calls</p>
 </div>
@@ -16292,7 +17096,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Gets the current platform that the game is running on</p>
 </div>
-<h4 id="_parameters_196" class="discrete">Parameters</h4>
+<h4 id="_parameters_207" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16305,7 +17109,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_65" class="discrete">Returns</h4>
+<h4 id="_returns_71" class="discrete">Returns</h4>
 <hr>
 </div>
 <div class="sect2">
@@ -16323,7 +17127,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Sets the correct decimals depending on the file size or speed</p>
 </div>
-<h4 id="_parameters_197" class="discrete">Parameters</h4>
+<h4 id="_parameters_208" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16357,7 +17161,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Dividend/Divisor and return the floating point result with no checks *</p>
 </div>
-<h4 id="_parameters_198" class="discrete">Parameters</h4>
+<h4 id="_parameters_209" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16392,7 +17196,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidSecurityCodeFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_199" class="discrete">Parameters</h4>
+<h4 id="_parameters_210" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16409,7 +17213,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_66" class="discrete">Returns</h4>
+<h4 id="_returns_72" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the security code has a valid format</p>
 </div>
@@ -16427,7 +17231,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidEmailAddressFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_200" class="discrete">Parameters</h4>
+<h4 id="_parameters_211" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16444,7 +17248,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_67" class="discrete">Returns</h4>
+<h4 id="_returns_73" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>true if the email address has a valid format</p>
 </div>
@@ -16465,7 +17269,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Gets the time span between present and specified past date FString</p>
 </div>
-<h4 id="_parameters_201" class="discrete">Parameters</h4>
+<h4 id="_parameters_212" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16499,7 +17303,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Shortens the specified large number</p>
 </div>
-<h4 id="_parameters_202" class="discrete">Parameters</h4>
+<h4 id="_parameters_213" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16530,7 +17334,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioInitializeOptions</span> <span class="n">GetProjectInitializeOptionsForSessionId</span><span class="p">(</span><span class="n">FString</span> <span class="n">SessionId</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_203" class="discrete">Parameters</h4>
+<h4 id="_parameters_214" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16603,7 +17407,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">GetDesiredFileSizeUnit</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_204" class="discrete">Parameters</h4>
+<h4 id="_parameters_215" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16620,7 +17424,7 @@ This class is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_68" class="discrete">Returns</h4>
+<h4 id="_returns_74" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>the desired file size unit</p>
 </div>
@@ -16641,7 +17445,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get Session Id for Windows  for initialization of the SDK return empty string if you are not on Windows</p>
 </div>
-<h4 id="_parameters_205" class="discrete">Parameters</h4>
+<h4 id="_parameters_216" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16669,7 +17473,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">Filesize_ToString</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MinDecimals</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MaxDecimals</span><span class="p">,</span> <span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">Unit</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIncludeUnitName</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_206" class="discrete">Parameters</h4>
+<h4 id="_parameters_217" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16702,7 +17506,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_69" class="discrete">Returns</h4>
+<h4 id="_returns_75" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>A text formatted from your specifications</p>
 </div>
@@ -16723,7 +17527,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Returns the default mod installation directory for this game and platform, ignoring overrides and without requiring the SDK to be initialized.</p>
 </div>
-<h4 id="_parameters_207" class="discrete">Parameters</h4>
+<h4 id="_parameters_218" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16740,7 +17544,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_70" class="discrete">Returns</h4>
+<h4 id="_returns_76" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The default mod installation directory for the specified game on the current platform</p>
 </div>
@@ -16929,7 +17733,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Submit a new mod, with its logo data coming from an in-memory buffer rather than a file.</p>
 </div>
-<h4 id="_parameters_208" class="discrete">Parameters</h4>
+<h4 id="_parameters_219" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -16971,7 +17775,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Queues the upload of a new mod file release for the specified mod, using the submitted parameters. This upload method accepts a a block of memory TArray&lt;uint8&gt; rather than a file path. The upload&#8217;s progress can be tracked in the same way as downloads; when completed, a Mod Management Event will be triggered with the result code for the upload.</p>
 </div>
-<h4 id="_requirements_32" class="discrete">Requirements</h4>
+<h4 id="_requirements_41" class="discrete">Requirements</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -16982,7 +17786,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_209" class="discrete">Parameters</h4>
+<h4 id="_parameters_220" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17020,7 +17824,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Loads an installed mod file into memory.</p>
 </div>
-<h4 id="_requirements_33" class="discrete">Requirements</h4>
+<h4 id="_requirements_42" class="discrete">Requirements</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -17031,7 +17835,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_210" class="discrete">Parameters</h4>
+<h4 id="_parameters_221" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17070,7 +17874,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetTextArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_211" class="discrete">Parameters</h4>
+<h4 id="_parameters_222" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17095,7 +17899,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_71" class="discrete">Returns</h4>
+<h4 id="_returns_77" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -17113,7 +17917,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetStringArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_212" class="discrete">Parameters</h4>
+<h4 id="_parameters_223" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17138,7 +17942,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_72" class="discrete">Returns</h4>
+<h4 id="_returns_78" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -17156,7 +17960,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetIntegerArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">int32</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_213" class="discrete">Parameters</h4>
+<h4 id="_parameters_224" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17181,7 +17985,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_73" class="discrete">Returns</h4>
+<h4 id="_returns_79" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -17199,7 +18003,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetFloatArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Value</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_214" class="discrete">Parameters</h4>
+<h4 id="_parameters_225" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17224,7 +18028,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_74" class="discrete">Returns</h4>
+<h4 id="_returns_80" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -17242,7 +18046,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUnsubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_215" class="discrete">Parameters</h4>
+<h4 id="_parameters_226" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17263,7 +18067,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_75" class="discrete">Returns</h4>
+<h4 id="_returns_81" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17281,7 +18085,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUninstallNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_216" class="discrete">Parameters</h4>
+<h4 id="_parameters_227" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17302,7 +18106,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_76" class="discrete">Returns</h4>
+<h4 id="_returns_82" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17320,7 +18124,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateSubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_217" class="discrete">Parameters</h4>
+<h4 id="_parameters_228" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17341,7 +18145,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_77" class="discrete">Returns</h4>
+<h4 id="_returns_83" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17359,7 +18163,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateRatingNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_218" class="discrete">Parameters</h4>
+<h4 id="_parameters_229" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17380,7 +18184,46 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_78" class="discrete">Returns</h4>
+<h4 id="_returns_84" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreatePrioritizeTransferForModNotification">Create Prioritize Transfer for Mod Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreatePrioritizeTransferForModNotification.png" alt="nd img CreatePrioritizeTransferForModNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreatePrioritizeTransferForModNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_230" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_85" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17398,7 +18241,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateNotificationParams</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">SuccessText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_219" class="discrete">Parameters</h4>
+<h4 id="_parameters_231" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17427,7 +18270,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_79" class="discrete">Returns</h4>
+<h4 id="_returns_86" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17445,7 +18288,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateInstallationNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_220" class="discrete">Parameters</h4>
+<h4 id="_parameters_232" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17466,7 +18309,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_80" class="discrete">Returns</h4>
+<h4 id="_returns_87" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>FModioNotificationParams instance</p>
 </div>
@@ -17484,7 +18327,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">AddFormatText</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FName</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_221" class="discrete">Parameters</h4>
+<h4 id="_parameters_233" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17509,7 +18352,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_81" class="discrete">Returns</h4>
+<h4 id="_returns_88" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>Updated ModioNotificationParams instance</p>
 </div>
@@ -17527,7 +18370,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_222" class="discrete">Parameters</h4>
+<h4 id="_parameters_234" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17544,7 +18387,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_82" class="discrete">Returns</h4>
+<h4 id="_returns_89" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17562,7 +18405,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateManualDialogInfo</span><span class="p">(</span><span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">DialogText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_223" class="discrete">Parameters</h4>
+<h4 id="_parameters_235" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17583,7 +18426,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_83" class="discrete">Returns</h4>
+<h4 id="_returns_90" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17601,7 +18444,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateErrorDialogInfo</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_224" class="discrete">Parameters</h4>
+<h4 id="_parameters_236" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17622,7 +18465,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_84" class="discrete">Returns</h4>
+<h4 id="_returns_91" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17640,7 +18483,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateConfirmUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_225" class="discrete">Parameters</h4>
+<h4 id="_parameters_237" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17657,7 +18500,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_85" class="discrete">Returns</h4>
+<h4 id="_returns_92" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>The created dialog</p>
 </div>
@@ -17675,7 +18518,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">CreateFromParams</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UWidget</span><span class="o">&gt;</span>  <span class="n">NotificationClass</span><span class="p">,</span> <span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">,</span> <span class="n">UWidget</span><span class="o">*</span> <span class="n">Outer</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_226" class="discrete">Parameters</h4>
+<h4 id="_parameters_238" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17700,7 +18543,7 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<h4 id="_returns_86" class="discrete">Returns</h4>
+<h4 id="_returns_93" class="discrete">Returns</h4>
 <div class="paragraph">
 <p>An instance of a Widget subclass that is a notification</p>
 </div>
@@ -18075,6 +18918,14 @@ return empty string if you are not on Windows</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">OpenID</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GoogleIDToken</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GoogleServerSideToken</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -18147,10 +18998,6 @@ return empty string if you are not on Windows</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">XboxLive</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Android</span></p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
@@ -18532,6 +19379,26 @@ return empty string if you are not on Windows</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">UploadCancelled</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The current modfile upload was cancelled.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">TempModSetNotInitialized</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">TempModSet need to be initialized first, call InitTempModSet.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MonetizationOperationError</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An error occurred while performing a monetization operation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PaymentTransactionFailed</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The transaction requires a payment but it could not be fulfilled. Please retry with funds on the wallet</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">IncorrectPrice</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The display price for the mod is out-of-date or incorrect. Please retry with the correct display price.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ItemAlreadyOwned</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The authenticated user already has acquired this item</p></td>
 </tr>
 </tbody>
 </table>
@@ -19092,7 +19959,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-05-02 12:13:43 +1000
+Last updated 2024-05-31 13:52:40 +1000
 </div>
 </div>
 </body>

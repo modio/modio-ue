@@ -27,6 +27,17 @@ std::vector<std::string> ToModio(const TArray<FString>& StringArray)
 	return Result;
 }
 
+std::vector<Modio::ModID> ToModio(const TArray<FModioModID>& ModIDArray)
+{
+	std::vector<Modio::ModID> Result;
+	Result.reserve(ModIDArray.Num());
+	for (const FModioModID& It : ModIDArray)
+	{
+		Result.emplace_back(ToModio(It));
+	}
+	return Result;
+}
+
 std::map<std::string, std::string> ToModio(const TMap<FString, FString>& StringMap)
 {
 	std::map<std::string, std::string> Result;
@@ -77,6 +88,11 @@ FModioUnsigned64 ToUnreal(const Modio::FileSize& In)
 FDateTime ToUnrealDateTime(std::int64_t UnixTimestamp)
 {
 	return FDateTime::FromUnixTimestamp(UnixTimestamp);
+}
+
+FText ToUnrealText(const std::string& String)
+{
+	return FText::FromString(UTF8_TO_TCHAR(String.c_str()));
 }
 
 Modio::ApiKey ToModio(const FModioApiKey& In)

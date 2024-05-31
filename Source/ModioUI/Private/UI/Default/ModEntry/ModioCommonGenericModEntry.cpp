@@ -159,6 +159,11 @@ void UModioCommonGenericModEntry::SynchronizeProperties()
 		{
 			OpenModDetailsButton->SetLabel(UISettings->ModEntryParams.OpenModDetailsLabel);
 		}
+
+		if (PrioritizeTransferButton)
+		{
+			PrioritizeTransferButton->SetLabel(UISettings->ModEntryParams.PrioritizeTransferLabel);
+		}
 	}
 	else
 	{
@@ -301,6 +306,16 @@ void UModioCommonGenericModEntry::SynchronizeProperties()
 		ListenForInputAction(OpenModDetailsButton, UISettings->ModEntryParams.OpenModDetailsInputAction, UISettings->ModEntryParams.OpenModDetailsLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
 			HandleOpenModDetailsClicked();
 		}));
+	}
+
+	if (bModInQueue)
+	{
+		if (PrioritizeTransferButton)
+		{
+			ListenForInputAction(PrioritizeTransferButton, UISettings->ModEntryParams.PrioritizeTransferInputAction, UISettings->ModEntryParams.PrioritizeTransferLabel, FOnModioCommonActivatableWidgetActionFiredFast::CreateWeakLambda(this, [this]() {
+				HandlePrioritizeTransferClicked();
+			}));
+		}
 	}
 
 	UModioModCollectionEntryUI* CollectionEntry = Cast<UModioModCollectionEntryUI>(DataSource);
@@ -759,5 +774,25 @@ void UModioCommonGenericModEntry::HandleForceUninstallClicked_Implementation()
 		{
 			ModioUISubsystem->ShowDialog(DialogInfo);
 		}
+	}
+}
+
+void UModioCommonGenericModEntry::HandlePrioritizeTransferClicked_Implementation()
+{
+	if (!IsUserAuthenticated())
+	{
+		if (UModioUISubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>()) 
+		{
+			UE_LOG(ModioUI, Warning, TEXT("Unable to prioritize transfer for mod entry '%s' since user is not authenticated. Showing user auth dialog"), *GetName());
+			Subsystem->ShowUserAuth();
+			return;
+		}
+	}
+	SelectModListItem();
+    
+	if (UModioUISubsystem* ModioUISubsystem = GEngine->GetEngineSubsystem<UModioUISubsystem>())
+	{
+		const FModioModID ModID = Execute_GetModID(this);
+		ModioUISubsystem->PrioritizeTransferForMod(ModID);
 	}
 }
