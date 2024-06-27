@@ -15,6 +15,7 @@
 #include "Types/ModioModStats.h"
 #include "Types/ModioModTag.h"
 #include "Types/ModioURLList.h"
+#include "Types/ModioUnsigned64.h"
 #include "Types/ModioUser.h"
 
 #include "ModioModInfo.generated.h"
@@ -25,21 +26,21 @@ namespace Modio
 }
 
 /**
-* Enumeration that represent mature content for the mod to create
-**/
+ * Enumeration that represent mature content for the mod to create
+ **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioObjectVisibilityFlags : uint8
 {
 	/** Mod is concealed from users **/
 	Hidden = 0,
-	
+
 	/** Mod is openly available **/
 	Public = 1
 };
 
 /**
-* Enumeration that represent mature content for the mod to create
-**/
+ * Enumeration that represent mature content for the mod to create
+ **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioMaturityFlags : uint8
 {
@@ -61,8 +62,8 @@ enum class EModioMaturityFlags : uint8
 ENUM_CLASS_FLAGS(EModioMaturityFlags);
 
 /**
-* Enumeration that represent mod server side status
-**/
+ * Enumeration that represent mod server side status
+ **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioModServerSideStatus : uint8
 {
@@ -71,9 +72,9 @@ enum class EModioModServerSideStatus : uint8
 	Deleted = 3
 };
 
-/** 
-* Full mod profile including current release information, media links, and stats 
-**/
+/**
+ * Full mod profile including current release information, media links, and stats
+ **/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModInfo
 {
@@ -127,16 +128,17 @@ struct MODIO_API FModioModInfo
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	EModioMaturityFlags ProfileMaturityOption {};
 
-	/** @brief Is the mod marked as visible? 
- 	* @deprecated Use Visibility property instead
-	*/
-	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.6 release. Please use the <<Visibility>> instead."))
+	/** @brief Is the mod marked as visible?
+	 * @deprecated Use Visibility property instead
+	 */
+	UPROPERTY(meta = (DeprecatedProperty,
+					  DeprecationMessage = "Deprecated as of 2023.6 release. Please use the <<Visibility>> instead."))
 	bool bVisible_DEPRECATED {};
-	
+
 	/**
-	* @brief Enum parameter to signal the backend if the mod to upload would be publicly visible.  
-    * Default value is Public
-	**/
+	 * @brief Enum parameter to signal the backend if the mod to upload would be publicly visible.
+	 * Default value is Public
+	 **/
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	EModioObjectVisibilityFlags Visibility {};
 
@@ -145,8 +147,8 @@ struct MODIO_API FModioModInfo
 	bool Dependencies;
 
 	/**
-	* Stored property to the metadata string
-	**/
+	 * Stored property to the metadata string
+	 **/
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Metadata")
 	FString MetadataBlob;
 
@@ -184,20 +186,20 @@ struct MODIO_API FModioModInfo
 
 	/** @brief Price of this mod */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Monetization")
-	int32 Price = 0;
+	FModioUnsigned64 Price = FModioUnsigned64(0);
 
 	friend struct FModioModInfo ToUnreal(const struct Modio::ModInfo& In);
 };
 
 /**
-* Strong type struct to store an optional ModInfo parameter
-**/
+ * Strong type struct to store an optional ModInfo parameter
+ **/
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModInfo
 {
 	GENERATED_BODY()
 	/**
-	* Stored property to an optional ModInfo
-	**/
+	 * Stored property to an optional ModInfo
+	 **/
 	TOptional<FModioModInfo> Internal;
 };

@@ -1657,7 +1657,8 @@ public:
 	 * @requires no-rate-limiting
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "PurchaseModAsync", Category = "mod.io|Monetization")
-	MODIO_API void K2_PurchaseModAsync(FModioModID ModID, int ExpectedPrice, FOnPurchaseModDelegate Callback);
+	MODIO_API void K2_PurchaseModAsync(FModioModID ModID, FModioUnsigned64 ExpectedPrice,
+									   FOnPurchaseModDelegate Callback);
 
 	/**
 	 * @docpublic

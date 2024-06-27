@@ -205,6 +205,16 @@ void UModioCommonActivatableWidget::ListenForInputAction(TObjectPtr<UModioCommon
 
 void UModioCommonActivatableWidget::ClearListeningInputActions()
 {
+	// If we're not on the game thread, we need to defer this to the game thread (since UMG/Slate and the ListeningInputActions array are not thread safe)
+	if (!IsInGameThread())
+	{
+		AsyncTask(ENamedThreads::GameThread, [WeakThis = MakeWeakObjectPtr(this)]()
+		{
+			WeakThis->ClearListeningInputActions();
+		});
+		return;
+	}
+
 	UnbindInputActions();
 	ListeningInputActions.Empty();
 }

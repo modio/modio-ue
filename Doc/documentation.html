@@ -1510,6 +1510,7 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiopagedresult">ModioPagedResult</a></li>
 <li><a href="#_modiomodinfolist">ModioModInfoList</a></li>
 <li><a href="#_modiomodinfo">ModioModInfo</a></li>
+<li><a href="#_modiounsigned64">ModioUnsigned64</a></li>
 <li><a href="#_modiomodstats">ModioModStats</a></li>
 <li><a href="#_modiosketchfaburllist">ModioSketchfabURLList</a></li>
 <li><a href="#_modioyoutubeurllist">ModioYoutubeURLList</a></li>
@@ -1558,13 +1559,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiolink">ModioLink</a></li>
 <li><a href="#_modioterms">ModioTerms</a></li>
 <li><a href="#_modiotransactionrecord">ModioTransactionRecord</a></li>
-<li><a href="#_modiounsigned64">ModioUnsigned64</a></li>
 <li><a href="#_modiooptionaluser">ModioOptionalUser</a></li>
 <li><a href="#_modiouserlist">ModioUserList</a></li>
 <li><a href="#_modiovalidationerror">ModioValidationError</a></li>
-<li><a href="#_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</a></li>
-<li><a href="#_modionotificationparams">ModioNotificationParams</a></li>
-<li><a href="#_modiomodcategoryparams">ModioModCategoryParams</a></li>
 <li><a href="#_modiocommontabdescriptor">ModioCommonTabDescriptor</a></li>
 <li><a href="#_modiocommonauthparamssettings">ModioCommonAuthParamsSettings</a></li>
 <li><a href="#_modiocommonemailauthcodeparamssettings">ModioCommonEmailAuthCodeParamsSettings</a></li>
@@ -1589,6 +1586,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiocommonreportsummaryparamssettings">ModioCommonReportSummaryParamsSettings</a></li>
 <li><a href="#_modiocommonsearchparamssettings">ModioCommonSearchParamsSettings</a></li>
 <li><a href="#_modiocommonuserprofilewidgetparamssettings">ModioCommonUserProfileWidgetParamsSettings</a></li>
+<li><a href="#_modionotificationparams">ModioNotificationParams</a></li>
+<li><a href="#_modiomodcategoryparams">ModioModCategoryParams</a></li>
+<li><a href="#_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</a></li>
 </ul>
 </li>
 <li><a href="#_functions">Functions</a>
@@ -1663,9 +1663,11 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#Divide">ModioUnsigned64 / ModioUnsigned64 (truncate)</a></li>
 <li><a href="#BreakToComponents">Break to Components</a></li>
 <li><a href="#Add">ModioUnsigned64 + ModioUnsigned64</a></li>
-<li><a href="#K2_SubmitNewModFromMemoryAsync">SubmitNewModFromMemoryAsync</a></li>
-<li><a href="#K2_SubmitNewModFileForModFromMemory">SubmitNewModFileForModFromMemory</a></li>
-<li><a href="#K2_LoadModFileToMemory">LoadModFileToMemory</a></li>
+<li><a href="#CreateUninstallDialogInfo">Create Uninstall Dialog Info</a></li>
+<li><a href="#CreateManualDialogInfo">Create Manual Dialog Info</a></li>
+<li><a href="#CreateErrorDialogInfo">Create Error Dialog Info</a></li>
+<li><a href="#CreateConfirmUninstallDialogInfo">Create Confirm Uninstall Dialog Info</a></li>
+<li><a href="#CreateFromParams">Create from Params</a></li>
 <li><a href="#SetTextArg">Set Text Arg</a></li>
 <li><a href="#SetStringArg">Set String Arg</a></li>
 <li><a href="#SetIntegerArg">Set Integer Arg</a></li>
@@ -1678,11 +1680,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#CreateNotificationParams">Create Notification Params</a></li>
 <li><a href="#CreateInstallationNotification">Create Installation Notification</a></li>
 <li><a href="#AddFormatText">Add Format Text</a></li>
-<li><a href="#CreateUninstallDialogInfo">Create Uninstall Dialog Info</a></li>
-<li><a href="#CreateManualDialogInfo">Create Manual Dialog Info</a></li>
-<li><a href="#CreateErrorDialogInfo">Create Error Dialog Info</a></li>
-<li><a href="#CreateConfirmUninstallDialogInfo">Create Confirm Uninstall Dialog Info</a></li>
-<li><a href="#CreateFromParams">Create from Params</a></li>
+<li><a href="#K2_SubmitNewModFromMemoryAsync">SubmitNewModFromMemoryAsync</a></li>
+<li><a href="#K2_SubmitNewModFileForModFromMemory">SubmitNewModFileForModFromMemory</a></li>
+<li><a href="#K2_LoadModFileToMemory">LoadModFileToMemory</a></li>
 </ul>
 </li>
 <li><a href="#_enums">Enums</a>
@@ -1716,6 +1716,9 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_emodiorating"> EModioRating</a></li>
 <li><a href="#_emodioreporttype"> EModioReportType</a></li>
 <li><a href="#_efilesizeunit"> EFileSizeUnit</a></li>
+<li><a href="#_emodiocommondialogbuttontype"> EModioCommonDialogButtonType</a></li>
+<li><a href="#_emodiocommonsearchviewtype"> EModioCommonSearchViewType</a></li>
+<li><a href="#_emodiocommonrichtextstyletextimageorder"> EModioCommonRichTextStyleTextImageOrder</a></li>
 <li><a href="#_emodiouiasyncoperationwidgetstate"> EModioUIAsyncOperationWidgetState</a></li>
 <li><a href="#_emodiouimediadownloadeventtype"> EModioUIMediaDownloadEventType</a></li>
 <li><a href="#_emodiouimodinfoeventtype"> EModioUIModInfoEventType</a></li>
@@ -1723,9 +1726,6 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_emodioqueuedfiltertype"> EModioQueuedFilterType</a></li>
 <li><a href="#_emodioinstalledfiltertype"> EModioInstalledFilterType</a></li>
 <li><a href="#_emodiomanualsorttype"> EModioManualSortType</a></li>
-<li><a href="#_emodiocommondialogbuttontype"> EModioCommonDialogButtonType</a></li>
-<li><a href="#_emodiocommonsearchviewtype"> EModioCommonSearchViewType</a></li>
-<li><a href="#_emodiocommonrichtextstyletextimageorder"> EModioCommonRichTextStyleTextImageOrder</a></li>
 </ul>
 </li>
 </ul>
@@ -11170,7 +11170,7 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_PurchaseModAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="n">int32</span> <span class="n">ExpectedPrice</span><span class="p">,</span> <span class="n">FOnPurchaseModDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_PurchaseModAsync</span><span class="p">(</span><span class="n">FModioModID</span> <span class="n">ModID</span><span class="p">,</span> <span class="n">FModioUnsigned64</span> <span class="n">ExpectedPrice</span><span class="p">,</span> <span class="n">FOnPurchaseModDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -14689,7 +14689,7 @@ This function is part of an experimental feature and is subject to change.
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioObjectVisibilityFlags">EModioObjectVisibilityFlags</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Visibility</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Enum parameter to signal the backend if the mod to upload would be publicly visible.   Default value is Public</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enum parameter to signal the backend if the mod to upload would be publicly visible. Default value is Public</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#bool">bool</a></span></p></td>
@@ -14742,12 +14742,19 @@ This function is part of an experimental feature and is subject to change.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Status of the mod</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int32">int32</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioUnsigned64">FModioUnsigned64</a></span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Price</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Price of this mod</p></td>
 </tr>
 </tbody>
 </table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiounsigned64">ModioUnsigned64</h3>
+<div class="paragraph">
+<p>Trivial Blueprint-compatible wrapper around an unsigned 64-bit integer</p>
+</div>
 <hr>
 </div>
 <div class="sect2">
@@ -15475,13 +15482,6 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_modiounsigned64">ModioUnsigned64</h3>
-<div class="paragraph">
-<p>Trivial Blueprint-compatible wrapper around an unsigned 64-bit integer</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_modiooptionaluser">ModioOptionalUser</h3>
 <hr>
 </div>
@@ -15537,125 +15537,8 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</h3>
-<h4 id="_variables_33" class="discrete">Variables</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;uint8&gt;">TArray&lt;uint8&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModMemory</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_modionotificationparams">ModioNotificationParams</h3>
-<h4 id="_variables_34" class="discrete">Variables</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioErrorCode">FModioErrorCode</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ErrorCode</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#UObject*">UObject*</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NotificationContextObject</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#float">float</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Duration</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_modiomodcategoryparams">ModioModCategoryParams</h3>
-<h4 id="_variables_35" class="discrete">Variables</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FText">FText</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CategoryName</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FString&gt;">TArray&lt;FString&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FString&gt;">TArray&lt;FString&gt;</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedTags</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioSortDirection">EModioSortDirection</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Direction</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioSortFieldType">EModioSortFieldType</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SortField</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int64">int64</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Count</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SearchKeywords</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioInstalledFilterType">EModioInstalledFilterType</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InstalledField</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioQueuedFilterType">EModioQueuedFilterType</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">QueuedField</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioEnabledFilterType">EModioEnabledFilterType</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EnabledFilter</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioManualSortType">EModioManualSortType</a></span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ManualSortField</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_modiocommontabdescriptor">ModioCommonTabDescriptor</h3>
-<h4 id="_variables_36" class="discrete">Variables</h4>
+<h4 id="_variables_33" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -15709,7 +15592,7 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocommoncodeinputtextboxinputstyle">ModioCommonCodeInputTextBoxInputStyle</h3>
-<h4 id="_variables_37" class="discrete">Variables</h4>
+<h4 id="_variables_34" class="discrete">Variables</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -15857,7 +15740,123 @@ This class is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modiocommonuserprofilewidgetparamssettings">ModioCommonUserProfileWidgetParamsSettings</h3>
-
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modionotificationparams">ModioNotificationParams</h3>
+<h4 id="_variables_35" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FModioErrorCode">FModioErrorCode</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ErrorCode</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#UObject*">UObject*</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NotificationContextObject</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#float">float</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Duration</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiomodcategoryparams">ModioModCategoryParams</h3>
+<h4 id="_variables_36" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FText">FText</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CategoryName</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FString&gt;">TArray&lt;FString&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Tags</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;FString&gt;">TArray&lt;FString&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ExcludedTags</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioSortDirection">EModioSortDirection</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Direction</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioSortFieldType">EModioSortFieldType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SortField</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#int64">int64</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Count</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#FString">FString</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SearchKeywords</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioInstalledFilterType">EModioInstalledFilterType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InstalledField</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioQueuedFilterType">EModioQueuedFilterType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">QueuedField</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioEnabledFilterType">EModioEnabledFilterType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">EnabledFilter</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#EModioManualSortType">EModioManualSortType</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ManualSortField</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiocreatemodfilememoryparams">ModioCreateModFileMemoryParams</h3>
+<h4 id="_variables_37" class="discrete">Variables</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variabletype"><a href="#TArray&lt;uint8&gt;">TArray&lt;uint8&gt;</a></span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModMemory</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -17719,6 +17718,693 @@ return empty string if you are not on Windows</p></td>
 <hr>
 </div>
 <div class="sect2">
+<h3 id="CreateUninstallDialogInfo">Create Uninstall Dialog Info</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateUninstallDialogInfo.png" alt="nd img CreateUninstallDialogInfo">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_219" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_77" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>The created dialog</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateManualDialogInfo">Create Manual Dialog Info</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateManualDialogInfo.png" alt="nd img CreateManualDialogInfo">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateManualDialogInfo</span><span class="p">(</span><span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">DialogText</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_220" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Title Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The title text of the dialog</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Dialog Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The description text of the dialog</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_78" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>The created dialog</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateErrorDialogInfo">Create Error Dialog Info</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateErrorDialogInfo.png" alt="nd img CreateErrorDialogInfo">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateErrorDialogInfo</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_221" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Error Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The error code to display in the dialog</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Title Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The title text of the dialog</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_79" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>The created dialog</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateConfirmUninstallDialogInfo">Create Confirm Uninstall Dialog Info</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateConfirmUninstallDialogInfo.png" alt="nd img CreateConfirmUninstallDialogInfo">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateConfirmUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_222" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The mod info to display in the dialog</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_80" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>The created dialog</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateFromParams">Create from Params</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateFromParams.png" alt="nd img CreateFromParams">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">CreateFromParams</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UWidget</span><span class="o">&gt;</span>  <span class="n">NotificationClass</span><span class="p">,</span> <span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">,</span> <span class="n">UWidget</span><span class="o">*</span> <span class="n">Outer</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_223" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Class</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The widget subclass the new instance will be part of</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The parameters the new instance should store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Outer</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The reference widget the new instance should be linked to</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An instance of a Widget subclass that is a notification</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_81" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>An instance of a Widget subclass that is a notification</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetTextArg">Set Text Arg</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetTextArg.png" alt="nd img SetTextArg">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetTextArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_224" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add a new argument</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The value associated to the name above</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_82" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>Updated ModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetStringArg">Set String Arg</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetStringArg.png" alt="nd img SetStringArg">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetStringArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Value</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_225" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the string</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The value associated to the name above</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_83" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>Updated ModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetIntegerArg">Set Integer Arg</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetIntegerArg.png" alt="nd img SetIntegerArg">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetIntegerArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">int32</span> <span class="n">Value</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_226" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the integer value</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The integer value associated to the name above</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_84" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>Updated ModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="SetFloatArg">Set Float Arg</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_SetFloatArg.png" alt="nd img SetFloatArg">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetFloatArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Value</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_227" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the float value</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The float value associated to the name above</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_85" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>Updated ModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateUnsubscriptionNotification">Create Unsubscription Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateUnsubscriptionNotification.png" alt="nd img CreateUnsubscriptionNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUnsubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_228" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_86" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateUninstallNotification">Create Uninstall Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateUninstallNotification.png" alt="nd img CreateUninstallNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUninstallNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_229" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_87" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateSubscriptionNotification">Create Subscription Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateSubscriptionNotification.png" alt="nd img CreateSubscriptionNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateSubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_230" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_88" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateRatingNotification">Create Rating Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateRatingNotification.png" alt="nd img CreateRatingNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateRatingNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_231" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_89" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreatePrioritizeTransferForModNotification">Create Prioritize Transfer for Mod Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreatePrioritizeTransferForModNotification.png" alt="nd img CreatePrioritizeTransferForModNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreatePrioritizeTransferForModNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_232" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_90" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateNotificationParams">Create Notification Params</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateNotificationParams.png" alt="nd img CreateNotificationParams">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateNotificationParams</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">SuccessText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_233" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Title Text</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Success Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when a successful result happen</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Error Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when an error occur</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_91" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="CreateInstallationNotification">Create Installation Notification</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_CreateInstallationNotification.png" alt="nd img CreateInstallationNotification">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateInstallationNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_234" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_92" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>FModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="AddFormatText">Add Format Text</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_AddFormatText.png" alt="nd img AddFormatText">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">AddFormatText</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FName</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<h4 id="_parameters_235" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the format</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned format name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Text</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The value of the format</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
+</tr>
+</tbody>
+</table>
+<h4 id="_returns_93" class="discrete">Returns</h4>
+<div class="paragraph">
+<p>Updated ModioNotificationParams instance</p>
+</div>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="K2_SubmitNewModFromMemoryAsync">SubmitNewModFromMemoryAsync</h3>
 <div class="imageblock">
 <div class="content">
@@ -17733,7 +18419,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Submit a new mod, with its logo data coming from an in-memory buffer rather than a file.</p>
 </div>
-<h4 id="_parameters_219" class="discrete">Parameters</h4>
+<h4 id="_parameters_236" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17786,7 +18472,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_220" class="discrete">Parameters</h4>
+<h4 id="_parameters_237" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17835,7 +18521,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_221" class="discrete">Parameters</h4>
+<h4 id="_parameters_238" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -17860,693 +18546,6 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="SetTextArg">Set Text Arg</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_SetTextArg.png" alt="nd img SetTextArg">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetTextArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_222" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add a new argument</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The value associated to the name above</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_77" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>Updated ModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="SetStringArg">Set String Arg</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_SetStringArg.png" alt="nd img SetStringArg">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetStringArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Value</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_223" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the string</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The value associated to the name above</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_78" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>Updated ModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="SetIntegerArg">Set Integer Arg</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_SetIntegerArg.png" alt="nd img SetIntegerArg">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetIntegerArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="n">int32</span> <span class="n">Value</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_224" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the integer value</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The integer value associated to the name above</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_79" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>Updated ModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="SetFloatArg">Set Float Arg</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_SetFloatArg.png" alt="nd img SetFloatArg">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">SetFloatArg</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FString</span> <span class="n">Name</span><span class="p">,</span> <span class="kt">float</span> <span class="n">Value</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_225" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the float value</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The float value associated to the name above</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_80" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>Updated ModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateUnsubscriptionNotification">Create Unsubscription Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateUnsubscriptionNotification.png" alt="nd img CreateUnsubscriptionNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUnsubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_226" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_81" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateUninstallNotification">Create Uninstall Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateUninstallNotification.png" alt="nd img CreateUninstallNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateUninstallNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_227" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_82" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateSubscriptionNotification">Create Subscription Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateSubscriptionNotification.png" alt="nd img CreateSubscriptionNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateSubscriptionNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_228" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_83" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateRatingNotification">Create Rating Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateRatingNotification.png" alt="nd img CreateRatingNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateRatingNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_229" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_84" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreatePrioritizeTransferForModNotification">Create Prioritize Transfer for Mod Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreatePrioritizeTransferForModNotification.png" alt="nd img CreatePrioritizeTransferForModNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreatePrioritizeTransferForModNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_230" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A class interface related to ModInfoUIDetails</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_85" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateNotificationParams">Create Notification Params</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateNotificationParams.png" alt="nd img CreateNotificationParams">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateNotificationParams</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">SuccessText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">ErrorText</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_231" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Title Text</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Success Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when a successful result happen</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Error Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The string to display when an error occur</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_86" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateInstallationNotification">Create Installation Notification</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateInstallationNotification.png" alt="nd img CreateInstallationNotification">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">CreateInstallationNotification</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">StatusCode</span><span class="p">,</span> <span class="n">TScriptInterface</span><span class="o">&lt;</span><span class="n">IModioModInfoUIDetails</span><span class="o">&gt;</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_232" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Status Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The modio error code to store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">FModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_87" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>FModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="AddFormatText">Add Format Text</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_AddFormatText.png" alt="nd img AddFormatText">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioNotificationParams</span> <span class="n">AddFormatText</span><span class="p">(</span><span class="n">FModioNotificationParams</span> <span class="n">NotificationParams</span><span class="p">,</span> <span class="n">FName</span> <span class="n">Name</span><span class="p">,</span> <span class="n">FText</span> <span class="n">Text</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_233" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Params</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Base class to add the format</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Name</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The assigned format name</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The value of the format</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Updated ModioNotificationParams instance</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_88" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>Updated ModioNotificationParams instance</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateUninstallDialogInfo">Create Uninstall Dialog Info</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateUninstallDialogInfo.png" alt="nd img CreateUninstallDialogInfo">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_234" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_89" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>The created dialog</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateManualDialogInfo">Create Manual Dialog Info</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateManualDialogInfo.png" alt="nd img CreateManualDialogInfo">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateManualDialogInfo</span><span class="p">(</span><span class="n">FText</span> <span class="n">TitleText</span><span class="p">,</span> <span class="n">FText</span> <span class="n">DialogText</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_235" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Title Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The title text of the dialog</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Dialog Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The description text of the dialog</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_90" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>The created dialog</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateErrorDialogInfo">Create Error Dialog Info</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateErrorDialogInfo.png" alt="nd img CreateErrorDialogInfo">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateErrorDialogInfo</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">ErrorCode</span><span class="p">,</span> <span class="n">FText</span> <span class="n">TitleText</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_236" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Error Code</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The error code to display in the dialog</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Title Text</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The title text of the dialog</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_91" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>The created dialog</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateConfirmUninstallDialogInfo">Create Confirm Uninstall Dialog Info</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateConfirmUninstallDialogInfo.png" alt="nd img CreateConfirmUninstallDialogInfo">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UModioCommonDialogInfo</span><span class="o">*</span> <span class="n">CreateConfirmUninstallDialogInfo</span><span class="p">(</span><span class="n">FModioModInfo</span> <span class="n">ModInfo</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_237" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Mod Info</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The mod info to display in the dialog</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The created dialog</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_92" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>The created dialog</p>
-</div>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="CreateFromParams">Create from Params</h3>
-<div class="imageblock">
-<div class="content">
-<img src="img/nd_img_CreateFromParams.png" alt="nd img CreateFromParams">
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="c++"><span class="n">UWidget</span><span class="o">*</span> <span class="n">CreateFromParams</span><span class="p">(</span><span class="n">TSubclassOf</span><span class="o">&lt;</span><span class="n">UWidget</span><span class="o">&gt;</span>  <span class="n">NotificationClass</span><span class="p">,</span> <span class="n">FModioNotificationParams</span> <span class="n">Params</span><span class="p">,</span> <span class="n">UWidget</span><span class="o">*</span> <span class="n">Outer</span><span class="p">)</span></code></pre>
-</div>
-</div>
-<h4 id="_parameters_238" class="discrete">Parameters</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 25%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Notification Class</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The widget subclass the new instance will be part of</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Params</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The parameters the new instance should store</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Outer</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The reference widget the new instance should be linked to</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An instance of a Widget subclass that is a notification</p></td>
-</tr>
-</tbody>
-</table>
-<h4 id="_returns_93" class="discrete">Returns</h4>
-<div class="paragraph">
-<p>An instance of a Widget subclass that is a notification</p>
-</div>
 </div>
 </div>
 </div>
@@ -19706,183 +19705,8 @@ return empty string if you are not on Windows</p></td>
 <hr>
 </div>
 <div class="sect2">
-<h3 id="_emodiouiasyncoperationwidgetstate"><a id="EModioUIAsyncOperationWidgetState"></a> EModioUIAsyncOperationWidgetState</h3>
-<h4 id="_values_30" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Success</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Operation succeeded *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Error</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Operation failed *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InProgress</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Operation still working *</p></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodiouimediadownloadeventtype"><a id="EModioUIMediaDownloadEventType"></a> EModioUIMediaDownloadEventType</h3>
-<h4 id="_values_31" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModGalleryImages</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading gallery images *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModCreatorAvatarImage</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading an avatar *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModLogo</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading a logo *</p></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodiouimodinfoeventtype"><a id="EModioUIModInfoEventType"></a> EModioUIModInfoEventType</h3>
-<h4 id="_values_32" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ListAllMods</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Event to list all mods *</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GetModInfo</span></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Event to retrieve the mod information *</p></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodioenabledfiltertype"><a id="EModioEnabledFilterType"></a> EModioEnabledFilterType</h3>
-<h4 id="_values_33" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Enabled</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Disabled</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodioqueuedfiltertype"><a id="EModioQueuedFilterType"></a> EModioQueuedFilterType</h3>
-<h4 id="_values_34" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Queued</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NotQueued</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodioinstalledfiltertype"><a id="EModioInstalledFilterType"></a> EModioInstalledFilterType</h3>
-<h4 id="_values_35" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentUser</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AnotherUser</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
-<h3 id="_emodiomanualsorttype"><a id="EModioManualSortType"></a> EModioManualSortType</h3>
-<h4 id="_values_36" class="discrete">Values</h4>
-<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
-<colgroup>
-<col style="width: 20%;">
-<col>
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AToZ</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ZToA</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SizeOnDisk</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RecentlyUpdated</span></p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="sect2">
 <h3 id="_emodiocommondialogbuttontype"><a id="EModioCommonDialogButtonType"></a> EModioCommonDialogButtonType</h3>
-<h4 id="_values_37" class="discrete">Values</h4>
+<h4 id="_values_30" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19915,7 +19739,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div class="sect2">
 <h3 id="_emodiocommonsearchviewtype"><a id="EModioCommonSearchViewType"></a> EModioCommonSearchViewType</h3>
-<h4 id="_values_38" class="discrete">Values</h4>
+<h4 id="_values_31" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19936,7 +19760,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div class="sect2">
 <h3 id="_emodiocommonrichtextstyletextimageorder"><a id="EModioCommonRichTextStyleTextImageOrder"></a> EModioCommonRichTextStyleTextImageOrder</h3>
-<h4 id="_values_39" class="discrete">Values</h4>
+<h4 id="_values_32" class="discrete">Values</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 20%;">
@@ -19953,13 +19777,188 @@ return empty string if you are not on Windows</p></td>
 </tr>
 </tbody>
 </table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodiouiasyncoperationwidgetstate"><a id="EModioUIAsyncOperationWidgetState"></a> EModioUIAsyncOperationWidgetState</h3>
+<h4 id="_values_33" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Success</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operation succeeded *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Error</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operation failed *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">InProgress</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Operation still working *</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodiouimediadownloadeventtype"><a id="EModioUIMediaDownloadEventType"></a> EModioUIMediaDownloadEventType</h3>
+<h4 id="_values_34" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModGalleryImages</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading gallery images *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModCreatorAvatarImage</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading an avatar *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ModLogo</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Downloading a logo *</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodiouimodinfoeventtype"><a id="EModioUIModInfoEventType"></a> EModioUIModInfoEventType</h3>
+<h4 id="_values_35" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ListAllMods</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Event to list all mods *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">GetModInfo</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Event to retrieve the mod information *</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodioenabledfiltertype"><a id="EModioEnabledFilterType"></a> EModioEnabledFilterType</h3>
+<h4 id="_values_36" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Enabled</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Disabled</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodioqueuedfiltertype"><a id="EModioQueuedFilterType"></a> EModioQueuedFilterType</h3>
+<h4 id="_values_37" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">Queued</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">NotQueued</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodioinstalledfiltertype"><a id="EModioInstalledFilterType"></a> EModioInstalledFilterType</h3>
+<h4 id="_values_38" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">None</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">CurrentUser</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AnotherUser</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_emodiomanualsorttype"><a id="EModioManualSortType"></a> EModioManualSortType</h3>
+<h4 id="_values_39" class="discrete">Values</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 20%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">AToZ</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ZToA</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">SizeOnDisk</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">RecentlyUpdated</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-05-31 13:52:40 +1000
+Last updated 2024-06-27 14:16:11 +1000
 </div>
 </div>
 </body>

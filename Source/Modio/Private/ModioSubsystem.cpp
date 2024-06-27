@@ -1301,10 +1301,10 @@ void UModioSubsystem::PurchaseModAsync(FModioModID ModID, uint64_t ExpectedPrice
 	});
 }
 
-void UModioSubsystem::K2_PurchaseModAsync(FModioModID ModID, int ExpectedPrice, FOnPurchaseModDelegate Callback)
+void UModioSubsystem::K2_PurchaseModAsync(FModioModID ModID, FModioUnsigned64 ExpectedPrice, FOnPurchaseModDelegate Callback)
 {
 	PurchaseModAsync(
-		ModID, ExpectedPrice,
+		ModID, ExpectedPrice.Underlying,
 		FOnPurchaseModDelegateFast::CreateLambda(
 								 [Callback](FModioErrorCode ec, TOptional<FModioTransactionRecord> TransactionRecord) {
 							 Callback.ExecuteIfBound(ec, ToBP<FModioOptionalTransactionRecord>(TransactionRecord));
