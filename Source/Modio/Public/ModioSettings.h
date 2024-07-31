@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioFilterParams.h"
 #include "Types/ModioInitializeOptions.h"
 
 #include "ModioSettings.generated.h"
@@ -49,6 +50,46 @@ public:
 	 * option. */
 	UPROPERTY(EditDefaultsOnly, config, Category = "Project")
 	bool bUseBackgroundThread = false;
+
+	// TODO: These properties probably should go into ModioUISettings instead
+
+	/**
+	 * The maximum number of reattempts the Mod Menu will make on any network operation
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Network")
+	int32 GlobalRetryLimit = 3;
+
+	/**
+	 * The string table asset which stores localization data for the plugin (user-facing strings for enums, etc)
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Localization", meta = (MetaClass = StringTable))
+	FSoftObjectPath LocalizationStringTable;
+
+	/**
+	 * Named sets of filter parameters for use in the default PresetFilterSelector UI component
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "UI Configuration")
+	TArray<FModioPresetFilterParams> PresetNamedFilters;
+
+	/**
+	 * If enabled, default implementations of Monetization-related UI components will be visible and interactable in mod.io UI templates
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta=(DisplayName="Enable Monetization widgets in UI"))
+	bool bEnableMonetizationFeature;
+
+	/**
+	 * If enabled, the UUGCSubsystem can manage mod enabled/disable state, if a valid IModEnabledStateProvider has been set via SetUGCEnabledStateProvider so you can persist the state appropriately
+	 * If this is disabled, enable/disable widgets in the UI will be hidden
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta = (DisplayName = "Enable Mod Enable/Disable support"))
+	bool bEnableModEnableDisableFeature;
+
+	/**
+	 * If enabled, widgets in mod.io UI templates will allow users to attempt to downvote mods. If downvoting is not enabled on the mod.io dashboards such votes will not be recorded
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta=(DisplayName="Enable Mod Downvoting in UI"))
+	bool bEnableModDownvoteFeature;
+
 
 private:
 #if WITH_EDITOR

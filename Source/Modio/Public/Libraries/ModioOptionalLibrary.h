@@ -19,6 +19,7 @@
 #include "Types/ModioModProgressInfo.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioTerms.h"
+#include "Types/ModioUnsigned64.h"
 
 #include "ModioOptionalLibrary.generated.h"
 
@@ -49,7 +50,7 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalModInfoList(const struct FModioOptionalModInfoList& OptionalModInfoList,
 												  struct FModioModInfoList& ModInfoList);
 
-		/**
+	/**
 	 * Check if the Game info list has a valid value
 	 *
 	 * @param OptionalGameInfoList - The optional to check
@@ -69,7 +70,7 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
 			  DisplayName = "GetValue (ModioOptionalGameInfoList)")
 	static bool GetValue_ModioOptionalGameInfoList(const struct FModioOptionalGameInfoList& OptionalGameInfoList,
-												  struct FModioGameInfoList& GameInfoList);
+												   struct FModioGameInfoList& GameInfoList);
 
 	/**
 	 * Check if the mod info has a valid value
@@ -262,4 +263,25 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalID)")
 	static bool GetValue_ModioOptionalModID(const struct FModioOptionalModID& OptionalID, struct FModioModID& ID);
+
+	/**
+	 * Check if the FModioUnsigned64 has a valid value
+	 *
+	 * @param OptionalInt - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioOptionalUInt64)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalUInt64(const struct FModioOptionalUInt64& OptionalInt);
+
+	/**
+	 * Get the FModioUnsigned64 from the optional if it's set
+	 *
+	 * @param OptionalInt - if this returned false, then this will be defaulted
+	 * @param UnderlyingInt - the underlying value
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalUInt64)")
+	static bool GetValue_ModioOptionalUInt64(const struct FModioOptionalUInt64& OptionalInt,
+											 FModioUnsigned64& UnderlyingInt);
 };

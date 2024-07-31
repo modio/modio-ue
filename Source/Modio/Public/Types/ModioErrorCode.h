@@ -30,6 +30,7 @@ struct MODIO_API FModioErrorCode
 	FModioErrorCode();
 	FModioErrorCode(const FModioErrorCode& Other);
 	FModioErrorCode(Modio::ErrorCode ec);
+	FModioErrorCode(int32 Value, int32 CategoryID);
 	FModioErrorCode& operator=(const FModioErrorCode& ec);
 	~FModioErrorCode();
 	/** return true if this error code is a error */
@@ -37,12 +38,18 @@ struct MODIO_API FModioErrorCode
 
 	/** Get the error code */
 	int GetValue() const;
+	FString GetCategoryString() const;
 	Modio::ErrorCode GetRawErrorCode() const;
 
 	/** Get a human readable message from the error code */
 	FString GetErrorMessage() const;
-
-private:
+	
+	static FModioErrorCode SystemError();
+	
+	int32 GetCategoryID() ;
+	
+	private:
 	TUniquePtr<Modio::ErrorCode> InternalError;
+
 };
 

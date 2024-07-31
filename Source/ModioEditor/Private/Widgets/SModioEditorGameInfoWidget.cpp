@@ -32,7 +32,7 @@
 void SModioEditorGameInfoWidget::LoadModioSubsystem()
 {
 	FModioInitializeOptions InitializeOptions =
-		UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("2345"));
+		UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
 
 	if (GEngine)
 	{

@@ -35,31 +35,31 @@ struct MODIO_API FModioUser
 	/**
 	 * User's unique ID
 	 **/
-	UPROPERTY(BlueprintReadOnly, Category = "User")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FModioUserID UserId;
 
 	/**
 	 * Name chosen by the user
 	 **/
-	UPROPERTY(BlueprintReadOnly, Category = "User")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FString Username;
 
 	/**
 	 * Unix timestamp the last time the  user was online
 	 **/
-	UPROPERTY(BlueprintReadOnly, Category = "User")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FDateTime DateOnline;
 
 	/**
 	 * URL of the user's mod.io profile
 	 **/
-	UPROPERTY(BlueprintReadOnly, Category = "User")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FString ProfileUrl;
 
 	/**
 	 * Display name of this User for the given Portal, if their account is linked
 	 **/
-	UPROPERTY(BlueprintReadOnly, Category = "User")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FString DisplayNamePortal;
 };
 

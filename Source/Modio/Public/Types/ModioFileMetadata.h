@@ -68,6 +68,10 @@ struct MODIO_API FModioFileMetadata
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
 	int64 Filesize {};
 
+	/** @brief Total size of all files in the mod after installation. */
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
+	int64 FilesizeUncompressed {};
+
 	/** @brief Filename including extension. */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
 	FString Filename;

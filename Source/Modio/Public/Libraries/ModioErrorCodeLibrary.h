@@ -30,6 +30,16 @@ public:
 	static bool IsError(const FModioErrorCode& Error);
 
 	/**
+	 * Checks if a error code contains a error
+	 * @param Error -
+	 * @return true if the error code is a error
+	 */
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Utilities|Error",
+			  meta = (DisplayName = "IsError", ExpandBoolAsExecs = "ReturnValue"))
+	static bool IsErrorAsExec(const FModioErrorCode& Error);
+
+
+	/**
 	 * Get underlying error code 
 	 * @param Error -
 	 * @return 0 if there is no error
@@ -44,4 +54,14 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Error")
 	static FString GetMessage(const FModioErrorCode& Error);
+
+	/**
+	 * Helper method to reconstruct a mod.io error passed via code that cannot reference mod.io types
+	 * @param Value The numeric value of the code
+	 * @param Category The category ID (populated by native code)
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Error")
+	static FModioErrorCode ReconstructError(int32 Value, int32 Category);
+
+
 };

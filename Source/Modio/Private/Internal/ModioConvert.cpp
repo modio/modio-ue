@@ -95,6 +95,11 @@ FText ToUnrealText(const std::string& String)
 	return FText::FromString(UTF8_TO_TCHAR(String.c_str()));
 }
 
+FString ToUnrealString(EModioLanguage Language)
+{
+	return FString(ToUnreal(Modio::Detail::ToString(ToModio(Language))));
+}
+
 Modio::ApiKey ToModio(const FModioApiKey& In)
 {
 	return Modio::ApiKey(TCHAR_TO_UTF8(*In.ToString()));
@@ -140,6 +145,8 @@ Modio::LogLevel ToModio(EModioLogLevel UnrealLogLevel)
 			return Modio::LogLevel::Trace;
 		case EModioLogLevel::Warning:
 			return Modio::LogLevel::Warning;
+		case EModioLogLevel::Detailed:
+			return Modio::LogLevel::Detailed;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EModioLogLevel UnrealLogLevel)"));
@@ -390,4 +397,44 @@ EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In)
 		default:
 			return EModioModChangeType::Removed;
 	}
+}
+
+EModioLanguage ToUnreal(const Modio::Language& In)
+{
+	switch (In)
+	{
+		case Modio::Language::English:
+			return EModioLanguage::English;
+		case Modio::Language::Bulgarian:
+			return EModioLanguage::Bulgarian;
+		case Modio::Language::French:
+			return EModioLanguage::French;
+		case Modio::Language::German:
+			return EModioLanguage::German;
+		case Modio::Language::Italian:
+			return EModioLanguage::Italian;
+		case Modio::Language::Polish:
+			return EModioLanguage::Polish;
+		case Modio::Language::Portuguese:
+			return EModioLanguage::Portuguese;
+		case Modio::Language::Hungarian:
+			return EModioLanguage::Hungarian;
+		case Modio::Language::Japanese:
+			return EModioLanguage::Japanese;
+		case Modio::Language::Korean:
+			return EModioLanguage::Korean;
+		case Modio::Language::Russian:
+			return EModioLanguage::Russian;
+		case Modio::Language::Spanish:
+			return EModioLanguage::Spanish;
+		case Modio::Language::Thai:
+			return EModioLanguage::Thai;
+		case Modio::Language::ChineseSimplified:
+			return EModioLanguage::ChineseSimplified;
+		case Modio::Language::ChineseTraditional:
+			return EModioLanguage::ChineseTraditional;
+	}
+
+	checkf(false, TEXT("Missed a case in ToUnreal(Modio::Language Language)"));
+	return EModioLanguage::English;
 }

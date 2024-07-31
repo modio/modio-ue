@@ -278,7 +278,7 @@ public class Modio : ModuleRules
             foreach(ModioTestConfigFile.FileToCopy TestFile in TestConfig.TestFiles)
             {
                 Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, Path.GetDirectoryName(TestFile.DestPath)));
-                File.Copy(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK", TestFile.SourcePath), Path.Combine(GeneratedHeaderPath, TestFile.DestPath));
+                File.Copy(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK", TestFile.SourcePath), Path.Combine(GeneratedHeaderPath, TestFile.DestPath), true);
             }
         }
     }

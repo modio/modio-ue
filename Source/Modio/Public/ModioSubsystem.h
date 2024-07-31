@@ -31,6 +31,7 @@
 #include "Types/ModioGameInfoList.h"
 #include "Types/ModioImageWrapper.h"
 #include "Types/ModioInitializeOptions.h"
+#include "Types/ModioModChangeMap.h"
 #include "Types/ModioModCollectionEntry.h"
 #include "Types/ModioModCreationHandle.h"
 #include "Types/ModioModDependencyList.h"
@@ -65,12 +66,11 @@ DECLARE_DELEGATE_TwoParams(FOnGetModDependenciesDelegateFast, FModioErrorCode, T
 DECLARE_DELEGATE_TwoParams(FOnSubmitNewModDelegateFast, FModioErrorCode, TOptional<FModioModID>);
 DECLARE_DELEGATE_TwoParams(FOnMuteUsersDelegateFast, FModioErrorCode, TOptional<FModioUserList>);
 DECLARE_DELEGATE_TwoParams(FOnListUserCreatedModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
-DECLARE_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegateFast, FModioErrorCode, TOptional<FModioMapPreview>);
-DECLARE_DELEGATE_TwoParams(FOnPurchaseModDelegateFast, FModioErrorCode, TOptional<FModioTransactionRecord>)
-DECLARE_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegateFast, FModioErrorCode, TOptional<uint64_t>);
+DECLARE_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegateFast, FModioErrorCode, TOptional<FModioModChangeMap>);
+DECLARE_DELEGATE_TwoParams(FOnPurchaseModDelegateFast, FModioErrorCode, TOptional<FModioTransactionRecord>);
+DECLARE_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegateFast, FModioErrorCode, TOptional<uint64>);
 DECLARE_DELEGATE_OneParam(FOnFetchUserPurchasesDelegateFast, FModioErrorCode);
-DECLARE_DELEGATE_TwoParams(FOnGetUserDerivedTokenDelegateFast, FModioErrorCode, FString);
-
+DECLARE_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegateFast, FModioErrorCode, FString);
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 
 // Blueprint version of delegates
@@ -109,15 +109,17 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCo
 								   FModioOptionalModInfoList, Result);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErrorCode, ErrorCode,
-								   FModioOptionalMapPreview, ModioPreviewMap);
+								   FModioOptionalModChangeMap, ModioPreviewMap);
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPurchaseModDelegate, FModioErrorCode, ErrorCode, FModioOptionalTransactionRecord, Transaction);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPurchaseModDelegate, FModioErrorCode, ErrorCode, FModioOptionalTransactionRecord,
+								   Transaction);
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegate, FModioErrorCode, ErrorCode, FModioOptionalUInt64, WalletBalance);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegate, FModioErrorCode, ErrorCode, FModioOptionalUInt64,
+								   WalletBalance);
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnFetchUserPurchasesDelegate, FModioErrorCode, ErrorCode);
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserDerivedTokenDelegate, FModioErrorCode, ErrorCode, FString, Token);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegate, FModioErrorCode, ErrorCode, FString, Token);
 
 class UModioSubsystem;
 
@@ -237,24 +239,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io")
 	MODIO_API TArray<FModioValidationError> GetLastValidationError();
-
-	/**
-	 * @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
-	 * marks the mod for local installation by the SDK
-	 * @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
-	 * @param OnSubscribeComplete Callback invoked when the subscription request is completed.
-	 * @requires initialized-sdk
-	 * @requires authenticated-user
-	 * @requires no-rate-limiting
-	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @errorcategory SDKNotInitialized|SDK not initialized
-	 * @errorcategory EntityNotFoundError|Specified mod does not exist or was deleted
-	 * @errorcategory UserNotAuthenticatedError|No authenticated user
-	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
-	 * @deprecated 2024.4 Call SubscribeToModAsync() and specify if mod dependencies should be included.
-	 **/
-	UE_DEPRECATED(5.1, "Deprecated as of 2024.4. Call SubscribeToModAsync(FModioModID, bool,  FOnErrorOnlyDelegateFast) and specify if recursive dependency subscription is desired.")
-	MODIO_API void SubscribeToModAsync(FModioModID ModToSubscribeTo, FOnErrorOnlyDelegateFast OnSubscribeComplete);
 
 	/**
 	 * @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
@@ -534,23 +518,8 @@ public:
 	/**
 	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
 	 * @param ModID The mod to retrieve dependencies for
-	 * @param Callback Callback providing a status code and an optional ModTagOptions object containing the available
-	 * tags
-	 * @requires initialized-sdk
-	 * @requires no-rate-limiting
-	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
-	 * @errorcategory SDKNotInitialized|SDK not initialized
-	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
-	 * @experimental
-	 * @deprecated 2024.4 Call GetModDependenciesAsync() and specify if recursion is desired.
-	 **/
-	UE_DEPRECATED(5.1, "Deprecated as of 2024.4. Call GetModDependenciesAsync(FModioModID, bool,  FOnErrorOnlyDelegateFast) and specify if recursive dependency resolution is desired.")
-	MODIO_API void GetModDependenciesAsync(FModioModID ModID, FOnGetModDependenciesDelegateFast Callback);
-
-	/**
-	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
-	 * @param ModID The mod to retrieve dependencies for
-	 * @param Recursive Include child dependencies in a recursive manner. \r\n NOTE: Recursion supports a maximum depth of 5.
+	 * @param Recursive Include child dependencies in a recursive manner. \r\n NOTE: Recursion supports a maximum depth
+	 *of 5.
 	 * @param Callback Callback providing a status code and an optional ModTagOptions object containing the available
 	 * tags
 	 * @requires initialized-sdk
@@ -560,7 +529,8 @@ public:
 	 * @errorcategory InvalidArgsError|The supplied mod ID is invalid
 	 * @experimental
 	 **/
-	MODIO_API void GetModDependenciesAsync(FModioModID ModID, bool Recursive, FOnGetModDependenciesDelegateFast Callback);
+	MODIO_API void GetModDependenciesAsync(FModioModID ModID, bool Recursive,
+										   FOnGetModDependenciesDelegateFast Callback);
 
 	/**
 	 * @brief Gets a new mod handle for use with SubmitNewModAsync.
@@ -702,9 +672,16 @@ public:
 	/**
 	 * @docpublic
 	 * @brief Set language to get corresponding data from the server
-	 * @param EModioLanguage to set
+	 * @param Locale Language to set
 	 **/
 	MODIO_API void SetLanguage(EModioLanguage Locale);
+
+	/**
+	 * @docpublic
+	 * @brief Get the currently applied language
+	 * @return Current language
+	 **/
+	MODIO_API EModioLanguage GetLanguage();
 
 	/**
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
@@ -727,14 +704,15 @@ public:
 	 * @docpublic
 	 * @brief Purchases a mod for the current player
 	 * @param ModID ID of the mod to purchase
-	 * @param ExpectedPrice The price the user is expected to pay for the mod, generally ModInfo.Price. This ensures that
-	 * there is consistency between the displayed price and the price in the backend. If there is a mismatch, the purchase will fail.
+	 * @param ExpectedPrice The price the user is expected to pay for the mod, generally ModInfo.Price. This ensures
+	 *that there is consistency between the displayed price and the price in the backend. If there is a mismatch, the
+	 *purchase will fail.
 	 * @param Callback Callback invoked with purchase information once the purchase is completed.
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 **/
-	MODIO_API void PurchaseModAsync(FModioModID ModID, uint64_t ExpectedPrice, FOnPurchaseModDelegateFast Callback);
+	MODIO_API void PurchaseModAsync(FModioModID ModID, uint64 ExpectedPrice, FOnPurchaseModDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -761,13 +739,13 @@ public:
 
 	/**
 	 * @docpublic
-	 * @brief Get a UserDerivedToken that can be used for S2S service calls
+	 * @brief Get a UserDelegationToken that can be used for S2S service calls.
 	 * @param Callback Callback invoked once the call has been completed.
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 **/
-	MODIO_API void GetUserDerivedTokenAsync(FOnGetUserDerivedTokenDelegateFast Callback);
+	MODIO_API void GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -779,8 +757,6 @@ public:
 	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Monetization")
 	MODIO_API TMap<FModioModID, FModioModInfo> QueryUserPurchasedMods();
-
-
 
 private:
 	TMap<EModioAvatarSize, FOnGetMediaMulticastDelegateFast> PendingUserMediaRequests;
@@ -936,7 +912,6 @@ public:
 	 */
 	MODIO_API FModioErrorCode InitTempModSet(TArray<FModioModID> ModIds);
 
-
 	/**
 	 * @brief  Add mods to a Temp Mod Set, install every temp mod given in the param if they are not already subbed.
 	 * @param TArray of ModID to install as temp mod
@@ -950,9 +925,9 @@ public:
 	 */
 	MODIO_API FModioErrorCode AddToTempModSet(TArray<FModioModID> ModIds);
 
-
 	/**
-	 * @brief  Remove mods from a Temp Mod Set, uninstall every temp mod given in the param if they are not already subbed.
+	 * @brief  Remove mods from a Temp Mod Set, uninstall every temp mod given in the param if they are not already
+	 * subbed.
 	 * @param TArray of ModID to install as temp mod
 	 * @return Error code indicating the status of the TempModSet. Will be empty if it was successful
 	 * @requires initialized-sdk
@@ -963,7 +938,6 @@ public:
 	 * @errorcategory TempModSetNotInitialize| TempModSet not initialized
 	 */
 	MODIO_API FModioErrorCode RemoveFromTempModSet(TArray<FModioModID> ModIds);
-
 
 	/**
 	 * @brief  Uninstall every temp mod.
@@ -977,10 +951,9 @@ public:
 	 */
 	MODIO_API FModioErrorCode CloseTempModSet();
 
-
 	/**
 	 * @brief	Query every System and Temp Mod in TempModSet
-	  * @return TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods 
+	 * @return TMap using Mod IDs as keys and ModCollectionEntry objects providing information about mods
 	 * in TempModSet
 	 */
 	MODIO_API TMap<FModioModID, FModioModCollectionEntry> QueryTempModSet();
@@ -1030,7 +1003,6 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "InitializeAsync", Category = "mod.io")
 	MODIO_API void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions,
 									  FOnErrorOnlyDelegate OnInitComplete);
-
 
 	/**
 	 * @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
@@ -1277,7 +1249,8 @@ public:
 	 * @experimental
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModDependenciesAsync", Category = "mod.io|Mods")
-	MODIO_API void K2_GetModDependenciesAsync(FModioModID ModID, bool Recursive, FOnGetModDependenciesDelegate Callback);
+	MODIO_API void K2_GetModDependenciesAsync(FModioModID ModID, bool Recursive,
+											  FOnGetModDependenciesDelegate Callback);
 
 	/**
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the
@@ -1360,10 +1333,18 @@ public:
 	/**
 	 * @docpublic
 	 * @brief Set language to get corresponding data from the server
-	 * @param EModioLanguage to set
+	 * @param Locale Language to set
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "SetLanguage", Category = "mod.io")
 	MODIO_API void K2_SetLanguage(EModioLanguage Locale);
+
+	/**
+	 * @docpublic
+	 * @brief Get the currently applied language
+	 * @return Current language
+	 **/
+	UFUNCTION(BlueprintCallable, DisplayName = "GetLanguage", Category = "mod.io")
+	MODIO_API EModioLanguage K2_GetLanguage();
 
 	/**
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
@@ -1581,7 +1562,6 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "GetDefaultModInstallationDirectory", Category = "mod.io|Mods")
 	static MODIO_API FString K2_GetDefaultModInstallationDirectory(FModioGameID GameID);
 
-	
 	/**
 	 * @brief Install every temp mod given in the param if they are not already subbed.
 	 * @param TArray of ModID to install as temp mod
@@ -1662,14 +1642,14 @@ public:
 
 	/**
 	 * @docpublic
-	 * @brief Get a User Derived Token that can be used for S2S service calls 
+	 * @brief Get a User Delegation Token that can be used for S2S service calls 
 	 * @param Callback Callback invoked with purchase information once the purchase is completed.
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 **/
-	UFUNCTION(BlueprintCallable, DisplayName = "GetUserDerivedTokenAsync", Category = "mod.io|Monetization")
-	MODIO_API void K2_GetUserDerivedTokenAsync(FOnGetUserDerivedTokenDelegate Callback);
+	UFUNCTION(BlueprintCallable, DisplayName = "GetUserDelegationTokenAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1702,6 +1682,8 @@ public:
 	 * @brief Converts a two letter ISO 639-1 language code to the corresponding EModioLanguage value.  Defaults to
 	 * English if the specified code is not a valid EModioLanguage value.
 	 * @param LanguageCode The two letter ISO 639-1 language code to convert
+	 * @deprecated 2024.7 Use UModioSDKLibrary::GetLanguageCodeFromString instead
 	 */
+	UE_DEPRECATED(5.1, "Deprecated as of 2024.7. Use UModioSDKLibrary::GetLanguageCodeFromString instead")
 	MODIO_API EModioLanguage ConvertLanguageCodeToModio(FString LanguageCode);
 };

@@ -5,7 +5,7 @@
 
 image:https://img.shields.io/badge/license-MIT-brightgreen.svg[alt="License", link="https://github.com/modio/modio-sdk/blob/master/LICENSE"]
 image:https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=discord&color=7289DA&labelColor=2C2F33[alt="Discord", link="https://discord.mod.io"]
-image:https://img.shields.io/badge/docs-master-green.svg[alt="Master Docs", link="https://go.mod.io/ue-docs"]
+image:https://img.shields.io/badge/docs-master-green.svg[alt="Master Docs", link="https://docs.mod.io/unreal/"]
 image:https://img.shields.io/badge/Unreal-4.26%2B-dea309[alt="Unreal Engine", link="https://www.unrealengine.com"]
 
 Welcome to the mod.io Unreal Engine plugin repository. It allows game developers to host and automatically install user-created mods in their Unreal Engine games. It provides a UI for mod discovery, installation and collection management, and a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API].
@@ -99,13 +99,13 @@ Before release, you will be able to setup a "hidden" Live environment that will 
 
 == Further reading
 
-To begin using the Plugin, either from Blueprint or from C++, please read our https://go.mod.io/ue-docs[Getting Started Guide] for a detailed explanation of initialization and usage.
+To begin using the Plugin, either from Blueprint or from C++, please read our https://docs.mod.io/unreal/[Getting Started Guide] for a detailed explanation of initialization and usage.
 
-* https://go.mod.io/ue-docs#_plugin_quick_start_initialization_and_teardown[SDK initialization and event loop]
-* https://go.mod.io/ue-docs#_plugin_quick_start_user_authentication[Authentication]
-* https://go.mod.io/ue-docs#_plugin_quick_start_browsing_available_mods[Mod Browsing]
-* https://go.mod.io/ue-docs#_plugin_quick_start_mod_subscriptions_and_management[Mod Subscription Management]
-* link:Doc/mod-creation-tool-documentation.adoc[Content Creation & Upload Tool]
+* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-initialization-and-teardown[SDK initialization and event loop]
+* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-user-authentication[Authentication]
+* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-browsing-available-mods[Mod Browsing]
+* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-mod-subscriptions-and-management[Mod Subscription Management]
+* https://docs.mod.io/unreal/mod-creation-tool/[Content Creation & Upload Tool]
 
 === User Interface
 

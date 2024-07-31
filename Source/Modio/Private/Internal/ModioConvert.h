@@ -28,6 +28,7 @@ uint64 ToUnreal(std::size_t Value);
 FString ToUnreal(const std::string& String);
 FDateTime ToUnrealDateTime(std::int64_t UnixTimestamp);
 FText ToUnrealText(const std::string& String);
+FString ToUnrealString(EModioLanguage Language);
 
 struct FModioModID ToUnreal(Modio::ModID Value);
 struct FModioFileMetadataID ToUnreal(Modio::FileMetadataID Value);
@@ -49,6 +50,7 @@ struct FModioGameStats ToUnreal(const Modio::GameStats& In);
 EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& In);
 struct FModioGamePlatform ToUnreal(const Modio::GamePlatform& In);
 EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In);
+EModioLanguage ToUnreal(const Modio::Language& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);

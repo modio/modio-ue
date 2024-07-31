@@ -180,7 +180,7 @@ For best performance it should be called at least once per frame, so it should e
 
 image::img/run_pending_handlers.png[]
 
-When you are ready to initialize the plugin for the current user, you'll need to call <<K2_InitializeAsync>>, passing in an instance of `FModioInitializeOptions`, and a delegate so you know when the plugin is initialized correctly. Here, you can specify your Game ID, API Key, Environment, and https://docs.mod.io/#targeting-a-portal[Portal]. You can get the default portal for the current platform using <<GetDefaultPortalForCurrentPlatform>> function.
+When you are ready to initialize the plugin for the current user, you'll need to call <<K2_InitializeAsync>>, passing in an instance of `FModioInitializeOptions`, and a delegate so you know when the plugin is initialized correctly. Here, you can specify your Game ID, API Key, Environment, and https://docs.mod.io/restapiref/#targeting-a-portal[Portal]. You can get the default portal for the current platform using <<GetDefaultPortalForCurrentPlatform>> function.
 
 image::img/initasync_customoptions.png[]
 
@@ -368,19 +368,20 @@ Once this completes successfully, the user is authenticated and you can then man
 
 mod.io features single sign on authentication from a number of external providers. This currently includes:
 
-    * Apple
-    * Discord
-    * Epic Games Store
-    * GoG
-    * Google
-    * itch.io
-    * Nintendo Switch
-    * PlayStation(TM) Network
-    * Steam
-    * Xbox Live
-    * OpenID
+	* Apple
+	* Discord
+	* Epic Games Store
+	* GoG
+	* Google
+	* itch.io
+	* Nintendo Switch
+	* PlayStation™Network
+	* Steam
+	* Xbox Live
+	* Oculus
+	* OpenID
 
-Please note that the ability to authenticate players using OpenID is feature for advanced partners only. If you are interested in becoming an advanced partner, please contact developers@mod.io
+Please note that the ability to authenticate players using OpenID is a premium feature. If you are interested in mod.io premium features, please contact developers@mod.io.
 
 To use SSO with mod.io, a user must have accepted the mod.io Terms of Use in order to create an account.
 
@@ -1145,4 +1146,181 @@ This call will start a TempModSet and install Mods with IDs 8, 4 and 5.
 
 Note | If you add an already subscribed mod to TempModSet, it will not download be downloaded as the player will already have that content. If you try to unsubscribe from it while it's in TempModSet, the SDK it will wait for it to be removed from TempModSet before processing the unsubscribe.
 
+== Plugin quick-start: Monetization
 
+The Mod.io Unreal Engine Plugin supports a range of Monetization features, allowing you to sell a per-game virtual currency to your players that they can use to purchase mods, with a share of the revenue split between creators and your studio. Visit https://docs.mod.io/monetization[here] for an overview of the mod.io monetization system.
+
+Every platform requires specific setup for monetization features to work, with regards to the virtual currency configuration and API calls, however the following documentation is generically applicable, with only small differences per-platform that are documented within the platform-specific monetization documentation.
+
+=== Initialization
+
+The mod.io monetization features are enabled as part of the onboarding process on your game profile. Once that is setup, there is nothing further you need to do for initialization in the Plugin.
+
+Ensure that you have set the appropriate Portal when initializing the SDK for the portal you are using for purchasing - for instance, on Steam, you must initialize with Modio::Portal::Steam in order to redeem entitlements for Steam.
+
+=== Getting the user's wallet
+
+On startup, you can make a call to `UModioSubsystem::GetUserWalletBalanceAsync` to get the balance of the current user's wallet. If no wallet exists for the user, one will be created for them automatically. This call returns the users wallet balance for the current game. The only time you need to make this call is on startup.
+
+We recommend that you cache the value of this result in your game code rather than making consistent calls to `UModioSubsystem::GetUserWalletBalanceAsync` and update your local state from the return values of other calls that affect wallet balance.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/get_user_wallet.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+void UModioManager::GetUserWallet()
+{
+	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegate::CreateUObject(this, &UModioManager::OnGetUserWalletCallback));
+	}
+}
+
+void UModioManager::OnGetUserWalletCallback(FModioErrorCode ErrorCode, FModioOptionalUInt64 WalletBalance)
+{
+	if (ErrorCode == false)
+	{
+		// Wallet Balance Successfully Retrieved
+	}
+}
+----
+
+====
+
+=== Querying & Purchasing Mods
+
+As part `UModioSubsystem::ListAllModsAsync`, you can include an additional filter for whether you list paid mods. By default, only free mods are shown, but you can set `RevenueType` on the [ModioFilterParams](#ModioFilterParams) object passed to `UModioSubsystem::ListAllModsAsync` to include free and paid content, or just paid content. All mods returned will have a `Price` property, indicating the virtual currency price that must be paid in order to purchase.
+
+Currently filtering for Paid/Unpaid content is not exposed to Blueprint.
+
+==== Purchasing Mods
+
+You can call `UModioSubsystem::PurchaseModAsync` to purchase a given mod. PurchaseModAsync takes two parameters = the ModID of the mod to purchase, and the ExpectedPrice, which is the price displayed to the user from `UModioSubsystem::ListAllModsAsync`. You must include this parameter for safety, so the user is not charged more or less than the price displayed to them in case the price of the mod has changed between the call to ListAllModsAsync and purchase time.
+
+Once a mod is purchased, it is automatically subscribed to for the user.
+
+You should validate that the user has enough virtual currency to make the purchase by comparing it to the balance you received from `UModioSubsystem::GetUserWalletBalanceAsync`. Note this is purely for user experience (ie for graying out the purchase button in the UI, or upselling the user a virtual currenct pack), and `UModioSubsystem::PurchaseModAsync` will return an error if the user does not have enough in their wallet.
+
+The updated wallet balance after the purchase amount is subtracted is returned in the callback of `UModioSubsystem::PurchaseModAsync`.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/purchase_mod.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+void UModioManager::PurchaseMod(FModioModID ModId, FModioUnsigned64 ExpectedPrice)
+{
+	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->PurchaseModAsync(ModId, ExpectedPrice, FOnPurchaseModDelegate::CreateUObject(this, &UModioManager::OnPurchaseModCallback));
+	}
+}
+
+void UModioManager::OnPurchaseModCallback(FModioErrorCode ErrorCode, FModioOptionalTransactionRecord Transaction)
+{
+	if (ErrorCode == false)
+	{
+		// Mod Purchase Successful
+	}
+}
+----
+
+====
+
+=== Showing user purchases
+
+Even though all purchased mods are automatically subscribed, the user can still unsubscribe from them and uninstall them; however, they still remain owned and purchased by the user. They must re-subscribe to the mod in order to have it installed. This is facilitated by `UModioSubsystem::FetchUserPurchasesAsync`, which will fetch a list of a users purchased mods. After a successful call, you can then display them with `UModioSubsystem::QueryUserPurchasedMods`, allowing re-subscription if necessary.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/show_user_purchases.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+void UModioManager::FetchUserPurchases()
+{
+	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegate::CreateUObject(this, &UModioManager::OnFetchUserPurchasesCallback));
+	}
+}
+
+void UModioManager::OnFetchUserPurchasesCallback(FModioErrorCode ErrorCode)
+{
+	if (ErrorCode == false)
+	{
+		// Purchases Successfully Fetched
+		if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+		{
+			// We can now access the list of purchased mods directly
+			TMap<FModioModID, FModioModInfo> PurchasedMods = GEngine->GetEngineSubsystem<UModioSubsystem>()->QueryUserPurchasedMods();
+		}
+	}
+}
+----
+
+====
+
+=== Getting a User Delegation Token
+
+User Delegation Tokens can be used by a backend server for S2S (Server to Server) transactions/functionality. You can get one for the current user by calling `UModioSubsystem::GetUserDelegationTokenAsync`, the callback for which contains the Token as a `FString`.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/get_user_delegation_token.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+void UModioManager::GetUserDelegationToken()
+{
+	if (GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		GEngine->GetEngineSubsystem<UModioSubsystem>()->GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDelegateFast::CreateUObject(this, &UModioManager::OnGetUserDelegationTokenCallback));
+	}
+}
+
+void UModioManager::OnGetUserDelegationTokenCallback(FModioErrorCode ErrorCode, FString UserDelegationToken)
+{
+	if (ErrorCode == false)
+	{
+		// Successfully got User Delegation Token
+	}
+}
+----
+
+====

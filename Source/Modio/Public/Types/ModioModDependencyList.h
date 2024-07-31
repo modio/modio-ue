@@ -11,8 +11,10 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioFileMetadata.h"
+#include "Types/ModioModInfo.h"
+#include "Types/ModioLogo.h"
 #include "Types/ModioPagedResult.h"
-#include "Types/ModioModProgressInfo.h"
 #include "Containers/UnrealString.h"
 #include "Misc/Optional.h"
 
@@ -40,6 +42,49 @@ struct MODIO_API FModioModDependency
 	**/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
 	FString ModName;
+
+	/**
+	 * Unix timestamp of the date the mod was registered
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
+	FDateTime DateAdded = 0;
+
+	/**
+	 * Unix timestamp of the date the mod was updated
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
+	FDateTime DateUpdated = 0;
+
+	/**
+	 * The level at which this dependency sits. When greater than zero (0), it means that this dependency relies
+	 * on additional dependencies.
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
+	uint8 DependencyDepth = 0;
+
+	/**
+	 * Media data related to the mod logo
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
+	FModioLogo Logo;
+
+	/**
+	 * Information about the mod's most recent public release
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
+	FModioFileMetadata FileInfo;
+
+	/**
+	 * The current ModStatus on the server: Accepted, NotAccepted, or Deleted.
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
+	EModioModServerSideStatus Status = EModioModServerSideStatus::NotAccepted;
+
+	/**
+	 * The visibility status of the mod, default to Public
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependency")
+	EModioObjectVisibilityFlags Visibility = EModioObjectVisibilityFlags::Public;
 };
 
 
@@ -63,6 +108,19 @@ struct MODIO_API FModioModDependencyList
 	**/
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependencyList")
 	TArray<FModioModDependency> InternalList;
+
+
+	/** 
+	* Total size of all the dependency files in bytes.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependencyList")
+	int64 TotalFilesize {};
+
+	/**
+	 * Total Size of the uncompressed dependency files in bytes.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModDependencyList")
+	int64 TotalFilesizeUncompressed {};
 };
 
 /**
@@ -88,54 +146,4 @@ struct MODIO_API FModioOptionalModDependencyList
     * Stored optional ModioModDependencyList
     **/
 	TOptional<FModioModDependencyList> Internal;
-};
-
-/**
- * Strong type struct to wrap a PreviewMap data as a map value
- **/
-USTRUCT(BlueprintType)
-struct MODIO_API FModioMapPreview
-{
-	GENERATED_BODY()
-
-	/**
-	 * Default constructor without parameters
-	 **/
-	FModioMapPreview() = default;
-
-	/**
-	 * Convenience constructor that has a map of ModID and Mod changes
-	 * @param ModPreviewMap Key/value pairs that contains mod changes
-	 **/
-	FModioMapPreview(PreviewMapDef&& ModPreview);
-
-	/**
-	 * Stored map preview
-	 **/
-	PreviewMapDef Internal;
-};
-
-/**
- * Strong type struct to wrap a MapPreview data as an optional value
- **/
-USTRUCT(BlueprintType)
-struct MODIO_API FModioOptionalMapPreview
-{
-	GENERATED_BODY()
-
-	/**
-	 * Default constructor without parameters
-	 **/
-	FModioOptionalMapPreview() = default;
-
-	/**
-	 * Convenience constructor that has a map of ModID and Mod changes
-	 * @param ModPreview An optional value that contains mod preview
-	 **/
-	FModioOptionalMapPreview(TOptional<FModioMapPreview>&& ModPreview);
-
-	/**
-	 * Stored optional FModioMapPreview
-	 **/
-	TOptional<FModioMapPreview> Internal;
 };

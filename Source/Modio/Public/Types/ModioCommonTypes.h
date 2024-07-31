@@ -10,6 +10,7 @@
 
 #pragma once
 #include "Misc/Crc.h"
+#include "Misc/EnumRange.h"
 
 #include "ModioCommonTypes.generated.h"
 
@@ -155,14 +156,17 @@ enum class EModioLogLevel : uint8
 	/** Detailed low-level debugging output. Not intended for general use **/
 	Trace = 0,
 
+	/* Detailed but not low-level. Generally useful for some mid-level information for debugging. */
+	Detailed = 1,
+
 	/** Informational output containing status messages **/
-	Info = 1,
+	Info = 2,
 
 	/** Warnings about incorrect plugin usage, timeouts **/
-	Warning = 2,
+	Warning = 3,
 
 	/** Only errors **/
-	Error = 3
+	Error = 4
 };
 
 /**
@@ -185,8 +189,10 @@ enum class EModioLanguage : uint8
 	Spanish,
 	Thai,
 	ChineseSimplified,
-	ChineseTraditional
+	ChineseTraditional,
+	Count UMETA(Hidden)
 };
+ENUM_RANGE_BY_COUNT(EModioLanguage, EModioLanguage::Count);
 
 UENUM(BlueprintType)
 enum class EModioModChangeType : uint8
@@ -353,7 +359,7 @@ struct MODIO_API FModioOptionalUInt64
 	/**
 	 * Stored optional uint64
 	 **/
-	TOptional<uint64_t> Internal;
+	TOptional<uint64> Internal;
 };
 
 
@@ -813,4 +819,24 @@ private:
 	TMap<FString, FString> ExtendedParameters;
 };
 
-#pragma endregion
+/**
+ * Enumerator with the possible memory measurement units
+ **/
+UENUM(BlueprintType)
+enum EFileSizeUnit
+{
+	/** Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb) **/
+	Largest = 0,
+
+	/** A single byte **/
+	B = 1,
+
+	/** Kilo bytes **/
+	KB = 1024,
+
+	/** Mega bytes **/
+	MB = 1024 * 1024,
+
+	/** Giga bytes **/
+	GB = 1024 * 1024 * 1024
+};

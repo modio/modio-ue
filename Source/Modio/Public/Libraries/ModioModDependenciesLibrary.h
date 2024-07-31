@@ -23,17 +23,33 @@ class MODIO_API UModioModDependenciesLibrary : public UBlueprintFunctionLibrary
 
 	/**
 	 * Get the tags in a mod tag options list
-	 * @param ModTags 
+	 * @param DependencyList 
 	 * @return
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
-	static const TArray<FModioModDependency>& GetDependencies(const FModioModDependencyList& ModTags);
+	static const TArray<FModioModDependency>& GetDependencies(const FModioModDependencyList& DependencyList);
 
 	/**
 	 * Get the paged result that contains information of the data returned
-	 * @param ModTags
+	 * @param DependencyList
 	 * @return
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
-	static const FModioPagedResult& GetPagedResult(const FModioModDependencyList& ModTags);
+	static const FModioPagedResult& GetPagedResult(const FModioModDependencyList& DependencyList);
+
+	/**
+	 * Get the total size of all the dependency files in bytes.
+	 * @param DependencyList
+	 * @return
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
+	static const int64& GetTotalFilesize(const FModioModDependencyList& DependencyList);
+
+	/**
+	 * Get the total Size of the uncompressed dependency files in bytes
+	 * @param DependencyList
+	 * @return
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
+	static const int64& GetTotalFilesizeUncompressed(const FModioModDependencyList& DependencyList);
 };

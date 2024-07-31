@@ -122,7 +122,7 @@ void FModioEditor::DisplayGettingStarted()
 
 void FModioEditor::PluginButtonClicked()
 {
-	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("1234"));
+	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
 	if (InitializeOptions.GameId.ToString().Equals("InvalidGameID") || InitializeOptions.ApiKey.ToString().Equals("InvalidApiKey"))
 	{
 		const FText Title = FText::FromString("mod.io");

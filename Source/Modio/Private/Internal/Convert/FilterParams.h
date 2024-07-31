@@ -61,6 +61,8 @@ FORCEINLINE Modio::FilterParams::SortFieldType ToModio(EModioSortFieldType Envir
 			return Modio::FilterParams::SortFieldType::DateUpdated;
 		case EModioSortFieldType::DownloadsTotal:
 			return Modio::FilterParams::SortFieldType::DownloadsTotal;
+		case EModioSortFieldType::Alphabetical:
+			return Modio::FilterParams::SortFieldType::Alphabetical;
 	}
 
 	return Modio::FilterParams::SortFieldType::ID;

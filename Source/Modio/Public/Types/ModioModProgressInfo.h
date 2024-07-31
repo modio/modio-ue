@@ -38,40 +38,8 @@ struct MODIO_API FModioModProgressInfo
 {
 	GENERATED_BODY()
 
-#if WITH_EDITORONLY_DATA
-	/**
-	 * Constructs a mock FModioModProgressInfo with dummy values. Only intended for use in editor previews, eg UMG
-	 * editor
-	 */
-	FModioModProgressInfo static ConstructPreviewProgressInfo(EModioModProgressState CurrentState, uint64_t Current,
-															  uint64_t Total)
-	{
-		FModioModProgressInfo Out {};
-		switch (CurrentState)
-		{
-			case EModioModProgressState::Compressing:
-				Out.CompressCurrent = Current;
-				Out.CompressTotal = Total;
-				break;
-			case EModioModProgressState::Downloading:
-				Out.DownloadCurrent = Current;
-				Out.DownloadTotal = Total;
-				break;
-			case EModioModProgressState::Uploading:
-				Out.UploadCurrent = Current;
-				Out.UploadTotal = Total;
-				break;
-			case EModioModProgressState::Extracting:
-				Out.ExtractCurrent = Current;
-				Out.ExtractTotal = Total;
-				break;
-			default:
-				break;
-		}
-		Out.CurrentState = CurrentState;
-		return Out;
-	}
-#endif
+	friend class UModioUIEditorPreviewDataLibrary;
+
 	/**
 	 * The mod ID of the mod being processed
 	 **/

@@ -274,14 +274,6 @@ void UModioCommonModOperationTrackerWidget::Tick(float DeltaTime)
 void UModioCommonModOperationTrackerWidget::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
-
-#if WITH_EDITOR
-	if (IsDesignTime())
-	{
-		FModioModProgressInfo PreviewProgressInfo = FModioModProgressInfo::ConstructPreviewProgressInfo(PreviewProgressState, PreviewCurrent, PreviewTotal);
-		UpdateProgress(PreviewProgressInfo);
-	}
-#endif
 }
 
 void UModioCommonModOperationTrackerWidget::UpdateProgress(const FModioModProgressInfo& ProgressInfo)

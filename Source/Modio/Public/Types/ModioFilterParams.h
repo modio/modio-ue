@@ -1,23 +1,21 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
-#include "Types/ModioCommonTypes.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "Misc/DateTime.h"
-
-#include "ModioModInfo.h"
+#include "Types/ModioCommonTypes.h"
+#include "Types/ModioModInfo.h"
 
 #include "ModioFilterParams.generated.h"
-
-
 
 /// Forward declaration of SDK type for declaration of conversion function below
 namespace Modio
@@ -35,7 +33,8 @@ enum class EModioSortFieldType : uint8
 	Rating, /** use mod rating */
 	DateMarkedLive, /** use date mod was marked live */
 	DateUpdated, /** use date mod was last updated */
-	DownloadsTotal /** use downloads total */
+	DownloadsTotal, /** use downloads total */
+	Alphabetical /** use mod name */
 };
 
 /// @brief Enum indicating which direction sorting should be applied
@@ -50,8 +49,8 @@ enum class EModioSortDirection : uint8
 UENUM(BlueprintType)
 enum class EModioRevenueFilterType : uint8
 {
-	Free = 0,		/** Return only free mods */
-	Paid = 1,		/** Return only paid mods */
+	Free = 0, /** Return only free mods */
+	Paid = 1, /** Return only paid mods */
 	FreeAndPaid = 2 /** Return both free and paid mods */
 };
 
@@ -185,7 +184,7 @@ struct MODIO_API FModioFilterParams
 	 * @return *this
 	 */
 	FModioFilterParams& RevenueType(EModioRevenueFilterType RevenueFilter);
-		
+
 	/**
 	 * @brief Indicates results should exclude all mods which contain mature content
 	 * @return *this
@@ -207,8 +206,7 @@ struct MODIO_API FModioFilterParams
 	FString ToString() const;
 
 public:
-	
-	friend class Modio::FilterParams ToModio(const FModioFilterParams& In );
+	friend class Modio::FilterParams ToModio(const FModioFilterParams& In);
 
 	EModioSortDirection Direction = EModioSortDirection::Ascending;
 	EModioSortFieldType SortField = EModioSortFieldType::ID;
@@ -226,4 +224,54 @@ public:
 	bool isPaged = false;
 	int64 Index = 0;
 	int64 Count = 100;
+};
+
+/**
+ * Helper struct for named preset filter parameters
+ */
+USTRUCT(BlueprintType)
+struct MODIO_API FModioPresetFilterParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	FText PresetName;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	TArray<FString> Tags;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	TArray<FString> ExcludedTags;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	EModioSortDirection Direction;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	EModioSortFieldType SortField;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	int64 Count = 20;
+
+	FModioFilterParams ToFilterParams() const
+	{
+		return FModioFilterParams()
+			.WithTags(Tags)
+			.WithoutTags(ExcludedTags)
+			.SortBy(SortField, Direction)
+			.IndexedResults(0, Count);
+	}
+};
+
+UCLASS()
+class MODIO_API UModioPresetFilterParamsLibrary : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+protected:
+	// Compiles a preset filter into a concrete set of filter parameters that can be passed to the mod.io plugin
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Filter Params")
+	static FModioFilterParams ToFilterParams(const FModioPresetFilterParams& Preset)
+	{
+		return Preset.ToFilterParams();
+	}
 };

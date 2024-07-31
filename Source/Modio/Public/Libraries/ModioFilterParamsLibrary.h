@@ -177,5 +177,15 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	 * @return *this
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
-	static FModioFilterParams& WithMatureContentFlags(UPARAM(ref) FModioFilterParams& Filter, UPARAM(meta = (Bitmask, BitmaskEnum = EModioMaturityFlags)) int32 ByMaturity);
+	static FModioFilterParams& WithMatureContentFlags(UPARAM(ref) FModioFilterParams& Filter,
+													  UPARAM(meta = (Bitmask, BitmaskEnum = EModioMaturityFlags))
+														  int32 ByMaturity);
+
+	/**
+	 * @brief Indicates results should be filtered by revenue type (free, paid, both)
+	 * @param RevenueType Revenue type to filter by
+	 * @return *this
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
+	static FModioFilterParams& RevenueType(UPARAM(ref) FModioFilterParams& Filter, EModioRevenueFilterType RevenueType);
 };

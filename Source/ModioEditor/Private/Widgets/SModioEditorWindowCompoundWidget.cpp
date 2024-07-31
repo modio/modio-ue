@@ -137,7 +137,7 @@ void SModioEditorWindowCompoundWidget::LoadResources()
 
 void SModioEditorWindowCompoundWidget::LoadModioSubsystem()
 {
-	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("1234"));
+	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
 	
 	if (GEngine)
 	{

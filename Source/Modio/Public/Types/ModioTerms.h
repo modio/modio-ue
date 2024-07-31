@@ -67,6 +67,7 @@ struct MODIO_API FModioTerms
 	FModioLink ManageLink;
 
 	/** @brief The plaintext version of the mod.io terms of use */
+	UPROPERTY(BlueprintReadOnly,Category="Terms|Links")
 	FString TermsText;
 };
 

@@ -15,8 +15,17 @@ const TArray<FModioModDependency>& UModioModDependenciesLibrary::GetDependencies
 	return DependencyList.InternalList;
 }
 
-const FModioPagedResult& UModioModDependenciesLibrary::GetPagedResult(
-	const FModioModDependencyList& DependencyList)
+const FModioPagedResult& UModioModDependenciesLibrary::GetPagedResult(const FModioModDependencyList& DependencyList)
 {
 	return DependencyList.PagedResult;
+}
+
+const int64& UModioModDependenciesLibrary::GetTotalFilesize(const FModioModDependencyList& DependencyList)
+{
+	return DependencyList.TotalFilesize;
+}
+
+const int64& UModioModDependenciesLibrary::GetTotalFilesizeUncompressed(const FModioModDependencyList& DependencyList)
+{
+	return DependencyList.TotalFilesizeUncompressed;
 }

@@ -157,3 +157,21 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalModID(const struct FModioOptio
 {
 	return GetValueInternal(OptionalID, ID);
 }
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalUInt64(const struct FModioOptionalUInt64& OptionalInt)
+{
+	return IsSetInternal(OptionalInt);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalUInt64(const struct FModioOptionalUInt64& OptionalInt,
+														 FModioUnsigned64& UnderlyingInt)
+{
+	// FModioOptionalUInt64 uses TOptional<uint64_t> internally rather than FModioUnsigned64, so we're not using the
+	// GetValueInternal() template function here
+	if (OptionalInt.Internal.IsSet())
+	{
+		UnderlyingInt = FModioUnsigned64(OptionalInt.Internal.GetValue());
+		return true;
+	}
+	return false;
+}

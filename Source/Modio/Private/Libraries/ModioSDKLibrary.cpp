@@ -13,6 +13,7 @@
 #include "Internal/Convert/InitializeOptions.h"
 #include "Modio.h"
 #include "ModioSettings.h"
+#include "Internal/ModioConvert.h"
 
 
 FModioGameID UModioSDKLibrary::GetProjectGameId()
@@ -38,6 +39,7 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptions()
 	Options.ApiKey = FModioApiKey(Settings->ApiKey);
 	Options.GameEnvironment = Settings->Environment;
 	Options.GameId = FModioGameID(Settings->GameId);
+	Options.PortalInUse = Settings->DefaultPortal;
 	Options.bUseBackgroundThread = Settings->bUseBackgroundThread;
 
 	return Options;
@@ -51,6 +53,7 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptionsForSessionI
 	Options.ApiKey = FModioApiKey(Settings->ApiKey);
 	Options.GameEnvironment = Settings->Environment;
 	Options.GameId = FModioGameID(Settings->GameId);
+	Options.PortalInUse = Settings->DefaultPortal;
 	Options.LocalSessionIdentifier = SessionId;
 	Options.bUseBackgroundThread = Settings->bUseBackgroundThread;
 
@@ -117,10 +120,11 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals/* = 
 	FormatRules.MaximumFractionalDigits = MaxDecimals;
 	FormatRules.MinimumIntegralDigits = 1;
 
-	Args.Add(TEXT("FileSize"), FText::AsNumber(InNewUnit, &FormatRules));
-	Args.Add(TEXT("UnitName"), bIncludeUnitName ? FText::FromString(ToString(Unit)) : FText::GetEmpty());
-
-	return FText::Format(FTextFormat::FromString(TEXT("{FileSize}{UnitName}")), Args);
+	Args.Add("Number", FText::AsNumber(InNewUnit, &FormatRules));
+	Args.Add("Unit", bIncludeUnitName ? FText::FromString(ToString(Unit)) : FText::GetEmpty());
+	FText FormatString = FText::FromString(TEXT("{Number}{Unit}"));
+	FText::FindText(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString) ;
+	return FText::Format(FormatString, Args);
 }
 
 bool UModioSDKLibrary::IsValidEmailAddressFormat(const FString& String)
@@ -269,4 +273,21 @@ FString UModioSDKLibrary::GetDefaultSessionIdWindows()
 #else
 	return FString(TEXT(""));
 #endif
+}
+
+FString UModioSDKLibrary::GetLanguageCodeString(EModioLanguage Language)
+{
+	return ToUnrealString(Language);
+}
+
+EModioLanguage UModioSDKLibrary::GetLanguageCodeFromString(FString LanguageCode)
+{
+	for (EModioLanguage Language : TEnumRange<EModioLanguage>())
+	{
+		if (ToUnrealString(Language) == LanguageCode)
+		{
+			return Language;
+		}
+	}
+	return EModioLanguage::English;
 }

@@ -16,28 +16,6 @@
 
 #include "ModioSDKLibrary.generated.h"
 
-/**
-* Enumerator with the possible memory measurement units
-**/
-UENUM(BlueprintType)
-enum EFileSizeUnit
-{
-	/** Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb) **/
-	Largest = 0,
-
-	/** A single byte **/
-	B = 1,
-
-	/** Kilo bytes **/
-	KB = 1024,
-
-	/** Mega bytes **/
-	MB = 1024 * 1024,
-
-	/** Giga bytes **/
-	GB = 1024 * 1024 * 1024
-};
-
 UCLASS(MinimalAPI)
 class UModioSDKLibrary : public UBlueprintFunctionLibrary
 {
@@ -168,4 +146,20 @@ public:
 	*/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static MODIO_API FString GetDefaultSessionIdWindows();
+
+	/**
+	 * @brief Get language code string. This can be used for localization purposes
+	 * @param Language The language code to convert to string
+	 * @return The language code as a string (e.g. "en", "fr", "de")
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
+	static MODIO_API FString GetLanguageCodeString(EModioLanguage Language);
+
+	/**
+	 * @brief Get language code enum from string in ISO 639-1 format. This can be used for localization purposes
+	 * @param LanguageCode The language code as a string (e.g. "en", "fr", "de")
+	 * @return The language code as an enum
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
+	static MODIO_API EModioLanguage GetLanguageCodeFromString(FString LanguageCode);
 };

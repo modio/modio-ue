@@ -51,7 +51,7 @@ void SModioEditorUserGamesList::Tick(const FGeometry& AllottedGeometry, const do
 void SModioEditorUserGamesList::LoadModioSubsystem()
 {
 	FModioInitializeOptions InitializeOptions =
-		UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("1234"));
+		UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
 
 	if (GEngine)
 	{

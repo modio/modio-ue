@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/KismetTextLibrary.h"
 
 #include "ModioUnsigned64.generated.h"
 
@@ -142,6 +143,14 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64",
+			  meta = (CompactNodeTitle = "> 0", Keywords = "> greater than 0 zero",
+					  DisplayName = "ModioUnsigned64 > 0"))
+	static bool GreaterThanZero(const FModioUnsigned64& In)
+	{
+		return In.Underlying > 0;
+	}
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64",
 			  meta = (CompactNodeTitle = ">", Keywords = "> greater than",
 					  DisplayName = "ModioUnsigned64 > ModioUnsigned64"))
 	static bool GreaterThan(const FModioUnsigned64& LHS, const FModioUnsigned64& RHS)
@@ -221,5 +230,12 @@ public:
 	static float Conv_FModioUnsigned64ToFloat(const FModioUnsigned64& In)
 	{
 		return float(In.Underlying);
+	}
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64",
+			  meta = (DisplayName = "To Text (ModioUnsigned64)", BlueprintAutocast))
+	static FText Conv_FModioUnsigned64ToText(const FModioUnsigned64& In)
+	{
+		return UKismetTextLibrary::Conv_Int64ToText(In.Underlying);
 	}
 };

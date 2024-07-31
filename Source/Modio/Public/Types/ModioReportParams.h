@@ -9,6 +9,7 @@
  */
 
 #pragma once
+#include "Misc/EnumRange.h"
 
 #include "ModioReportParams.generated.h"
 
@@ -45,8 +46,9 @@ enum class EModioReportType : uint8
 	FalseInformation = 6,
 
 	/** Other type of mod report **/
-	Other = 7            
+	Other = 7
 };
+ENUM_RANGE_BY_FIRST_AND_LAST(EModioReportType, EModioReportType::Generic, EModioReportType::Other);
 
 /**
 * Struct type to store the parameters used to report a mod

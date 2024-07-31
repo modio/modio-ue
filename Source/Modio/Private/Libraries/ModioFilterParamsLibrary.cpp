@@ -15,7 +15,8 @@ FModioFilterParams& UModioFilterParamsLibrary::MatchingAuthor(FModioFilterParams
 	return Filter.MatchingAuthor(ID);
 }
 
-FModioFilterParams& UModioFilterParamsLibrary::MatchingAuthors(FModioFilterParams& Filter, const TArray<FModioUserID>& IDs)
+FModioFilterParams& UModioFilterParamsLibrary::MatchingAuthors(FModioFilterParams& Filter,
+															   const TArray<FModioUserID>& IDs)
 {
 	return Filter.MatchingAuthors(IDs);
 }
@@ -91,4 +92,10 @@ FModioFilterParams& UModioFilterParamsLibrary::DisallowMatureContent(FModioFilte
 FModioFilterParams& UModioFilterParamsLibrary::WithMatureContentFlags(FModioFilterParams& Filter, int32 ByMaturity)
 {
 	return Filter.WithMatureContentFlags(static_cast<EModioMaturityFlags>(ByMaturity));
+}
+
+FModioFilterParams& UModioFilterParamsLibrary::RevenueType(FModioFilterParams& Filter,
+														   EModioRevenueFilterType RevenueType)
+{
+	return Filter.RevenueType(RevenueType);
 }

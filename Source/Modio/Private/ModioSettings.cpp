@@ -17,7 +17,10 @@
 #include "UnrealEdMisc.h"
 #endif
 
-UModioSettings::UModioSettings() : LogLevel(EModioLogLevel::Info) {}
+UModioSettings::UModioSettings()
+	: LogLevel(EModioLogLevel::Info),
+	  LocalizationStringTable("/Modio/Data/ST_ModioStaticLocData.ST_ModioStaticLocData")
+{}
 
 #if WITH_EDITOR
 void UModioSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

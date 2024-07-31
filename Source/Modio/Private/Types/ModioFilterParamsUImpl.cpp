@@ -140,3 +140,9 @@ FModioFilterParams& FModioFilterParams::WithMatureContentFlags(EModioMaturityFla
 	Maturity = ByMaturity;
 	return *this;
 }
+
+FModioFilterParams& FModioFilterParams::RevenueType(EModioRevenueFilterType RevenueFilter)
+{
+	Revenue = RevenueFilter;
+	return *this;
+}
