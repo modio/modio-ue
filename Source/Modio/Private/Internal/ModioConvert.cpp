@@ -323,6 +323,12 @@ Modio::Language ToModio(EModioLanguage Language)
 			return Modio::Language::ChineseSimplified;
 		case EModioLanguage::ChineseTraditional:
 			return Modio::Language::ChineseTraditional;
+		case EModioLanguage::Turkish:
+			return Modio::Language::Turkish;
+		case EModioLanguage::Ukrainian:
+			return Modio::Language::Ukrainian;
+		case EModioLanguage::Arabic:
+			return Modio::Language::Arabic;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EModioLanguage Language)"));

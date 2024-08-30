@@ -47,6 +47,7 @@
 #include "Types/ModioUser.h"
 #include "Types/ModioUserList.h"
 #include "Types/ModioValidationError.h"
+#include "Types/ModioEntitlementConsumptionStatusList.h"
 
 #include "ModioSubsystem.generated.h"
 
@@ -71,6 +72,7 @@ DECLARE_DELEGATE_TwoParams(FOnPurchaseModDelegateFast, FModioErrorCode, TOptiona
 DECLARE_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegateFast, FModioErrorCode, TOptional<uint64>);
 DECLARE_DELEGATE_OneParam(FOnFetchUserPurchasesDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegateFast, FModioErrorCode, FString);
+DECLARE_DELEGATE_TwoParams(FOnRefreshUserEntitlementsDelegateFast, FModioErrorCode, TOptional<FModioEntitlementConsumptionStatusList>);
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 
 // Blueprint version of delegates
@@ -120,6 +122,9 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegate, FModioErrorC
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnFetchUserPurchasesDelegate, FModioErrorCode, ErrorCode);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegate, FModioErrorCode, ErrorCode, FString, Token);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnRefreshUserEntitlementsDelegate, FModioErrorCode, ErrorCode,
+								   FModioOptionalEntitlementConsumptionStatusList, Entitlements);
 
 class UModioSubsystem;
 
@@ -174,9 +179,9 @@ public:
 	FOnUserProfileUpdatedDelegate OnUserProfileUpdatedDelegate;
 
 	/** Begin USubsystem interface */
-	virtual void Initialize(FSubsystemCollectionBase& Collection);
-	virtual void Deinitialize();
-	virtual bool ShouldCreateSubsystem(UObject* Outer) const;
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 	/** End USubsystem interface */
 
 	/// @brief Bind to a function that returns the appropriate EModioLanguage for the game. The Terms of Use will be
@@ -207,7 +212,7 @@ public:
 	 * @brief Sets the global logging level - messages with a log level below the specified value will not be displayed
 	 * @note This is a transient function, and won't be stored to disk. So at the next engine start, the log level will
 	 * be restored to the one in your FModioRuntimeSettings
-	 * @param Level Value indicating which priority of messages should be included in the log output
+	 * @param UnrealLogLevel Value indicating which priority of messages should be included in the log output
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io")
 	MODIO_API void SetLogLevel(EModioLogLevel UnrealLogLevel);
@@ -958,6 +963,18 @@ public:
 	 */
 	MODIO_API TMap<FModioModID, FModioModCollectionEntry> QueryTempModSet();
 
+	/**
+	 * @docpublic
+	 * @brief Requests mod.io refresh the available entitlements for the current user purchased through the portal and currently authenticated.
+	 * @param Params Additional parameters.
+	 * @param Callback Callback providing an error code indicating success or failure of the refresh operation.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 */
+	MODIO_API void RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
+                                                FOnRefreshUserEntitlementsDelegateFast Callback);
+
 private:
 	TUniquePtr<struct FModioImageCache> ImageCache;
 
@@ -1675,6 +1692,19 @@ public:
 	 **/
 	UFUNCTION(BlueprintCallable, DisplayName = "FetchUserPurchasesAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Requests mod.io refresh the available entitlements for the current user purchased through the portal and currently authenticated.
+	 * @param Params Additional parameters.
+	 * @param Callback Callback providing an error code indicating success or failure of the refresh operation.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "RefreshUserEntitlementsAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
+	                                               FOnRefreshUserEntitlementsDelegate Callback);
 
 #pragma endregion
 

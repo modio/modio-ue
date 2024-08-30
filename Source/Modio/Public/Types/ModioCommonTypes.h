@@ -190,6 +190,9 @@ enum class EModioLanguage : uint8
 	Thai,
 	ChineseSimplified,
 	ChineseTraditional,
+	Turkish,
+	Ukrainian,
+	Arabic,
 	Count UMETA(Hidden)
 };
 ENUM_RANGE_BY_COUNT(EModioLanguage, EModioLanguage::Count);

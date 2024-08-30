@@ -19,8 +19,10 @@ FORCEINLINE FModioModTagInfo ToUnreal(const Modio::ModTagInfo& In)
 	Out.TagGroupName = ToUnreal(In.TagGroupName);
 	Out.TagGroupValues = ToUnreal<FString>(In.TagGroupValues);
 	Out.bAllowMultipleSelection = ToUnreal(In.bAllowMultipleSelection);
+	Out.bHidden = ToUnreal(In.bHidden);
+	Out.bLocked = ToUnreal(In.bLocked);
 
-	for(const auto& Value : In.TagGroupValueLocData)
+	for (const auto& Value : In.TagGroupValueLocData)
 	{
 		Out.TagGroupValueLocalizationData.Add(ToUnreal(Value));
 	}

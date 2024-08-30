@@ -244,10 +244,10 @@ struct MODIO_API FModioPresetFilterParams
 	TArray<FString> ExcludedTags;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
-	EModioSortDirection Direction;
+	EModioSortDirection Direction = EModioSortDirection::Ascending;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
-	EModioSortFieldType SortField;
+	EModioSortFieldType SortField = EModioSortFieldType::ID;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	int64 Count = 20;

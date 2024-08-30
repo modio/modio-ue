@@ -37,28 +37,13 @@
 #include "Internal/Convert/Terms.h"
 #include "Internal/Convert/TransactionRecord.h"
 #include "Internal/Convert/User.h"
-#include "Internal/Convert/UserList.h"
+#include "Internal/Convert/Entitlements.h"
 #include "Internal/ModioConvert.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ModioSettings.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "ProfilingDebugging/CpuProfilerTrace.h"
 #include <map>
-
-template<typename DestKey, typename DestValue, typename SourceKey, typename SourceValue>
-TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>& OriginalMap);
-
-template<typename DestKey, typename DestValue, typename SourceKey, typename SourceValue>
-TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>&& OriginalMap)
-{
-	return ToUnreal<DestKey, DestValue, SourceKey, SourceValue>(OriginalMap);
-}
-
-template<typename Dest, typename Source>
-TOptional<Dest> ToUnrealOptional(Source Original);
-
-template<typename Dest, typename Source>
-Dest ToBP(Source Original);
 
 FModioBackgroundThread::FModioBackgroundThread(UModioSubsystem* ModioSubsystem)
 {
@@ -205,7 +190,7 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 #endif
 
 	Modio::InitializeAsync(ToModio(Options),
-						   [WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnInitComplete](Modio::ErrorCode ec) {
+						   [WeakThis = MakeWeakObjectPtr(this), OnInitComplete](Modio::ErrorCode ec) {
 							   if (!WeakThis.IsValid())
 							   {
 								   return;
@@ -256,7 +241,7 @@ void UModioSubsystem::SubscribeToModAsync(FModioModID ModToSubscribeTo, bool Inc
 {
 	Modio::SubscribeToModAsync(
 		ToModio(ModToSubscribeTo), IncludeDependencies,
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnSubscribeComplete](Modio::ErrorCode ec) {
+		[WeakThis = MakeWeakObjectPtr(this), OnSubscribeComplete](Modio::ErrorCode ec) {
 			if (!WeakThis.IsValid())
 			{
 				return;
@@ -275,7 +260,7 @@ void UModioSubsystem::SubscribeToModAsync(FModioModID ModToSubscribeTo, bool Inc
 void UModioSubsystem::UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 											  FOnErrorOnlyDelegateFast OnUnsubscribeComplete)
 {
-	Modio::UnsubscribeFromModAsync(ToModio(ModToUnsubscribeFrom), [WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
+	Modio::UnsubscribeFromModAsync(ToModio(ModToUnsubscribeFrom), [WeakThis = MakeWeakObjectPtr(this),
 																   OnUnsubscribeComplete](Modio::ErrorCode ec) {
 		if (!WeakThis.IsValid())
 		{
@@ -295,7 +280,7 @@ void UModioSubsystem::UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 void UModioSubsystem::FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetchDone)
 {
 	Modio::FetchExternalUpdatesAsync(
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnFetchDone](Modio::ErrorCode ec) {
+		[WeakThis = MakeWeakObjectPtr(this), OnFetchDone](Modio::ErrorCode ec) {
 			if (!WeakThis.IsValid())
 			{
 				return;
@@ -314,7 +299,7 @@ void UModioSubsystem::FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetch
 void UModioSubsystem::PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegateFast OnPreviewDone)
 {
 	Modio::PreviewExternalUpdatesAsync(
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnPreviewDone](
+		[WeakThis = MakeWeakObjectPtr(this), OnPreviewDone](
 			Modio::ErrorCode ec, std::map<Modio::ModID, Modio::UserSubscriptionList::ChangeType> PreviewMap) {
 			if (!WeakThis.IsValid())
 			{
@@ -344,7 +329,7 @@ void UModioSubsystem::PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDeleg
 FModioErrorCode UModioSubsystem::EnableModManagement(FOnModManagementDelegateFast Callback)
 {
 	return Modio::EnableModManagement(
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), Callback](Modio::ModManagementEvent Event) {
+		[WeakThis = MakeWeakObjectPtr(this), Callback](Modio::ModManagementEvent Event) {
 			if (!WeakThis.IsValid())
 			{
 				return;
@@ -433,7 +418,7 @@ void UModioSubsystem::KillBackgroundThread()
 
 void UModioSubsystem::ShutdownAsync(FOnErrorOnlyDelegateFast OnShutdownComplete)
 {
-	Modio::ShutdownAsync([WeakThis = TWeakObjectPtr<UModioSubsystem>(this), OnShutdownComplete](Modio::ErrorCode ec) {
+	Modio::ShutdownAsync([WeakThis = MakeWeakObjectPtr(this), OnShutdownComplete](Modio::ErrorCode ec) {
 		if (!WeakThis.IsValid())
 		{
 			return;
@@ -565,7 +550,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioAvatarSize Avata
 	PendingModMediaAvatarRequests.Add(ModIdAndSizePair).Add(Callback);
 	Modio::GetModMediaAsync(
 		ToModio(ModId), ToModio(AvatarSize),
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdAndSizePair](Modio::ErrorCode ec,
+		[WeakThis = MakeWeakObjectPtr(this), ModIdAndSizePair](Modio::ErrorCode ec,
 																			 Modio::Optional<std::string> Path) {
 			if (!WeakThis.IsValid())
 			{
@@ -615,7 +600,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize Gall
 	PendingModMediaGalleryRequests.Add(ModIdSizeIndexTuple).Add(Callback);
 	Modio::GetModMediaAsync(
 		ToModio(ModId), ToModio(GallerySize), Index,
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdSizeIndexTuple](Modio::ErrorCode ec,
+		[WeakThis = MakeWeakObjectPtr(this), ModIdSizeIndexTuple](Modio::ErrorCode ec,
 																				Modio::Optional<std::string> Path) {
 			if (!WeakThis.IsValid())
 			{
@@ -664,7 +649,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSiz
 	PendingModMediaLogoRequests.Add(ModIdAndSizePair).Add(Callback);
 	Modio::GetModMediaAsync(
 		ToModio(ModId), ToModio(LogoSize),
-		[WeakThis = TWeakObjectPtr<UModioSubsystem>(this), ModIdAndSizePair](Modio::ErrorCode ec,
+		[WeakThis = MakeWeakObjectPtr(this), ModIdAndSizePair](Modio::ErrorCode ec,
 																			 Modio::Optional<std::string> Path) {
 			if (!WeakThis.IsValid())
 			{
@@ -742,7 +727,7 @@ void UModioSubsystem::GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Call
 	}
 	// TODO: @modio-UE4 capturing `this` is bad and we shouldn't do it. Better to store the cached tags as a TSharedPtr
 	// and capture that by value, so we are guaranteed lifetime
-	Modio::GetModTagOptionsAsync([WeakThis = TWeakObjectPtr<UModioSubsystem>(this),
+	Modio::GetModTagOptionsAsync([WeakThis = MakeWeakObjectPtr(this),
 								  Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModTagOptions> ModTagOptions) {
 		if (!WeakThis.IsValid())
 		{
@@ -882,7 +867,7 @@ void UModioSubsystem::GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMedia
 		return;
 	}
 	PendingUserMediaRequests.Add(AvatarSize).Add(Callback);
-	Modio::GetUserMediaAsync(ToModio(AvatarSize), [WeakThis = TWeakObjectPtr<UModioSubsystem>(this), AvatarSize](
+	Modio::GetUserMediaAsync(ToModio(AvatarSize), [WeakThis = MakeWeakObjectPtr(this), AvatarSize](
 													  Modio::ErrorCode ec, Modio::Optional<std::string> Media) {
 		// Manually calling ToUnreal on the path and assigning to the member of FModioImage
 		// because we already have a std::string -> FString overload of ToUnreal
@@ -986,19 +971,6 @@ void UModioSubsystem::K2_ReportContentAsync(FModioReportParams Report, FOnErrorO
 								   [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
-TArray<FModioModDependency> ToUnreal(const std::vector<Modio::ModDependency>& OriginalArray)
-{
-	TArray<FModioModDependency> Result;
-
-	Result.Reserve(OriginalArray.size());
-	for (const auto& It : OriginalArray)
-	{
-		Result.Emplace(ToUnreal(It));
-	}
-
-	return Result;
-}
-
 void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, bool Recursive,
 											  FOnGetModDependenciesDelegateFast Callback)
 {
@@ -1008,7 +980,7 @@ void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, bool Recursive,
 			if (Dependencies)
 			{
 				FModioModDependencyList Out;
-				Out.InternalList = ToUnreal(Dependencies->GetRawList());
+				Out.InternalList = ToUnreal<FModioModDependency>(Dependencies->GetRawList());
 				Out.PagedResult = FModioPagedResult(Dependencies.value());
 				Out.TotalFilesize = Dependencies.value().TotalFilesize;
 				Out.TotalFilesizeUncompressed = Dependencies.value().TotalFilesizeUncompressed;
@@ -1165,7 +1137,7 @@ void UModioSubsystem::GetMutedUsersAsync(FOnMuteUsersDelegateFast Callback)
 		if (Dependencies)
 		{
 			FModioUserList Out;
-			Out.InternalList = ToUnreal(Dependencies->GetRawList());
+			Out.InternalList = ToUnreal<FModioUser>(Dependencies->GetRawList());
 			Out.PagedResult = FModioPagedResult(Dependencies.value());
 
 			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() { Callback.ExecuteIfBound(ec, Out); }));
@@ -1230,6 +1202,27 @@ TMap<FModioModID, FModioModCollectionEntry> UModioSubsystem::QueryTempModSet()
 	return ToUnreal<FModioModID, FModioModCollectionEntry>(Modio::QueryTempModSet());
 }
 
+void UModioSubsystem::RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
+												FOnRefreshUserEntitlementsDelegateFast Callback)
+{
+	Modio::RefreshUserEntitlementsAsync(
+		ToModio(Params),
+		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementConsumptionStatusList> Entitlements) {
+			if (Entitlements)
+			{
+				FModioEntitlementConsumptionStatusList Out;
+				Out.InternalList = ToUnreal<FEntitlementConsumptionStatus>(Entitlements->GetRawList());
+				Out.PagedResult = FModioPagedResult(Entitlements.value());
+				Out.WalletBalance = ToUnrealOptional<FModioEntitlementWalletBalance>(Entitlements.value().WalletBalance);
+				AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() { Callback.ExecuteIfBound(ec, Out); }));
+			}
+			else
+			{
+				AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ec, {}); }));
+			}
+		});
+}
+
 FModioErrorCode UModioSubsystem::K2_InitTempModSet(TArray<FModioModID> ModIds)
 {
 	return InitTempModSet(ModIds);
@@ -1271,6 +1264,17 @@ void UModioSubsystem::K2_FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegate C
 {
 	FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegateFast::CreateLambda(
 		[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+}
+
+void UModioSubsystem::K2_RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
+	FOnRefreshUserEntitlementsDelegate Callback)
+{
+	RefreshUserEntitlementsAsync(Params, FOnRefreshUserEntitlementsDelegateFast::CreateLambda(
+		                             [Callback](FModioErrorCode ec,
+		                                        TOptional<FModioEntitlementConsumptionStatusList> Entitlements) {
+			                             Callback.ExecuteIfBound(
+				                             ec, ToBP<FModioOptionalEntitlementConsumptionStatusList>(Entitlements));
+		                             }));
 }
 
 void UModioSubsystem::GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegateFast Callback)
@@ -1339,37 +1343,5 @@ void UModioSubsystem::K2_GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDe
 /// File scope implementations
 
 #pragma region Implementation
-template<typename DestKey, typename DestValue, typename SourceKey, typename SourceValue>
-TMap<DestKey, DestValue> ToUnreal(std::map<SourceKey, SourceValue>& OriginalMap)
-{
-	TMap<DestKey, DestValue> Result;
-
-	Result.Reserve(OriginalMap.size());
-	for (auto& It : OriginalMap)
-	{
-		Result.Add(ToUnreal(It.first), ToUnreal(It.second));
-	}
-
-	return Result;
-}
-
-template<typename Dest, typename Source>
-TOptional<Dest> ToUnrealOptional(Source Original)
-{
-	TOptional<Dest> DestinationOptional = {};
-	if (Original)
-	{
-		DestinationOptional = ToUnreal(Original.value());
-	}
-
-	return DestinationOptional;
-}
-
-template<typename Dest, typename Source>
-Dest ToBP(Source Original)
-{
-	Dest Result = {MoveTempIfPossible(Original)};
-	return Result;
-}
 
 #pragma endregion

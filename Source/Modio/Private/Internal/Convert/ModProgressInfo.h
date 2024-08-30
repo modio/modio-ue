@@ -14,7 +14,7 @@
 #include "ModioSDK.h"
 #include "Types/ModioModProgressInfo.h"
 
-FORCEINLINE EModioModProgressState ToUnreal(const Modio::ModProgressInfo::EModProgressState In)
+FORCEINLINE EModioModProgressState ToUnreal(const Modio::ModProgressInfo::EModProgressState& In)
 {
 	switch (In)
 	{

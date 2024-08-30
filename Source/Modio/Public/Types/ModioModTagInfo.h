@@ -101,12 +101,20 @@ struct MODIO_API FModioModTagInfo
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ModTagInfo")
 	bool bAllowMultipleSelection {};
 
+	/** @brief True if only visible by admins */
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ModTagInfo")
+	bool bHidden {};
+
+	/** @brief TrueTrue if only editable by admins */
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ModTagInfo")
+	bool bLocked {};
+
 	/** @brief the culture code for the mod.io locale at the time the mod.io API returned this data */
 	UPROPERTY()
 	FString Locale;
 
-	/** @brief Localized display string for this tag category and its values in the current mod.io locale set at the time this data was requested from the API */
+	/** @brief Localized display string for this tag category and its values in the current mod.io locale set at the
+	 * time this data was requested from the API */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "mod.io|ModTagInfo|Localized")
-	FModioLocalizedTagCategory LocalizedTagCategoryDataCurrentLocale; 
-
+	FModioLocalizedTagCategory LocalizedTagCategoryDataCurrentLocale;
 };

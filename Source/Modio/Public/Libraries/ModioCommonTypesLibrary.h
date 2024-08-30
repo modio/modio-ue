@@ -149,6 +149,34 @@ public:
 														 EModioPortal PortalInUse = EModioPortal::None);
 
 	/**
+	 * @brief Changes the game id for the provided set of initialization options
+	 * @param Options - The template initialization options
+	 * @param GameId - The new game id to use
+	 * @return New Initialization Options object with the game id set to the desired value
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
+	static FModioInitializeOptions SetGameId(const FModioInitializeOptions& Options, int64 GameId);
+
+	/**
+	 * @brief Changes the API key for the provided set of initialization options
+	 * @param Options - The template initialization options
+	 * @param APIKey - The new API key to use
+	 * @return New Initialization Options object with the API key set to the desired value
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (DisplayName = "Set API Key"))
+	static FModioInitializeOptions SetAPIKey(const FModioInitializeOptions& Options, const FString& APIKey);
+
+	/**
+	 * @brief Changes the game environment for the provided set of initialization options
+	 * @param Options - The template initialization options
+	 * @param GameEnvironment - The new environment to use
+	 * @return New Initialization Options object with the game environment set to the desired value
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
+	static FModioInitializeOptions SetGameEnvironment(const FModioInitializeOptions& Options,
+	                                                  EModioEnvironment GameEnvironment);
+
+	/**
 	 * @brief Changes the portal for the provided set of initialization options
 	 * @param Options - The template initialization options
 	 * @param PortalToUse - The new portal to use
@@ -166,6 +194,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options,
 														const FString& SessionIdentifier);
+
+	/**
+	 * @brief Sets extended initialization parameters for the provided set of initialization options
+	 * @param Options - The template initialization options
+	 * @param ExtendedParameters - The new extended parameters to use (will overwrite existing values)
+	 * @return New Initialization Options object with the extended parameters set to the desired value
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
+	static FModioInitializeOptions SetExtendedInitializationParameters(const FModioInitializeOptions& Options,
+	                                                                   const TMap<FString, FString>&
+	                                                                   ExtendedParameters);
+	
 	/**
 	 * @brief Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use
 	 * with care.

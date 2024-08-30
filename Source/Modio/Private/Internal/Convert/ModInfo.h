@@ -20,20 +20,6 @@
 #include "Types/ModioModInfo.h"
 #include "Types/ModioUnsigned64.h"
 
-template<typename DestValueType, typename SourceValueType, typename... OtherParams>
-TArray<DestValueType> ToUnrealD(const std::vector<SourceValueType, OtherParams...>& OriginalArray)
-{
-	TArray<DestValueType> Result;
-
-	Result.Reserve(OriginalArray.size());
-	for (const auto& It : OriginalArray)
-	{
-		Result.Emplace(ToUnreal(It));
-	}
-
-	return Result;
-}
-
 FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 {
 	FModioModInfo Out;
@@ -58,8 +44,8 @@ FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 		Out.FileInfo = ToUnreal(In.FileInfo.value());
 	}
 
-	Out.MetadataKvp = ToUnrealD<FModioMetadata>(In.MetadataKvp);
-	Out.Tags = ToUnrealD<FModioModTag>(In.Tags);
+	Out.MetadataKvp = ToUnreal<FModioMetadata>(In.MetadataKvp);
+	Out.Tags = ToUnreal<FModioModTag>(In.Tags);
 	Out.NumGalleryImages = ToUnreal(In.NumGalleryImages);
 	Out.YoutubeURLs = ToUnreal(In.YoutubeURLs);
 	Out.SketchfabURLs = ToUnreal(In.SketchfabURLs);

@@ -19,17 +19,7 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "ModioUICore",
-			"Type": "Runtime",
-			"LoadingPhase": "PreDefault"
-		},
-		{
 			"Name": "ModioEx",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "ModioUI",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		},
@@ -63,13 +53,17 @@
 	],
 	"LocalizationTargets": [
 		{
-			"Name": "ModioUI5",
+			"Name": "Modio",
 			"LoadingPolicy": "Always"
 		}
 	],
 	"Plugins": [
 		{
 			"Name": "CommonUI",
+			"Enabled": true
+		},
+		{
+			"Name": "PluginBrowser",
 			"Enabled": true
 		}
 	]

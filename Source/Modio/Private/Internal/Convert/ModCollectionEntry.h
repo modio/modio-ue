@@ -40,7 +40,7 @@ FORCEINLINE EModioModState ToUnreal(Modio::ModState ModState)
 }
 MODIO_END_CONVERT_SWITCHES
 
-FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In)
+FORCEINLINE FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In)
 {
 	FModioModCollectionEntry Out;
 	Out.ModState = ToUnreal(In.GetModState());

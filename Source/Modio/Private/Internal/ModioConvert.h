@@ -17,6 +17,15 @@
 #include "ModioSDK.h"
 #include "Templates/UnrealTypeTraits.h"
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioEntitlementConsumptionStatusList.h"
+#include "Types/ModioGameInfoList.h"
+#include "Types/ModioModCollectionEntry.h"
+#include "Types/ModioModInfoList.h"
+#include "Types/ModioModProgressInfo.h"
+#include "Types/ModioTerms.h"
+#include "Types/ModioTransactionRecord.h"
+#include "Types/ModioUser.h"
+
 #include <chrono>
 #include <string>
 #include <vector>
@@ -51,6 +60,21 @@ EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& In);
 struct FModioGamePlatform ToUnreal(const Modio::GamePlatform& In);
 EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In);
 EModioLanguage ToUnreal(const Modio::Language& In);
+FEntitlementConsumptionStatus ToUnreal(const Modio::EntitlementConsumptionStatus& In);
+FModioEntitlementConsumptionVirtualCurrencyDetails ToUnreal(const Modio::EntitlementConsumptionVirtualCurrencyDetails& In);
+FModioEntitlementWalletBalance ToUnreal(const Modio::EntitlementWalletBalance& In);
+EModioEntitlementConsumptionState ToUnreal(const Modio::EntitlementConsumptionState& In);
+EModioEntitlementType ToUnreal(const Modio::EntitlementType& In);
+FModioGameInfoList ToUnreal(const Modio::GameInfoList& In);
+FModioUser ToUnreal(const Modio::User& In);
+FModioModInfoList ToUnreal(const Modio::ModInfoList& In);
+FModioModTagOptions ToUnreal(const Modio::ModTagOptions& In);
+FModioLink ToUnreal(const Modio::Terms::Link& In);
+FModioTerms ToUnreal(const Modio::Terms& In);
+FModioTransactionRecord ToUnreal(const Modio::TransactionRecord& In);
+FModioModProgressInfo ToUnreal(const Modio::ModProgressInfo& In);
+EModioModProgressState ToUnreal(const Modio::ModProgressInfo::EModProgressState& In);
+FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
@@ -120,12 +144,32 @@ template<typename DestKeyType, typename DestValueType, typename SourceKeyType, t
 TMap<DestKeyType, DestValueType> ToUnreal(const std::map<SourceKeyType, SourceValueType, OtherParams...>& OriginalMap)
 {
 	TMap<DestKeyType, DestValueType> Result;
+	Result.Reserve(OriginalMap.size());
 
 	for (const auto& [Key, Value] : OriginalMap)
 	{
-		Result.Append(ToUnreal(Key), ToUnreal(Value));
+		Result.Add(ToUnreal(Key), ToUnreal(Value));
 	}
 
+	return Result;
+}
+
+template<typename DestValueType, typename SourceValueType>
+TOptional<DestValueType> ToUnrealOptional(SourceValueType&& Original)
+{
+	TOptional<DestValueType> DestinationOptional = {};
+	if (Original)
+	{
+		DestinationOptional = ToUnreal(Original.value());
+	}
+
+	return DestinationOptional;
+}
+
+template<typename DestValueType, typename SourceValueType>
+DestValueType ToBP(SourceValueType&& Original)
+{
+	DestValueType Result = {MoveTempIfPossible(Original)};
 	return Result;
 }
 

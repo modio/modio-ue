@@ -84,8 +84,30 @@ FModioInitializeOptions UModioCommonTypesLibrary::MakeInitializeOptions(int64 Ga
 	return Options;
 }
 
+FModioInitializeOptions UModioCommonTypesLibrary::SetGameId(const FModioInitializeOptions& Options, int64 GameId)
+{
+	FModioInitializeOptions DuplicateOptions {Options};
+	DuplicateOptions.GameId = FModioGameID(GameId);
+	return DuplicateOptions;
+}
+
+FModioInitializeOptions UModioCommonTypesLibrary::SetAPIKey(const FModioInitializeOptions& Options, const FString& APIKey)
+{
+	FModioInitializeOptions DuplicateOptions {Options};
+	DuplicateOptions.ApiKey = FModioApiKey(APIKey);
+	return DuplicateOptions;
+}
+
+FModioInitializeOptions UModioCommonTypesLibrary::SetGameEnvironment(const FModioInitializeOptions& Options,
+	EModioEnvironment GameEnvironment)
+{
+	FModioInitializeOptions DuplicateOptions {Options};
+	DuplicateOptions.GameEnvironment = GameEnvironment;
+	return DuplicateOptions;
+}
+
 FModioInitializeOptions UModioCommonTypesLibrary::SetPortal(const FModioInitializeOptions& Options,
-															EModioPortal PortalToUse)
+                                                            EModioPortal PortalToUse)
 {
 	FModioInitializeOptions DuplicateOptions {Options};
 	DuplicateOptions.PortalInUse = PortalToUse;
@@ -97,6 +119,14 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetSessionIdentifier(const FMo
 {
 	FModioInitializeOptions DuplicateOptions {Options};
 	DuplicateOptions.LocalSessionIdentifier = SessionIdentifier;
+	return DuplicateOptions;
+}
+
+FModioInitializeOptions UModioCommonTypesLibrary::SetExtendedInitializationParameters(
+	const FModioInitializeOptions& Options, const TMap<FString, FString>& ExtendedParameters)
+{
+	FModioInitializeOptions DuplicateOptions {Options};
+	DuplicateOptions.ExtendedInitializationParameters = ExtendedParameters;
 	return DuplicateOptions;
 }
 

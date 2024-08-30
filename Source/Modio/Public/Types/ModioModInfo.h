@@ -144,7 +144,7 @@ struct MODIO_API FModioModInfo
 
 	/** @brief If this mod has any dependencies */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
-	bool Dependencies;
+	bool Dependencies = false;
 
 	/**
 	 * Stored property to the metadata string
