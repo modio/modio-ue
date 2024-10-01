@@ -17,7 +17,7 @@ public class ModioEditor : ModuleRules
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UnrealEd", "Blutility", "LevelEditor", "UMGEditor", "UMG", "MainFrame"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UnrealEd", "Blutility", "LevelEditor", "UMGEditor", "UMG", "MainFrame", "Settings"});
  
         PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Public") });
         PrivateIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Private") });

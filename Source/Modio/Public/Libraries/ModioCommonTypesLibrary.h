@@ -174,7 +174,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
 	static FModioInitializeOptions SetGameEnvironment(const FModioInitializeOptions& Options,
-	                                                  EModioEnvironment GameEnvironment);
+													  EModioEnvironment GameEnvironment);
 
 	/**
 	 * @brief Changes the portal for the provided set of initialization options
@@ -190,7 +190,7 @@ public:
 	 * @param Options - The template initialization options
 	 * @param SessionIdentifier - The new session id to use
 	 * @return New Initialization Options object with the session identifier set to the desired value
-	**/
+	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options,
 														const FString& SessionIdentifier);
@@ -202,15 +202,14 @@ public:
 	 * @return New Initialization Options object with the extended parameters set to the desired value
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
-	static FModioInitializeOptions SetExtendedInitializationParameters(const FModioInitializeOptions& Options,
-	                                                                   const TMap<FString, FString>&
-	                                                                   ExtendedParameters);
-	
+	static FModioInitializeOptions SetExtendedInitializationParameters(
+		const FModioInitializeOptions& Options, const TMap<FString, FString>& ExtendedParameters);
+
 	/**
 	 * @brief Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use
 	 * with care.
 	 * @param In - the FModioModID to retrieve the value for
-	 * @return The underlying value 
+	 * @return The underlying value
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities")
 	static int64 GetRawValueFromModID(const FModioModID& In);
@@ -234,4 +233,26 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
 	static FModioEntitlementParams MakeEntitlementParams(const TMap<FString, FString>& ExtendedParameters);
+
+	/**
+	 * @brief Create Metrics Session parameters
+	 * @param Ids The list of mods to store within the Metrics Session parameters
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
+	static FModioMetricsSessionParams MakeMetricsSessionParams(const TArray<FModioModID>& Ids);
+
+	/**
+	 * @brief Create a Guid from a string
+	 * @param Guid A string to wrap within a Guid struct
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
+	static FModioGuid MakeGuid(const FString Guid);
+
+	/**
+	 * @brief Changes the session identifier for the provided Metrics Session parameters
+	 * @param Params The template Metrics Session parameters
+	 * @param Id The intended Guid to store in the Metrics Session parameters
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
+	static FModioMetricsSessionParams SetSessionId(const FModioMetricsSessionParams& Params, const FModioGuid& Id);
 };

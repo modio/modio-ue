@@ -1324,3 +1324,147 @@ void UModioManager::OnGetUserDelegationTokenCallback(FModioErrorCode ErrorCode, 
 ----
 
 ====
+=== Metrics Play Sessions
+
+The mod.io SDK supports all of the mod.io metrics features, allowing you to start a metrics play sesion, keeping that session alive via a heartbeat (automatically called, or manually handled) and then ending that session. Metric sessions allow you to track which mods your players interact with most frequently. Visit https://docs.mod.io/metrics/ for an overview of the mod.io metrics system.
+
+NOTE: Running metrics play sessions is a premium feature. If you are interested in mod.io premium features, please contact developers@mod.io.
+
+The Metrics session functionality is all accessible through the `modiosdk.h`, as well as suplemented with a global Metrics Service to manage session data, accessed via `Modio::Detail::Services::GetGlobalService<Modio::Detail::MetricsService>()`
+
+Metrics based on the platform and portal, are transparently taken care of with no additional consideration needed when using the SDK.
+
+==== Initialization
+
+The mod.io metrics features are enabled as part of generating a Metrics Secret Key your API settings in your game dashboard, e.g. https://mod.io/g/<game-name>/admin/api-key. Once this key has been generated, you need to pass it in as an ExtendedInitializationParameters entry in your InitializeOptions when Initializing the mod.io SDK, e.g.:
+
+[source,cpp]
+----
+FModioInitializeOptions initializeOptions;
+initializeOptions.ExtendedInitializationParameters.Add("MetricsSecretKey", "00000000-1111-2222-3333-444444444444");
+----
+
+Failing to set up the Metrics Secret Key will result in a `Modio::MetricsError::SessionNotInitialized`` error being returned when using the metrics functionality.
+
+Additionally, ensure that you have set the appropriate Portal when initializing the SDK to track metrics sessions fro the appropriate portal you are using - for instance, on Steam, you must initialize with Modio::Portal::Steam.
+
+==== Starting a Metrics Session
+
+You can call <<MetricsSessionStartAsync>> to start a new session tracking the usage of mods in the context of your game. You'll notice that `MetricsSessionStartAsync` takes a <<MetricsSessionParams>> object as its parameter. This contains an optional Session Id, as well as a required vector of mods to track.
+
+NOTE: If a Session Id is not provided, a random one will be created for you.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/metrics_session_start_1.png[]
+
+NOTE: Use the `SetSessionId` node if you want to associate your own Id with this session.
+
+image::img/metrics_session_start_2.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+FModioMetricsSessionParams Params = FModioMetricsSessionParams(ModIds);
+
+void UModioManager::MetricsSessionStart(const FModioMetricsSessionParams& Params)
+{
+	GEngine->GetEngineSubsystem<UModioSubsystem>()->MetricsSessionStartAsync(
+		Params, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::MetricsSessionStartCallback));
+}
+----
+====
+
+The Metrics Session Params accepts an optional Session Id in the form of a `Modio::Guid` which you may want to use to associate the new session with any supplementary telemetry you are gathering in your game.
+
+==== Metrics heartbeat
+
+To ensure that the session is kept alive, a heartbeat is required to be submitted at most every 5 minutes. We recommend doing this a bit earlier than the threshold to ensure you do not miss the window.
+
+There are two methods provided to control the behaviour of the heart beat, <<MetricsSessionSendHeartbeatOnceAsync>> which you can call at your desired precision, as well as a single call and forget <<MetricsSessionSendHeartbeatAtIntervalAsync>> with a desired interval.
+
+Calling `MetricsSessionSendHeartbeatOnceAsync` will submit a single heartbeat, and return an error code if something went wrong. If no error has occured, the heartbeat has been successfully sent.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/metrics_session_heartbeat.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+void UModioManager::MetricsSessionHeartbeat()
+{
+	GEngine->GetEngineSubsystem<UModioSubsystem>()->MetricsSessionSendHeartbeatOnceAsync(
+		FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::MetricsSessionHeartbeatCallback));
+}
+----
+====
+
+Calling `MetricsSessionSendHeartbeatAtIntervalAsync` requires a parameter with the desired interval frequency in seconds. An error code will be returned if something went wrong, otherwise you will receive a false-y error if the interval loop has been shut down successfully (such as ending a session).
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/metrics_session_heartbeat_interval.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+const FModioUnsigned64 IntervalSeconds(150);
+
+void UModioManager::MetricsSessionHeartbeat(const FModioUnsigned64& IntervalSeconds)
+{
+	GEngine->GetEngineSubsystem<UModioSubsystem>()->MetricsSessionSendHeartbeatAtIntervalAsync(
+		IntervalSeconds, 
+		FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::MetricsSessionHeartbeatCallback));
+}
+----
+====
+
+==== Ending a Metrics Session
+
+To complete a session, for example when finishing a match, or quitting out of your game, you can call <<MetricsSessionEndAsync>>.
+As with the other calls, you will receive an error if anything has gone wrong, otherwise the operation successfully completed.
+
+.Blueprint Example
+[%collapsible]
+====
+
+image::img/metrics_session_end.png[]
+
+====
+
+.C++ Example
+[%collapsible]
+====
+
+[source,cpp]
+----
+void UModioManager::MetricsSessionHeartbeat()
+{
+	GEngine->GetEngineSubsystem<UModioSubsystem>()->MetricsSessionEndAsync(
+
+		FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManager::MetricsSessionHeartbeatCallback));
+}
+----
+====

@@ -71,6 +71,10 @@ void ModioCreateModFileParamsDetails::DrawCreateNewModFile(IDetailLayoutBuilder&
 		[
 			SAssignNew(PathToModRootDirectoryEditableTextBox, SEditableTextBox)
 			.MinDesiredWidth(256.f)
+			.OnTextChanged_Lambda([this](const FText& InText)
+			{
+				Target->PathToModRootDirectory = InText.ToString();
+			})
 		]
 
 		+ SHorizontalBox::Slot()

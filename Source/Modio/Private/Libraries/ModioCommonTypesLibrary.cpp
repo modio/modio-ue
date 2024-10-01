@@ -91,7 +91,8 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetGameId(const FModioInitiali
 	return DuplicateOptions;
 }
 
-FModioInitializeOptions UModioCommonTypesLibrary::SetAPIKey(const FModioInitializeOptions& Options, const FString& APIKey)
+FModioInitializeOptions UModioCommonTypesLibrary::SetAPIKey(const FModioInitializeOptions& Options,
+															const FString& APIKey)
 {
 	FModioInitializeOptions DuplicateOptions {Options};
 	DuplicateOptions.ApiKey = FModioApiKey(APIKey);
@@ -99,7 +100,7 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetAPIKey(const FModioInitiali
 }
 
 FModioInitializeOptions UModioCommonTypesLibrary::SetGameEnvironment(const FModioInitializeOptions& Options,
-	EModioEnvironment GameEnvironment)
+																	 EModioEnvironment GameEnvironment)
 {
 	FModioInitializeOptions DuplicateOptions {Options};
 	DuplicateOptions.GameEnvironment = GameEnvironment;
@@ -107,7 +108,7 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetGameEnvironment(const FModi
 }
 
 FModioInitializeOptions UModioCommonTypesLibrary::SetPortal(const FModioInitializeOptions& Options,
-                                                            EModioPortal PortalToUse)
+															EModioPortal PortalToUse)
 {
 	FModioInitializeOptions DuplicateOptions {Options};
 	DuplicateOptions.PortalInUse = PortalToUse;
@@ -130,8 +131,7 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetExtendedInitializationParam
 	return DuplicateOptions;
 }
 
-
-int64 UModioCommonTypesLibrary::GetRawValueFromModID(const FModioModID& In) 
+int64 UModioCommonTypesLibrary::GetRawValueFromModID(const FModioModID& In)
 {
 	return GetUnderlyingValue(In);
 }
@@ -146,7 +146,26 @@ bool UModioCommonTypesLibrary::NotEqualTo(const FModioModID& A, const FModioModI
 	return A != B;
 }
 
-FModioEntitlementParams UModioCommonTypesLibrary::MakeEntitlementParams(const TMap<FString, FString>& ExtendedParameters)
+FModioEntitlementParams UModioCommonTypesLibrary::MakeEntitlementParams(
+	const TMap<FString, FString>& ExtendedParameters)
 {
 	return FModioEntitlementParams(ExtendedParameters);
+}
+
+FModioMetricsSessionParams UModioCommonTypesLibrary::MakeMetricsSessionParams(const TArray<FModioModID>& Ids)
+{
+	return FModioMetricsSessionParams(Ids);
+}
+
+FModioMetricsSessionParams UModioCommonTypesLibrary::SetSessionId(const FModioMetricsSessionParams& Params,
+																  const FModioGuid& Id)
+{
+	FModioMetricsSessionParams DuplicateOptions {Params};
+	DuplicateOptions.SessionId = FModioGuid(Id);
+	return DuplicateOptions;
+}
+
+FModioGuid UModioCommonTypesLibrary::MakeGuid(const FString Guid)
+{
+	return FModioGuid(Guid);
 }

@@ -80,6 +80,7 @@ void FModioEditor::StartupModule()
 void FModioEditor::ShutdownModule()
 {
 #if WITH_EDITOR
+
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
 		SettingsModule->UnregisterSettings("Project", "Plugins", "mod.io Editor");

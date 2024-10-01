@@ -851,6 +851,14 @@ table.stripes-odd tr:nth-of-type(odd) {
 </li>
 <li><a href="#_showing_user_purchases">Showing user purchases</a></li>
 <li><a href="#_getting_a_user_delegation_token">Getting a User Delegation Token</a></li>
+<li><a href="#_metrics_play_sessions">Metrics Play Sessions</a>
+<ul class="sectlevel3">
+<li><a href="#_initialization_2">Initialization</a></li>
+<li><a href="#_starting_a_metrics_session">Starting a Metrics Session</a></li>
+<li><a href="#_metrics_heartbeat">Metrics heartbeat</a></li>
+<li><a href="#_ending_a_metrics_session">Ending a Metrics Session</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_classes">Classes</a>
@@ -902,6 +910,10 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#ModioSubsystem_K2_PurchaseModAsync">PurchaseModAsync</a></li>
 <li><a href="#ModioSubsystem_K2_PreviewExternalUpdatesAsync">PreviewExternalUpdatesAsync</a></li>
 <li><a href="#ModioSubsystem_K2_MuteUserAsync">MuteUserAsync</a></li>
+<li><a href="#ModioSubsystem_K2_MetricsSessionStartAsync">MetricsSessionStartAsync</a></li>
+<li><a href="#ModioSubsystem_K2_MetricsSessionSendHeartbeatOnceAsync">MetricsSessionSendHeartbeatOnceAsync</a></li>
+<li><a href="#ModioSubsystem_K2_MetricsSessionSendHeartbeatAtIntervalAsync">MetricsSessionSendHeartbeatAtIntervalAsync</a></li>
+<li><a href="#ModioSubsystem_K2_MetricsSessionEndAsync">MetricsSessionEndAsync</a></li>
 <li><a href="#ModioSubsystem_K2_ListUserGamesAsync">ListUserGamesAsync</a></li>
 <li><a href="#ModioSubsystem_K2_ListUserCreatedModsAsync">ListUserCreatedModsAsync</a></li>
 <li><a href="#ModioSubsystem_K2_ListAllModsAsync">ListAllModsAsync</a></li>
@@ -990,9 +1002,12 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_modiooptionalmodid">ModioOptionalModID</a></li>
 <li><a href="#_modioauthenticationparams">ModioAuthenticationParams</a></li>
 <li><a href="#_modioapikey">ModioApiKey</a></li>
+<li><a href="#_modioguid">ModioGuid</a></li>
+<li><a href="#_modiooptionalguid">ModioOptionalGuid</a></li>
 <li><a href="#_modioemailaddress">ModioEmailAddress</a></li>
 <li><a href="#_modioemailauthcode">ModioEmailAuthCode</a></li>
 <li><a href="#_modioentitlementparams">ModioEntitlementParams</a></li>
+<li><a href="#_modiometricssessionparams">ModioMetricsSessionParams</a></li>
 <li><a href="#_modiocreatemodfileparams">ModioCreateModFileParams</a></li>
 <li><a href="#_modiocreatemodparams">ModioCreateModParams</a></li>
 <li><a href="#_modioeditmodparams">ModioEditModParams</a></li>
@@ -1025,13 +1040,16 @@ table.stripes-odd tr:nth-of-type(odd) {
 <li><a href="#_functions">Functions</a>
 <ul class="sectlevel2">
 <li><a href="#ModioCommonTypesLibrary_SetSessionIdentifier">Set Session Identifier</a></li>
+<li><a href="#ModioCommonTypesLibrary_SetSessionId">Set Session Id</a></li>
 <li><a href="#ModioCommonTypesLibrary_SetPortal">Set Portal</a></li>
 <li><a href="#ModioCommonTypesLibrary_SetGameId">Set Game Id</a></li>
 <li><a href="#ModioCommonTypesLibrary_SetGameEnvironment">Set Game Environment</a></li>
 <li><a href="#ModioCommonTypesLibrary_SetExtendedInitializationParameters">Set Extended Initialization Parameters</a></li>
 <li><a href="#ModioCommonTypesLibrary_SetAPIKey">Set API Key</a></li>
 <li><a href="#ModioCommonTypesLibrary_NotEqualTo">ModioModID != ModioModID</a></li>
+<li><a href="#ModioCommonTypesLibrary_MakeMetricsSessionParams">Make Metrics Session Params</a></li>
 <li><a href="#ModioCommonTypesLibrary_MakeInitializeOptions">Make Initialize Options</a></li>
+<li><a href="#ModioCommonTypesLibrary_MakeGuid">Make Guid</a></li>
 <li><a href="#ModioCommonTypesLibrary_MakeGameId">Make Game Id</a></li>
 <li><a href="#ModioCommonTypesLibrary_MakeEntitlementParams">Make Entitlement Params</a></li>
 <li><a href="#ModioCommonTypesLibrary_MakeAuthParams">Make Auth Params</a></li>
@@ -2947,6 +2965,210 @@ To perform any of these actions, the muting user must be authenticated.
 </div>
 </details>
 </div>
+<div class="sect2">
+<h3 id="_metrics_play_sessions">Metrics Play Sessions</h3>
+<div class="paragraph">
+<p>The mod.io SDK supports all of the mod.io metrics features, allowing you to start a metrics play sesion, keeping that session alive via a heartbeat (automatically called, or manually handled) and then ending that session. Metric sessions allow you to track which mods your players interact with most frequently. Visit <a href="https://docs.mod.io/metrics/" class="bare">https://docs.mod.io/metrics/</a> for an overview of the mod.io metrics system.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Running metrics play sessions is a premium feature. If you are interested in mod.io premium features, please contact <a href="mailto:developers@mod.io">developers@mod.io</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The Metrics session functionality is all accessible through the <code>modiosdk.h</code>, as well as suplemented with a global Metrics Service to manage session data, accessed via <code>Modio::Detail::Services::GetGlobalService&lt;Modio::Detail::MetricsService&gt;()</code></p>
+</div>
+<div class="paragraph">
+<p>Metrics based on the platform and portal, are transparently taken care of with no additional consideration needed when using the SDK.</p>
+</div>
+<div class="sect3">
+<h4 id="_initialization_2">Initialization</h4>
+<div class="paragraph">
+<p>The mod.io metrics features are enabled as part of generating a Metrics Secret Key your API settings in your game dashboard, e.g. <a href="https://mod.io/g/&lt;game-name&gt;/admin/api-key" class="bare">https://mod.io/g/&lt;game-name&gt;/admin/api-key</a>. Once this key has been generated, you need to pass it in as an ExtendedInitializationParameters entry in your InitializeOptions when Initializing the mod.io SDK, e.g.:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">FModioInitializeOptions</span> <span class="n">initializeOptions</span><span class="p">;</span>
+<span class="n">initializeOptions</span><span class="p">.</span><span class="n">ExtendedInitializationParameters</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="s">"MetricsSecretKey"</span><span class="p">,</span> <span class="s">"00000000-1111-2222-3333-444444444444"</span><span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Failing to set up the Metrics Secret Key will result in a <code>Modio::MetricsError::SessionNotInitialized`</code> error being returned when using the metrics functionality.</p>
+</div>
+<div class="paragraph">
+<p>Additionally, ensure that you have set the appropriate Portal when initializing the SDK to track metrics sessions fro the appropriate portal you are using - for instance, on Steam, you must initialize with Modio::Portal::Steam.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_starting_a_metrics_session">Starting a Metrics Session</h4>
+<div class="paragraph">
+<p>You can call <a href="#ModioSubsystem_K2_MetricsSessionStartAsync">MetricsSessionStartAsync</a> to start a new session tracking the usage of mods in the context of your game. You&#8217;ll notice that <code>MetricsSessionStartAsync</code> takes a <a href="#MetricsSessionParams">[MetricsSessionParams]</a> object as its parameter. This contains an optional Session Id, as well as a required vector of mods to track.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+If a Session Id is not provided, a random one will be created for you.
+</td>
+</tr>
+</table>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<img src="img/metrics_session_start_1.png" alt="metrics session start 1">
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Use the <code>SetSessionId</code> node if you want to associate your own Id with this session.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/metrics_session_start_2.png" alt="metrics session start 2">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="n">FModioMetricsSessionParams</span> <span class="n">Params</span> <span class="o">=</span> <span class="n">FModioMetricsSessionParams</span><span class="p">(</span><span class="n">ModIds</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionStart</span><span class="p">(</span><span class="k">const</span> <span class="n">FModioMetricsSessionParams</span><span class="o">&amp;</span> <span class="n">Params</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">MetricsSessionStartAsync</span><span class="p">(</span>
+		<span class="n">Params</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegateFast</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionStartCallback</span><span class="p">));</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>The Metrics Session Params accepts an optional Session Id in the form of a <code>Modio::Guid</code> which you may want to use to associate the new session with any supplementary telemetry you are gathering in your game.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_metrics_heartbeat">Metrics heartbeat</h4>
+<div class="paragraph">
+<p>To ensure that the session is kept alive, a heartbeat is required to be submitted at most every 5 minutes. We recommend doing this a bit earlier than the threshold to ensure you do not miss the window.</p>
+</div>
+<div class="paragraph">
+<p>There are two methods provided to control the behaviour of the heart beat, <a href="#ModioSubsystem_K2_MetricsSessionSendHeartbeatOnceAsync">MetricsSessionSendHeartbeatOnceAsync</a> which you can call at your desired precision, as well as a single call and forget <a href="#ModioSubsystem_K2_MetricsSessionSendHeartbeatAtIntervalAsync">MetricsSessionSendHeartbeatAtIntervalAsync</a> with a desired interval.</p>
+</div>
+<div class="paragraph">
+<p>Calling <code>MetricsSessionSendHeartbeatOnceAsync</code> will submit a single heartbeat, and return an error code if something went wrong. If no error has occured, the heartbeat has been successfully sent.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<img src="img/metrics_session_heartbeat.png" alt="metrics session heartbeat">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionHeartbeat</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">MetricsSessionSendHeartbeatOnceAsync</span><span class="p">(</span>
+		<span class="n">FOnErrorOnlyDelegateFast</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionHeartbeatCallback</span><span class="p">));</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+<div class="paragraph">
+<p>Calling <code>MetricsSessionSendHeartbeatAtIntervalAsync</code> requires a parameter with the desired interval frequency in seconds. An error code will be returned if something went wrong, otherwise you will receive a false-y error if the interval loop has been shut down successfully (such as ending a session).</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<img src="img/metrics_session_heartbeat_interval.png" alt="metrics session heartbeat interval">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="k">const</span> <span class="n">FModioUnsigned64</span> <span class="nf">IntervalSeconds</span><span class="p">(</span><span class="mi">150</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionHeartbeat</span><span class="p">(</span><span class="k">const</span> <span class="n">FModioUnsigned64</span><span class="o">&amp;</span> <span class="n">IntervalSeconds</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">MetricsSessionSendHeartbeatAtIntervalAsync</span><span class="p">(</span>
+		<span class="n">IntervalSeconds</span><span class="p">,</span>
+		<span class="n">FOnErrorOnlyDelegateFast</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionHeartbeatCallback</span><span class="p">));</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+<div class="sect3">
+<h4 id="_ending_a_metrics_session">Ending a Metrics Session</h4>
+<div class="paragraph">
+<p>To complete a session, for example when finishing a match, or quitting out of your game, you can call <a href="#ModioSubsystem_K2_MetricsSessionEndAsync">MetricsSessionEndAsync</a>.
+As with the other calls, you will receive an error if anything has gone wrong, otherwise the operation successfully completed.</p>
+</div>
+<details>
+<summary class="title">Blueprint Example</summary>
+<div class="content">
+<div class="imageblock">
+<div class="content">
+<img src="img/metrics_session_end.png" alt="metrics session end">
+</div>
+</div>
+</div>
+</details>
+<details>
+<summary class="title">C++ Example</summary>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="cpp"><span class="kt">void</span> <span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionHeartbeat</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">GEngine</span><span class="o">-&gt;</span><span class="n">GetEngineSubsystem</span><span class="o">&lt;</span><span class="n">UModioSubsystem</span><span class="o">&gt;</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">MetricsSessionEndAsync</span><span class="p">(</span>
+
+		<span class="n">FOnErrorOnlyDelegateFast</span><span class="o">::</span><span class="n">CreateUObject</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">UModioManager</span><span class="o">::</span><span class="n">MetricsSessionHeartbeatCallback</span><span class="p">));</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -4727,6 +4949,262 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect3">
+<h4 id="ModioSubsystem_K2_MetricsSessionStartAsync">MetricsSessionStartAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ModioSubsystem_K2_MetricsSessionStartAsync.png" alt="nd img ModioSubsystem K2 MetricsSessionStartAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_MetricsSessionStartAsync</span><span class="p">(</span><span class="n">FModioMetricsSessionParams</span> <span class="n">Params</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Start a Metrics play session</p>
+</div>
+<h5 id="_parameters_29" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModioSubsystem</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MetricsServiceParams struct containing information of what and how to start a metrics session</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback providing an error code indicating success or failure of the session start operation</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_error_values_15" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">RateLimited</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Too many frequent calls to the API. Wait some time and try again.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">InvalidUser</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No authenticated user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SessionNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has not yet been initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SessionIsActive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session is currently active and running</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">BadParameter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One or more values in the Metric Session Parameters are invalid</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ModioSubsystem_K2_MetricsSessionSendHeartbeatOnceAsync">MetricsSessionSendHeartbeatOnceAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ModioSubsystem_K2_MetricsSessionSendHeartbeatOnceAsync.png" alt="nd img ModioSubsystem K2 MetricsSessionSendHeartbeatOnceAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_MetricsSessionSendHeartbeatOnceAsync</span><span class="p">(</span><span class="n">FOnErrorOnlyDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sends a single heartbeat to the mod.io server to indicate a session is still active</p>
+</div>
+<h5 id="_parameters_30" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModioSubsystem</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback providing an error code indicating success or failure of the session heartbeat operation</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_error_values_16" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">InvalidUser</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No authenticated user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SessionNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has not yet been initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SessionIsNotActive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session is not currently running. Call MetricsSessionStartAsync before attempting to sending a heartbeat.</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ModioSubsystem_K2_MetricsSessionSendHeartbeatAtIntervalAsync">MetricsSessionSendHeartbeatAtIntervalAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ModioSubsystem_K2_MetricsSessionSendHeartbeatAtIntervalAsync.png" alt="nd img ModioSubsystem K2 MetricsSessionSendHeartbeatAtIntervalAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_MetricsSessionSendHeartbeatAtIntervalAsync</span><span class="p">(</span><span class="n">FModioUnsigned64</span> <span class="n">IntervalSeconds</span><span class="p">,</span> <span class="n">FOnErrorOnlyDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sends a constant heartbeat at a given interval to the mod.io server to indicate a session is still active</p>
+</div>
+<h5 id="_parameters_31" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModioSubsystem</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">IntervalSeconds</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The frequency in seconds to send a heartbeat to the mod.io server</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback providing an error code indicating success or failure of the session heartbeat operation</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_error_values_17" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GenericError::SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UserDataError::InvalidUser</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No authenticated user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MetricsError::SessionNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has not yet been initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MetricsError::SessionIsNotActive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session is not currently running. Call MetricsSessionStartAsync before attempting to sending a heartbeat.</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
+<h4 id="ModioSubsystem_K2_MetricsSessionEndAsync">MetricsSessionEndAsync</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ModioSubsystem_K2_MetricsSessionEndAsync.png" alt="nd img ModioSubsystem K2 MetricsSessionEndAsync">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="kt">void</span> <span class="n">K2_MetricsSessionEndAsync</span><span class="p">(</span><span class="n">FOnErrorOnlyDelegate</span> <span class="n">Callback</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ends a Metrics play session</p>
+</div>
+<h5 id="_parameters_32" class="discrete">Parameters</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Target</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ModioSubsystem</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Callback</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Callback providing an error code indicating success or failure of the session end operation</p></td>
+</tr>
+</tbody>
+</table>
+<h5 id="_error_values_18" class="discrete">Error Values</h5>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GenericError::SDKNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SDK not initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HttpError::RateLimited</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Too many frequent calls to the API. Wait some time and try again.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UserDataError::InvalidUser</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No authenticated user</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MetricsError::SessionNotInitialized</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has not yet been initialized</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MetricsError::SessionIsNotActive</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session is not currently running. Call MetricsSessionStartAsync before attempting to end a session.</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect3">
 <h4 id="ModioSubsystem_K2_ListUserGamesAsync">ListUserGamesAsync</h4>
 <div class="imageblock">
 <div class="content">
@@ -4755,7 +5233,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_29" class="discrete">Parameters</h5>
+<h5 id="_parameters_33" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4776,7 +5254,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_15" class="discrete">Error Values</h5>
+<h5 id="_error_values_19" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4828,7 +5306,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_30" class="discrete">Parameters</h5>
+<h5 id="_parameters_34" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4849,7 +5327,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_16" class="discrete">Error Values</h5>
+<h5 id="_error_values_20" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4898,7 +5376,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_31" class="discrete">Parameters</h5>
+<h5 id="_parameters_35" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4919,7 +5397,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_17" class="discrete">Error Values</h5>
+<h5 id="_error_values_21" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4964,7 +5442,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_32" class="discrete">Parameters</h5>
+<h5 id="_parameters_36" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -4989,7 +5467,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Error code indicating the status of the TempModSet. Will be empty if it was successful</p>
 </div>
-<h5 id="_error_values_18" class="discrete">Error Values</h5>
+<h5 id="_error_values_22" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5023,7 +5501,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the set of mods the specified user has installed on this device</p>
 </div>
-<h5 id="_parameters_33" class="discrete">Parameters</h5>
+<h5 id="_parameters_37" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5044,7 +5522,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_19" class="discrete">Error Values</h5>
+<h5 id="_error_values_23" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5100,7 +5578,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_34" class="discrete">Parameters</h5>
+<h5 id="_parameters_38" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5148,7 +5626,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_35" class="discrete">Parameters</h5>
+<h5 id="_parameters_39" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5169,7 +5647,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_20" class="discrete">Error Values</h5>
+<h5 id="_error_values_24" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5221,7 +5699,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_36" class="discrete">Parameters</h5>
+<h5 id="_parameters_40" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5263,7 +5741,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_37" class="discrete">Parameters</h5>
+<h5 id="_parameters_41" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5280,7 +5758,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_21" class="discrete">Error Values</h5>
+<h5 id="_error_values_25" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5325,7 +5803,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_38" class="discrete">Parameters</h5>
+<h5 id="_parameters_42" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5342,7 +5820,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_22" class="discrete">Error Values</h5>
+<h5 id="_error_values_26" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5387,7 +5865,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_39" class="discrete">Parameters</h5>
+<h5 id="_parameters_43" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5404,7 +5882,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_23" class="discrete">Error Values</h5>
+<h5 id="_error_values_27" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5449,7 +5927,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_40" class="discrete">Parameters</h5>
+<h5 id="_parameters_44" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5474,7 +5952,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_24" class="discrete">Error Values</h5>
+<h5 id="_error_values_28" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5531,7 +6009,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_41" class="discrete">Parameters</h5>
+<h5 id="_parameters_45" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5560,7 +6038,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_25" class="discrete">Error Values</h5>
+<h5 id="_error_values_29" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5617,7 +6095,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_42" class="discrete">Parameters</h5>
+<h5 id="_parameters_46" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5642,7 +6120,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_26" class="discrete">Error Values</h5>
+<h5 id="_error_values_30" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5699,7 +6177,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_43" class="discrete">Parameters</h5>
+<h5 id="_parameters_47" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5720,7 +6198,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_27" class="discrete">Error Values</h5>
+<h5 id="_error_values_31" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5785,7 +6263,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_44" class="discrete">Parameters</h5>
+<h5 id="_parameters_48" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5810,7 +6288,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_28" class="discrete">Error Values</h5>
+<h5 id="_error_values_32" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5860,7 +6338,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </table>
 </div>
-<h5 id="_parameters_45" class="discrete">Parameters</h5>
+<h5 id="_parameters_49" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5894,7 +6372,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get the currently applied language</p>
 </div>
-<h5 id="_parameters_46" class="discrete">Parameters</h5>
+<h5 id="_parameters_50" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5943,7 +6421,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_47" class="discrete">Parameters</h5>
+<h5 id="_parameters_51" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -5964,7 +6442,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_29" class="discrete">Error Values</h5>
+<h5 id="_error_values_33" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6006,7 +6484,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Forcibly uninstalls a mod from the system. This can be used when the host application requires additional space for other mods. The current user must not be subscribed to the mod to force uninstall. To remove a mod the current user is subscribed to, first use <a href="#ModioSubsystem_K2_UnsubscribeFromModAsync">UnsubscribeFromModAsync</a>. If the mod does not uninstall (due to a different user on the same system remaining subscribed), ForceUninstallModAsync can be called next.</p>
 </div>
-<h5 id="_parameters_48" class="discrete">Parameters</h5>
+<h5 id="_parameters_52" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6027,7 +6505,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_30" class="discrete">Error Values</h5>
+<h5 id="_error_values_34" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6083,7 +6561,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_49" class="discrete">Parameters</h5>
+<h5 id="_parameters_53" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6117,7 +6595,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Synchronises the local list of the current user&#8217;s subscribed mods with the server. Any mods that have been externally subscribed will be automatically marked for installation, and mods that have been externally removed from the user&#8217;s subscriptions may be uninstalled if no other local users have a current subscription.</p>
 </div>
-<h5 id="_parameters_50" class="discrete">Parameters</h5>
+<h5 id="_parameters_54" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6151,7 +6629,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Enables the automatic management of installed mods on the system based on the user&#8217;s subscriptions.</p>
 </div>
-<h5 id="_parameters_51" class="discrete">Parameters</h5>
+<h5 id="_parameters_55" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6203,7 +6681,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_52" class="discrete">Parameters</h5>
+<h5 id="_parameters_56" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6224,7 +6702,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Error code indicating the status of the TempModSet. Will be empty if it was successful</p>
 </div>
-<h5 id="_error_values_31" class="discrete">Error Values</h5>
+<h5 id="_error_values_35" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6276,7 +6754,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_53" class="discrete">Parameters</h5>
+<h5 id="_parameters_57" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6293,7 +6771,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_32" class="discrete">Error Values</h5>
+<h5 id="_error_values_36" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6341,7 +6819,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_54" class="discrete">Parameters</h5>
+<h5 id="_parameters_58" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6366,7 +6844,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_33" class="discrete">Error Values</h5>
+<h5 id="_error_values_37" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6418,7 +6896,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_55" class="discrete">Parameters</h5>
+<h5 id="_parameters_59" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6439,7 +6917,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_34" class="discrete">Error Values</h5>
+<h5 id="_error_values_38" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6491,7 +6969,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_56" class="discrete">Parameters</h5>
+<h5 id="_parameters_60" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6512,7 +6990,7 @@ This function is part of an experimental feature and is subject to change.
 </tr>
 </tbody>
 </table>
-<h5 id="_error_values_35" class="discrete">Error Values</h5>
+<h5 id="_error_values_39" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6572,7 +7050,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_57" class="discrete">Parameters</h5>
+<h5 id="_parameters_61" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6597,7 +7075,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Error code indicating the status of the TempModSet. Will be empty if it was successful</p>
 </div>
-<h5 id="_error_values_36" class="discrete">Error Values</h5>
+<h5 id="_error_values_40" class="discrete">Error Values</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6649,7 +7127,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the automatic management process is currently installing or removing mods</p>
 </div>
-<h5 id="_parameters_58" class="discrete">Parameters</h5>
+<h5 id="_parameters_62" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6695,7 +7173,7 @@ This function is part of an experimental feature and is subject to change.
 </li>
 </ul>
 </div>
-<h5 id="_parameters_59" class="discrete">Parameters</h5>
+<h5 id="_parameters_63" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -6733,7 +7211,7 @@ This function is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Disables automatic installation or uninstallation of mods based on the user&#8217;s subscriptions. Allows currently processing installation to complete; will cancel any pending operations when called.</p>
 </div>
-<h5 id="_parameters_60" class="discrete">Parameters</h5>
+<h5 id="_parameters_64" class="discrete">Parameters</h5>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -7843,6 +8321,14 @@ This function is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="_modioguid">ModioGuid</h3>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiooptionalguid">ModioOptionalGuid</h3>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="_modioemailaddress">ModioEmailAddress</h3>
 <hr>
 </div>
@@ -7852,6 +8338,10 @@ This function is part of an experimental feature and is subject to change.
 </div>
 <div class="sect2">
 <h3 id="_modioentitlementparams">ModioEntitlementParams</h3>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_modiometricssessionparams">ModioMetricsSessionParams</h3>
 <hr>
 </div>
 <div class="sect2">
@@ -8522,7 +9012,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the session identifier for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_61" class="discrete">Parameters</h4>
+<h4 id="_parameters_65" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8550,6 +9040,44 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="ModioCommonTypesLibrary_SetSessionId">Set Session Id</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ModioCommonTypesLibrary_SetSessionId.png" alt="nd img ModioCommonTypesLibrary SetSessionId">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioMetricsSessionParams</span> <span class="n">SetSessionId</span><span class="p">(</span><span class="n">FModioMetricsSessionParams</span> <span class="n">Params</span><span class="p">,</span> <span class="n">FModioGuid</span> <span class="n">Id</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Changes the session identifier for the provided Metrics Session parameters</p>
+</div>
+<h4 id="_parameters_66" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Params</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The template Metrics Session parameters</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Id</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The intended Guid to store in the Metrics Session parameters</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="ModioCommonTypesLibrary_SetPortal">Set Portal</h3>
 <div class="imageblock">
 <div class="content">
@@ -8564,7 +9092,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the portal for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_62" class="discrete">Parameters</h4>
+<h4 id="_parameters_67" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8606,7 +9134,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the game id for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_63" class="discrete">Parameters</h4>
+<h4 id="_parameters_68" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8648,7 +9176,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the game environment for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_64" class="discrete">Parameters</h4>
+<h4 id="_parameters_69" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8690,7 +9218,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Sets extended initialization parameters for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_65" class="discrete">Parameters</h4>
+<h4 id="_parameters_70" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8732,7 +9260,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Changes the API key for the provided set of initialization options</p>
 </div>
-<h4 id="_parameters_66" class="discrete">Parameters</h4>
+<h4 id="_parameters_71" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8774,7 +9302,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if not equal</p>
 </div>
-<h4 id="_parameters_67" class="discrete">Parameters</h4>
+<h4 id="_parameters_72" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8798,6 +9326,40 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="ModioCommonTypesLibrary_MakeMetricsSessionParams">Make Metrics Session Params</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ModioCommonTypesLibrary_MakeMetricsSessionParams.png" alt="nd img ModioCommonTypesLibrary MakeMetricsSessionParams">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioMetricsSessionParams</span> <span class="n">MakeMetricsSessionParams</span><span class="p">(</span><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModID</span><span class="o">&gt;</span> <span class="n">Ids</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create Metrics Session parameters</p>
+</div>
+<h4 id="_parameters_73" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Ids</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The list of mods to store within the Metrics Session parameters</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="ModioCommonTypesLibrary_MakeInitializeOptions">Make Initialize Options</h3>
 <div class="imageblock">
 <div class="content">
@@ -8812,7 +9374,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Make initialization options, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_68" class="discrete">Parameters</h4>
+<h4 id="_parameters_74" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8844,6 +9406,40 @@ This class is part of an experimental feature and is subject to change.
 <hr>
 </div>
 <div class="sect2">
+<h3 id="ModioCommonTypesLibrary_MakeGuid">Make Guid</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/nd_img_ModioCommonTypesLibrary_MakeGuid.png" alt="nd img ModioCommonTypesLibrary MakeGuid">
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioGuid</span> <span class="n">MakeGuid</span><span class="p">(</span><span class="n">FString</span> <span class="n">Guid</span><span class="p">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a Guid from a string</p>
+</div>
+<h4 id="_parameters_75" class="discrete">Parameters</h4>
+<table class="tableblock frame-none grid-all stripes-odd stretch stretch">
+<colgroup>
+<col style="width: 25%;">
+<col>
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Guid</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A string to wrap within a Guid struct</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="paramname">Return Value</span></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="sect2">
 <h3 id="ModioCommonTypesLibrary_MakeGameId">Make Game Id</h3>
 <div class="imageblock">
 <div class="content">
@@ -8858,7 +9454,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a game id from a integer, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_69" class="discrete">Parameters</h4>
+<h4 id="_parameters_76" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8892,7 +9488,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create entitlement parameters</p>
 </div>
-<h4 id="_parameters_70" class="discrete">Parameters</h4>
+<h4 id="_parameters_77" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8926,7 +9522,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Creates an AuthenticationParams object</p>
 </div>
-<h4 id="_parameters_71" class="discrete">Parameters</h4>
+<h4 id="_parameters_78" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -8972,7 +9568,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Create a ApiKey id from a string, should only be used in conjunction with InitializeAsync</p>
 </div>
-<h4 id="_parameters_72" class="discrete">Parameters</h4>
+<h4 id="_parameters_79" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9006,7 +9602,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the raw underlying value from a FModioModID. FModioModIDs are intended as opaque types, so use with care.</p>
 </div>
-<h4 id="_parameters_73" class="discrete">Parameters</h4>
+<h4 id="_parameters_80" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9044,7 +9640,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Compares two ModioModIDs, returning true if equal</p>
 </div>
-<h4 id="_parameters_74" class="discrete">Parameters</h4>
+<h4 id="_parameters_81" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9236,7 +9832,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Returns the string table FText for a given enum value&#8217;s FName - <strong>Only works with enums registered via /// ModioUI::RegisterEnumAsLocalizable</strong> //</p>
 </div>
-<h4 id="_parameters_75" class="discrete">Parameters</h4>
+<h4 id="_parameters_82" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9271,7 +9867,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">FileSizeUnsigned64_ToText</span><span class="p">(</span><span class="n">FModioUnsigned64</span> <span class="n">FileSize</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MinDecimals</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MaxDecimals</span><span class="p">,</span> <span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">Unit</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIncludeUnitName</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_76" class="discrete">Parameters</h4>
+<h4 id="_parameters_83" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9325,7 +9921,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Returns the string table FText for a given string key //</p>
 </div>
-<h4 id="_parameters_77" class="discrete">Parameters</h4>
+<h4 id="_parameters_84" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9360,7 +9956,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioErrorCode</span> <span class="n">ReconstructError</span><span class="p">(</span><span class="n">int32</span> <span class="n">Value</span><span class="p">,</span> <span class="n">int32</span> <span class="n">Category</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_78" class="discrete">Parameters</h4>
+<h4 id="_parameters_85" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9395,7 +9991,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsErrorAsExec</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_79" class="discrete">Parameters</h4>
+<h4 id="_parameters_86" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9426,7 +10022,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">int32</span> <span class="n">GetValue</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_80" class="discrete">Parameters</h4>
+<h4 id="_parameters_87" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9461,7 +10057,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetMessage</span><span class="p">(</span><span class="n">FModioErrorCode</span> <span class="n">Error</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_81" class="discrete">Parameters</h4>
+<h4 id="_parameters_88" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9496,7 +10092,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Checks if the passed-in ErrorCode matches the specified error condition</p>
 </div>
-<h4 id="_parameters_82" class="discrete">Parameters</h4>
+<h4 id="_parameters_89" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9538,7 +10134,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Runs a filter over the user&#8217;s subscription list</p>
 </div>
-<h4 id="_parameters_83" class="discrete">Parameters</h4>
+<h4 id="_parameters_90" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9667,7 +10263,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetLogoSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Logo</span><span class="p">,</span> <span class="n">EModioLogoSize</span> <span class="n">LogoSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_84" class="discrete">Parameters</h4>
+<h4 id="_parameters_91" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9706,7 +10302,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetGallerySize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">GalleryImage</span><span class="p">,</span> <span class="n">EModioGallerySize</span> <span class="n">GallerySize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_85" class="discrete">Parameters</h4>
+<h4 id="_parameters_92" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9745,7 +10341,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FVector2D</span> <span class="n">GetAvatarSize</span><span class="p">(</span><span class="n">UTexture</span><span class="o">*</span> <span class="n">Avatar</span><span class="p">,</span> <span class="n">EModioAvatarSize</span> <span class="n">AvatarSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_86" class="discrete">Parameters</h4>
+<h4 id="_parameters_93" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9784,7 +10380,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FString</span> <span class="n">GetPath</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_87" class="discrete">Parameters</h4>
+<h4 id="_parameters_94" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9819,7 +10415,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">EModioModState</span> <span class="n">GetModState</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_88" class="discrete">Parameters</h4>
+<h4 id="_parameters_95" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9854,7 +10450,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModInfo</span> <span class="n">GetModProfile</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_89" class="discrete">Parameters</h4>
+<h4 id="_parameters_96" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9889,7 +10485,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioModID</span> <span class="n">GetID</span><span class="p">(</span><span class="n">FModioModCollectionEntry</span> <span class="n">Entry</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_90" class="discrete">Parameters</h4>
+<h4 id="_parameters_97" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9927,7 +10523,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the total amount of progress required for the specified state.</p>
 </div>
-<h4 id="_parameters_91" class="discrete">Parameters</h4>
+<h4 id="_parameters_98" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -9969,7 +10565,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Returns a EModioModProgressState indicating which state the mod operation is in</p>
 </div>
-<h4 id="_parameters_92" class="discrete">Parameters</h4>
+<h4 id="_parameters_99" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10003,7 +10599,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Retrieves the progress value for the specified state. <code>CurrentProgress == TotalProgress</code> for states which have completed, for example if a mod is currently Extracting, then passing in Downloading would give you a value equal to the total download size because the download has completed</p>
 </div>
-<h4 id="_parameters_93" class="discrete">Parameters</h4>
+<h4 id="_parameters_100" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10042,7 +10638,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">TArray</span><span class="o">&lt;</span><span class="n">FModioModTagInfo</span><span class="o">&gt;</span> <span class="n">GetTags</span><span class="p">(</span><span class="n">FModioModTagOptions</span> <span class="n">ModTags</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_94" class="discrete">Parameters</h4>
+<h4 id="_parameters_101" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10074,7 +10670,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioPagedResult</span> <span class="n">GetPagedResult</span><span class="p">(</span><span class="n">FModioModTagOptions</span> <span class="n">ModTags</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_95" class="discrete">Parameters</h4>
+<h4 id="_parameters_102" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10109,7 +10705,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get the default portal for the platform the game is running on.</p>
 </div>
-<h4 id="_parameters_96" class="discrete">Parameters</h4>
+<h4 id="_parameters_103" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10143,7 +10739,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get the default Authentication Provider for the current platform the game is running on</p>
 </div>
-<h4 id="_parameters_97" class="discrete">Parameters</h4>
+<h4 id="_parameters_104" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10177,7 +10773,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Gets the current platform that the game is running on</p>
 </div>
-<h4 id="_parameters_98" class="discrete">Parameters</h4>
+<h4 id="_parameters_105" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10208,7 +10804,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Sets the correct decimals depending on the file size or speed</p>
 </div>
-<h4 id="_parameters_99" class="discrete">Parameters</h4>
+<h4 id="_parameters_106" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10242,7 +10838,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Dividend/Divisor and return the floating point result with no checks *</p>
 </div>
-<h4 id="_parameters_100" class="discrete">Parameters</h4>
+<h4 id="_parameters_107" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10277,7 +10873,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidSecurityCodeFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_101" class="discrete">Parameters</h4>
+<h4 id="_parameters_108" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10312,7 +10908,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="kt">bool</span> <span class="n">IsValidEmailAddressFormat</span><span class="p">(</span><span class="n">FString</span> <span class="n">String</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_102" class="discrete">Parameters</h4>
+<h4 id="_parameters_109" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10350,7 +10946,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Gets the time span between present and specified past date FString</p>
 </div>
-<h4 id="_parameters_103" class="discrete">Parameters</h4>
+<h4 id="_parameters_110" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10384,7 +10980,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Shortens the specified large number</p>
 </div>
-<h4 id="_parameters_104" class="discrete">Parameters</h4>
+<h4 id="_parameters_111" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10415,7 +11011,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FModioInitializeOptions</span> <span class="n">GetProjectInitializeOptionsForSessionId</span><span class="p">(</span><span class="n">FString</span> <span class="n">SessionId</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_105" class="discrete">Parameters</h4>
+<h4 id="_parameters_112" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10491,7 +11087,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get language code string. This can be used for localization purposes</p>
 </div>
-<h4 id="_parameters_106" class="discrete">Parameters</h4>
+<h4 id="_parameters_113" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10529,7 +11125,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get language code enum from string in ISO 639-1 format. This can be used for localization purposes</p>
 </div>
-<h4 id="_parameters_107" class="discrete">Parameters</h4>
+<h4 id="_parameters_114" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10564,7 +11160,7 @@ This class is part of an experimental feature and is subject to change.
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">GetDesiredFileSizeUnit</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_108" class="discrete">Parameters</h4>
+<h4 id="_parameters_115" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10602,7 +11198,7 @@ This class is part of an experimental feature and is subject to change.
 <div class="paragraph">
 <p>Get Session Id for Windows  for initialization of the SDK return empty string if you are not on Windows</p>
 </div>
-<h4 id="_parameters_109" class="discrete">Parameters</h4>
+<h4 id="_parameters_116" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10630,7 +11226,7 @@ return empty string if you are not on Windows</p></td>
 <pre class="rouge highlight"><code data-lang="c++"><span class="n">FText</span> <span class="n">Filesize_ToString</span><span class="p">(</span><span class="n">int64</span> <span class="n">FileSize</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MinDecimals</span><span class="p">,</span> <span class="n">int32</span> <span class="n">MaxDecimals</span><span class="p">,</span> <span class="n">TEnumAsByte</span><span class="o">&lt;</span><span class="n">EFileSizeUnit</span><span class="o">&gt;</span> <span class="n">Unit</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">bIncludeUnitName</span><span class="p">)</span></code></pre>
 </div>
 </div>
-<h4 id="_parameters_110" class="discrete">Parameters</h4>
+<h4 id="_parameters_117" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10684,7 +11280,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Returns the default mod installation directory for this game and platform, ignoring overrides and without requiring the SDK to be initialized.</p>
 </div>
-<h4 id="_parameters_111" class="discrete">Parameters</h4>
+<h4 id="_parameters_118" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10904,7 +11500,7 @@ return empty string if you are not on Windows</p></td>
 <div class="paragraph">
 <p>Submit a new mod, with its logo data coming from an in-memory buffer rather than a file.</p>
 </div>
-<h4 id="_parameters_112" class="discrete">Parameters</h4>
+<h4 id="_parameters_119" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -10957,7 +11553,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_113" class="discrete">Parameters</h4>
+<h4 id="_parameters_120" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11006,7 +11602,7 @@ return empty string if you are not on Windows</p></td>
 </li>
 </ul>
 </div>
-<h4 id="_parameters_114" class="discrete">Parameters</h4>
+<h4 id="_parameters_121" class="discrete">Parameters</h4>
 <table class="tableblock frame-none grid-all stripes-odd stretch stretch">
 <colgroup>
 <col style="width: 25%;">
@@ -11985,6 +12581,34 @@ return empty string if you are not on Windows</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ItemAlreadyOwned</span></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The authenticated user already has acquired this item</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">ParentalControlRestrictions</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parental control restrictions prevent this account from accessing UGC.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetricsSessionNotInitialized</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has not yet been initialized. Ensure that you have a metrics secret key set for your project.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetricsSessionAlreadyInitialized</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has already been been initialized.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetricsSessionIsActive</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has been started.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetricsSessionIsNotActive</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Metrics session has not been started. Please call MetricsSessionStartAsync.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">MetricsSessionHasNoMods</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No mods have been added to the session.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><span class="variablename">PremiumFeatureNotAvailable</span></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This premium feature is not available for your project.</p></td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -12265,7 +12889,7 @@ return empty string if you are not on Windows</p></td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-08-30 14:45:13 +1000
+Last updated 2024-10-01 14:54:26 +1000
 </div>
 </div>
 </body>

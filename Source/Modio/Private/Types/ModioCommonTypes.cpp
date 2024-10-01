@@ -1,11 +1,11 @@
-/* 
+/*
  *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE4 Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
- *   
+ *
  */
 
 #include "Types/ModioCommonTypes.h"
@@ -59,3 +59,15 @@ FModioEmailAddress::FModioEmailAddress(const FString& InEmailAddress) : EmailAdd
 FModioEmailAuthCode::FModioEmailAuthCode(const FString& InEmailAuthCode)
 	: EmailAuthCode(InEmailAuthCode.TrimStartAndEnd())
 {}
+
+FModioGuid::FModioGuid(const FString& InGuid) : InternalGuid(TCHAR_TO_UTF8(*InGuid)) {}
+
+FModioGuid FModioGuid::InvalidGuid()
+{
+	return FModioGuid(ToUnreal(*Modio::Guid::InvalidGuid()));
+}
+
+FModioGuid FModioGuid::GenerateGuid()
+{
+	return FModioGuid(ToUnreal(*Modio::Guid::GenerateGuid()));
+}

@@ -49,7 +49,9 @@
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
 	#include "Launch/Resources/Version.h"
 #endif
+#include "ModioEditor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 
 
 #define LOCTEXT_NAMESPACE "LocalizedText"
@@ -156,7 +158,7 @@ void SModioEditorWindowCompoundWidget::EnableModManagement()
 
 void SModioEditorWindowCompoundWidget::OnModManagementCallback(FModioModManagementEvent Event) 
 {
-	UE_LOG(LogTemp, Warning, TEXT("ModEvent: %d, ID: %s, Msg: %s"), (int)Event.Event, *Event.ID.ToString(), *Event.Status.GetErrorMessage());
+	UE_LOG(ModioEditor, Warning, TEXT("ModEvent: %d, ID: %s, Msg: %s"), (int)Event.Event, *Event.ID.ToString(), *Event.Status.GetErrorMessage());
 
 	if (Event.ID == UploadModID)
 	{
@@ -189,12 +191,20 @@ void SModioEditorWindowCompoundWidget::OnModManagementCallback(FModioModManageme
 
 void SModioEditorWindowCompoundWidget::OnInitCallback(FModioErrorCode ErrorCode)
 {
-	if (ErrorCode.GetValue() == 0 || ErrorCode.GetValue() == 21769)
+	if (!ErrorCode || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
 		EnableModManagement();
 
 		ModioSubsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(), FOnGetGameInfoDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) 
 		{
+			if (ErrorCode)
+			{
+				FText Message = Localize("ModioGameInfoError", FString::Printf(TEXT("Could not retrieve game information from mod.io\n%s"), *ErrorCode.GetErrorMessage()));
+				FMessageDialog::Open(EAppMsgType::Ok, Message);
+				WindowManager::Get().GetWindow()->BringToFront();
+				WindowManager::Get().CloseWindow();
+				return;
+			}
 			if (GameInfo.IsSet())
 			{
 				ModioGameInfo = GameInfo;
@@ -218,14 +228,14 @@ void SModioEditorWindowCompoundWidget::OnInitCallback(FModioErrorCode ErrorCode)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("ModioSubsystem - OnInitCallback - Could not initialize ModioSubsystem - ErrorCode: %d | ErrorMessage: %s"), ErrorCode.GetValue(), *ErrorCode.GetErrorMessage());
+		UE_LOG(ModioEditor, Error, TEXT("ModioSubsystem - OnInitCallback - Could not initialize ModioSubsystem - ErrorCode: %d | ErrorMessage: %s"), ErrorCode.GetValue(), *ErrorCode.GetErrorMessage());
 		WindowManager::Get().CloseWindow();
 	}
 }
 
 void SModioEditorWindowCompoundWidget::OnVerifyCurrentUserAuthenticationCompleted(FModioErrorCode ErrorCode)
 {
-	if (ErrorCode.GetValue() == 0)
+	if (!ErrorCode)
 	{
 		TOptional<FModioUser> CurrentUser = ModioSubsystem->QueryUserProfile();
 		if (CurrentUser.IsSet())
@@ -349,9 +359,20 @@ void SModioEditorWindowCompoundWidget::OnRequestEmailAuthCodeCompleted(FModioErr
 	{
 		DrawLoginWidget();
 
-		FText Message = Localize("ModioAuthFailed", FString::Printf(TEXT("Authentication failed, see message for detail\n%s!"), *ErrorCode.GetErrorMessage()));
-		FMessageDialog::Open(EAppMsgType::Ok, Message);
-		WindowManager::Get().GetWindow()->BringToFront();
+		const FString LastValidationError = [this]() -> FString
+		{
+			if (ModioSubsystem && ModioSubsystem->GetLastValidationError().Num() > 0)
+			{
+				return FString::Printf(TEXT("\n\"%s\": \"%s\""), *ModioSubsystem->GetLastValidationError()[0].FieldName, *ModioSubsystem->GetLastValidationError()[0].ValidationFailureDescription);
+			}
+			return FString();
+		}();
+		if (ModioSubsystem)
+		{
+			FText Message = Localize("ModioAuthFailed", FString::Printf(TEXT("Authentication failed, see message for detail\n%s%s"), *ErrorCode.GetErrorMessage(), *LastValidationError));
+			FMessageDialog::Open(EAppMsgType::Ok, Message);
+			WindowManager::Get().GetWindow()->BringToFront();
+		}
 	}
 }
 
@@ -675,68 +696,55 @@ void SModioEditorWindowCompoundWidget::DrawModCreationToolWidget()
 								{
 									if (GameInfo.IsSet())
 									{
-										bool CanSubmitNewMods = true;
-										FModioGamePlatform GamePlatform;
-										if (!DoesGameSupportThisPlatform(GameInfo.GetValue(), GamePlatform))
-										{
-											CanSubmitNewMods = false;
-											FText Message = Localize("PlatformNotSupportedByGameError", FString::Printf(TEXT("%s\nThe game doesn not support current platform '%s' at the moment."), *GameInfo->Name, *ToPlatformString(GamePlatform.Platform)));
-											FMessageDialog::Open(EAppMsgType::Ok, Message);
-											WindowManager::Get().GetWindow()->BringToFront();
-										}
-										
-										if (GamePlatform.Locked)
-										{
-											CanSubmitNewMods = false;
-											FText Message = Localize("PlatformLockedByGameError", FString::Printf(TEXT("%s\nThe game is locked and uploading new mod is not permitted"), *GameInfo->Name));
-											FMessageDialog::Open(EAppMsgType::Ok, Message);
-											WindowManager::Get().GetWindow()->BringToFront();
-										}
-										
-										if (CanSubmitNewMods)
-										{
-											FModioModCreationHandle Handle = ModioSubsystem->GetModCreationHandle();
+										FModioModCreationHandle Handle = ModioSubsystem->GetModCreationHandle();
 
-											FModioCreateModParams Params;
-											Params.Name = ModProperties->Name;
-											Params.Description = ModProperties->Summary;
-											Params.PathToLogoFile = ModProperties->PathToLogoFile;
-											Params.Summary = ModProperties->Summary;
+										FModioCreateModParams Params;
+										Params.Name = ModProperties->Name;
+										Params.Description = ModProperties->Summary;
+										Params.PathToLogoFile = ModProperties->PathToLogoFile;
+										Params.Summary = ModProperties->Summary;
 
-											SubmitThrobber->SetVisibility(EVisibility::Visible);
+										SubmitThrobber->SetVisibility(EVisibility::Visible);
 								
-											ModioSubsystem->SubmitNewModAsync(Handle, Params, FOnSubmitNewModDelegateFast::CreateLambda( [this, Params](FModioErrorCode ErrorCode, TOptional<FModioModID> ModId) 
+										ModioSubsystem->SubmitNewModAsync(Handle, Params, FOnSubmitNewModDelegateFast::CreateLambda( [this, Params](FModioErrorCode ErrorCode, TOptional<FModioModID> ModId) 
+										{
+											if (!ErrorCode)
 											{
-												if (ErrorCode == false)
-												{
-													UE_LOG(LogTemp, Warning, TEXT("Mod (%s) Submitted Successfully"), *ModId->ToString());
+												UE_LOG(ModioEditor, Warning, TEXT("Mod (%s) Submitted Successfully"), *ModId->ToString());
 
-													const FText Title = Localize("ModCreated", "Mod Created");
-													const FText Message = Localize("ModCreatedMessage", "Would you like to add a mod file?");
+												const FText Title = Localize("ModCreated", "Mod Created");
+												const FText Message = Localize("ModCreatedMessage", "Would you like to add a mod file?");
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
-													EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::YesNo, Message, &Title);
-													#else
-													EAppReturnType::Type UserSelection =
-														FMessageDialog::Open(EAppMsgType::YesNo, Message, Title);
-													#endif
-													if (UserSelection == EAppReturnType::Yes) 
-													{
-														DrawCreateModFileToolWidget(ModId.GetValue());
-													}
-													else if (UserSelection == EAppReturnType::No)
-													{
-														DrawModCreationToolWidget();
-													}
-												}
-												else
+												EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::YesNo, Message, &Title);
+#else
+												EAppReturnType::Type UserSelection =
+													FMessageDialog::Open(EAppMsgType::YesNo, Message, Title);
+#endif
+												if (UserSelection == EAppReturnType::Yes) 
 												{
-													FText Message = Localize("ModCreationFailed", FString::Printf(TEXT("Mod creation failed, please see the message below and try again.\nError Message: %s"), *ErrorCode.GetErrorMessage()));
-													EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message);
+													DrawCreateModFileToolWidget(ModId.GetValue());
 												}
-												WindowManager::Get().GetWindow()->BringToFront(true);
-												SubmitThrobber->SetVisibility(EVisibility::Hidden);
-											}));
-										}
+												else if (UserSelection == EAppReturnType::No)
+												{
+													DrawModCreationToolWidget();
+												}
+											}
+											else
+											{
+												const FString LastValidationError = [this]() -> FString
+												{
+													if (ModioSubsystem && ModioSubsystem->GetLastValidationError().Num() > 0)
+													{
+														return FString::Printf(TEXT("\n\"%s\": \"%s\""), *ModioSubsystem->GetLastValidationError()[0].FieldName, *ModioSubsystem->GetLastValidationError()[0].ValidationFailureDescription);
+													}
+													return FString();
+												}();
+												FText Message = Localize("ModCreationFailed", FString::Printf(TEXT("Mod creation failed, please see the message below and try again.\nError Message: %s%s"), *ErrorCode.GetErrorMessage(), *LastValidationError));
+												EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message);
+											}
+											WindowManager::Get().GetWindow()->BringToFront(true);
+											SubmitThrobber->SetVisibility(EVisibility::Hidden);
+										}));
 									}
 								}));
 								
@@ -1170,7 +1178,7 @@ void SModioEditorWindowCompoundWidget::DrawCreateModFileToolWidget(FModioModID M
 					SNew(STextBlock)
 					.ColorAndOpacity(FLinearColor::White)
 					.Font(ButtonTextStyle)
-					.Text(Localize("CreatePCMod", "Create mod for PC"))
+					.Text(Localize("CreatePCMod", "Create a mod"))
 					.Justification(ETextJustify::Center)
 				]
 
@@ -1184,7 +1192,7 @@ void SModioEditorWindowCompoundWidget::DrawCreateModFileToolWidget(FModioModID M
 					.MinDesiredWidth(700.f)
 					.AutoWrapText(true)
 					.Font(ButtonTextStyle)
-					.Text(Localize("CreatePCModDesc", "Lets you create a mod for PC."))
+					.Text(Localize("CreatePCModDesc", "Lets you create a mod."))
 					.Justification(ETextJustify::Left)
 				]
 			]
@@ -1431,30 +1439,17 @@ void SModioEditorWindowCompoundWidget::DrawBrowseModFileWidget(FModioModInfo Mod
 			{
 				ModioSubsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(), FOnGetGameInfoDelegateFast::CreateLambda([this, ModInfo, BrowseModFileParams](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) 
 				{
+					if (ErrorCode)
+					{
+						FText Message = Localize("ModioGameInfoError", FString::Printf(TEXT("Could not retrieve game information from mod.io\n%s"), *ErrorCode.GetErrorMessage()));
+						FMessageDialog::Open(EAppMsgType::Ok, Message);
+						WindowManager::Get().GetWindow()->BringToFront();
+						WindowManager::Get().CloseWindow();
+						return;
+					}
 					if (GameInfo.IsSet())
 					{
-						bool CanSubmitNewMods = true;
-						FModioGamePlatform GamePlatform;
-						if (!DoesGameSupportThisPlatform(GameInfo.GetValue(), GamePlatform))
-						{
-							CanSubmitNewMods = false;
-							FText Message = Localize("PlatformNotSupportedByGameError", FString::Printf(TEXT("%s\nThe game doesn not support current platform '%s' at the moment."), *GameInfo->Name, *ToPlatformString(GamePlatform.Platform)));
-							FMessageDialog::Open(EAppMsgType::Ok, Message);
-							WindowManager::Get().GetWindow()->BringToFront();
-						}
-										
-						if (GamePlatform.Locked)
-						{
-							CanSubmitNewMods = false;
-							FText Message = Localize("PlatformLockedByGameError", FString::Printf(TEXT("%s\nThe game is locked and uploading new mod is not permitted"), *GameInfo->Name));
-							FMessageDialog::Open(EAppMsgType::Ok, Message);
-							WindowManager::Get().GetWindow()->BringToFront();
-						}
-						
-						if (CanSubmitNewMods)
-						{
-							DrawCreateOrEditModFileWidget(ModInfo.ModId, BrowseModFileParams);
-						}
+						DrawCreateOrEditModFileWidget(ModInfo.ModId, BrowseModFileParams);
 					}
 				}));
 				
@@ -1619,7 +1614,7 @@ void SModioEditorWindowCompoundWidget::DownloadGameLogo(FString URL)
 
 		if (!bWasSuccessful || !Response.IsValid() || !EHttpResponseCodes::IsOk(Response->GetResponseCode()))
 		{
-			UE_LOG(LogTemp, Error, TEXT("DownloadGameLogo - Request Failed -_url: %s | content: %s"), *URL, *content);
+			UE_LOG(ModioEditor, Error, TEXT("DownloadGameLogo - Request Failed -_url: %s | content: %s"), *URL, *content);
 			return;
 		}
 
@@ -1668,22 +1663,6 @@ FString SModioEditorWindowCompoundWidget::ToPlatformString(EModioModfilePlatform
 	static const UEnum* PlatformEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EModioModfilePlatform"));
 #endif
 	return PlatformEnum->GetNameStringByIndex(static_cast<uint32>(Platform));
-}
-
-bool SModioEditorWindowCompoundWidget::DoesGameSupportThisPlatform(FModioGameInfo GameInfo, FModioGamePlatform& GamePlatform) 
-{
-	if (GameInfo.PlatformSupport.Num() > 0)
-	{
-		for (int i = 0; i < GameInfo.PlatformSupport.Num(); i++)
-		{
-			if (GameInfo.PlatformSupport[i].Platform == ToPlatformEnum(UGameplayStatics::GetPlatformName()))
-			{
-				GamePlatform = GameInfo.PlatformSupport[i];
-				return true;
-			}
-		}
-	}
-	return false;
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

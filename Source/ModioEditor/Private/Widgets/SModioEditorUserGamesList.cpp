@@ -18,6 +18,7 @@
 
 #include "Libraries/ModioSDKLibrary.h"
 #include "WindowManager.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "EditorGamesListWidget"
 
@@ -66,7 +67,7 @@ void SModioEditorUserGamesList::LoadModioSubsystem()
 
 void SModioEditorUserGamesList::OnModioInitCallback(FModioErrorCode ErrorCode)
 {
-	if (!ErrorCode || ErrorCode.GetValue() == 21769)
+	if (!ErrorCode || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
 		DrawGameList();
 	}

@@ -250,5 +250,4 @@ public:
 
 	EModioModfilePlatform ToPlatformEnum(FString Platform);
 	FString ToPlatformString(EModioModfilePlatform Platform);
-	bool DoesGameSupportThisPlatform(FModioGameInfo GameInfo, FModioGamePlatform& GamePlatform);
 };

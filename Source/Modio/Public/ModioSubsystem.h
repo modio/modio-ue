@@ -25,6 +25,7 @@
 #include "Types/ModioCreateModFileParams.h"
 #include "Types/ModioCreateModParams.h"
 #include "Types/ModioEditModParams.h"
+#include "Types/ModioEntitlementConsumptionStatusList.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
 #include "Types/ModioGameInfo.h"
@@ -47,7 +48,6 @@
 #include "Types/ModioUser.h"
 #include "Types/ModioUserList.h"
 #include "Types/ModioValidationError.h"
-#include "Types/ModioEntitlementConsumptionStatusList.h"
 
 #include "ModioSubsystem.generated.h"
 
@@ -72,7 +72,8 @@ DECLARE_DELEGATE_TwoParams(FOnPurchaseModDelegateFast, FModioErrorCode, TOptiona
 DECLARE_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegateFast, FModioErrorCode, TOptional<uint64>);
 DECLARE_DELEGATE_OneParam(FOnFetchUserPurchasesDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegateFast, FModioErrorCode, FString);
-DECLARE_DELEGATE_TwoParams(FOnRefreshUserEntitlementsDelegateFast, FModioErrorCode, TOptional<FModioEntitlementConsumptionStatusList>);
+DECLARE_DELEGATE_TwoParams(FOnRefreshUserEntitlementsDelegateFast, FModioErrorCode,
+						   TOptional<FModioEntitlementConsumptionStatusList>);
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 
 // Blueprint version of delegates
@@ -565,13 +566,13 @@ public:
 
 	/**
 	 * @brief Queues the upload of a new modfile release for the specified mod using the submitted parameters. This
-	 * function takes an FModioCreateModFileParams object to specify the path to the root folder of the new modfile. The
-	 * plugin will compress the folder's contents into a .zip archive and queue the result for upload. When the upload
-	 * completes, a Mod Management Event will be triggered. Note the plugin is also responsible for decompressing the
-	 * archive upon its installation at a later point in time.
+	 * function takes an FModioCreateModFileParams object to specify the path to the root folder of the new modfile.
+	 * The plugin will compress the folder's contents into a .zip archive and queue the result for upload. When the
+	 * upload completes, a Mod Management Event will be triggered. Note the plugin is also responsible for
+	 * decompressing the archive upon its installation at a later point in time.
 	 * @param Mod The ID of the mod you are submitting a file for
-	 * @param Params Information about the mod file being created, including the root path of the directory that will be
-	 * archived
+	 * @param Params Information about the mod file being created, including the root path of the directory that will
+	 * be archived
 	 * @experimental
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
@@ -586,8 +587,8 @@ public:
 	 * values. Fields left empty on the Params object will not be updated.
 	 * @param Mod The ID of the mod you wish to edit
 	 * @param Params Descriptor containing the fields that should be altered.
-	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
-	 * object if the edits were performed successfully
+	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated
+	 * ModInfo object if the edits were performed successfully
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
@@ -665,8 +666,8 @@ public:
 
 	/**
 	 * @docpublic
-	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
-	 * who wishes to create a mod.io account
+	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a
+	 *player who wishes to create a mod.io account
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
@@ -898,8 +899,8 @@ public:
 
 	/**
 	 * @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
-	 * requiring the SDK to be initialized. This overload takes an int64 for the GameID param, allowing other modules to
-	 * execute this function via a delegate without depending on this module and the FModioGameID type.
+	 * requiring the SDK to be initialized. This overload takes an int64 for the GameID param, allowing other modules
+	 * to execute this function via a delegate without depending on this module and the FModioGameID type.
 	 * @param GameID An int64 representing the GameID of the game we're fetching the default mod installation directory
 	 * for.
 	 * @return The default mod installation directory for the specified game on the current platform
@@ -965,7 +966,8 @@ public:
 
 	/**
 	 * @docpublic
-	 * @brief Requests mod.io refresh the available entitlements for the current user purchased through the portal and currently authenticated.
+	 * @brief Requests mod.io refresh the available entitlements for the current user purchased through the portal and
+	 * currently authenticated.
 	 * @param Params Additional parameters.
 	 * @param Callback Callback providing an error code indicating success or failure of the refresh operation.
 	 * @requires initialized-sdk
@@ -973,7 +975,71 @@ public:
 	 * @requires no-rate-limiting
 	 */
 	MODIO_API void RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
-                                                FOnRefreshUserEntitlementsDelegateFast Callback);
+												FOnRefreshUserEntitlementsDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Start a Metrics play session
+	 * @param Params MetricsServiceParams struct containing information of what and how to start a metrics
+	 * session
+	 * @param Callback Callback providing an error code indicating success or failure of the session start operation
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @errorcategory InvalidUser|No authenticated user
+	 * @errorcategory SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory SessionIsActive|Metrics session is currently active and running
+	 * @errorcategory BadParameter|One or more values in the Metric Session Parameters are invalid
+	 * @premiumfeature Metrics
+	 */
+	MODIO_API void MetricsSessionStartAsync(const FModioMetricsSessionParams& Params,
+											FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a single heartbeat to the mod.io server to indicate a session is still active
+	 * @param Callback Callback providing an error code indicating success or failure of the session heartbeat
+	 * operation
+	 *
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidUser|No authenticated user
+	 * @errorcategory SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory SessionIsNotActive|Metrics session is not currently running. Call MetricsSessionStartAsync before
+	 * attempting to sending a heartbeat.
+	 * @premiumfeature Metrics
+	 */
+	MODIO_API void MetricsSessionSendHeartbeatOnceAsync(FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a constant heartbeat at a given interval to the mod.io server to indicate a session is still active
+	 * @param IntervalSeconds The frequency in seconds to send a heartbeat to the mod.io server
+	 * @param Callback Callback providing an error code indicating success or failure of the session heartbeat
+	 * operation
+	 *
+	 * @errorcategory GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory MetricsError::SessionIsNotActive|Metrics session is not currently running.
+	 * Call MetricsSessionStartAsync before attempting to sending a heartbeat.
+	 * @premiumfeature Metrics
+	 */
+	MODIO_API void MetricsSessionSendHeartbeatAtIntervalAsync(FModioUnsigned64 IntervalSeconds,
+															  FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Ends a Metrics play session
+	 * @param Callback Callback providing an error code indicating success or failure of the session end operation
+	 *
+	 * @errorcategory GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @errorcategory UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory MetricsError::SessionIsNotActive|Metrics session is not currently running.
+	 * Call MetricsSessionStartAsync before attempting to end a session.
+	 * @premiumfeature Metrics
+	 */
+	MODIO_API void MetricsSessionEndAsync(FOnErrorOnlyDelegateFast Callback);
 
 private:
 	TUniquePtr<struct FModioImageCache> ImageCache;
@@ -1337,8 +1403,8 @@ public:
 	MODIO_API void K2_VerifyUserAuthenticationAsync(FOnErrorOnlyDelegate Callback);
 
 	/**
-	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a player
-	 * who wishes to create a mod.io account
+	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a
+	 *player who wishes to create a mod.io account
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
@@ -1445,8 +1511,8 @@ public:
 	 * upload's progress can be tracked in the same way as downloads; when completed, a Mod Management Event will be
 	 * triggered with the result code for the upload.
 	 * @param Mod The ID of the mod you are submitting a file for
-	 * @param Params Information about the mod file being created, including the root path of the directory that will be
-	 * archived
+	 * @param Params Information about the mod file being created, including the root path of the directory that will
+	 * be archived
 	 * @experimental
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
@@ -1462,8 +1528,8 @@ public:
 	 * values. Fields left empty on the Params object will not be updated.
 	 * @param Mod The ID of the mod you wish to edit
 	 * @param Params Descriptor containing the fields that should be altered.
-	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated ModInfo
-	 * object if the edits were performed successfully
+	 * @param Callback The callback invoked when the changes have been submitted, containing an optional updated
+	 * ModInfo object if the edits were performed successfully
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
@@ -1659,7 +1725,7 @@ public:
 
 	/**
 	 * @docpublic
-	 * @brief Get a User Delegation Token that can be used for S2S service calls 
+	 * @brief Get a User Delegation Token that can be used for S2S service calls
 	 * @param Callback Callback invoked with purchase information once the purchase is completed.
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
@@ -1695,7 +1761,8 @@ public:
 
 	/**
 	 * @docpublic
-	 * @brief Requests mod.io refresh the available entitlements for the current user purchased through the portal and currently authenticated.
+	 * @brief Requests mod.io refresh the available entitlements for the current user purchased through the portal and
+	 * currently authenticated.
 	 * @param Params Additional parameters.
 	 * @param Callback Callback providing an error code indicating success or failure of the refresh operation.
 	 * @requires initialized-sdk
@@ -1704,7 +1771,75 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "RefreshUserEntitlementsAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
-	                                               FOnRefreshUserEntitlementsDelegate Callback);
+												   FOnRefreshUserEntitlementsDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Start a Metrics play session
+	 * @param Params MetricsServiceParams struct containing information of what and how to start a metrics
+	 * session
+	 * @param Callback Callback providing an error code indicating success or failure of the session start operation
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @errorcategory InvalidUser|No authenticated user
+	 * @errorcategory SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory SessionIsActive|Metrics session is currently active and running
+	 * @errorcategory BadParameter|One or more values in the Metric Session Parameters are invalid
+	 * @premiumfeature Metrics
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "MetricsSessionStartAsync", Category = "mod.io|Metrics")
+	MODIO_API void K2_MetricsSessionStartAsync(const FModioMetricsSessionParams& Params, FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a single heartbeat to the mod.io server to indicate a session is still active
+	 * @param Callback Callback providing an error code indicating success or failure of the session heartbeat
+	 * operation
+	 *
+	 * @errorcategory SDKNotInitialized|SDK not initialized
+	 * @errorcategory InvalidUser|No authenticated user
+	 * @errorcategory SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory SessionIsNotActive|Metrics session is not currently running. Call MetricsSessionStartAsync before
+	 * attempting to sending a heartbeat.
+	 * @premiumfeature Metrics
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "MetricsSessionSendHeartbeatOnceAsync", Category = "mod.io|Metrics")
+	MODIO_API void K2_MetricsSessionSendHeartbeatOnceAsync(FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a constant heartbeat at a given interval to the mod.io server to indicate a session is still active
+	 * @param IntervalSeconds The frequency in seconds to send a heartbeat to the mod.io server
+	 * @param Callback Callback providing an error code indicating success or failure of the session heartbeat
+	 * operation
+	 *
+	 * @errorcategory GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory MetricsError::SessionIsNotActive|Metrics session is not currently running.
+	 * Call MetricsSessionStartAsync before attempting to sending a heartbeat.
+	 * @premiumfeature Metrics
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "MetricsSessionSendHeartbeatAtIntervalAsync",
+			  Category = "mod.io|Metrics")
+	MODIO_API void K2_MetricsSessionSendHeartbeatAtIntervalAsync(FModioUnsigned64 IntervalSeconds,
+																 FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Ends a Metrics play session
+	 * @param Callback Callback providing an error code indicating success or failure of the session end operation
+	 *
+	 * @errorcategory GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @errorcategory UserDataError::InvalidUser|No authenticated user
+	 * @errorcategory MetricsError::SessionNotInitialized|Metrics session has not yet been initialized
+	 * @errorcategory MetricsError::SessionIsNotActive|Metrics session is not currently running.
+	 * Call MetricsSessionStartAsync before attempting to end a session.
+	 * @premiumfeature Metrics
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "MetricsSessionEndAsync", Category = "mod.io|Metrics")
+	MODIO_API void K2_MetricsSessionEndAsync(FOnErrorOnlyDelegate Callback);
 
 #pragma endregion
 

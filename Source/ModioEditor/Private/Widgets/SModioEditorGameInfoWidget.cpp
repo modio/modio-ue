@@ -26,6 +26,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Misc/FileHelper.h"
 #include "SHyperlinkLaunchURL.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "ModioEditorGameInfoWidget"
 
@@ -47,7 +48,7 @@ void SModioEditorGameInfoWidget::LoadModioSubsystem()
 
 void SModioEditorGameInfoWidget::OnInitCallback(FModioErrorCode ErrorCode)
 {
-	if (ErrorCode.GetValue() == 0 || ErrorCode.GetValue() == 21769)
+	if (!ErrorCode || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
 		UE_LOG(LogTemp, Display,
 			   TEXT("ModioSubsystem - UserAuthWidget - OnInitCallback - ModioSubsystem initialized."));

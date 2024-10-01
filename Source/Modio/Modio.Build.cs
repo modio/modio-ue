@@ -474,6 +474,12 @@ public class Modio : ModuleRules
             PrivateDefinitions.Add("MODIO_UNREAL_PROFILING_SUPPORT=1");
         }
 
+		// This define is a recommendation from Microsoft for issues that are caused by mutex's constructor to not being constexpr
+		// Not using this can cause crashes in the std::mutex constructor under some circumstances where there are build-time and
+		// runtime stl version mismatches.
+	    // More information: https://github.com/microsoft/STL/wiki/Changelog#vs-2022-1710
+        PrivateDefinitions.Add("_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR");
+
         // Enable Unreal-specific headers in the native SDK
         PrivateDefinitions.Add("MODIO_PLATFORM_UNREAL");
         // Disable header-only mode

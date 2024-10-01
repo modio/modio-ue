@@ -25,9 +25,10 @@ The mod.io plugin is generally maintained to support the 3 most recent versions 
 |UE4.26 | 2023.11
 |UE4.27 | 2023.11
 |UE5.0 | 2023.11
-|UE5.1 | Current
+|UE5.1 | 2024.6
 |UE5.2 | Current
 |UE5.3 | Current
+|UE5.4 | Current
 |===
 
 ### Platform compatability
@@ -109,7 +110,7 @@ To begin using the Plugin, either from Blueprint or from C++, please read our ht
 
 === User Interface
 
-The plugin ships with a fully functional UI, featuring mod browsing, searching and collection management. If you want to use the UI in the game, you can read the link:Doc/ui5-documentation.adoc[UI Documentation]
+mod.io also provides a separate plugin for building an in-game UI. This includes a template for mod browsing, searching, collection management etc, as well as a set of components for customizing or building your own in-game UI. You can download that from the  https://github.com/modio/modio-ue-component-ui[Component UI Repository].
 
 === Profiling
 

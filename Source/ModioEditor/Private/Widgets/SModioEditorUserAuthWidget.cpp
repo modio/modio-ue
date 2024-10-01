@@ -14,6 +14,7 @@
 #include "WindowManager.h"
 
 #include "EngineMinimal.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 
 #include "Misc/MessageDialog.h"
 #include "Widgets/Input/SButton.h"
@@ -79,7 +80,7 @@ void SModioEditorUserAuthWidget::LoadModioSubsystem()
 
 void SModioEditorUserAuthWidget::OnInitCallback(FModioErrorCode ErrorCode)
 {
-	if (ErrorCode.GetValue() == 0 || ErrorCode.GetValue() == 21769)
+	if (!ErrorCode.GetValue() || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
 		UE_LOG(LogTemp, Display, TEXT("ModioSubsystem - UserAuthWidget - OnInitCallback - ModioSubsystem initialized."));
 		ModioSubsystem->VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserAuthWidget::OnUserAuthCheckResponse));

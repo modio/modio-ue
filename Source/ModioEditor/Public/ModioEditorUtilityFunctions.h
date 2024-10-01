@@ -1,4 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+/*
+ *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE4 Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *
+ */
 
 #pragma once
 
@@ -14,6 +22,8 @@ class MODIOEDITOR_API UModioEditorUtilityFunctions : public UEditorUtilityLibrar
 {
 	GENERATED_BODY()
 
+public:
+
 	UFUNCTION(BlueprintCallable, Category = "Modio|EditorUtilities")
 	static void SelectAssetsInContentBrowser(const TArray<FString>& AssetPaths);
 
@@ -28,4 +38,10 @@ class MODIOEDITOR_API UModioEditorUtilityFunctions : public UEditorUtilityLibrar
 
 	UFUNCTION(BlueprintCallable, Category = "Modio|EditorUtilities")
 	static void OpenModioSettings();
+
+	UFUNCTION(BlueprintCallable, Category = "Modio|EditorUtilities")
+	static void AddGettingStartedWidgetEntries(TSet<struct FModioGettingStartedEntry> NewEntries);
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "Context", Category = "Modio|EditorUtilities"))
+	static bool ExecuteStaticExecutor(UObject* Context, TSubclassOf<class UModioStaticExecutionBase> Executor, FString Args);
 };

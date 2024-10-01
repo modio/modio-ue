@@ -22,6 +22,8 @@ namespace Modio
 	struct FileMetadataID;
 	struct UserID;
 	struct EntitlementParams;
+	struct MetricsSessionParams;
+	struct Guid;
 } // namespace Modio
 
 /**
@@ -74,7 +76,6 @@ enum class EModioPlatformName : uint8
 	Android,
 	iOS
 };
-
 
 /**
  * Enum representing the platform(s) that a modfile is enabled for
@@ -364,7 +365,6 @@ struct MODIO_API FModioOptionalUInt64
 	 **/
 	TOptional<uint64> Internal;
 };
-
 
 /**
  * Strong type struct to wrap a GameID to uniquely identify a single game in mod.io
@@ -719,6 +719,81 @@ private:
 };
 
 /**
+ * Strong type struct to wrap a Guid, used to communicate with the mod.io metrics service
+ **/
+USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeGuid"))
+struct MODIO_API FModioGuid
+{
+	GENERATED_BODY()
+
+	/**
+	 * Default constructor without parameters
+	 **/
+	FModioGuid() = default;
+
+	/**
+	 * Generates a new Guid.
+	 * NOTE: This is a minimalistic implementation of generating a Guid for metrics, an improved more robust
+	 * per-platform implementation is planned
+	 */
+	static FModioGuid GenerateGuid();
+
+	/**
+	 * Preferred constructor with Guid initialization parameter
+	 * @param InGuid Base Guid to create this strong type
+	 **/
+	explicit FModioGuid(const FString& InGuid);
+
+	/**
+	 * Transform a Guid into its string representation
+	 * @return String value of the stored Guid
+	 **/
+	const FString& ToString() const
+	{
+		// Put in the function instead of default constructor to avoid having to allocate memory for
+		// each empty instance
+		if (InternalGuid.Len() == 0)
+		{
+			static FString Invalid(TEXT("InvalidGuid"));
+			return Invalid;
+		}
+		return InternalGuid;
+	}
+
+	/// @docinternal
+	/// @brief Compare the InternalGuid to the invalid state define by the SDK
+	bool IsValid() const
+	{
+		return InternalGuid != InvalidGuid().InternalGuid;
+	}
+
+	/**
+	 * An always invalid Guid, helpful to compare against other Guids
+	 * @return Guid struct containing an invalid String value
+	 **/
+	static FModioGuid InvalidGuid();
+
+private:
+	friend struct Modio::Guid ToModio(const FModioGuid& In);
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
+	FString InternalGuid;
+};
+
+/**
+ * Strong type struct to wrap Guid as an optional value
+ **/
+USTRUCT(BlueprintType)
+struct MODIO_API FModioOptionalGuid
+{
+	GENERATED_BODY()
+
+	/**
+	 * Stored optional Guid
+	 **/
+	TOptional<FModioGuid> Internal;
+};
+
+/**
  * Strong type struct to wrap an email address
  **/
 USTRUCT(BlueprintType)
@@ -782,13 +857,6 @@ struct MODIO_API FModioEmailAuthCode
 	 **/
 	const FString& ToString() const
 	{
-		// Put in the function instead of default constructor to avoid having to allocate memory for
-		// each empty instance
-		if (EmailAuthCode.Len() == 0)
-		{
-			static FString Invalid(TEXT("InvalidEmailAuthCode"));
-			return Invalid;
-		}
 		return EmailAuthCode;
 	}
 
@@ -813,13 +881,54 @@ struct MODIO_API FModioEntitlementParams
 	 * Preferred constructor with ExtendedParameters initialization parameter
 	 * @param InExtendedParameters Base ExtendedParameters to create this struct
 	 **/
-	explicit FModioEntitlementParams(const TMap<FString, FString>& InExtendedParameters) : ExtendedParameters(InExtendedParameters) {}
+	explicit FModioEntitlementParams(const TMap<FString, FString>& InExtendedParameters)
+		: ExtendedParameters(InExtendedParameters)
+	{}
 
 private:
 	friend struct Modio::EntitlementParams ToModio(const FModioEntitlementParams& In);
 	/// @brief ExtendedParameters A map to store extended parameters required by some portals.
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
 	TMap<FString, FString> ExtendedParameters;
+};
+
+/**
+ * Simple struct to store metric session specific parameters
+ **/
+USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeMetricsSessionParams"))
+struct MODIO_API FModioMetricsSessionParams
+{
+	GENERATED_BODY()
+
+	/**
+	 * Default constructor without parameters
+	 **/
+	FModioMetricsSessionParams() = default;
+
+	/**
+	 * Preferred constructor with array of Mod Ids to track
+	 * @param InIds Mod Id array to create this struct
+	 **/
+	explicit FModioMetricsSessionParams(const TArray<FModioModID>& InIds) : SessionId({}), ModIds(InIds) {}
+
+	/**
+	 * Constructor with custom Session Id and array of Mod Ids to track
+	 * @param InSessionId Custom Session Id to use
+	 * @param InIds Mod Id array to create this struct
+	 **/
+	explicit FModioMetricsSessionParams(const FModioGuid& InSessionId, const TArray<FModioModID>& InIds)
+		: SessionId(InSessionId),
+		  ModIds(InIds)
+	{}
+
+public:
+	friend struct Modio::MetricsSessionParams ToModio(const FModioMetricsSessionParams& In);
+	/// @brief Set a custom Session Id to be used in the metrics service for your session
+	TOptional<FModioGuid> SessionId;
+
+	/// @brief Includes mods which will be tracked as part of the metrics service
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
+	TArray<FModioModID> ModIds;
 };
 
 /**

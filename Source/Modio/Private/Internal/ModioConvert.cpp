@@ -9,6 +9,8 @@
  */
 
 #include "Internal/ModioConvert.h"
+
+#include "Convert/Optional.h"
 #include "Types/ModioUnsigned64.h"
 
 std::string ToModio(const FString& String)
@@ -340,6 +342,24 @@ Modio::EntitlementParams ToModio(const FModioEntitlementParams& InParams)
 	Modio::EntitlementParams Params;
 	Params.ExtendedParameters = ToModio(InParams.ExtendedParameters);
 	return Params;
+}
+
+Modio::MetricsSessionParams ToModio(const FModioMetricsSessionParams& InParams)
+{
+	Modio::MetricsSessionParams Params;
+	Params.SessionId = ToModioOptional<Modio::Guid>(InParams.SessionId);
+	Params.ModIds = ToModio(InParams.ModIds);
+	return Params;
+}
+
+Modio::Guid ToModio(const FModioGuid& In)
+{
+	if (In.IsValid())
+	{
+		return Modio::Guid(TCHAR_TO_UTF8(*In.ToString()));
+	}
+
+	return Modio::Guid::InvalidGuid();
 }
 
 FModioModID ToUnreal(Modio::ModID Value)
