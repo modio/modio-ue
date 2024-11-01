@@ -1,10 +1,10 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
  *
- *  This file is part of the mod.io UE4 Plugin.
+ *  This file is part of the mod.io UE Plugin.
  *
  *  Distributed under the MIT License. (See accompanying file LICENSE or
- *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
  *
  */
 
@@ -70,33 +70,6 @@ void FModioModule::StartupModule()
 	});
 
 	RegisterSettings();
-	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin
-	// file per-module
-
-	// Get the base directory of this plugin
-	// FString BaseDir = IPluginManager::Get().FindPlugin("modio")->GetBaseDir();
-
-	// Add on the relative location of the third party dll and load it
-	// FString LibraryPath;
-	/*#if PLATFORM_WINDOWS
-		LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/modioLibrary/Win64/ExampleLibrary.dll"));
-	#elif PLATFORM_MAC
-		LibraryPath = FPaths::Combine(*BaseDir,
-	TEXT("Source/ThirdParty/modioLibrary/Mac/Release/libExampleLibrary.dylib")); #endif // PLATFORM_WINDOWS
-
-		ExampleLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
-
-		if (ExampleLibraryHandle)
-		{
-			// Call the test function in the third party library that opens a message box
-			ExampleLibraryFunction();
-		}
-		else
-		{
-			FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("ThirdPartyLibraryError", "Failed to load example third party
-	library"));
-		}*/
-
 	
 #if PLATFORM_ANDROID
 	Modio::InitializeAndroidJNI(GJavaVM, AndroidJavaEnv::GetClassLoader());

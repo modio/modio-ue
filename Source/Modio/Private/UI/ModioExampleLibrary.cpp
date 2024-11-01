@@ -1,10 +1,10 @@
 /* 
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
  *  
- *  This file is part of the mod.io UE4 Plugin.
+ *  This file is part of the mod.io UE Plugin.
  *  
  *  Distributed under the MIT License. (See accompanying file LICENSE or 
- *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
  *   
  */
 
@@ -15,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include <system_error>
 #include "ModioSDK.h"
+#include "Misc/EngineVersionComparison.h"
 
 EModioAvatarSize UModioExampleLibrary::GetAvatarThumbnailSize()
 {
@@ -213,7 +214,11 @@ void UModioExampleLibrary::ListUserSubscriptionAsync(const FModioFilterParams& F
 
 		if (EndIndex < ModList.Num())
 		{
+#if UE_VERSION_OLDER_THAN(5, 4, 0)
 			ModList.SetNum(EndIndex, false);
+#else
+			ModList.SetNum(EndIndex, EAllowShrinking::No);
+#endif
 		}
 		if (StartIndex > 0)
 		{

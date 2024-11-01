@@ -1,10 +1,10 @@
 /* 
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
  *  
- *  This file is part of the mod.io UE4 Plugin.
+ *  This file is part of the mod.io UE Plugin.
  *  
  *  Distributed under the MIT License. (See accompanying file LICENSE or 
- *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
  *   
  */
 
@@ -27,6 +27,23 @@ using System.Linq;
 
 public class Modio : ModuleRules
 {
+    private bool bDevelopmentModeOverride = false;
+    private bool IsDevelopmentMode()
+    {
+        return bDevelopmentModeOverride || File.Exists(Path.Combine(PluginDirectory, "../../.modio_development_mode"));
+    }
+    private void ApplyProjectDefinitions(ReadOnlyTargetRules Target)
+    {
+        if (Target.ProjectDefinitions.Contains("MODIO_DEVELOPMENT_MODE"))
+        {
+            bDevelopmentModeOverride = true;
+        }
+        else if (System.Environment.GetEnvironmentVariables().Contains("MODIO_DEVELOPMENT_MODE"))
+        {
+           bDevelopmentModeOverride = true;
+        }
+    }
+
     private bool PlatformMatches(UnrealTargetPlatform PlatformToCheck, string PlatformIdentifier)
     {
         UnrealTargetPlatform Platform;
@@ -285,8 +302,8 @@ public class Modio : ModuleRules
 
     private void CopyCommonGeneratedHeaders(string GeneratedHeaderPath)
     {
-        // Only process generated headers if we are using the NativeSDK as a git submodule
-        if (Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")) || File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
+        // Only process generated headers if we are in development mode
+        if (IsDevelopmentMode())
         {
             //Clean the generated source directory so that we dont have any stale files in it
             if (Directory.Exists(GeneratedHeaderPath))
@@ -297,13 +314,13 @@ public class Modio : ModuleRules
 
             Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Public"));
             Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Private"));
+            /*
 
             //Because this file is a dummy we don't need it as a dependency
             string GeneratedHeaderFilePath = Path.Combine(GeneratedHeaderPath, "Private", "ModioGeneratedVariables.h");
             using (StreamWriter DummyGeneratedHeader = File.AppendText(GeneratedHeaderFilePath))
             { };
-
-            // Silly hack/workaround until 4.26 adds ConditionalAddModuleDirectory - we may change where this lives in the native SDK later
+            */
             string ErrorConditionLibraryPath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/modio/modio/core/ModioErrorCondition.h");
             // Add dependency on the upstream file so if it is modified we re-run and copy it again
             ExternalDependencies.Add(ErrorConditionLibraryPath);
@@ -317,7 +334,7 @@ public class Modio : ModuleRules
     /// <param name="GeneratedSourcePath"> The root directory containing the platform-specific source directories </param>
     private void CopyPlatformGeneratedSource(string GeneratedSourcePath)
     {
-        if (Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")) || File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
+        if (IsDevelopmentMode())
         {
             foreach (var PlatformDirectory in Directory.EnumerateDirectories(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/platform")))
             {
@@ -348,7 +365,7 @@ public class Modio : ModuleRules
     private void CopyCommonGeneratedSource(string GeneratedSourcePath)
     {
         string CommonGeneratedSourcePath = Path.Combine(GeneratedSourcePath, "core");
-        if (Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")) || File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.git")))
+        if (IsDevelopmentMode())
         {
             //Clean the generated source directory so that we dont have any stale files in it
             if (Directory.Exists(CommonGeneratedSourcePath))
@@ -491,9 +508,16 @@ public class Modio : ModuleRules
 
         // Pass-through of SDK version identifier with Unreal prefix
         string VersionFilePath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.modio");
-        string VersionString = File.ReadAllText(VersionFilePath);
-        VersionString = VersionString.Trim();
-        PrivateDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-{0}\"", VersionString));
+        if (File.Exists(VersionFilePath))
+        {
+            string VersionString = File.ReadAllText(VersionFilePath);
+            VersionString = VersionString.Trim();
+            PrivateDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-{0}\"", VersionString));
+        }
+        else
+        {
+            PrivateDefinitions.Add("MODIO_COMMIT_HASH=\"UNREAL-DEV\"");
+        }
 
         // Add dependency on version file so if it is changed we trigger a rebuild
         ExternalDependencies.Add(VersionFilePath);
@@ -512,9 +536,15 @@ public class Modio : ModuleRules
 
     public Modio(ReadOnlyTargetRules Target) : base(Target)
     {
+        ApplyProjectDefinitions(Target);
         PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
         PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
+#if UE_5_5_OR_LATER
+        UndefinedIdentifierWarningLevel = WarningLevel.Off;
+#else
         bEnableUndefinedIdentifierWarnings = false;
+#endif
+
 #if UE_5_3_OR_LATER
 	    IWYUSupport = IWYUSupport.Full;
 	    CppStandard = CppStandardVersion.Cpp17;
@@ -523,6 +553,12 @@ public class Modio : ModuleRules
 #endif
 		//bUseUnity = false;
 		bAllowConfidentialPlatformDefines = true;
+
+        if (IsDevelopmentMode())
+        {
+            InternalLog("Enabling development mode, NativeSDK source files will be regenerated");
+        }
+
         string GeneratedSourcePath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedSource");
         string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedHeader");
 

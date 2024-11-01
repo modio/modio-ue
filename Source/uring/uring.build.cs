@@ -1,10 +1,10 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
  *
- *  This file is part of the mod.io UE4 Plugin.
+ *  This file is part of the mod.io UE Plugin.
  *
  *  Distributed under the MIT License. (See accompanying file LICENSE or
- *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
  *
  */
 
@@ -12,6 +12,7 @@ using UnrealBuildTool;
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 #if UE_5_0_OR_LATER
 using EpicGames.Core;
@@ -21,55 +22,74 @@ using Tools.DotNETCommon;
 
 public class uring : ModuleRules
 {
-	public uring(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+    private bool bDevelopmentModeOverride = false;
+    private bool IsDevelopmentMode()
+    {
+        return bDevelopmentModeOverride || File.Exists(Path.Combine(PluginDirectory, "../../.modio_development_mode"));
+    }
+    private void ApplyProjectDefinitions(ReadOnlyTargetRules Target)
+    {
+        if (Target.ProjectDefinitions.Contains("MODIO_DEVELOPMENT_MODE"))
+        {
+            bDevelopmentModeOverride = true;
+        }
+        else if (System.Environment.GetEnvironmentVariables().Contains("MODIO_DEVELOPMENT_MODE"))
+        {
+            bDevelopmentModeOverride = true;
+        }
+    }
 
-		string GeneratedSourcePath = Path.Combine(ModuleDirectory, "../ThirdParty", "GeneratedUringSource");
+    public uring(ReadOnlyTargetRules Target) : base(Target)
+    {
+        ApplyProjectDefinitions(Target);
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine" });
-		PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Public"), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src/include") });
-		PrivateIncludePaths.AddRange(new string[] { Path.Combine(GeneratedSourcePath), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src") });
-		PrivateDefinitions.Add("LIBURING_INTERNAL=1");
-		if (File.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")) || Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/.git")))
-		{
-			string OldGeneratedSourcePath = Path.Combine(ModuleDirectory, "Private", "GeneratedSource");
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        string GeneratedSourcePath = Path.Combine(ModuleDirectory, "../ThirdParty", "GeneratedUringSource");
 
-			// Delete the old Generated Source path if its present, as it may conflict with the new way we add GeneratedSource for this module
-			if (Directory.Exists(OldGeneratedSourcePath))
-			{
-				Directory.Delete(OldGeneratedSourcePath, true);
-			}
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine" });
+        PublicIncludePaths.AddRange(new string[] { Path.Combine(ModuleDirectory, "Public"), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src/include") });
+        PrivateIncludePaths.AddRange(new string[] { Path.Combine(GeneratedSourcePath), Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src") });
+        PrivateDefinitions.Add("LIBURING_INTERNAL=1");
 
-			// Set up the new GeneratedSourcePath. This folder sits outside the module directory so we can use
-			// ConditionalAddModuleDirectory. Relying on UBT to pull in files that we have copied via this script
-			// is unreliable and causes intermittent build issues.
-			if (Directory.Exists(GeneratedSourcePath))
-			{
-				Directory.Delete(GeneratedSourcePath, true);
-			}
+        if (IsDevelopmentMode())
+        {
 
-			Directory.CreateDirectory(GeneratedSourcePath);
+            string OldGeneratedSourcePath = Path.Combine(ModuleDirectory, "Private", "GeneratedSource");
+            // Delete the old Generated Source path if its present, as it may conflict with the new way we add GeneratedSource for this module
+            if (Directory.Exists(OldGeneratedSourcePath))
+            {
+                Directory.Delete(OldGeneratedSourcePath, true);
+            }
 
-			List<string> CFiles = new List<string>(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src"), "*.c", SearchOption.AllDirectories));
+            // Set up the new GeneratedSourcePath. This folder sits outside the module directory so we can use
+            // ConditionalAddModuleDirectory. Relying on UBT to pull in files that we have copied via this script
+            // is unreliable and causes intermittent build issues.
+            if (Directory.Exists(GeneratedSourcePath))
+            {
+                Directory.Delete(GeneratedSourcePath, true);
+            }
 
-			foreach (string CFile in CFiles)
-			{
-				//Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
-				ExternalDependencies.Add(CFile);
-				string DestinationPath = Path.Combine(GeneratedSourcePath, Path.GetFileName(CFile));
-				File.Copy(CFile, DestinationPath, true);
-			}
+            Directory.CreateDirectory(GeneratedSourcePath);
 
-			if (File.Exists(Path.Combine(GeneratedSourcePath, "nolibc.c")))
-			{
-				File.Delete(Path.Combine(GeneratedSourcePath, "nolibc.c"));
-			}
+            List<string> CFiles = new List<string>(Directory.GetFiles(Path.Combine(ModuleDirectory, "../ThirdParty/liburing/src"), "*.c", SearchOption.AllDirectories));
 
-			ConditionalAddModuleDirectory(new DirectoryReference(GeneratedSourcePath));
+            foreach (string CFile in CFiles)
+            {
+                //Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
+                ExternalDependencies.Add(CFile);
+                string DestinationPath = Path.Combine(GeneratedSourcePath, Path.GetFileName(CFile));
+                File.Copy(CFile, DestinationPath, true);
+            }
 
-			{
-				string CompatHeader = @"/* SPDX-License-Identifier: MIT */
+            if (File.Exists(Path.Combine(GeneratedSourcePath, "nolibc.c")))
+            {
+                File.Delete(Path.Combine(GeneratedSourcePath, "nolibc.c"));
+            }
+
+            
+
+            {
+                string CompatHeader = @"/* SPDX-License-Identifier: MIT */
 #ifndef LIBURING_COMPAT_H
 #define LIBURING_COMPAT_H
 
@@ -97,10 +117,12 @@ struct __kernel_timespec
 
 #endif
 ";
-				string CompatHeaderPath = Path.Combine(ModuleDirectory, "Public", "liburing");
-				Directory.CreateDirectory(CompatHeaderPath);
-				File.WriteAllText(Path.Combine(CompatHeaderPath, "compat.h"), CompatHeader);
-			}
-		}
-	}
+                string CompatHeaderPath = Path.Combine(ModuleDirectory, "Public", "liburing");
+                Directory.CreateDirectory(CompatHeaderPath);
+                File.WriteAllText(Path.Combine(CompatHeaderPath, "compat.h"), CompatHeader);
+            }
+        }
+
+        ConditionalAddModuleDirectory(new DirectoryReference(GeneratedSourcePath));
+    }
 }

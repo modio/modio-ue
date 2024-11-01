@@ -125,7 +125,7 @@ struct FEntitlementConsumptionStatus
 	 * @brief Whether this entitlement was consumed or not
 	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Entitlements")
-	bool EntitlementConsumed;
+	bool EntitlementConsumed = false;
 
 	/**
 	 * @brief Type of Entitlement that was consumed

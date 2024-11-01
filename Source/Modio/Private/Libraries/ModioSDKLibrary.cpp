@@ -1,10 +1,10 @@
 /*
- *  Copyright (C) 2021 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
  *
- *  This file is part of the mod.io UE4 Plugin.
+ *  This file is part of the mod.io UE Plugin.
  *
  *  Distributed under the MIT License. (See accompanying file LICENSE or
- *   view online at <https://github.com/modio/modio-ue4/blob/main/LICENSE>)
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
  *
  */
 
@@ -14,6 +14,7 @@
 #include "Modio.h"
 #include "ModioSettings.h"
 #include "Internal/ModioConvert.h"
+#include "Misc/EngineVersionComparison.h"
 
 
 FModioGameID UModioSDKLibrary::GetProjectGameId()
@@ -123,7 +124,12 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals/* = 
 	Args.Add("Number", FText::AsNumber(InNewUnit, &FormatRules));
 	Args.Add("Unit", bIncludeUnitName ? FText::FromString(ToString(Unit)) : FText::GetEmpty());
 	FText FormatString = FText::FromString(TEXT("{Number}{Unit}"));
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
 	FText::FindText(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString) ;
+#else
+	FText::FindTextInLiveTable_Advanced(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString);
+#endif
+
 	return FText::Format(FormatString, Args);
 }
 

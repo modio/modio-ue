@@ -1,0 +1,1 @@
+"/"===location.pathname&&location.hash.startsWith("#")&&(location.href=`${location.origin}/restapiref/${location.hash}`);
