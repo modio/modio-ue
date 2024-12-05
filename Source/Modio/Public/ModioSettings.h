@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "Types/ModioAuthenticationParams.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioFilterParams.h"
 #include "Types/ModioInitializeOptions.h"
@@ -83,6 +84,13 @@ public:
 	 */
 	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta=(DisplayName="Enable Mod Downvoting in UI"))
 	bool bEnableModDownvoteFeature;
+
+	/**
+	 * If you intend to sell Premium Currency through the relevant platform store, this Map is used to invoke the platform-native storefront on the given platform(s).
+	 * See the monetization documentation for more info.
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Monetization", meta = (EditCondition="bEnableMonetizationFeature", EditConditionHides="true"))
+	TMap<EModioPortal, FString> PlatformIdentifiers;
 
 
 private:

@@ -18,12 +18,10 @@
 UENUM(BlueprintType)
 enum class EModioRating : uint8
 {
-	/** A neutral rating **/
+	/** A neutral rating */
 	Neutral,
-
-	/** A positive rating **/
+	/** A positive rating */
 	Positive,
-
-	/** A negative rating **/
+	/** A negative rating */
 	Negative
 };

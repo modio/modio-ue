@@ -24,7 +24,7 @@ class UModioSubmissionExtensionLibrary : public UBlueprintFunctionLibrary
 public:
 	/**
 	 * @brief Queues the upload of a new mod file release for the specified mod, using the submitted parameters. This
-	 * upload method accepts a a block of memory TArray<uint8> rather than a file path. The upload's progress can be
+	 * upload method accepts a block of memory `TArray<uint8>` rather than a file path. The upload's progress can be
 	 * tracked in the same way as downloads; when completed, a Mod Management Event will be triggered with the result
 	 * code for the upload.
 	 * @param Target The ModioSubsystem object
@@ -37,7 +37,7 @@ public:
 
 	/**
 	 * @brief Queues the upload of a new mod file release for the specified mod, using the submitted parameters. This upload method
-	 * accepts a a block of memory TArray<uint8> rather than a file path. The
+	 * accepts a block of memory `TArray<uint8>` rather than a file path. The
 	 * upload's progress can be tracked in the same way as downloads; when completed, a Mod Management Event will be
 	 * triggered with the result code for the upload.
 	 * @param Target The ModioSubsystem object

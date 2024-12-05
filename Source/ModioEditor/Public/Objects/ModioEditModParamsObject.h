@@ -11,7 +11,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <Types/ModioModInfo.h>
+#include "Types/ModioModInfo.h"
 
 #include "ModioEditModParamsObject.generated.h"
 
@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Modio Edit Mod Params")
 	FString NamePath;
 
-	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.6 release. Please use the <<Visibility>> instead."))
+	UPROPERTY(meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.6 release. Please use `EModioObjectVisibilityFlags Visibility` instead."))
 	bool bVisible_DEPRECATED;
 
 	UPROPERTY(EditAnywhere, Category = "Modio Edit Mod Params")

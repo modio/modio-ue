@@ -19,14 +19,22 @@
 UENUM(BlueprintType)
 enum class EModioModManagementEventType : uint8
 {
-	Installed, /** Mod installation to local storage completed*/
-	Uninstalled, /** Mod uninstallation from local storage completed*/
-	Updated, /** Mod local installation updated to latest version*/
-	Uploaded, /** Mod file was uploaded*/
-	BeginInstall, /** Mod download and installation has started */
-	BeginUninstall, /** Mod uninstallation has started */
-	BeginUpdate, /** Mod download and update has started*/
-	BeginUpload /** Mod upload has started*/
+	/** Mod installation to local storage completed*/
+	Installed, 
+	/** Mod uninstallation from local storage completed*/
+	Uninstalled, 
+	/** Mod local installation updated to latest version*/
+	Updated, 
+	/** Mod file was uploaded*/
+	Uploaded, 
+	/** Mod download and installation has started */
+	BeginInstall, 
+	/** Mod uninstallation has started */
+	BeginUninstall, 
+	/** Mod download and update has started*/
+	BeginUpdate, 
+	/** Mod upload has started*/
+	BeginUpload
 };
 
 /** @brief Simple struct representing the outcome of a mod management operation */

@@ -8,14 +8,15 @@
  *
  */
 
-#include "../../Public/DetailCustomizations/ModioBrowseModsParamsDetails.h"
+#include "DetailCustomizations/ModioBrowseModsParamsDetails.h"
 #include "Engine/StaticMesh.h"
-#include "../../Public/Objects/ModioBrowseModsObject.h"
+#include "Objects/ModioBrowseModsObject.h"
 #include "PropertyEditing.h"
-#include <Framework/Application/SlateApplication.h>
-#include <WindowManager.h>
-#include <PropertyCustomizationHelpers.h>
-#include <Widgets/Input/SSearchBox.h>
+#include "Framework/Application/SlateApplication.h"
+#include "WindowManager.h"
+#include "PropertyCustomizationHelpers.h"
+#include "Widgets/Input/SSearchBox.h"
+#include "Misc/EngineVersionComparison.h"
 
 #define LOCTEXT_NAMESPACE "ModioBrowseModsParamsDetails"
 
@@ -86,7 +87,9 @@ void ModioBrowseModsParamsDetails::DrawEditMod(IDetailLayoutBuilder& DetailBuild
 	.WholeRowContent()
 	[
 		SAssignNew(ListView, SListView<TSharedPtr<FModioModInfo>>)
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
 		.ItemHeight(50)
+#endif
 		.ListItemsSource(&Source)
 		.HeaderRow
 		(

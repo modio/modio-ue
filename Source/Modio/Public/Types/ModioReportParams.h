@@ -24,28 +24,21 @@ namespace Modio
 UENUM(BlueprintType)
 enum class EModioReportType : uint8
 {
-	/** A generic mod report **/
+	/** A generic mod report */
 	Generic = 0,
-	
-	/** Digital Millennium Copyright Act mod report **/
+	/** Digital Millennium Copyright Act mod report */
 	DMCA = 1,
-
-	/** Not working mod report **/
+	/** Not working mod report */
 	NotWorking = 2,
-
-	/** Rude content mod report **/
+	/** Rude content mod report */
 	RudeContent = 3,
-
-	/** Illegal content mod report **/
+	/** Illegal content mod report */
 	IllegalContent = 4,
-
-	/** Stolen content mod report **/
+	/** Stolen content mod report */
 	StolenContent = 5,
-
-	/** False information mod report **/
+	/** False information mod report */
 	FalseInformation = 6,
-
-	/** Other type of mod report **/
+	/** Other type of mod report */
 	Other = 7
 };
 ENUM_RANGE_BY_FIRST_AND_LAST(EModioReportType, EModioReportType::Generic, EModioReportType::Other);

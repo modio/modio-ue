@@ -11,11 +11,10 @@
 #pragma once
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioCommonTypes.h"
-#include "Types/ModioImageWrapper.h"
 #include "Types/ModioImageState.h"
+#include "Types/ModioImageWrapper.h"
 
 #include "ModioImageLibrary.generated.h"
-
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnLoadImageDelegate, class UTexture2DDynamic*, Texture);
 
@@ -39,14 +38,14 @@ public:
 	/**
 	 * If a logo size is EModioLogoSize::Original, then the size of the Logo returned,
 	 * else, the thumbnail size a logo is returned
-	 * @param Logo If null and EModioLogoSize::Original is passed, then (0, 0) is returned
+	 * @param Logo If null and `EModioLogoSize::Original` is passed, then (0, 0) is returned
 	 * @param LogoSize The size of the logo we want to return
 	 *
 	 * @return Dimensions of the logo if displayed in a 1:1 pixel ratio
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Image")
 	static FVector2D GetLogoSize(class UTexture* Logo, EModioLogoSize LogoSize);
-	
+
 	/**
 	 * If a avatar size is EModioAvatarSize::Original, then the size of the Logo returned,
 	 * else, the thumbnail size a avatar is returned

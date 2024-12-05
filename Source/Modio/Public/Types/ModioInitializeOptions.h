@@ -45,7 +45,7 @@ struct MODIO_API FModioInitializeOptions
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	TMap<FString, FString> ExtendedInitializationParameters;
 
-	/** @brief Set Mod.io to run with background thread*/
+	/** @brief Set mod.io to run with background thread*/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	bool bUseBackgroundThread = false;
 

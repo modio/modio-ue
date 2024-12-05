@@ -46,10 +46,11 @@ public:
 	// I'd prefer to do this such that you can pass in the enum value rather than the name but don't really want to deal
 	// with a whole custom K2Node to properly support generic enum values
 
-	/// @brief Returns the string table FText for a given enum value's FName - *Only works with enums registered via
-	/// ModioUI::RegisterEnumAsLocalizable*
-	/// @param EnumName The Name from a given enum value
-	/// @return localized Text for the specified enum value, or dummy FText if not found
+	/**
+	 * @brief Returns the string table `FText` for a given enum value's `FName`. Only works with enums registered via `ModioUI::RegisterEnumAsLocalizable`.
+	 * @param EnumName The Name from a given enum value
+	 * @return localized Text for the specified enum value, or dummy FText if not found
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "mod.io|UI|Localization")
 	static FText GetLocalizedTextForEnumByName(const FName& EnumName)
 	{
@@ -69,11 +70,13 @@ public:
 	/**
 	 * Converts a Unsigned64 filesize to a human readable string with the appropriate unit
 	 *
-	 * @param FileSize - Filesize in bytes
-	 * @param MaxDecimals - Maximum amount of decimals to display of the filesize
-	 * @param Unit - If Largest, then it tries to display the size in the largest unit that will have a integral
+	 * @param FileSize Filesize in bytes
+	 * @param MinDecimals Minimum number of decimals to display for the filesize
+	 * @param MaxDecimals Maximum number of decimals to display for the filesize
+	 * @param Unit If `Largest`, it tries to display the size in the largest unit that will have a integral
 	 * part > 0, else it displays the filesize in the specified unit
-	 * @return A text formatted from your specifications
+	 * @param bIncludeUnitName Whether or not to include the unit name
+	 * @return An `FText` formatted with your specifications
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Text",
 			  meta = (DisplayName = "FileSizeToText (Unsigned64)", CompactNodeTitle = "FileSizeUnsigned64>Text"))
@@ -124,9 +127,11 @@ class MODIO_API UModioUILocalizationLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	/// @brief Returns the string table FText for a given string key
-	/// @param StringKey The key to look up in the table
-	/// @return localized Text for the specified key, or StringKey if not found
+	/**
+	 * @brief Returns the string table `FText` for a given string key
+	 * @param StringKey The key to look up in the table
+	 * @return Localized Text for the specified key, or `StringKey` if not found
+	*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "mod.io|UI|Localization")
 	static FText GetLocalizedTextFromDefaultTableByKey(const FString& StringKey)
 	{

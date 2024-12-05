@@ -13,8 +13,8 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioCommonTypes.h"
-#include "Types/ModioModInfo.h"
 #include "Types/ModioEditModParams.h"
+#include "Types/ModioModInfo.h"
 
 #include "ModioEditModLibrary.generated.h"
 
@@ -36,8 +36,7 @@ class MODIO_API UModioEditModLibrary : public UBlueprintFunctionLibrary
 	static void SetNamePath(UPARAM(ref) FModioEditModParams& In, FString NamePath);
 
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Edit Mod Params",
-			  meta = (DeprecatedProperty,
-					  DeprecationMessage = "Deprecated as of 2023.6 release. Please use the <<Visibility>> instead."))
+			  meta = (DeprecatedProperty, DeprecationMessage = "Deprecated as of 2023.6 release. Please use `SetVisibility` with `EModioObjectVisibilityFlags Visibility`  instead."))
 	static void SetVisibility_DEPRECATED(UPARAM(ref) FModioEditModParams& In, bool Visibility);
 
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Edit Mod Params")

@@ -26,43 +26,38 @@ namespace Modio
 }
 
 /**
- * Enumeration that represent mature content for the mod to create
+ * @brief Enum representing whether or not a mod is visible to users
  **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioObjectVisibilityFlags : uint8
 {
-	/** Mod is concealed from users **/
+	/** Mod is concealed from users */
 	Hidden = 0,
-
-	/** Mod is openly available **/
+	/** Mod is openly available */
 	Public = 1
 };
 
 /**
- * Enumeration that represent mature content for the mod to create
+ * @brief Enum representing mature content that a mod may contain
  **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioMaturityFlags : uint8
 {
-	/** No maturity **/
+	// No maturity
 	None,
-
-	/** Content contains alcohol references **/
+	// Content contains alcohol references
 	Alcohol = 1,
-
-	/** Content contains drug references **/
+	// Content contains drug references
 	Drugs = 2,
-
-	/** Content contains violence references **/
+	// Content contains violence references
 	Violence = 4,
-
-	/** Content contains sexual references **/
+	// Content contains sexual references
 	Explicit = 8
 };
 ENUM_CLASS_FLAGS(EModioMaturityFlags);
 
 /**
- * Enumeration that represent mod server side status
+ * @brief Enum representing a mod's server side status
  **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EModioModServerSideStatus : uint8
@@ -121,9 +116,8 @@ struct MODIO_API FModioModInfo
 	FDateTime ProfileDateLive;
 
 	/**
-	 * @brief Flags for maturity options
-	 * Maturity options flagged by the mod developer, this is only relevant if the parent game allows mods to
-	 * be labeled as mature.
+	 * @brief Flags for maturity options. Maturity options are flagged by the mod developer. This is only relevant if
+	 *the parent game allows mods to be labeled as mature.
 	 **/
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Profile")
 	EModioMaturityFlags ProfileMaturityOption {};
@@ -131,8 +125,10 @@ struct MODIO_API FModioModInfo
 	/** @brief Is the mod marked as visible?
 	 * @deprecated Use Visibility property instead
 	 */
-	UPROPERTY(meta = (DeprecatedProperty,
-					  DeprecationMessage = "Deprecated as of 2023.6 release. Please use the <<Visibility>> instead."))
+	UPROPERTY(
+		meta = (DeprecatedProperty,
+				DeprecationMessage =
+					"Deprecated as of 2023.6 release. Please use `EModioObjectVisibilityFlags Visibility` instead."))
 	bool bVisible_DEPRECATED {};
 
 	/**

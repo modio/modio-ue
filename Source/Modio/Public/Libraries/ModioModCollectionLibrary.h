@@ -34,9 +34,8 @@ public:
 	static const FModioModInfo& GetModProfile(const FModioModCollectionEntry& Entry);
 
 	/**
-	 * @return Path to the mod's installation folder on disk
-	 * NOTE: If the mod is not yet installed this path may not yet exist. Check
-	 * xref:GetModState[] before trying to load files in this location
+	 * @return Path to the mod's installation folder on disk. If the mod is not yet installed this path may not yet exist. Check
+	 * `GetModState` before trying to load files in this location
 	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Mods")
 	static const FString GetPath(const FModioModCollectionEntry& Entry);

@@ -12,16 +12,16 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
-#include <Types/ModioGameInfo.h>
-#include <Widgets/DeclarativeSyntaxSupport.h>
-#include <Brushes/SlateDynamicImageBrush.h>
-#include <Widgets/SBoxPanel.h>
-#include <Widgets/Text/STextBlock.h>
-#include <Widgets/Input/SEditableTextBox.h>
-#include <Widgets/Images/SThrobber.h>
-#include <Widgets/Input/SButton.h>
-#include <Widgets/Notifications/SProgressBar.h>
-#include <Widgets/Images/SImage.h>
+#include "Types/ModioGameInfo.h"
+#include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Brushes/SlateDynamicImageBrush.h"
+#include "Widgets/SBoxPanel.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/Images/SThrobber.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Notifications/SProgressBar.h"
+#include "Widgets/Images/SImage.h"
 
 class UModioSubsystem;
 class UModioBrowseModsObject;

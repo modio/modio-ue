@@ -415,7 +415,8 @@ public class Modio : ModuleRules
                 Path.Combine(ModuleDirectory,  "../ThirdParty/concurrentqueue"),
  
                 Path.Combine(GeneratedHeaderPath, "Private"),
-                Path.Combine(GeneratedHeaderPath, "Public")
+                Path.Combine(GeneratedHeaderPath, "Public"),
+                GeneratedHeaderPath
         });
 
 
@@ -428,7 +429,7 @@ public class Modio : ModuleRules
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
-            "Projects", "CoreUObject", "RHI", "RenderCore", "HTTP"
+            "Projects", "CoreUObject", "RHI", "RenderCore", "HTTP", "OnlineSubsystem"
         });
 
         if (Target.bBuildEditor)
@@ -513,14 +514,15 @@ public class Modio : ModuleRules
             string VersionString = File.ReadAllText(VersionFilePath);
             VersionString = VersionString.Trim();
             PrivateDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-{0}\"", VersionString));
+            // Add dependency on version file so if it is changed we trigger a rebuild
+            ExternalDependencies.Add(VersionFilePath);
         }
         else
         {
             PrivateDefinitions.Add("MODIO_COMMIT_HASH=\"UNREAL-DEV\"");
         }
 
-        // Add dependency on version file so if it is changed we trigger a rebuild
-        ExternalDependencies.Add(VersionFilePath);
+       
     }
 
     private bool DoesPlatformSupportProfiling(UnrealTargetPlatform Platform)

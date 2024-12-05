@@ -19,15 +19,15 @@
 UENUM(BlueprintType)
 enum class EModioImageState : uint8
 {
-	/** Image data is located on hard drive **/
+	/** Image data is located on hard drive */
 	OnDisc,
 
-	/** Image data is transferring to a memory location **/
+	/** Image data is transferring to a memory location */
 	LoadingIntoMemory,
 
-	/** Image data is located in memory **/
+	/** Image data is located in memory */
 	InMemory,
 
-	/** Image data is not readable **/
+	/** Image data is not readable */
 	Corrupted
 };

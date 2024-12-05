@@ -11,7 +11,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <Types/ModioModInfo.h>
+#include "Types/ModioModInfo.h"
 #include "ModioBrowseModFileObject.generated.h"
 
 USTRUCT()

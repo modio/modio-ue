@@ -124,7 +124,7 @@ void FModioEditor::DisplayGettingStarted()
 void FModioEditor::PluginButtonClicked()
 {
 	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
-	if (InitializeOptions.GameId.ToString().Equals("InvalidGameID") || InitializeOptions.ApiKey.ToString().Equals("InvalidApiKey"))
+	if (!InitializeOptions.GameId.IsValid() || !InitializeOptions.ApiKey.IsValid())
 	{
 		const FText Title = FText::FromString("mod.io");
 		const FText Message = FText::FromString("Please specify a valid Game Id and Api Key in 'Project Settings->Plugins->mod.io'");

@@ -11,6 +11,7 @@
 #include "Widgets/SModioEditorUserGamesList.h"
 
 #include "EngineMinimal.h"
+#include "Misc/EngineVersionComparison.h"
 
 #include "Widgets/Images/SThrobber.h"
 #include "Widgets/SOverlay.h"
@@ -145,7 +146,9 @@ void SModioEditorUserGamesList::DrawGameList()
 									.DefaultLabel(LOCTEXT("GameListHeaderId", "ID"))
 								)
 								.SelectionMode(ESelectionMode::Single)
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
 								.ItemHeight(32)
+#endif
 								.ListItemsSource(&Games)
 								.OnGenerateRow(this, &SModioEditorUserGamesList::GenerateGameInfoRow)
 								.OnSelectionChanged(this, &SModioEditorUserGamesList::OnGameSelectedFromList)

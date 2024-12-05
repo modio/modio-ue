@@ -14,8 +14,8 @@
 #include "SlateFwd.h"
 #include "SlateBasics.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-#include <Objects/ModioBrowseModFileObject.h>
-#include <Widgets/Views/STableRow.h>
+#include "Objects/ModioBrowseModFileObject.h"
+#include "Widgets/Views/STableRow.h"
 
 class MODIOEDITOR_API SModFileRow : public SMultiColumnTableRow<TSharedPtr<FModioBrowseModFileStruct>>
 {

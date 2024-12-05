@@ -39,7 +39,7 @@ public:
 
 	/**
 	 * @brief Runs a filter over the user's subscription list
-	 * @param FilterParams Supports the following operations:
+	 * @param FilterParams The filters to use on the user's subscription list
 	 * @param Callback Called when mod list has been processed
 	 **/
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Example|UserSubscription")

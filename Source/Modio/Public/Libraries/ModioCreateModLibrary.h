@@ -29,7 +29,7 @@ class MODIO_API UModioCreateModLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Mod Params",
 			  meta = (DeprecatedProperty,
-					  DeprecationMessage = "Deprecated as of 2023.6 release. Please use the <<Visibility>> instead."))
+					  DeprecationMessage = "Deprecated as of 2023.6 release. Please use the `SetInitialVisibility` instead."))
 	static void SetInitialVisibility_DEPRECATED(UPARAM(ref) FModioCreateModParams& In, bool InitialVisibility);
 
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Mod Params")

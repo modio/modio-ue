@@ -20,7 +20,7 @@ namespace Modio
 	class ErrorCode;
 }
 
-/** @brief wrapper around Modio::ErrorCode */
+/** @brief Wrapper around `Modio::ErrorCode` */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioErrorCode
 {

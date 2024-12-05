@@ -27,14 +27,22 @@ namespace Modio
 UENUM(BlueprintType)
 enum class EModioSortFieldType : uint8
 {
-	ID, /** use mod ID (default) */
-	DownloadsToday, /** use number of downloads in last 24 (exposed in REST API as 'popular' */
-	SubscriberCount, /** use number of subscribers */
-	Rating, /** use mod rating */
-	DateMarkedLive, /** use date mod was marked live */
-	DateUpdated, /** use date mod was last updated */
-	DownloadsTotal, /** use downloads total */
-	Alphabetical /** use mod name */
+	/** Use mod ID (default) */
+	ID,
+	/** Use number of downloads in last 24 (exposed in REST API as "popular") */
+	DownloadsToday,
+	/** Use number of subscribers */
+	SubscriberCount,
+	/** Use mod rating */
+	Rating,
+	/** Use date mod was marked live */
+	DateMarkedLive,
+	/** Use date mod was last updated */
+	DateUpdated,
+	/** Use downloads total */
+	DownloadsTotal,
+	/** Use mod name */
+	Alphabetical
 };
 
 /// @brief Enum indicating which direction sorting should be applied
@@ -49,18 +57,22 @@ enum class EModioSortDirection : uint8
 UENUM(BlueprintType)
 enum class EModioRevenueFilterType : uint8
 {
-	Free = 0, /** Return only free mods */
-	Paid = 1, /** Return only paid mods */
-	FreeAndPaid = 2 /** Return both free and paid mods */
+	/** Return only free mods */
+	Free = 0, 
+	/** Return only paid mods */
+	Paid = 1, 
+	/** Return both free and paid mods */
+	FreeAndPaid = 2 
 };
 
-/** @brief Class storing a set of filter parameters for use in xref:ListAllModsAsync[] */
+/** @brief Class storing a set of filter parameters for use in [`ListAllModsAsync`](#listallmodsasync) */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioFilterParams
 {
 	GENERATED_BODY()
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods with the specified author User ID
 	 * @param UserID The User ID to filter on
 	 * @return *this
@@ -68,6 +80,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& MatchingAuthor(const FModioUserID& UserID);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods with the specified author User IDs
 	 * @param UserIDs The list of User IDs to filter on
 	 * @return *this
@@ -75,6 +88,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& MatchingAuthors(const TArray<FModioUserID>& UserIDs);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates the filter should only include the specified mods
 	 * @param IDs the set of mods to match
 	 * @return *this
@@ -82,6 +96,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& MatchingIDs(const TArray<FModioModID>& IDs);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates the filter should exclude the specified mods.
 	 * @param IDs the set of mods to exclude
 	 * @return *this
@@ -89,6 +104,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& ExcludingIDs(const TArray<FModioModID>& IDs);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates results should be sorted using the specified field and direction
 	 * @param ByField Field to sort with
 	 * @param ByDirection Direction to sort
@@ -97,6 +113,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& SortBy(EModioSortFieldType ByField, EModioSortDirection ByDirection);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods where the name contains the provided string
 	 * @param SearchString Search string
 	 * @return *this
@@ -104,16 +121,16 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& NameContains(const FString& SearchString);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods where the name contains at least one of the provided strings (string1 OR string2 OR
-	 *stringN...)
-	 * @tparam ...Args std::string
+	 * stringN...)
 	 * @param SearchString First search string
-	 * @param ...args Additional search strings
 	 * @return *this
 	 **/
 	FModioFilterParams& NameContains(const TArray<FString>& SearchString);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that were marked live (i.e released) after the specified date
 	 * @param LiveAfter Minimum date
 	 * @return *this
@@ -121,6 +138,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& MarkedLiveAfter(FDateTime LiveAfter);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that were marked live (i.e released) before the specified date
 	 * @param LiveBefore Maximum date
 	 * @return *this
@@ -128,6 +146,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& MarkedLiveBefore(FDateTime LiveBefore);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods with a metadata blob containing the specified substring
 	 * @param SearchString The substring to search for
 	 * @return *this
@@ -135,6 +154,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& MetadataLike(FString SearchString);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that have the specified tag
 	 * @param Tag Tag to include
 	 * @return *this
@@ -142,6 +162,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& WithTags(const FString& Tag);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that have all the specified tags (tag1 AND tag2 AND tagN...)
 	 * @param NewTags The set of tags to filter on
 	 * @return *this
@@ -149,6 +170,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& WithTags(const TArray<FString>& NewTags);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that do not have the specified tag
 	 * @param Tag Tag to exclude
 	 * @return *this
@@ -156,6 +178,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& WithoutTags(const FString& Tag);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that do not have any of the specified tags ( NOT (tag1 OR tag2 OR tagN...))
 	 * @param NewTags Tags to exclude
 	 * @return *this
@@ -163,6 +186,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& WithoutTags(const TArray<FString>& NewTags);
 
 	/**
+	 * @docpublic
 	 * @brief Returns a sub-range of query results from StartIndex to StartIndex + ResultCount
 	 * @param StartIndex Zero-based index of first result to return
 	 * @param ResultCount Number of results to return
@@ -171,6 +195,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& IndexedResults(uint64 StartIndex, uint64 ResultCount);
 
 	/**
+	 * @docpublic
 	 * @brief Returns a sub-range of query results based on a specified page size and index
 	 * @param PageNumber Zero-based index of page to return
 	 * @param PageSize Number of results in a page
@@ -179,6 +204,7 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& PagedResults(uint64 PageNumber, uint64 PageSize);
 
 	/**
+	 * @docpublic
 	 * @brief Returned mods according to the specified revenue type (free, paid, both)
 	 * @param RevenueFilter Filter to use
 	 * @return *this
@@ -186,12 +212,14 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& RevenueType(EModioRevenueFilterType RevenueFilter);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates results should exclude all mods which contain mature content
 	 * @return *this
 	 */
 	FModioFilterParams& DisallowMatureContent();
 
 	/**
+	 * @docpublic
 	 * @brief Indicates results should be filtered by maturity options
 	 * @param ByMaturity Maturity flags to filter by
 	 * @return *this
@@ -199,9 +227,10 @@ struct MODIO_API FModioFilterParams
 	FModioFilterParams& WithMatureContentFlags(EModioMaturityFlags ByMaturity);
 
 	/**
-	 *  @brief Converts the filter params to a string suitable for use in the REST API.
-	 *  @note Performs a allocation to acquire the string
-	 *  @return FString containing the filter parameters
+	 * @docpublic
+	 * @brief Converts the filter params to a string suitable for use in the REST API.
+	 * @note Performs allocation to acquire the string
+	 * @return FString containing the filter parameters
 	 */
 	FString ToString() const;
 
@@ -227,7 +256,7 @@ public:
 };
 
 /**
- * Helper struct for named preset filter parameters
+ * @brief Helper struct for named preset filter parameters
  */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioPresetFilterParams
@@ -262,13 +291,20 @@ struct MODIO_API FModioPresetFilterParams
 	}
 };
 
+/**
+ * @brief Blueprint library for working with preset filter parameters
+ */
 UCLASS()
 class MODIO_API UModioPresetFilterParamsLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 protected:
-	// Compiles a preset filter into a concrete set of filter parameters that can be passed to the mod.io plugin
+	/**
+	 * @brief Converts a preset filter into a concrete set of filter parameters that can be passed to the mod.io plugin
+	 * @param Preset The preset to convert
+	 * @return The converted filter params
+	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Filter Params")
 	static FModioFilterParams ToFilterParams(const FModioPresetFilterParams& Preset)
 	{

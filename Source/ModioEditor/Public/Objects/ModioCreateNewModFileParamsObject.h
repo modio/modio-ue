@@ -11,7 +11,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <Types/ModioCommonTypes.h>
+#include "Types/ModioCommonTypes.h"
 
 #include "ModioCreateNewModFileParamsObject.generated.h"
 

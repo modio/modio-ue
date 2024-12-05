@@ -172,6 +172,8 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 		BackgroundThread = MakeUnique<FModioBackgroundThread>(this);
 	}
 
+	CachedInitializeOptions = Options;
+
 #if WITH_EDITOR
 	if (const UModioSettings* Settings = GetMutableDefault<UModioSettings>())
 	{

@@ -74,13 +74,14 @@ FString UModioCommonTypesLibrary::Conv_UserIDToString(FModioUserID UserID)
 
 FModioInitializeOptions UModioCommonTypesLibrary::MakeInitializeOptions(int64 GameId, const FString& APIKey,
 																		EModioEnvironment GameEnvironment,
-																		EModioPortal PortalInUse)
+																		EModioPortal PortalInUse, bool bUseBackgroundThread)
 {
 	FModioInitializeOptions Options;
 	Options.GameId = FModioGameID(GameId);
 	Options.ApiKey = FModioApiKey(APIKey);
 	Options.GameEnvironment = GameEnvironment;
 	Options.PortalInUse = PortalInUse;
+	Options.bUseBackgroundThread = bUseBackgroundThread;
 	return Options;
 }
 
@@ -115,8 +116,15 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetPortal(const FModioInitiali
 	return DuplicateOptions;
 }
 
+FModioInitializeOptions UModioCommonTypesLibrary::SetBackgroundThread(const FModioInitializeOptions& Options, bool bUseBackgroundThread)
+{
+	FModioInitializeOptions DuplicateOptions {Options};
+	DuplicateOptions.bUseBackgroundThread = bUseBackgroundThread;
+	return DuplicateOptions;
+}
+
 FModioInitializeOptions UModioCommonTypesLibrary::SetSessionIdentifier(const FModioInitializeOptions& Options,
-																	   const FString& SessionIdentifier)
+                                                                       const FString& SessionIdentifier)
 {
 	FModioInitializeOptions DuplicateOptions {Options};
 	DuplicateOptions.LocalSessionIdentifier = SessionIdentifier;

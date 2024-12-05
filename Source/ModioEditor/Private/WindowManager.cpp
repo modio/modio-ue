@@ -11,20 +11,20 @@
 #include "WindowManager.h"
 #include "Misc/EngineVersionComparison.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
-	#include <DesktopPlatform/Public/IDesktopPlatform.h>
-	#include <DesktopPlatform/Public/DesktopPlatformModule.h>
+	#include "DesktopPlatform/Public/IDesktopPlatform.h"
+	#include "DesktopPlatform/Public/DesktopPlatformModule.h"
 #else
 	#include "DesktopPlatformModule.h"
 	#include "IDesktopPlatform.h"
 #endif
-#include <DetailCustomizations/ModioCreateModParamsDetails.h>
-#include <DetailCustomizations/ModioBrowseModFileDetails.h>
-#include <DetailCustomizations/ModioBrowseModsParamsDetails.h>
-#include <DetailCustomizations/ModioCreateModFileParamsDetails.h>
-#include <DetailCustomizations/ModioEditModParamsDetails.h>
-#include <Objects/ModioCreateModParamsObject.h>
-#include <Widgets/SWindow.h>
-#include <Widgets/SModioEditorWindowCompoundWidget.h>
+#include "DetailCustomizations/ModioCreateModParamsDetails.h"
+#include "DetailCustomizations/ModioBrowseModFileDetails.h"
+#include "DetailCustomizations/ModioBrowseModsParamsDetails.h"
+#include "DetailCustomizations/ModioCreateModFileParamsDetails.h"
+#include "DetailCustomizations/ModioEditModParamsDetails.h"
+#include "Objects/ModioCreateModParamsObject.h"
+#include "Widgets/SWindow.h"
+#include "Widgets/SModioEditorWindowCompoundWidget.h"
 
 TSharedPtr<SWindow> WindowManager::GetWindow()
 {

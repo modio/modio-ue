@@ -71,3 +71,10 @@ FModioGuid FModioGuid::GenerateGuid()
 {
 	return FModioGuid(ToUnreal(*Modio::Guid::GenerateGuid()));
 }
+
+FModioTokenPackID::FModioTokenPackID() {}
+
+uint32 GetTypeHash(FModioTokenPackID ModioTokenPackId)
+{
+	return FCrc::MemCrc32(&ModioTokenPackId, sizeof(FModioTokenPackID));
+}

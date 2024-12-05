@@ -26,12 +26,18 @@ namespace Modio
 UENUM(BlueprintType)
 enum class EModioModState : uint8
 {
-	InstallationPending, // dont save
+	// The mod is pending installation.  This state is not saved.
+	InstallationPending, 
+	// The mod is installed.
 	Installed,
-	UpdatePending, // saved as installed
-	Downloading, // installing - dont save
-	Extracting, // installing- don't save
-	UninstallPending, // saved as installed
+	// The mod is pending an update. This state is saved as installed.
+	UpdatePending, 
+	// The mod is downloading as part of the installation process. This state is not saved.
+	Downloading, 
+	// The mod is extracting as part of the installation process. This state is not saved.
+	Extracting, 
+	// The mod is pending uninstallation.  This state is saved as installed.
+	UninstallPending, 
 };
 
 /**

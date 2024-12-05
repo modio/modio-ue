@@ -8,13 +8,13 @@
  *
  */
 
-#include "../../Public/DetailCustomizations/ModioCreateModFileParamsDetails.h"
-#include <DetailLayoutBuilder.h>
-#include <Objects/ModioCreateNewModFileParamsObject.h>
-#include <Widgets/Input/SEditableTextBox.h>
-#include <WindowManager.h>
-#include <DetailCategoryBuilder.h>
-#include <DetailWidgetRow.h>
+#include "DetailCustomizations/ModioCreateModFileParamsDetails.h"
+#include "DetailLayoutBuilder.h"
+#include "Objects/ModioCreateNewModFileParamsObject.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "WindowManager.h"
+#include "DetailCategoryBuilder.h"
+#include "DetailWidgetRow.h"
 
 TSharedRef<IDetailCustomization> ModioCreateModFileParamsDetails::MakeInstance()
 {

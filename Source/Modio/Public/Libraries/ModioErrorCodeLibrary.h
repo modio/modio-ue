@@ -22,17 +22,15 @@ class MODIO_API UModioErrorCodeLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 	/**
-	 * Checks if a error code contains a error
-	 * @param Error -
-	 * @return true if the error code is a error
+	 * @brief Checks if an error code contains a error
+	 * @return true if the error code is an error
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Error", meta = (CompactNodeTitle = "Error", BlueprintAutocast))
 	static bool IsError(const FModioErrorCode& Error);
 
 	/**
-	 * Checks if a error code contains a error
-	 * @param Error -
-	 * @return true if the error code is a error
+	 * @brief Checks if an error code contains a error
+	 * @return true if the error code is an error
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Utilities|Error",
 			  meta = (DisplayName = "IsError", ExpandBoolAsExecs = "ReturnValue"))
@@ -40,23 +38,21 @@ public:
 
 
 	/**
-	 * Get underlying error code 
-	 * @param Error -
-	 * @return 0 if there is no error
+	 * @brief Get underlying error code for an FModioErrorCode.
+	 * @return The underlying error code.  0 represents no error.
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Error")
 	static int32 GetValue(const FModioErrorCode& Error);
 
 	/**
-	 * Get the textual representation of the error
-	 * @param Error -
-	 * @return 
+	 * @brief Get the textual representation of the error
+	 * @return An `FString` message describing the error
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Error")
 	static FString GetMessage(const FModioErrorCode& Error);
 
 	/**
-	 * Helper method to reconstruct a mod.io error passed via code that cannot reference mod.io types
+	 * @brief Helper method to reconstruct a mod.io error passed via code that cannot reference mod.io types
 	 * @param Value The numeric value of the code
 	 * @param Category The category ID (populated by native code)
 	 */

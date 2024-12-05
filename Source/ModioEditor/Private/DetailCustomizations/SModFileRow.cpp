@@ -8,12 +8,12 @@
  *
  */
 
-#include "../../Public/DetailCustomizations/SModFileRow.h"
-#include <Widgets/SModioEditorWindowCompoundWidget.h>
-#include <WindowManager.h>
+#include "DetailCustomizations/SModFileRow.h"
+#include "Widgets/SModioEditorWindowCompoundWidget.h"
+#include "WindowManager.h"
 #include "Misc/EngineVersionComparison.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
-	#include <Launch/Resources/Version.h>
+	#include "Launch/Resources/Version.h"
 #endif
 
 void SModFileRow::Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTableView)
@@ -37,7 +37,7 @@ TSharedRef<SWidget> SModFileRow::GenerateWidgetForColumn(const FName& ColumnName
 		return SNew(SHorizontalBox)
 
 			+SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 0.f))
+			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
 			[
 				SNew(STextBlock)
 			   .Text(FText::FromString(Item->Name))
@@ -48,7 +48,7 @@ TSharedRef<SWidget> SModFileRow::GenerateWidgetForColumn(const FName& ColumnName
 		return SNew(SHorizontalBox)
 
 			+ SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 0.f))
+			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
 			[
 				SNew(STextBlock)
 				.Text(FText::FromString(PlatformString))
@@ -59,7 +59,7 @@ TSharedRef<SWidget> SModFileRow::GenerateWidgetForColumn(const FName& ColumnName
 		return SNew(SHorizontalBox)
 
 			+ SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 0.f))
+			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
 			[
 				SNew(STextBlock)
 				.Text(FText::FromString(Item->Version))
@@ -70,7 +70,7 @@ TSharedRef<SWidget> SModFileRow::GenerateWidgetForColumn(const FName& ColumnName
 		return SNew(SHorizontalBox)
 
 			+ SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 0.f))
+			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
 			[
 				SNew(STextBlock)
 				.Text(FText::FromString(Item->Status))

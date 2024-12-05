@@ -8,15 +8,16 @@
  *
  */
 
-#include "../../Public/DetailCustomizations/ModioBrowseModFileDetails.h"
-#include "../../Public/Widgets/SModioEditorWindowCompoundWidget.h"
-#include <DetailCategoryBuilder.h>
-#include <DetailCustomizations/SModFileRow.h>
-#include <DetailLayoutBuilder.h>
-#include <DetailWidgetRow.h>
-#include <Objects/ModioBrowseModFileCollectionObject.h>
-#include <Objects/ModioBrowseModFileObject.h>
-#include <WindowManager.h>
+#include "DetailCustomizations/ModioBrowseModFileDetails.h"
+#include "Widgets/SModioEditorWindowCompoundWidget.h"
+#include "DetailCategoryBuilder.h"
+#include "DetailCustomizations/SModFileRow.h"
+#include "DetailLayoutBuilder.h"
+#include "DetailWidgetRow.h"
+#include "Objects/ModioBrowseModFileCollectionObject.h"
+#include "Objects/ModioBrowseModFileObject.h"
+#include "Misc/EngineVersionComparison.h"
+#include "WindowManager.h"
 
 TSharedRef<IDetailCustomization> ModioBrowseModFileDetails::MakeInstance()
 {
@@ -56,7 +57,6 @@ void ModioBrowseModFileDetails::DrawBrowseModFile(IDetailLayoutBuilder& DetailBu
 	.WholeRowContent()
 	[
 		SAssignNew(ListView, SListView<TSharedPtr<FModioBrowseModFileStruct>>)
-		.ItemHeight(50)
 		.SelectionMode(ESelectionMode::Multi)
 		.ListItemsSource(&Source)
 		.OnGenerateRow_Lambda([this](TSharedPtr<FModioBrowseModFileStruct> Item, const TSharedRef<STableViewBase>& OwnerTable)->TSharedRef<ITableRow>

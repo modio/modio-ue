@@ -27,21 +27,20 @@ namespace Modio
 } // namespace Modio
 
 /**
- * Enum representing what environment the game is deployed in, between
- * test or a live environment
+ * @brief Enum representing which environment the game is deployed to: `Test` or `Live`.
  **/
 UENUM(BlueprintType)
 enum class EModioEnvironment : uint8
 {
-	/** Test/Private environment **/
+	/** Test (private) environment */
 	Test,
 
-	/** Live/Public environment **/
+	/** Live (public) environment */
 	Live
 };
 
 /**
- * Enum representing the store or service your game is being distributed through
+ * @brief Enum representing the store or service your game is being distributed through
  **/
 UENUM(BlueprintType)
 enum class EModioPortal : uint8
@@ -59,7 +58,7 @@ enum class EModioPortal : uint8
 };
 
 /**
- * Enum representing a named platform that the plugin is running on.
+ * @brief Enum representing a named platform that the plugin is running on.
  **/
 UENUM(BlueprintType)
 enum class EModioPlatformName : uint8
@@ -78,7 +77,7 @@ enum class EModioPlatformName : uint8
 };
 
 /**
- * Enum representing the platform(s) that a modfile is enabled for
+ * @brief Enum representing the platform(s) that a modfile is enabled for
  **/
 UENUM(BlueprintType)
 enum class EModioModfilePlatform : uint8
@@ -103,16 +102,13 @@ enum class EModioModfilePlatform : uint8
 UENUM(BlueprintType)
 enum class EModioLogoSize : uint8
 {
-	/** 320x180px **/
+	/** 320x180px */
 	Thumb320 = 0,
-
-	/** 640x360px **/
+	/** 640x360px */
 	Thumb640 = 1,
-
-	/** 1280x720px **/
+	/** 1280x720px */
 	Thumb1280 = 2,
-
-	/** Original Size **/
+	/** Original Size */
 	Original = 3
 };
 
@@ -122,13 +118,11 @@ enum class EModioLogoSize : uint8
 UENUM(BlueprintType)
 enum class EModioAvatarSize : uint8
 {
-	/** Original Size **/
+	/** Original Size */
 	Original,
-
-	/** 50x50px Thumbnail **/
+	/** 50x50px Thumbnail */
 	Thumb50,
-
-	/** 100x100px Thumbnail **/
+	/** 100x100px Thumbnail */
 	Thumb100
 };
 
@@ -138,13 +132,13 @@ enum class EModioAvatarSize : uint8
 UENUM(BlueprintType)
 enum class EModioGallerySize : uint8
 {
-	/** Original Size **/
+	/** Original Size */
 	Original,
 
-	/** 320x180px Thumbnail **/
+	/** 320x180px Thumbnail */
 	Thumb320,
 
-	/** 1280x720 Thumbnail **/
+	/** 1280x720 Thumbnail */
 	Thumb1280
 };
 
@@ -154,19 +148,19 @@ enum class EModioGallerySize : uint8
 UENUM(BlueprintType)
 enum class EModioLogLevel : uint8
 {
-	/** Detailed low-level debugging output. Not intended for general use **/
+	/** Detailed low-level debugging output. Not intended for general use */
 	Trace = 0,
 
 	/* Detailed but not low-level. Generally useful for some mid-level information for debugging. */
 	Detailed = 1,
 
-	/** Informational output containing status messages **/
+	/** Informational output containing status messages */
 	Info = 2,
 
-	/** Warnings about incorrect plugin usage, timeouts **/
+	/** Warnings about incorrect plugin usage, timeouts */
 	Warning = 3,
 
-	/** Only errors **/
+	/** Only errors */
 	Error = 4
 };
 
@@ -201,9 +195,12 @@ ENUM_RANGE_BY_COUNT(EModioLanguage, EModioLanguage::Count);
 UENUM(BlueprintType)
 enum class EModioModChangeType : uint8
 {
-	Added, // The user's list has a new mod to synchronize
-	Removed, // The user's list must remove a mod to synchronize
-	Updated // The user's list must update a mod to synchronize
+	// The user's list has a new mod to synchronize
+	Added, 
+	// The user's list must remove a mod to synchronize
+	Removed, 
+	// The user's list must update a mod to synchronize
+	Updated 
 };
 
 /**
@@ -270,11 +267,14 @@ struct MODIO_API FModioModID
 	 **/
 	FString ToString() const
 	{
-		if (ModID < 0)
-		{
-			return TEXT("InvalidModID");
-		}
 		return FString::Printf(TEXT("%lld"), ModID);
+	}
+
+	/// @docinternal
+	/// @brief Compare the ModID to the invalid state
+	bool IsValid() const
+	{
+		return ModID != INDEX_NONE;
 	}
 
 	/**
@@ -387,7 +387,7 @@ struct MODIO_API FModioGameID
 
 	/**
 	 * Transform a GameID into its 32 bit integer representation
-	 * @param ModGameId String type for the GameID to read its hash from
+	 * @param ModioGameId String type for the GameID to read its hash from
 	 * @return unsigned 32 bit integer that matches the hash of the GameID provided
 	 **/
 	MODIO_API friend uint32 GetTypeHash(FModioGameID ModioGameId);
@@ -406,11 +406,14 @@ struct MODIO_API FModioGameID
 	 **/
 	FString ToString() const
 	{
-		if (GameId < 0)
-		{
-			return TEXT("InvalidGameID");
-		}
 		return FString::Printf(TEXT("%lld"), GameId);
+	}
+
+	/// @docinternal
+	/// @brief Compare the GameID to the invalid state defined by the SDK
+	bool IsValid() const
+	{
+		return GameId != InvalidGameID().GameId;
 	}
 
 	/**
@@ -513,11 +516,14 @@ struct MODIO_API FModioFileMetadataID
 	 **/
 	FString ToString() const
 	{
-		if (FileMetadataID < 0)
-		{
-			return TEXT("InvalidFileMetadataID");
-		}
 		return FString::Printf(TEXT("%lld"), FileMetadataID);
+	}
+
+	/// @docinternal
+	/// @brief Compare the FileMetadataID to the invalid state
+	bool IsValid() const
+	{
+		return FileMetadataID != INDEX_NONE;
 	}
 
 	/**
@@ -612,11 +618,14 @@ struct MODIO_API FModioUserID
 	 **/
 	FString ToString() const
 	{
-		if (UserID < 0)
-		{
-			return TEXT("InvalidUserID");
-		}
 		return FString::Printf(TEXT("%lld"), UserID);
+	}
+
+	/// @docinternal
+	/// @brief Compare the UserID to the invalid state
+	bool IsValid() const
+	{
+		return UserID != INDEX_NONE;
 	}
 
 	/**
@@ -696,14 +705,14 @@ struct MODIO_API FModioApiKey
 	 **/
 	const FString& ToString() const
 	{
-		// Put in the function instead of default constructor to avoid having to allocate memory for
-		// each empty instance
-		if (ApiKey.Len() == 0)
-		{
-			static FString Invalid(TEXT("InvalidApiKey"));
-			return Invalid;
-		}
 		return ApiKey;
+	}
+
+	/// @docinternal
+	/// @brief Compare the ApiKey to the invalid state defined by the SDK
+	bool IsValid() const
+	{
+		return ApiKey != InvalidAPIKey().ToString();
 	}
 
 	/**
@@ -750,18 +759,11 @@ struct MODIO_API FModioGuid
 	 **/
 	const FString& ToString() const
 	{
-		// Put in the function instead of default constructor to avoid having to allocate memory for
-		// each empty instance
-		if (InternalGuid.Len() == 0)
-		{
-			static FString Invalid(TEXT("InvalidGuid"));
-			return Invalid;
-		}
 		return InternalGuid;
 	}
 
 	/// @docinternal
-	/// @brief Compare the InternalGuid to the invalid state define by the SDK
+	/// @brief Compare the InternalGuid to the invalid state defined by the SDK
 	bool IsValid() const
 	{
 		return InternalGuid != InvalidGuid().InternalGuid;
@@ -818,14 +820,14 @@ struct MODIO_API FModioEmailAddress
 	 **/
 	const FString& ToString() const
 	{
-		// Put in the function instead of default constructor to avoid having to allocate memory for
-		// each empty instance
-		if (EmailAddress.Len() == 0)
-		{
-			static FString Invalid(TEXT("InvalidEmailAddress"));
-			return Invalid;
-		}
 		return EmailAddress;
+	}
+
+	/// @docinternal
+	/// @brief Compare the EmailAddress to the invalid state
+	bool IsValid() const
+	{
+		return EmailAddress.Len() > 0;
 	}
 
 private:
@@ -858,6 +860,13 @@ struct MODIO_API FModioEmailAuthCode
 	const FString& ToString() const
 	{
 		return EmailAuthCode;
+	}
+
+	/// @docinternal
+	/// @brief Compare the EmailAuthCode to the invalid state
+	bool IsValid() const
+	{
+		return EmailAuthCode.Len() > 0;
 	}
 
 private:
@@ -937,18 +946,114 @@ public:
 UENUM(BlueprintType)
 enum EFileSizeUnit
 {
-	/** Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb) **/
+	/** Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb) */
 	Largest = 0,
-
-	/** A single byte **/
+	/** A single byte */
 	B = 1,
-
-	/** Kilo bytes **/
+	/** Kilobytes */
 	KB = 1024,
-
-	/** Mega bytes **/
+	/** Megabytes */
 	MB = 1024 * 1024,
-
-	/** Giga bytes **/
+	/** Gigabytes */
 	GB = 1024 * 1024 * 1024
+};
+
+USTRUCT(BlueprintType)
+struct MODIO_API FModioTokenPackID
+{
+	GENERATED_BODY()
+
+	/**
+	 * Default constructor without parameters
+	 **/
+	FModioTokenPackID();
+
+	/**
+	 * Preferred constructor with Token Pack initialization parameter
+	 * @param InTokenPAckId Base Token Pack ID to create this strong type
+	 **/
+	FModioTokenPackID(FString InTokenPackId)
+	{
+		TokenPackID = InTokenPackId;
+	}
+
+	/**
+	 * Transform a TokenPackID into its 32 bit integer representation
+	 * @param ModioTokenPackId String type for the TokenPackID to read its hash from
+	 * @return unsigned 32 bit integer that matches the hash of the TokenPackID provided
+	 **/
+	MODIO_API friend uint32 GetTypeHash(FModioTokenPackID ModioTokenPackId);
+
+	/**
+	 * Comparison operator between TokenPackID elements
+	 **/
+	MODIO_API friend bool operator==(FModioTokenPackID A, FModioTokenPackID B)
+	{
+		return A.TokenPackID == B.TokenPackID;
+	}
+
+	/**
+	 * Comparison operator between TokenPackID elements
+	 **/
+	MODIO_API friend bool operator!=(FModioTokenPackID A, FModioTokenPackID B)
+	{
+		return A.TokenPackID != B.TokenPackID;
+	}
+
+	/**
+	 * Transform a TokenPackID into its string representation
+	 * @return String value of the stored TokenPackID
+	 **/
+	FString ToString() const
+	{
+		return TokenPackID;
+	}
+
+	/**
+	 * Stream forward operator to pass the TokenPackID along
+	 * @param Ar The archive class that receives information
+	 * @param ID The TokenPackID to pass along this operator
+	 * @return FArchive The updated archive with the TokenPackID passed along
+	 **/
+	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioTokenPackID& ID)
+	{
+		return Ar << ID.TokenPackID;
+	}
+
+	/**
+	 * Store this instance TokenPackID into an archive
+	 * @param Ar The archive class that receives information
+	 * @return Always true when the TokenPackID is forwarded to Ar
+	 **/
+	bool Serialize(FArchive& Ar)
+	{
+		Ar << *this;
+		return true;
+	}
+
+	/**
+	 * Store this instance TokenPackID into an archive with reference flag as parameter
+	 * @param Ar The archive class that receives information
+	 * @param Map A dictionary from indices for network communication
+	 * @param bOutSuccess Flag to signal the result of this operation, True when stored
+	 * @return Always true when the ModID is forwarded to Ar
+	 **/
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << *this;
+		bOutSuccess = true;
+		return true;
+	}
+
+	private:
+	/// @brief Function for retrieving the underlying value of an FModioTokenPackID for use in custom serialization. Not
+	/// recommended for any other use. FModioTokenPackIDs should be treated as opaque.
+	/// @param In the FModioTokenPackID to retrieve the value for
+	/// @return the underlying string ID.
+	MODIO_API friend FString GetUnderlyingValue(const FModioTokenPackID& In)
+	{
+		return In.TokenPackID;
+	}
+
+	FString TokenPackID;
 };

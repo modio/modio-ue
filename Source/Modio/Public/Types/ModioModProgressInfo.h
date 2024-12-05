@@ -23,11 +23,16 @@ namespace Modio
 UENUM(BlueprintType)
 enum class EModioModProgressState : uint8
 {
-	Initializing, // Download information is being retrieved from mod.io servers
-	Downloading, // Mod archive is downloading from mod.io servers
-	Extracting, // Mod archive is downloaded and now extracting
-	Compressing, // Mod archive is being compressed from files on disk
-	Uploading // Mod archive is uploading to mod.io servers
+	// Download information is being retrieved from mod.io servers
+	Initializing, 
+	// Mod archive is downloading from mod.io servers
+	Downloading, 
+	// Mod archive is downloaded and now extracting
+	Extracting, 
+	// Mod archive is being compressed from files on disk
+	Compressing, 
+	// Mod archive is uploading to mod.io servers
+	Uploading 
 };
 
 /**

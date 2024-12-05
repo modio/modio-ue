@@ -65,6 +65,10 @@
 		{
 			"Name": "PluginBrowser",
 			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystem",
+			"Enabled": true
 		}
 	]
 }

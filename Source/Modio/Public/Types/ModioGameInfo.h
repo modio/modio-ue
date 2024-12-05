@@ -30,31 +30,31 @@ namespace Modio
 
 /**
 * @brief Monetization properties of a game
-* 0 = None set (default)
-* 1 = Monetization is enabled
-* 2 = Marketplace is enabled
-* 4 = Partner Program is enabled
 **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EGameMonetizationFlags : uint8
 {
+	// None set (default)
 	None = 0,
+	// Monetization is enabled
 	Monetization = 1,
+	// Marketplace is enabled
 	Marketplace = 2,
+	// Partner Program is enabled
 	PartnerProgram = 4,
 };
 
 /**
 * @brief Maturity options for a game
-* 0 = Don't allow mature content in mods (default)
-* 1 = This game allows mods containing mature content
-* 2 = This game is for mature audiences only
 **/
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EGameMaturityFlags : uint8
 {
+	// Don't allow mature content in mods (default)
 	None = 0,
+	// This game allows mods containing mature content
 	MatureModsAllowed = 1,
+	// This game is for mature audiences only
 	MatureAudiencesOnly = 2,
 };
 
@@ -110,8 +110,7 @@ struct MODIO_API FModioGameInfo
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
 	FString Instructions;
 
-	/** @brief Link to a mod.io guide, modding wiki, or a page where modders can learn how to make and submit mods */
-	/// to this game's profile
+	/** @brief Link to a mod.io guide, modding wiki, or a page where modders can learn how to make and submit mods to this game's profile */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
 	FString InstructionsUrl;
 

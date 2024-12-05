@@ -15,6 +15,7 @@
 #include "ModioSettings.h"
 #include "Internal/ModioConvert.h"
 #include "Misc/EngineVersionComparison.h"
+#include "Libraries/ModioPlatformHelpersLibrary.h"
 
 
 FModioGameID UModioSDKLibrary::GetProjectGameId()
@@ -296,4 +297,17 @@ EModioLanguage UModioSDKLibrary::GetLanguageCodeFromString(FString LanguageCode)
 		}
 	}
 	return EModioLanguage::English;
+}
+
+FString UModioSDKLibrary::GetMonetizationPurchaseCategory(EModioPortal Portal)
+{
+	const UModioSettings* Settings = GetDefault<UModioSettings>();
+
+	if (!Settings->PlatformIdentifiers.Contains(Portal))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Could not find current platform in Platform identifiers. Platform: %d"), (int)Portal);
+		return FString();
+	}
+
+	return Settings->PlatformIdentifiers[Portal];
 }

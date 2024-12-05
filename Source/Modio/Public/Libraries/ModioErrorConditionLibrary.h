@@ -26,7 +26,7 @@ public:
 	 * @brief Checks if the passed-in ErrorCode matches the specified error condition
 	 * @param ErrorCode The code to check
 	 * @param Condition The error condition to check against
-	 * @return true if the code matches the condition
+	 * @return True if the code matches the condition
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Error Handling")
 	static bool ErrorCodeMatches(FModioErrorCode ErrorCode, EModioErrorCondition Condition);
