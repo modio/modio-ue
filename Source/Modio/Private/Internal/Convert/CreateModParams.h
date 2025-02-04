@@ -29,6 +29,9 @@ FORCEINLINE Modio::CreateModParams ToModio(const FModioCreateModParams& In)
 	Out.Stock = ToModioOptional<int64>(In.QuantityAvailable);
 	Out.MaturityRating = In.MaturityFlags.IsSet() ? static_cast<Modio::MaturityOption>(In.MaturityFlags.GetValue())
 												  : Modio::Optional<Modio::MaturityOption> {};
+	Out.CommunityOptions = In.CommunityOptionsFlags.IsSet()
+		                       ? ToModio(In.CommunityOptionsFlags.GetValue())
+		                       : Modio::Optional<Modio::ModCommunityOptionsFlags>{};
 	Out.MetadataBlob = ToModioOptional<std::string>(In.MetadataBlob);
 	Out.Tags = ToModioOptional<std::vector<std::string>>(In.Tags);
 	return Out;

@@ -15,18 +15,25 @@
 #include "ModioMetadata.generated.h"
 
 /**
-* Strong type struct to represent key-value pairs for a mod metadata
-**/
+ * @docpublic
+ * @brief Strong type struct to represent key-value pairs for mod metadata
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioMetadata
 {
 	GENERATED_BODY()
 
-	/** Key of the metadata */
+	/**
+	 * @docpublic
+	 * @brief Key of the metadata
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "Metadata")
 	FString Key;
 
-	/** Value of the metadata */
+	/**
+	 * @docpublic
+	 * @brief Value of the metadata
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "Metadata")
 	FString Value;
 };

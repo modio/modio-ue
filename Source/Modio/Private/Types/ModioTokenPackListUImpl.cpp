@@ -13,6 +13,8 @@
 #include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
+template const TArray<FModioTokenPack>& FModioList<TArray, FModioTokenPack>::GetRawList() const;
+
 FModioTokenPackList::FModioTokenPackList(const FModioPagedResult& PagedResult, TArray<FModioTokenPack>&& TokenPackList)
 	: FModioPagedResult(PagedResult),
 	  FModioList(MoveTemp(TokenPackList))

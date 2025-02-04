@@ -23,13 +23,18 @@
 
 #include "ModioOptionalLibrary.generated.h"
 
+/**
+ * @docpublic
+ * @brief Utility library for handling optional types used in the mod.io API
+ */
 UCLASS()
 class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 	/**
-	 * Check if the mod info list has a valid value
+	 * @docpublic
+	 * @brief Check if the mod info list has a valid value
 	 *
 	 * @param OptionalModInfoList - The optional to check
 	 * @return true if it has a value set
@@ -39,7 +44,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalModInfoList(const struct FModioOptionalModInfoList& OptionalModInfoList);
 
 	/**
-	 * Get the mod info list from the optional if it's set
+	 * @docpublic
+	 * @brief Get the mod info list from the optional if it's set
 	 *
 	 * @param OptionalModInfoList -
 	 * @param ModInfoList - if this returned false, then this will be defaulted
@@ -51,7 +57,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 												  struct FModioModInfoList& ModInfoList);
 
 	/**
-	 * Check if the Game info list has a valid value
+	 * @docpublic
+	 * @brief Check if the Game info list has a valid value
 	 *
 	 * @param OptionalGameInfoList - The optional to check
 	 * @return true if it has a value set
@@ -61,7 +68,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalGameInfoList(const struct FModioOptionalGameInfoList& OptionalGameInfoList);
 
 	/**
-	 * Get the game info list from the optional if it's set
+	 * @docpublic
+	 * @brief Get the game info list from the optional if it's set
 	 *
 	 * @param OptionalGameInfoList -
 	 * @param GameInfoList - if this returned false, then this will be defaulted
@@ -73,7 +81,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 												   struct FModioGameInfoList& GameInfoList);
 
 	/**
-	 * Check if the mod info has a valid value
+	 * @docpublic
+	 * @brief Check if the mod info has a valid value
 	 *
 	 * @param OptionalModInfo - The optional to check
 	 * @return true if it has a value set
@@ -83,7 +92,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalModInfo(const struct FModioOptionalModInfo& OptionalModInfo);
 
 	/**
-	 * Get the mod info from the optional if it's set
+	 * @docpublic
+	 * @brief Get the mod info from the optional if it's set
 	 *
 	 * @param OptionalModInfo -
 	 * @param ModInfo - if this returned false, then this will be defaulted
@@ -94,7 +104,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 											  struct FModioModInfo& ModInfo);
 
 	/**
-	 * Check if the game info has a valid value
+	 * @docpublic
+	 * @brief Check if the game info has a valid value
 	 *
 	 * @param OptionalGameInfo - The optional to check
 	 * @return true if it has a value set
@@ -104,7 +115,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalGameInfo(const struct FModioOptionalGameInfo& OptionalGameInfo);
 
 	/**
-	 * Get the mod info from the optional if it's set
+	 * @docpublic
+	 * @brief Get the mod info from the optional if it's set
 	 *
 	 * @param OptionalGameInfo -
 	 * @param GameInfo - if this returned false, then this will be defaulted
@@ -115,7 +127,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 											   struct FModioGameInfo& GameInfo);
 
 	/**
-	 * Check if the user optional has a valid value
+	 * @docpublic
+	 * @brief Check if the user optional has a valid value
 	 *
 	 * @param OptionalUser - The optional to check
 	 * @return true if it has a value set
@@ -125,7 +138,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalUser(const struct FModioOptionalUser& OptionalUser);
 
 	/**
-	 * Get the user from the optional if it's set
+	 * @docpublic
+	 * @brief Get the user from the optional if it's set
 	 *
 	 * @param OptionalUser -
 	 * @param User - if this returned false, then this will be defaulted
@@ -135,7 +149,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalUser(const struct FModioOptionalUser& OptionalUser, struct FModioUser& User);
 
 	/**
-	 * Check if the optional mod tag option has a valid value
+	 * @docpublic
+	 * @brief Check if the optional mod tag option has a valid value
 	 *
 	 * @param OptionalModTagOptions - The optional to check
 	 * @return true if it has a value set
@@ -145,7 +160,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalModTagOptions(const struct FModioOptionalModTagOptions& OptionalModTagOptions);
 
 	/**
-	 * Get the mod tag option from the optional if it's set
+	 * @docpublic
+	 * @brief Get the mod tag option from the optional if it's set
 	 *
 	 * @param OptionalModTagOptions -
 	 * @param ModTagOptions - if this returned false, then this will be defaulted
@@ -157,7 +173,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 													struct FModioModTagOptions& ModTagOptions);
 
 	/**
-	 * Check if the mod progression info has a valid value
+	 * @docpublic
+	 * @brief Check if the mod progression info has a valid value
 	 *
 	 * @param OptionalModProgressInfo - The optional to check
 	 * @return true if it has a value set
@@ -167,7 +184,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalModProgressInfo(const struct FModioOptionalModProgressInfo& OptionalModProgressInfo);
 
 	/**
-	 * Get the mod progression info from the optional if it's set
+	 * @docpublic
+	 * @brief Get the mod progression info from the optional if it's set
 	 *
 	 * @param OptionalModProgressInfo -
 	 * @param ModProgressInfo - if this returned false, then this will be defaulted
@@ -180,7 +198,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 		struct FModioModProgressInfo& ModProgressInfo);
 
 	/**
-	 * Check if the image has a valid value
+	 * @docpublic
+	 * @brief Check if the image has a valid value
 	 *
 	 * @param OptionalImage - The optional to check
 	 * @return true if it has a value set
@@ -190,7 +209,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalImage(const struct FModioOptionalImage& OptionalImage);
 
 	/**
-	 * Get the image from the optional if it's set
+	 * @docpublic
+	 * @brief Get the image from the optional if it's set
 	 *
 	 * @param OptionalImage -
 	 * @param Image - if this returned false, then this will be defaulted
@@ -201,7 +221,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 											struct FModioImageWrapper& Image);
 
 	/**
-	 * Check if the terms has a valid value
+	 * @docpublic
+	 * @brief Check if the terms has a valid value
 	 *
 	 * @param OptionalTerms - The optional to check
 	 * @return true if it has a value set
@@ -211,7 +232,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalTerms(const struct FModioOptionalTerms& OptionalTerms);
 
 	/**
-	 * Get the terms from the optional if it's set
+	 * @docpublic
+	 * @brief Get the terms from the optional if it's set
 	 *
 	 * @param OptionalTerms -
 	 * @param Terms - if this returned false, then this will be defaulted
@@ -221,7 +243,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalTerms(const struct FModioOptionalTerms& OptionalTerms, struct FModioTerms& Terms);
 
 	/**
-	 * Check if the optional mod dependency list has a valid value
+	 * @docpublic
+	 * @brief Check if the optional mod dependency list has a valid value
 	 *
 	 * @param OptionalDependencyList - The optional to check
 	 * @return true if it has a value set
@@ -232,7 +255,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 		const struct FModioOptionalModDependencyList& OptionalDependencyList);
 
 	/**
-	 * Get the dependency list from the optional if it's set
+	 * @docpublic
+	 * @brief Get the dependency list from the optional if it's set
 	 *
 	 * @param OptionalDependencyList -
 	 * @param DependencyList - if this returned false, then this will be defaulted
@@ -245,7 +269,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 		struct FModioModDependencyList& DependencyList);
 
 	/**
-	 * Check if the ModioModID has a valid value
+	 * @docpublic
+	 * @brief Check if the ModioModID has a valid value
 	 *
 	 * @param OptionalID - The optional to check
 	 * @return true if it has a value set
@@ -255,7 +280,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalModID(const struct FModioOptionalModID& OptionalID);
 
 	/**
-	 * Get the ID from the optional if it's set
+	 * @docpublic
+	 * @brief Get the ID from the optional if it's set
 	 *
 	 * @param OptionalID - if this returned false, then this will be defaulted
 	 * @param ID - the underlying value
@@ -265,7 +291,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalModID(const struct FModioOptionalModID& OptionalID, struct FModioModID& ID);
 
 	/**
-	 * Check if the FModioUnsigned64 has a valid value
+	 * @docpublic
+	 * @brief Check if the FModioUnsigned64 has a valid value
 	 *
 	 * @param OptionalInt - The optional to check
 	 * @return true if it has a value set
@@ -275,7 +302,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool IsSet_ModioOptionalUInt64(const struct FModioOptionalUInt64& OptionalInt);
 
 	/**
-	 * Get the FModioUnsigned64 from the optional if it's set
+	 * @docpublic
+	 * @brief Get the FModioUnsigned64 from the optional if it's set
 	 *
 	 * @param OptionalInt - if this returned false, then this will be defaulted
 	 * @param UnderlyingInt - the underlying value
@@ -284,4 +312,28 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalUInt64)")
 	static bool GetValue_ModioOptionalUInt64(const struct FModioOptionalUInt64& OptionalInt,
 											 FModioUnsigned64& UnderlyingInt);
+
+	/**
+	 * @docpublic
+	 * @brief Check if the optional mod change map has a valid value
+	 *
+	 * @param OptionalModChangeMap - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+		meta = (DisplayName = "IsSet (ModioOptionalModChangeMap)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap);
+
+	/**
+	 * @docpublic
+	 * @brief Get the mod change map from the optional if it's set
+	 *
+	 * @param OptionalModChangeMap - The optional to get the value from
+	 * @param ModChangeMap - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+		DisplayName = "GetValue (ModioOptionalModChangeMap)")
+	static bool GetValue_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap,
+	                                               struct FModioModChangeMap& ModChangeMap);
 };

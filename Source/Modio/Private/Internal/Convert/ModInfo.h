@@ -34,6 +34,7 @@ FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 	Out.ProfileDateUpdated = ToUnrealDateTime(In.ProfileDateUpdated);
 	Out.ProfileDateLive = ToUnrealDateTime(In.ProfileDateLive);
 	Out.ProfileMaturityOption = ToUnreal<EModioMaturityFlags, Modio::MaturityOption>(In.ProfileMaturityOption);
+	Out.CommunityOptions = ToUnreal(In.CommunityOptions);
 	Out.Visibility = (EModioObjectVisibilityFlags) In.Visibility;
 	Out.Dependencies = In.Dependencies;
 

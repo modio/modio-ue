@@ -15,29 +15,53 @@
 #include "ModioTheme.generated.h"
 
 /**
- * Theme color values for the game
- **/
+ * @docpublic
+ * @brief Theme color values for the game
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioTheme
 {
 	GENERATED_BODY()
 
-	/** @brief The primary hex color code */
+	/** 
+	 * @docpublic
+	 * @brief The primary hex color code
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Theme")
 	FString Primary;
-	/** @brief The dark hex color code */
+
+	/** 
+	 * @docpublic
+	 * @brief The dark hex color code
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Theme")
 	FString Dark;
-	/** @brief The light hex color code */
+
+	/** 
+	 * @docpublic
+	 * @brief The light hex color code
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Theme")
 	FString Light;
-	/** @brief The success hex color code */
+
+	/** 
+	 * @docpublic
+	 * @brief The success hex color code
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Theme")
 	FString Success;
-	/** @brief The warning hex color code */
+
+	/** 
+	 * @docpublic
+	 * @brief The warning hex color code
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Theme")
 	FString Warning;
-	/** @brief The danger hex color code */
+
+	/** 
+	 * @docpublic
+	 * @brief The danger hex color code
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Theme")
 	FString Danger;
 };

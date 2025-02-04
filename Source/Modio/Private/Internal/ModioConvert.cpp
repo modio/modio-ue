@@ -464,3 +464,37 @@ EModioLanguage ToUnreal(const Modio::Language& In)
 	checkf(false, TEXT("Missed a case in ToUnreal(Modio::Language Language)"));
 	return EModioLanguage::English;
 }
+
+EModioModCommunityOptionsFlags ToUnreal(const Modio::ModCommunityOptionsFlags& In)
+{
+	// Workaround for Unreal's Enum flags limitation.
+	EModioModCommunityOptionsFlags Flags = EModioModCommunityOptionsFlags::None;
+
+	if (In.HasFlag(Modio::ModCommunityOptions::EnableComments))
+		Flags |= EModioModCommunityOptionsFlags::EnableComments;
+	if (In.HasFlag(Modio::ModCommunityOptions::EnablePreviews))
+		Flags |= EModioModCommunityOptionsFlags::EnablePreviews;
+	if (In.HasFlag(Modio::ModCommunityOptions::EnablePreviewURLs))
+		Flags |= EModioModCommunityOptionsFlags::EnablePreviewURLs;
+	if (In.HasFlag(Modio::ModCommunityOptions::AllowDependencies))
+		Flags |= EModioModCommunityOptionsFlags::AllowDependencies;
+
+	return Flags;
+}
+
+Modio::ModCommunityOptionsFlags ToModio(EModioModCommunityOptionsFlags In)
+{
+	// Workaround for Unreal's Enum flags limitation.
+	Modio::ModCommunityOptionsFlags Flags = Modio::ModCommunityOptions::None;
+    
+	if (EnumHasAnyFlags(In, EModioModCommunityOptionsFlags::EnableComments))
+		Flags.SetFlag(Modio::ModCommunityOptions::EnableComments);
+	if (EnumHasAnyFlags(In, EModioModCommunityOptionsFlags::EnablePreviews))
+		Flags.SetFlag(Modio::ModCommunityOptions::EnablePreviews);
+	if (EnumHasAnyFlags(In, EModioModCommunityOptionsFlags::EnablePreviewURLs))
+		Flags.SetFlag(Modio::ModCommunityOptions::EnablePreviewURLs);
+	if (EnumHasAnyFlags(In, EModioModCommunityOptionsFlags::AllowDependencies))
+		Flags.SetFlag(Modio::ModCommunityOptions::AllowDependencies);
+    
+	return Flags;
+}

@@ -14,7 +14,10 @@
 
 #include "ModioAuthenticationParams.generated.h"
 
-/** @brief Simple struct to encapsulate data passed to external authentication systems */
+/**
+ * @docpublic
+ * @brief Simple struct to encapsulate data passed to external authentication systems
+ */
 UENUM(BlueprintType)
 enum class EModioAuthenticationProvider : uint8
 {
@@ -32,34 +35,52 @@ enum class EModioAuthenticationProvider : uint8
 	GoogleServerSideToken
 };
 
-/** @brief Simple struct to encapsulate data passed to external authentication systems */
+/**
+ * @docpublic
+ * @brief Struct to encapsulate data passed to external authentication systems
+ * 
+ * This struct is used to store authentication parameters required by various external 
+ * authentication providers. These parameters are used to authenticate users with 
+ * external systems (e.g., Xbox, Steam, Google, etc.).
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioAuthenticationParams
 {
 	GENERATED_BODY()
 
 	/**
-	* Stored property of the authentication token
-	**/
+	 * @docpublic
+	 * @brief Stored property of the authentication token
+	 * This token is required for authentication with the external provider.
+	 */
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	FString AuthToken;
 
 	/**
-	* Stored property of the user email
-	**/
+	 * @docpublic
+	 * @brief Stored property of the user email
+	 * This is the email address of the user, which is used for authentication 
+	 * purposes in certain external systems.
+	 */
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	FString UserEmail;
 
 	/**
-	* Stored property boolean that signals if the user has accepted the terms of service,
-	* true when that has occurred, false by default otherwise
-	**/
+	 * @docpublic
+	 * @brief Boolean that signals if the user has accepted the terms of service
+	 * This flag is used to indicate whether the user has agreed to the terms of service 
+	 * required by the external authentication provider.
+	 */
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	bool bUserHasAcceptedTerms = false;
 
 	/**
-	 * Stored property of extended parameters required by some providers.
-	 **/
+	 * @docpublic
+	 * @brief Stored property of extended parameters required by some providers
+	 * This map holds additional key-value pairs for authentication that might be 
+	 * required by specific authentication providers. These could include things like 
+	 * additional credentials or metadata.
+	 */
 	UPROPERTY(BlueprintReadWrite, EditInstanceOnly, Category = "mod.io|Authentication")
 	TMap<FString, FString> ExtendedParameters;
 };

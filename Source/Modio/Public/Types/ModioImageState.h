@@ -13,9 +13,10 @@
 #include "ModioImageState.generated.h"
 
 /**
-* Enumerator to represent the possible states the image data
-* can be, from hard drive to corrupted
-**/
+ * @docpublic
+ * @brief Enumerator to represent the possible states the image data
+ * can be, from hard drive to corrupted
+ */
 UENUM(BlueprintType)
 enum class EModioImageState : uint8
 {

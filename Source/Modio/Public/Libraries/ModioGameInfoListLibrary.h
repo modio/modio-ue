@@ -15,24 +15,29 @@
 
 #include "ModioGameInfoListLibrary.generated.h"
 
-
+/**
+ * @docpublic
+ * @brief Utility functions for game info list
+ */
 UCLASS()
 class MODIO_API UModioGameInfoListLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 	/**
-	 * Get the games in a game info list
+	 * @docpublic
+	 * @brief Get the games in a game info list
 	 * @param GameInfoList
-	 * @return
+	 * @return The games
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static const TArray<FModioGameInfo>& GetGames(const FModioGameInfoList& GameInfoList);
 
 	/**
-	 * Get the paged result that contains information of the data returned
+	 * @docpublic
+	 * @brief Get the paged result that contains information of the data returned
 	 * @param GameInfoList
-	 * @return
+	 * @return The paged result
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static const FModioPagedResult& GetPagedResult(const FModioGameInfoList& GameInfoList);

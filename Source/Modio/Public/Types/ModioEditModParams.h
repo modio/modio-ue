@@ -15,69 +15,85 @@
 #include "ModioEditModParams.generated.h"
 
 /**
-* Struct type to specify the fields to update for a mod
-**/
+ * @docpublic
+ * @brief Struct type to specify the fields to update for a mod
+ */
 USTRUCT(BlueprintType)
 struct FModioEditModParams
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
 
-    /**
-    * The name of the mod
-    **/
-    TOptional<FString> Name;
-    
-    /**
-    * A brief summary of what the mod is
-    **/
-    TOptional<FString> Summary;
-    
-    /**
-    * Optional override for the name 'slug' in the mod's URL
-    **/
-    TOptional<FString> NamePath;
-    
-    /**
-    * Optional override for the mod's visibility status. Defaults to true (visible)
-    * @deprecated Use Visibility property instead
-	**/
-	TOptional<bool> bVisible_DEPRECATED;
-	
 	/**
-	* Enum parameter to signal the backend if the mod to upload would be publicly visible. Default 
-    * value is Public
-	**/
+	 * @docpublic
+	 * @brief The name of the mod
+	 */
+	TOptional<FString> Name;
+    
+	/**
+	 * @docpublic
+	 * @brief A brief summary of what the mod is
+	 */
+	TOptional<FString> Summary;
+    
+	/**
+	 * @docpublic
+	 * @brief Optional override for the name 'slug' in the mod's URL
+	 */
+	TOptional<FString> NamePath;
+    
+	/**
+	 * @docpublic
+	 * @brief Optional override for the mod's visibility status. Defaults to true (visible)
+	 * @deprecated Use Visibility property instead
+	 */
+	TOptional<bool> bVisible_DEPRECATED;
+    
+	/**
+	 * @docpublic
+	 * @brief Enum parameter to signal the backend if the mod to upload would be publicly visible. Default value is Public
+	 */
 	TOptional<EModioObjectVisibilityFlags> Visibility;
     
-    /**
-    * Optional long description of the mod
-    **/
-    TOptional<FString> Description;
+	/**
+	 * @docpublic
+	 * @brief Optional long description of the mod
+	 */
+	TOptional<FString> Description;
     
-    /**
-    * Optional URL to the mod's homepage. Must be a valid URL
-    **/
-    TOptional<FString> HomepageURL;
+	/**
+	 * @docpublic
+	 * @brief Optional URL to the mod's homepage. Must be a valid URL
+	 */
+	TOptional<FString> HomepageURL;
     
-    /**
-    * Bitwise mask of flags indicating the type of mature content present in this mod
-    **/
-    TOptional<EModioMaturityFlags> MaturityFlags;
-    
-    /**
-    * Optional metadata blob for this mod
-    **/
-    TOptional<FString> MetadataBlob;
+	/**
+	 * @docpublic
+	 * @brief Bitwise mask of flags indicating the type of mature content present in this mod
+	 */
+	TOptional<EModioMaturityFlags> MaturityFlags;
 
-    /**
-	 * Optional path to a new logo image for this mod
-	 **/
+	/**
+	 * Bitwise mask of flags indicating the community options for this mod
+	 */
+	TOptional<EModioModCommunityOptionsFlags> CommunityOptionsFlags;
+    
+	/**
+	 * @docpublic
+	 * @brief Optional metadata blob for this mod
+	 */
+	TOptional<FString> MetadataBlob;
+
+	/**
+	 * @docpublic
+	 * @brief Optional path to a new logo image for this mod
+	 */
 	TOptional<FString> LogoPath;
 
-    /**
-	 * List of metadata tags that reference the mod to create. They help to search and filter content
-	 **/
+	/**
+	 * @docpublic
+	 * @brief List of metadata tags that reference the mod to create. They help to search and filter content
+	 */
 	TOptional<TArray<FString>> Tags;
 };

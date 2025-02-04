@@ -22,53 +22,61 @@ namespace Modio
 }
 
 /**
- * Contains information about a successful transaction for a mod
- **/
+ * @docpublic
+ * @brief Contains information about a successful transaction for a mod
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioTransactionRecord
 {
 	GENERATED_BODY()
 
-	/**
-	 * Default constructor without parameters
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioTransactionRecord() = default;
 
-	/**
-	 * Constructor that uses a paged result to initialize an instance
-	 * @param Other The paged result to use in the construction of this struct
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Constructor that uses a transaction record to initialize an instance
+	 * @param Other The transaction record to use in the construction of this struct
+	 */
 	FModioTransactionRecord(const Modio::TransactionRecord& Other);
 
-	/**
-	 * The mod the purchase was for
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief The mod the purchase was for
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Monetization|TransactionRecord")
 	FModioModID AssociatedModID;
 
-	/**
-	 * The price the mod was purchased for
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief The price the mod was purchased for
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Monetization|TransactionRecord")
 	FModioUnsigned64 Price;
 
-	/**
-	 * The updated balance in the user's wallet after the transaction
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief The updated balance in the user's wallet after the transaction
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Monetization|TransactionRecord")
 	FModioUnsigned64 UpdatedUserWalletBalance;
 };
 
 /**
-* Struct to store an optional value for the transaction record
-**/
+ * @docpublic
+ * @brief Struct to store an optional value for the transaction record
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalTransactionRecord
 {
 	GENERATED_BODY()
 
-	/**
-	* The Modio transaction record as an optional value
-	**/
+	/** 
+	 * @docpublic
+	 * @brief The Modio transaction record as an optional value
+	 */
 	TOptional<FModioTransactionRecord> Internal;
 };

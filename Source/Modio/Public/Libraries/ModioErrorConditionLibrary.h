@@ -15,7 +15,10 @@
 
 #include "ModioErrorConditionLibrary.generated.h"
 
-
+/**
+ * @docpublic
+ * @brief Utility functions for checking error conditions
+ */
 UCLASS()
 class MODIO_API UModioErrorConditionLibrary : public UBlueprintFunctionLibrary
 {
@@ -23,6 +26,7 @@ class MODIO_API UModioErrorConditionLibrary : public UBlueprintFunctionLibrary
 
 public:
 	/**
+	 * @docpublic
 	 * @brief Checks if the passed-in ErrorCode matches the specified error condition
 	 * @param ErrorCode The code to check
 	 * @param Condition The error condition to check against

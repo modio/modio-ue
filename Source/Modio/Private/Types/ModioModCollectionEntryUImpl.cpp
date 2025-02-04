@@ -1,15 +1,15 @@
-/* 
+/*
  *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
- *  
+ *
  *  This file is part of the mod.io UE Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
- *   
+ *
  */
 
-#include "Types/ModioModCollectionEntry.h"
 #include "Internal/ModioConvert.h"
+#include "Types/ModioModCollectionEntry.h"
 
 EModioModState FModioModCollectionEntry::GetModState() const
 {
@@ -38,9 +38,9 @@ const FString FModioModCollectionEntry::GetPath() const
 	}
 }
 
-FModioUnsigned64 FModioModCollectionEntry::GetSizeOnDisk() const 
+FModioUnsigned64 FModioModCollectionEntry::GetSizeOnDisk() const
 {
-	return FModioUnsigned64(SizeOnDisk);
+	return SizeOnDisk;
 }
 
 FModioErrorCode FModioModCollectionEntry::GetLastError()

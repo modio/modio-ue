@@ -13,6 +13,8 @@
 
 #include "ModioSDK.h"
 
+template const TArray<FString>& FModioList<TArray, FString>::GetRawList() const;
+
 FModioYoutubeURLList::FModioYoutubeURLList(const Modio::YoutubeURLList& URLList)
 	: FModioList(ToUnrealList<TArray, FString>(URLList))
 {}

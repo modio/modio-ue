@@ -10,12 +10,16 @@
 
 #pragma once
 
-#include "Types/ModioCommonTypes.h"
 #include "Misc/DateTime.h"
+#include "ModioUnsigned64.h"
+#include "Types/ModioCommonTypes.h"
 
 #include "ModioFileMetadata.generated.h"
 
-/** @brief Current state of the scanned file */
+/**
+ * @docpublic
+ * @brief Current state of the scanned file
+ */
 UENUM(BlueprintType)
 enum class EModioVirusScanStatus : uint8
 {
@@ -27,7 +31,10 @@ enum class EModioVirusScanStatus : uint8
 	ErrorScanning = 5
 };
 
-/** @brief If the file has been found to be malicious or not */
+/**
+ * @docpublic
+ * @brief If the file has been found to be malicious or not
+ */
 UENUM(BlueprintType)
 enum class EModioVirusStatus : uint8
 {
@@ -35,56 +42,90 @@ enum class EModioVirusStatus : uint8
 	Malicious = 1
 };
 
-/** @brief Metadata for a release archive for a mod */
+/**
+ * @docpublic
+ * @brief Metadata for a release archive for a mod
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioFileMetadata
 {
 	GENERATED_BODY()
 
-	/** @brief Unique modfile id. */
+	/**
+	 * @docpublic
+	 * @brief Unique modfile id.
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata")
 	FModioFileMetadataID MetadataId;
 
-	/** @brief Unique mod id. */
+	/**
+	 * @docpublic
+	 * @brief Unique mod id.
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "FileMetadata")
 	FModioModID ModId;
 
-	/** @brief Unix timestamp of date file was added. */
+	/**
+	 * @docpublic
+	 * @brief Unix timestamp of date file was added.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata")
 	FDateTime DateAdded;
 
 	/**
+	 * @docpublic
 	 * @brief Current virus scan status of the file. For newly added files that have yet to be scanned this field
 	 * will change frequently until a scan is complete
-	 **/
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Virus")
 	EModioVirusScanStatus CurrentVirusScanStatus {};
 
-	/** @brief Was a virus detected? */
+	/**
+	 * @docpublic
+	 * @brief Was a virus detected?
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Virus")
 	EModioVirusStatus CurrentVirusStatus {};
 
-	/** @brief Size of the file in bytes. */
+	/**
+	 * @docpublic
+	 * @brief Size of the file in bytes.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
-	int64 Filesize {};
+	FModioUnsigned64 Filesize;
 
-	/** @brief Total size of all files in the mod after installation. */
+	/**
+	 * @docpublic
+	 * @brief Total size of all files in the mod after installation.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
-	int64 FilesizeUncompressed {};
+	FModioUnsigned64 FilesizeUncompressed;
 
-	/** @brief Filename including extension. */
+	/**
+	 * @docpublic
+	 * @brief Filename including extension.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|File")
 	FString Filename;
 
-	/** @brief Release version this file represents. */
+	/**
+	 * @docpublic
+	 * @brief Release version this file represents.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Version")
 	FString Version;
 
-	/** @brief Changelog for the file. */
+	/**
+	 * @docpublic
+	 * @brief Changelog for the file.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Version")
 	FString Changelog;
 
-	/** @brief Metadata stored by the game developer for this file. */
+	/**
+	 * @docpublic
+	 * @brief Metadata stored by the game developer for this file.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "FileMetadata|Metadata")
 	FString MetadataBlob;
 };

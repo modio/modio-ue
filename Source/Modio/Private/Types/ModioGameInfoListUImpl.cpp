@@ -18,6 +18,8 @@
 #include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
+template const TArray<FModioGameInfo>& FModioList<TArray, FModioGameInfo>::GetRawList() const;
+
 FModioGameInfoList::FModioGameInfoList(const Modio::GameInfoList& GameInfoList)
 	: FModioPagedResult(GameInfoList)
 {

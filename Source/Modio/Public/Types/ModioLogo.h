@@ -15,26 +15,46 @@
 #include "ModioLogo.generated.h"
 
 /**
- * Contains media URLs to the logo for the game
- **/
+ * @docpublic
+ * @brief Contains media URLs to the logo for the game
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioLogo
 {
 	GENERATED_BODY()
 
-	/** @brief Logo filename including extension. */
+	/**
+	 * @docpublic
+	 * @brief Logo filename including extension.
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Logo")
 	FString Filename;
-	/** @brief URL to the full - sized logo. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the full-sized logo.
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Logo")
 	FString Original;
-	/** @brief URL to the small logo thumbnail. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the small logo thumbnail.
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Logo")
 	FString Thumb320x180;
-	/** @brief URL to the medium logo thumbnail. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the medium logo thumbnail.
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Logo")
 	FString Thumb640x360;
-	/** @brief URL to the large logo thumbnail. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the large logo thumbnail.
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Logo")
 	FString Thumb1280x720;
 };

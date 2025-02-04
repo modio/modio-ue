@@ -58,8 +58,8 @@ FORCEINLINE FModioFileMetadata ToUnreal(const Modio::FileMetadata& FileMetadata)
 	Out.DateAdded = ToUnrealDateTime(FileMetadata.DateAdded);
 	Out.CurrentVirusScanStatus = ToUnreal(FileMetadata.CurrentVirusScanStatus);
 	Out.CurrentVirusStatus = ToUnreal(FileMetadata.CurrentVirusStatus);
-	Out.Filesize = ToUnreal(FileMetadata.Filesize);
-	Out.FilesizeUncompressed = ToUnreal(FileMetadata.FilesizeUncompressed);
+	Out.Filesize = FModioUnsigned64(FileMetadata.Filesize);
+	Out.FilesizeUncompressed = FModioUnsigned64(FileMetadata.FilesizeUncompressed);
 	Out.Filename = ToUnreal(FileMetadata.Filename);
 	Out.Version = ToUnreal(FileMetadata.Version);
 	Out.Changelog = ToUnreal(FileMetadata.Changelog);

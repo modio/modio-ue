@@ -15,26 +15,46 @@
 #include "ModioIcon.generated.h"
 
 /**
- * Contains media URLs to the icon for the game
- **/
+ * @docpublic
+ * @brief Contains media URLs to the icon for the game
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioIcon
 {
 	GENERATED_BODY()
 
-	/** @brief Icon filename including extension. */
+	/**
+	 * @docpublic
+	 * @brief Icon filename including extension
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Icon")
 	FString Filename;
-	/** @brief URL to the full-sized icon. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the full-sized icon
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Icon")
 	FString Original;
-	/** @brief URL to the small icon thumbnail. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the small icon thumbnail
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Icon")
 	FString Thumb64x64;
-	/** @brief URL to the medium icon thumbnail. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the medium icon thumbnail
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Icon")
 	FString Thumb128x128;
-	/** @brief URL to the large icon thumbnail. */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the large icon thumbnail
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|Icon")
 	FString Thumb256x256;
 };

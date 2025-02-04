@@ -22,57 +22,75 @@ namespace Modio
 }
 
 /**
- * Object representing a mod.io user profile information
- **/
+ * @docpublic
+ * @brief Object representing a mod.io user profile information
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioUser
 {
 	GENERATED_BODY()
 
+	/** 
+	 * @docpublic
+	 * @brief Default constructor
+	 */
 	FModioUser() = default;
+
+	/** 
+	 * @docpublic
+	 * @brief Constructor that initializes the FModioUser from a Modio::User
+	 * @param User The Modio::User instance to copy data from
+	 */
 	FModioUser(const Modio::User& User);
 
-	/**
-	 * User's unique ID
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief User's unique ID
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FModioUserID UserId;
 
-	/**
-	 * Name chosen by the user
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Name chosen by the user
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FString Username;
 
-	/**
-	 * Unix timestamp the last time the  user was online
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Unix timestamp of the last time the user was online
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FDateTime DateOnline;
 
-	/**
-	 * URL of the user's mod.io profile
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief URL of the user's mod.io profile
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FString ProfileUrl;
 
-	/**
-	 * Display name of this User for the given Portal, if their account is linked
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Display name of this User for the given Portal, if their account is linked
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FString DisplayNamePortal;
 };
 
 /**
- * Struct wrapper for an optional ModioUser
- **/
+ * @docpublic
+ * @brief Struct wrapper for an optional ModioUser
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalUser
 {
 	GENERATED_BODY()
 
-	/**
-	 * Stored optional ModioUser
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Stored optional ModioUser
+	 */
 	TOptional<FModioUser> Internal;
 };

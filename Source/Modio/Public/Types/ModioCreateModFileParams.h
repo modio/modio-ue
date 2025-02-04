@@ -14,42 +14,49 @@
 #include "ModioCreateModFileParams.generated.h"
 
 /**
- * Strong type for the parameters needed to create a mod file
- **/
+ * @docpublic
+ * @brief Strong type for the parameters needed to create a mod file
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioCreateModFileParams
 {
 	GENERATED_BODY()
 
 	/**
-	 * The file system path that references the directory with the mod files. The plugin will compress the contents of
+	 * @docpublic
+	 * @brief The file system path that references the directory with the mod files. The plugin will compress the contents of
 	 * this path into a .zip archive.
-	 **/
+	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "mod.io|CreateModFileParams")
 	FString PathToModRootDirectory;
 
 	/**
-	 * The version for this mod file
-	 **/
+	 * @docpublic
+	 * @brief The version for this mod file
+	 */
 	TOptional<FString> VersionString;
 
 	/**
-	 * Any changes between versions
-	 **/
+	 * @docpublic
+	 * @brief Any changes between versions
+	 */
 	TOptional<FString> Changelog;
 
 	/**
-	 * True to set the mod file as an active release for versioning purposes
-	 **/
+	 * @docpublic
+	 * @brief True to set the mod file as an active release for versioning purposes
+	 */
 	TOptional<bool> bSetAsActiveRelease;
 
 	/**
-	 * Any extra information needed to provide
-	 **/
+	 * @docpublic
+	 * @brief Any extra information needed to provide
+	 */
 	TOptional<FString> MetadataBlob;
 
 	/**
-	 * List of platforms this mod file supports
-	 **/
+	 * @docpublic
+	 * @brief List of platforms this mod file supports
+	 */
 	TOptional<TArray<EModioModfilePlatform>> ModfilePlatforms;
 };

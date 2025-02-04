@@ -15,23 +15,30 @@
 
 #include "ModioModTagOptionsLibrary.generated.h"
 
+/**
+ * @docpublic
+ * @brief Utility functions for accessing and managing mod tag options
+ */
 UCLASS()
 class MODIO_API UModioModTagOptionsLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
+
 public:
 	/**
-	 * Get the tags in a mod tag options list
-	 * @param ModTags
-	 * @return
+	 * @docpublic
+	 * @brief Retrieve the tags from a mod tag options list
+	 * @param ModTags The mod tag options list to retrieve tags from
+	 * @return An array of FModioModTagInfo representing the tags available for a mod
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static const TArray<FModioModTagInfo>& GetTags(const FModioModTagOptions& ModTags);
 
 	/**
-	 * Get the paged result that contains information of the data returned
-	 * @param ModTags
-	 * @return
+	 * @docpublic
+	 * @brief Retrieve paged result information for a mod tag options list
+	 * @param ModTags The mod tag options list to retrieve paged result information from
+	 * @return An FModioPagedResult containing metadata about the paginated data
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static const FModioPagedResult& GetPagedResult(const FModioModTagOptions& ModTags);

@@ -24,62 +24,83 @@ namespace Modio
 
 #if CPP
 /**
-* Struct to store links and metadata associated to youtube URLs
-**/
+ * @docpublic
+ * @brief Struct to store links and metadata associated to YouTube URLs
+ */
 struct MODIO_API FModioYoutubeURLList : public FModioList<TArray, FString>
 {
-	/**
-	* ModioYoutubeURLList default constructor
-	**/
+	/** 
+	 * @docpublic
+	 * @brief ModioYoutubeURLList default constructor
+	 */
 	FModioYoutubeURLList() = default;
 
-	/**
-	* ModioYoutubeURLList constructor based on a Modio::YoutubeURLList
-	* @param URLList Elements to copy over this struct
-	**/
+	/** 
+	 * @docpublic
+	 * @brief ModioYoutubeURLList constructor based on a Modio::YoutubeURLList
+	 * @param URLList Elements to copy over this struct
+	 */
 	FModioYoutubeURLList(const Modio::YoutubeURLList& URLList);
 };
 
 /**
-* Struct to store links and metadata associated to sketchfab URLs
-**/
+ * @docpublic
+ * @brief Struct to store links and metadata associated to Sketchfab URLs
+ */
 struct MODIO_API FModioSketchfabURLList : public FModioList<TArray, FString>
 {
-	/**
-	* ModioSketchfabURLList default constructor
-	**/
+	/** 
+	 * @docpublic
+	 * @brief ModioSketchfabURLList default constructor
+	 */
 	FModioSketchfabURLList() = default;
-	
-	/**
-	* ModioSketchfabURLList constructor based on a Modio::SketchfabURLList
-	* @param URLList Elements to copy over this struct
-	**/
+
+	/** 
+	 * @docpublic
+	 * @brief ModioSketchfabURLList constructor based on a Modio::SketchfabURLList
+	 * @param URLList Elements to copy over this struct
+	 */
 	FModioSketchfabURLList(const Modio::SketchfabURLList& URLList);
 };
 #else
 /**
-* Provides blueprint support to an array of strings
-**/
+ * @docpublic
+ * @brief Provides blueprint support to an array of strings
+ */
 struct FModioURLListInternal
 {
+	/** 
+	 * @docpublic
+	 * @brief Internal list of strings for storing URLs
+	 */
 	TArray<FString> InternalList;
 };
 
 /**
-* Struct to store links and metadata associated to youtube URLs
-**/
+ * @docpublic
+ * @brief Struct to store links and metadata associated to YouTube URLs for Blueprint
+ */
 USTRUCT(NoExport, BlueprintType)
 struct FModioYoutubeURLList
 {
+	/** 
+	 * @docpublic
+	 * @brief Internal list of YouTube URLs
+	 */
 	FModioURLListInternal InternalList;
 };
 
 /**
-* Struct to store links and metadata associated to sketchfab URLs
-**/
+ * @docpublic
+ * @brief Struct to store links and metadata associated to Sketchfab URLs for Blueprint
+ */
 USTRUCT(NoExport, BlueprintType)
 struct FModioSketchfabURLList
 {
+	/** 
+	 * @docpublic
+	 * @brief Internal list of Sketchfab URLs
+	 */
 	FModioURLListInternal InternalList;
 };
 #endif

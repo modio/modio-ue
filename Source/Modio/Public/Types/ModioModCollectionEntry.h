@@ -26,7 +26,7 @@ namespace Modio
 UENUM(BlueprintType)
 enum class EModioModState : uint8
 {
-	// The mod is pending installation.  This state is not saved.
+	// The mod is pending installation. This state is not saved.
 	InstallationPending, 
 	// The mod is installed.
 	Installed,
@@ -36,28 +36,59 @@ enum class EModioModState : uint8
 	Downloading, 
 	// The mod is extracting as part of the installation process. This state is not saved.
 	Extracting, 
-	// The mod is pending uninstallation.  This state is saved as installed.
+	// The mod is pending uninstallation. This state is saved as installed.
 	UninstallPending, 
 };
 
 /**
-* Struct representing a mod which is installed locally 
-**/
+ * @docpublic
+ * @brief Struct representing a mod which is installed locally
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModCollectionEntry
 {
 	GENERATED_BODY()
 
+	/**
+	 * @docpublic
+	 * @brief Get the current mod state
+	 * @return The state of the mod
+	 */
 	EModioModState GetModState() const;
 
+	/**
+	 * @docpublic
+	 * @brief Get the unique identifier for the mod
+	 * @return The mod's unique ID
+	 */
 	FModioModID GetID() const;
 
+	/**
+	 * @docpublic
+	 * @brief Get the mod's profile information
+	 * @return The mod's profile data
+	 */
 	const FModioModInfo& GetModProfile() const;
 
+	/**
+	 * @docpublic
+	 * @brief Get the path where the mod is stored
+	 * @return The path as a string
+	 */
 	const FString GetPath() const;
 
+	/**
+	 * @docpublic
+	 * @brief Get the size of the mod on disk
+	 * @return The size of the mod in bytes
+	 */
 	FModioUnsigned64 GetSizeOnDisk() const;
 
+	/**
+	 * @docpublic
+	 * @brief Get the last error encountered when dealing with the mod
+	 * @return The error code associated with the last operation
+	 */
 	FModioErrorCode GetLastError();
 
 private:

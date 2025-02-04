@@ -16,27 +16,50 @@
 #include "ModioModCollectionLibrary.generated.h"
 
 
+/**
+ * @docpublic
+ * @brief Utility functions for accessing and managing mod collection data
+ */
 UCLASS()
 class MODIO_API UModioModCollectionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
+
 public:
-	/** @return EModioModState enum representing current state of the mod */
+	/**
+	 * @docpublic
+	 * @brief Get the current state of a mod within the collection
+	 * @param Entry The mod collection entry to retrieve the state from
+	 * @return An EModioModState enum representing the current state of the mod
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Mods")
 	static EModioModState GetModState(const FModioModCollectionEntry& Entry);
 
-	/** @return Mod ID */
+	/**
+	 * @docpublic
+	 * @brief Retrieve the Mod ID from the mod collection entry
+	 * @param Entry The mod collection entry to retrieve the ID from
+	 * @return A FModioModID representing the ID of the mod
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Mods")
 	static FModioModID GetID(const FModioModCollectionEntry& Entry);
 
-	/** @return FModioModInfo containing mod profile data */
+	/**
+	 * @docpublic
+	 * @brief Get the profile information of a mod
+	 * @param Entry The mod collection entry to retrieve the profile information from
+	 * @return An FModioModInfo structure containing the mod's profile data
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Mods")
 	static const FModioModInfo& GetModProfile(const FModioModCollectionEntry& Entry);
 
 	/**
-	 * @return Path to the mod's installation folder on disk. If the mod is not yet installed this path may not yet exist. Check
-	 * `GetModState` before trying to load files in this location
-	 **/
+	 * @docpublic
+	 * @brief Get the installation path for a mod on disk
+	 * @param Entry The mod collection entry to retrieve the installation path from
+	 * @return A FString representing the path to the mod's installation folder. 
+	 *         If the mod is not yet installed, this path may not exist. Use `GetModState` to check the mod's status before accessing files.
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Mods")
 	static const FString GetPath(const FModioModCollectionEntry& Entry);
 };

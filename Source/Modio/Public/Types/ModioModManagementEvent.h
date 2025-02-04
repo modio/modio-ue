@@ -15,43 +15,58 @@
 
 #include "ModioModManagementEvent.generated.h"
 
-/** @brief What type of event occurred */
+/**
+ * @docpublic
+ * @brief What type of event occurred
+ */
 UENUM(BlueprintType)
 enum class EModioModManagementEventType : uint8
 {
-	/** Mod installation to local storage completed*/
+	/** Mod installation to local storage completed */
 	Installed, 
-	/** Mod uninstallation from local storage completed*/
+	/** Mod uninstallation from local storage completed */
 	Uninstalled, 
-	/** Mod local installation updated to latest version*/
+	/** Mod local installation updated to latest version */
 	Updated, 
-	/** Mod file was uploaded*/
+	/** Mod file was uploaded */
 	Uploaded, 
 	/** Mod download and installation has started */
 	BeginInstall, 
 	/** Mod uninstallation has started */
 	BeginUninstall, 
-	/** Mod download and update has started*/
+	/** Mod download and update has started */
 	BeginUpdate, 
-	/** Mod upload has started*/
+	/** Mod upload has started */
 	BeginUpload
 };
 
-/** @brief Simple struct representing the outcome of a mod management operation */
+/**
+ * @docpublic
+ * @brief Simple struct representing the outcome of a mod management operation
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModManagementEvent
 {
 	GENERATED_BODY()
 
-	/** @brief ID for the mod that the event occurred on */
+	/** 
+	 * @docpublic
+	 * @brief ID for the mod that the event occurred on
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "ModManagementEvent")
 	FModioModID ID;
 
-	/** @brief What type of event occurred */
+	/** 
+	 * @docpublic
+	 * @brief What type of event occurred
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "ModManagementEvent")
 	EModioModManagementEventType Event {};
 
-	/** @brief Empty if operation completed successfully, truthy/contains error code if operation failed */
+	/** 
+	 * @docpublic
+	 * @brief Empty if operation completed successfully, truthy/contains error code if operation failed
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "ModManagementEvent")
 	FModioErrorCode Status;
 };

@@ -99,3 +99,13 @@ FModioFilterParams& UModioFilterParamsLibrary::RevenueType(FModioFilterParams& F
 {
 	return Filter.RevenueType(RevenueType);
 }
+
+bool UModioFilterParamsLibrary::EqualTo(const FModioFilterParams& A, const FModioFilterParams& B)
+{
+	return A == B;
+}
+
+bool UModioFilterParamsLibrary::NotEqualTo(const FModioFilterParams& A, const FModioFilterParams& B)
+{
+	return A != B;
+}

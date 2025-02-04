@@ -19,18 +19,24 @@
 #if CPP
 struct MODIO_API FModioTokenPackList : public FModioPagedResult, public FModioList<TArray, FModioTokenPack>
 {
-	/**
-	 * Default constructor without parameters
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioTokenPackList() = default;
 
-	/**
-	 * Constructor that takes an array of token packs and an index of paged results
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Constructor that takes an array of token packs and an index of paged results
+	 * @param PagedResult The paged result containing the pagination details
+	 * @param TokenPackList The list of token packs
+	 */
 	FModioTokenPackList(const FModioPagedResult& PagedResult, TArray<FModioTokenPack>&& TokenPackList);
 
-	/**
-	 * Constructor that takes only an array of token packs
+	/** 
+	 * @docpublic
+	 * @brief Constructor that takes only an array of token packs
+	 * @param TokenPackList The list of token packs
 	 */
 	FModioTokenPackList(TArray<FModioTokenPack> TokenPackList);
 };
@@ -38,47 +44,56 @@ struct MODIO_API FModioTokenPackList : public FModioPagedResult, public FModioLi
 #else
 
 /** 
-* Strong type struct to wrap multiple TokenPack indexed by a paged result 
-**/
+ * @docpublic
+ * @brief Strong type struct to wrap multiple TokenPacks indexed by a paged result
+ */
 USTRUCT(NoExport, BlueprintType)
 struct MODIO_API FModioTokenPackList
 {
-	/**
-	* A paged result property
-	**/
+	GENERATED_BODY()
+
+	/** 
+	 * @docpublic
+	 * @brief A paged result property
+	 */
 	UPROPERTY()
 	FModioPagedResult PagedResult;
 
-	/**
-	* Arrray of Token Packs
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Array of Token Packs
+	 */
 	UPROPERTY()
 	TArray<FModioTokenPack> InternalList;
 };
 
 #endif
 
-/**
- * Struct to wrap ModInfoList into an optional parameter
- **/
+/** 
+ * @docpublic
+ * @brief Struct to wrap ModInfoList into an optional parameter
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalTokenPackList
 {
 	GENERATED_BODY()
 
-	/**
-	 * Default constructor without parameters
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioOptionalTokenPackList() = default;
 
-	/**
-	 * Constructor with a Token Pack list parameter to initialize an instance
+	/** 
+	 * @docpublic
+	 * @brief Constructor with a Token Pack list parameter to initialize an instance
 	 * @param TokenPackList Optional value of a FModioTokenPackList
-	 **/
+	 */
 	FModioOptionalTokenPackList(TOptional<FModioTokenPackList>&& TokenPackList);
 
-	/**
-	 * Stored optional ModioTokenPackList
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Stored optional ModioTokenPackList
+	 */
 	TOptional<FModioTokenPackList> Internal;
 };

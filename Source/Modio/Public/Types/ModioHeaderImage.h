@@ -15,17 +15,25 @@
 #include "ModioHeaderImage.generated.h"
 
 /**
- * Contains media URLs to the preview header image for the game
- **/
+ * @docpublic
+ * @brief Contains media URLs to the preview header image for the game
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioHeaderImage
 {
 	GENERATED_BODY()
 
-	/** @brief  Header image filename including extension */
+	/**
+	 * @docpublic
+	 * @brief Header image filename including extension
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|HeaderImage")
 	FString Filename;
-	/** @brief  URL to the full-sized header image */
+
+	/**
+	 * @docpublic
+	 * @brief URL to the full-sized header image
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|HeaderImage")
 	FString Original;
 };

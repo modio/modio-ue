@@ -15,6 +15,7 @@
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioUser.h"
+#include "Types/ModioModChangeMap.h"
 
 template<typename BPOptionalType>
 bool IsSetInternal(const BPOptionalType& Optional)
@@ -174,4 +175,14 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalUInt64(const struct FModioOpti
 		return true;
 	}
 	return false;
+}
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap)
+{
+	return IsSetInternal(OptionalModChangeMap);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap, struct FModioModChangeMap& ModChangeMap)
+{
+	return GetValueInternal(OptionalModChangeMap, ModChangeMap);
 }

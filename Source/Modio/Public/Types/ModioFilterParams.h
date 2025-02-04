@@ -23,7 +23,10 @@ namespace Modio
 	class FilterParams;
 }
 
-/// @brief Enum indicating which field should be used to sort the results
+/**
+ * @docpublic
+ * @brief Enum indicating which field should be used to sort the results
+ */
 UENUM(BlueprintType)
 enum class EModioSortFieldType : uint8
 {
@@ -45,27 +48,38 @@ enum class EModioSortFieldType : uint8
 	Alphabetical
 };
 
-/// @brief Enum indicating which direction sorting should be applied
+/**
+ * @docpublic
+ * @brief Enum indicating which direction sorting should be applied
+ */
 UENUM(BlueprintType)
 enum class EModioSortDirection : uint8
 {
-	Ascending, /** (default) */
+	/** (default) */
+	Ascending,
+	/** Sort in descending order */
 	Descending
 };
 
-/// @brief Enum indicating filtering options based off revenue type
+/**
+ * @docpublic
+ * @brief Enum indicating filtering options based off revenue type
+ */
 UENUM(BlueprintType)
 enum class EModioRevenueFilterType : uint8
 {
 	/** Return only free mods */
-	Free = 0, 
+	Free = 0,
 	/** Return only paid mods */
-	Paid = 1, 
+	Paid = 1,
 	/** Return both free and paid mods */
-	FreeAndPaid = 2 
+	FreeAndPaid = 2
 };
 
-/** @brief Class storing a set of filter parameters for use in [`ListAllModsAsync`](#listallmodsasync) */
+/**
+ * @docpublic
+ * @brief Class storing a set of filter parameters for use in [`ListAllModsAsync`](#listallmodsasync)
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioFilterParams
 {
@@ -97,7 +111,7 @@ struct MODIO_API FModioFilterParams
 
 	/**
 	 * @docpublic
-	 * @brief Indicates the filter should exclude the specified mods.
+	 * @brief Indicates the filter should exclude the specified mods
 	 * @param IDs the set of mods to exclude
 	 * @return *this
 	 */
@@ -109,7 +123,7 @@ struct MODIO_API FModioFilterParams
 	 * @param ByField Field to sort with
 	 * @param ByDirection Direction to sort
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& SortBy(EModioSortFieldType ByField, EModioSortDirection ByDirection);
 
 	/**
@@ -117,7 +131,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods where the name contains the provided string
 	 * @param SearchString Search string
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& NameContains(const FString& SearchString);
 
 	/**
@@ -126,7 +140,7 @@ struct MODIO_API FModioFilterParams
 	 * stringN...)
 	 * @param SearchString First search string
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& NameContains(const TArray<FString>& SearchString);
 
 	/**
@@ -134,7 +148,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods that were marked live (i.e released) after the specified date
 	 * @param LiveAfter Minimum date
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& MarkedLiveAfter(FDateTime LiveAfter);
 
 	/**
@@ -142,7 +156,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods that were marked live (i.e released) before the specified date
 	 * @param LiveBefore Maximum date
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& MarkedLiveBefore(FDateTime LiveBefore);
 
 	/**
@@ -150,7 +164,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods with a metadata blob containing the specified substring
 	 * @param SearchString The substring to search for
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& MetadataLike(FString SearchString);
 
 	/**
@@ -158,7 +172,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods that have the specified tag
 	 * @param Tag Tag to include
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& WithTags(const FString& Tag);
 
 	/**
@@ -166,7 +180,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods that have all the specified tags (tag1 AND tag2 AND tagN...)
 	 * @param NewTags The set of tags to filter on
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& WithTags(const TArray<FString>& NewTags);
 
 	/**
@@ -174,7 +188,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods that do not have the specified tag
 	 * @param Tag Tag to exclude
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& WithoutTags(const FString& Tag);
 
 	/**
@@ -182,7 +196,7 @@ struct MODIO_API FModioFilterParams
 	 * @brief Only include mods that do not have any of the specified tags ( NOT (tag1 OR tag2 OR tagN...))
 	 * @param NewTags Tags to exclude
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& WithoutTags(const TArray<FString>& NewTags);
 
 	/**
@@ -191,7 +205,7 @@ struct MODIO_API FModioFilterParams
 	 * @param StartIndex Zero-based index of first result to return
 	 * @param ResultCount Number of results to return
 	 * @return *this
-	 **/
+	 */
 	FModioFilterParams& IndexedResults(uint64 StartIndex, uint64 ResultCount);
 
 	/**
@@ -199,8 +213,8 @@ struct MODIO_API FModioFilterParams
 	 * @brief Returns a sub-range of query results based on a specified page size and index
 	 * @param PageNumber Zero-based index of page to return
 	 * @param PageSize Number of results in a page
-	 * @return
-	 **/
+	 * @return *this
+	 */
 	FModioFilterParams& PagedResults(uint64 PageNumber, uint64 PageSize);
 
 	/**
@@ -234,6 +248,30 @@ struct MODIO_API FModioFilterParams
 	 */
 	FString ToString() const;
 
+
+	/**
+	 * @docpublic
+	 * @brief Comparison operator between ModioFilterParams elements
+	 */
+	MODIO_API friend bool operator==(const FModioFilterParams& A, const FModioFilterParams& B)
+	{
+		return A.Direction == B.Direction && A.SortField == B.SortField && A.SearchKeywords == B.SearchKeywords &&
+			   A.DateRangeBegin == B.DateRangeBegin && A.DateRangeEnd == B.DateRangeEnd && A.Tags == B.Tags &&
+			   A.ExcludedTags == B.ExcludedTags && A.AuthorUserIds == B.AuthorUserIds && A.IncludedIDs == B.IncludedIDs &&
+			   A.ExcludedIDs == B.ExcludedIDs && A.MetadataBlobSearchString == B.MetadataBlobSearchString &&
+			   A.Revenue == B.Revenue && A.Maturity == B.Maturity && A.isPaged == B.isPaged && A.Index == B.Index &&
+			   A.Count == B.Count;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Comparison operator between ModioFilterParams elements
+	 */
+	MODIO_API friend bool operator!=(const FModioFilterParams& A, const FModioFilterParams& B)
+	{
+		return !(A == B);
+	}
+
 public:
 	friend class Modio::FilterParams ToModio(const FModioFilterParams& In);
 
@@ -256,6 +294,7 @@ public:
 };
 
 /**
+ * @docpublic
  * @brief Helper struct for named preset filter parameters
  */
 USTRUCT(BlueprintType)
@@ -263,24 +302,53 @@ struct MODIO_API FModioPresetFilterParams
 {
 	GENERATED_BODY()
 
+	/**
+	 * @docpublic
+	 * @brief Preset name
+	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	FText PresetName;
 
+	/**
+	 * @docpublic
+	 * @brief List of tags to filter on
+	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	TArray<FString> Tags;
 
+	/**
+	 * @docpublic
+	 * @brief List of tags to exclude from filtering
+	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	TArray<FString> ExcludedTags;
 
+	/**
+	 * @docpublic
+	 * @brief Sorting direction (default is ascending)
+	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	EModioSortDirection Direction = EModioSortDirection::Ascending;
 
+	/**
+	 * @docpublic
+	 * @brief Field to use for sorting (default is ID)
+	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	EModioSortFieldType SortField = EModioSortFieldType::ID;
 
+	/**
+	 * @docpublic
+	 * @brief Number of results to return
+	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	int64 Count = 20;
 
+	/**
+	 * @docpublic
+	 * @brief Converts the preset filter into actual filter parameters
+	 * @return The converted filter parameters
+	 */
 	FModioFilterParams ToFilterParams() const
 	{
 		return FModioFilterParams()
@@ -292,6 +360,7 @@ struct MODIO_API FModioPresetFilterParams
 };
 
 /**
+ * @docpublic
  * @brief Blueprint library for working with preset filter parameters
  */
 UCLASS()
@@ -301,6 +370,7 @@ class MODIO_API UModioPresetFilterParamsLibrary : public UBlueprintFunctionLibra
 
 protected:
 	/**
+	 * @docpublic
 	 * @brief Converts a preset filter into a concrete set of filter parameters that can be passed to the mod.io plugin
 	 * @param Preset The preset to convert
 	 * @return The converted filter params

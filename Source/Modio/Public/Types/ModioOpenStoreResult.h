@@ -13,8 +13,9 @@
 #include "ModioOpenStoreResult.generated.h"
 
 /**
+ * @docpublic
  * @brief Enumerator of potential results on attempting to open a native platform store
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioOpenStoreResult : uint8
 {

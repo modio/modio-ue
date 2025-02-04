@@ -20,14 +20,15 @@ namespace Modio
 struct FModioModCreationHandle;
 
 /**
-* Struct type to store the handle when a new mod is created
-**/
+ * @docpublic
+ * @brief Struct type to store the handle when a new mod is created
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModCreationHandle
 {
 	GENERATED_BODY()
 
-	private:
+private:
 	int64 Underlying;
 	friend FModioModCreationHandle ToUnreal(const Modio::ModCreationHandle& In);
 	friend Modio::ModCreationHandle ToModio(const FModioModCreationHandle& In);

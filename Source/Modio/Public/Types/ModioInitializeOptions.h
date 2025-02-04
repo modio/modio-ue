@@ -17,41 +17,63 @@
 #include "ModioInitializeOptions.generated.h"
 
 /**
- * Struct type to store the initialization options used by the mod.io SDK
- **/
+ * @docpublic
+ * @brief Struct type to store the initialization options used by the mod.io SDK
+ */
 USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeInitializeOptions"))
 struct MODIO_API FModioInitializeOptions
 {
 	GENERATED_BODY()
 
-	/** @brief The mod.io-provided ID for the game */
+	/**
+	 * @docpublic
+	 * @brief The mod.io-provided ID for the game
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io", meta = (ShowOnlyInnerProperties))
 	FModioGameID GameId = FModioGameID::InvalidGameID();
 
-	/** @brief The mod.io-provided API key for your application or game */
+	/**
+	 * @docpublic
+	 * @brief The mod.io-provided API key for your application or game
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io", meta = (ShowOnlyInnerProperties))
 	FModioApiKey ApiKey = FModioApiKey::InvalidAPIKey();
 
-	/** @brief The mod.io environment you want to run the SDK on */
+	/**
+	 * @docpublic
+	 * @brief The mod.io environment you want to run the SDK on
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	EModioEnvironment GameEnvironment = EModioEnvironment::Test;
 
-	/** @brief The portal your title is running through */
+	/**
+	 * @docpublic
+	 * @brief The portal your title is running through
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	EModioPortal PortalInUse = EModioPortal::None;
 
-	/** @brief Extended platform-specific initialization parameters. Refer to the platform documentation for valid keys
-	 * and their values. Unrecognized values will be ignored */
+	/**
+	 * @docpublic
+	 * @brief Extended platform-specific initialization parameters. Refer to the platform documentation for valid keys
+	 * and their values. Unrecognized values will be ignored
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	TMap<FString, FString> ExtendedInitializationParameters;
 
-	/** @brief Set mod.io to run with background thread*/
+	/**
+	 * @docpublic
+	 * @brief Set mod.io to run with background thread
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "mod.io")
 	bool bUseBackgroundThread = false;
 
-	/// @brief String representing the local session. We recommend setting this to a unique per-user string.
-	/// On Windows, defaults to the string SID of the current logged-in Windows account.
-	/// On non-desktop platforms, this needs to be set by gameplay code before passing `FModioInitializeOptions` to
-	/// `InitializeAsync`
+	/**
+	 * @docpublic
+	 * @brief String representing the local session. We recommend setting this to a unique per-user string.
+	 * On Windows, defaults to the string SID of the current logged-in Windows account.
+	 * On non-desktop platforms, this needs to be set by gameplay code before passing `FModioInitializeOptions` to
+	 * `InitializeAsync`
+	 */
 	TOptional<FString> LocalSessionIdentifier;
 };

@@ -84,25 +84,30 @@ static FString ToString(EFileSizeUnit Unit)
 	}
 }
 
-EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit(int64 FileSize)
+EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64 FileSize)
 {
-	if (FileSize > GB)
+	if (FileSize.Underlying > GB)
 	{
 		return EFileSizeUnit::GB;
 	}
-	if (FileSize > MB)
+	if (FileSize.Underlying > MB)
 	{
 		return EFileSizeUnit::MB;
 	}
-	if (FileSize > KB)
+	if (FileSize.Underlying > KB)
 	{
 		return EFileSizeUnit::KB;
 	}
 	return EFileSizeUnit::B;
 }
 
-FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals/* = 0*/, int32 MaxDecimals /** = 2*/,
-										  EFileSizeUnit Unit /**= EFileSizeUnit::Largest*/, bool bIncludeUnitName /**= true*/)
+EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit(int64 FileSize)
+{
+	return UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64(FileSize));
+}
+
+FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, int32 MinDecimals, int32 MaxDecimals,
+													EFileSizeUnit Unit, bool bIncludeUnitName)
 {
 	static const int32 KB = 1024;
 	static const int32 MB = 1024 * 1024;
@@ -110,7 +115,7 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals/* = 
 
 	if (Unit == EFileSizeUnit::Largest)
 	{
-		Unit = GetDesiredFileSizeUnit(FileSize);
+		Unit = GetDesiredFileSizeUnit(FileSize.Underlying);
 	}
 
 	const double InNewUnit = FileSize / static_cast<double>(Unit);
@@ -126,12 +131,20 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals/* = 
 	Args.Add("Unit", bIncludeUnitName ? FText::FromString(ToString(Unit)) : FText::GetEmpty());
 	FText FormatString = FText::FromString(TEXT("{Number}{Unit}"));
 #if UE_VERSION_OLDER_THAN(5, 5, 0)
-	FText::FindText(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString) ;
+	FText::FindText(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString);
 #else
-	FText::FindTextInLiveTable_Advanced(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString);
+	FText::FindTextInLiveTable_Advanced(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"),
+										FormatString);
 #endif
 
 	return FText::Format(FormatString, Args);
+}
+
+FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals /* = 0*/,
+										  int32 MaxDecimals /** = 2*/,
+										  EFileSizeUnit Unit /**= EFileSizeUnit::Largest*/, bool bIncludeUnitName /**= true*/)
+{
+	return UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64(FileSize), MinDecimals, MaxDecimals, Unit, bIncludeUnitName);
 }
 
 bool UModioSDKLibrary::IsValidEmailAddressFormat(const FString& String)

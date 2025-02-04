@@ -16,6 +16,8 @@
 #include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
+template const TArray<FModioModTagInfo>& FModioList<TArray, FModioModTagInfo>::GetRawList() const;
+
 FModioModTagOptions::FModioModTagOptions(const Modio::ModTagOptions& ModTagList)
 	: FModioPagedResult(ModTagList)
 //    FModioList(ToUnrealList<TArray, FModioModTagInfo>(ModInfoList))

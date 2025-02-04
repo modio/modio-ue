@@ -10,6 +10,7 @@
 
 #include "ModioEditorSettings.h"
 
+#include "Interfaces/IPluginManager.h"
 #include "Objects/ModioOpenSettingsAction.h"
 #include "Objects/ModioOpenWeblinkAction.h"
 
@@ -43,9 +44,19 @@ UModioEditorSettings::UModioEditorSettings(const FObjectInitializer& Initializer
 		UModioOpenWeblinkAction::StaticClass(), "https://discord.mod.io"));
 	GettingStartedEntries.Add(FModioGettingStartedEntry(
 		true, LOCTEXT("RestApiEntryName", "REST API Documentation"),
-		LOCTEXT("RestApiEntryDescription", "Documentation for our low-level REST API "),
+		LOCTEXT("RestApiEntryDescription", "Documentation for our low-level REST API"),
 		TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Modio/GettingStarted/T_api_D.T_api_D")),
 		UModioOpenWeblinkAction::StaticClass(), "https://docs.mod.io/restapiref/"));
+
+	const TSharedPtr<IPlugin> ComponentUIPlugin = IPluginManager::Get().FindPlugin("ModioComponentUI");
+	if (!ComponentUIPlugin.IsValid() || !ComponentUIPlugin->IsEnabled())
+	{
+		GettingStartedEntries.Add(FModioGettingStartedEntry(
+			true, LOCTEXT("DownloadComponentUIName", "Download Component UI"),
+			LOCTEXT("DownloadComponentUIDescription", "Download the mod.io Component UI Plugin for building custom UGC Browser UIs"),
+			TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Modio/GettingStarted/T_modbrowser_D.T_modbrowser_D")),
+			UModioOpenWeblinkAction::StaticClass(), "https://github.com/modio/modio-ue-component-ui"));
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -35,6 +35,7 @@
 #include "Internal/Convert/ModTagOptions.h"
 #include "Internal/Convert/Rating.h"
 #include "Internal/Convert/ReportParams.h"
+#include "Internal/Convert/StorageInfo.h"
 #include "Internal/Convert/Terms.h"
 #include "Internal/Convert/TransactionRecord.h"
 #include "Internal/Convert/User.h"
@@ -927,6 +928,16 @@ TMap<FModioModID, FModioModCollectionEntry> UModioSubsystem::QuerySystemInstalla
 	return ToUnreal<FModioModID, FModioModCollectionEntry>(Modio::QuerySystemInstallations());
 }
 
+FModioStorageInfo UModioSubsystem::QueryStorageInfo()
+{
+	return ToUnreal(Modio::QueryStorageInfo());
+}
+
+FModioStorageInfo UModioSubsystem::K2_QueryStorageInfo()
+{
+	return QueryStorageInfo();
+}
+
 void UModioSubsystem::ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::ForceUninstallModAsync(ToModio(ModToRemove), [Callback](FModioErrorCode ec) {
@@ -978,14 +989,52 @@ void UModioSubsystem::GetModDependenciesAsync(FModioModID ModID, bool Recursive,
 				FModioModDependencyList Out;
 				Out.InternalList = ToUnreal<FModioModDependency>(Dependencies->GetRawList());
 				Out.PagedResult = FModioPagedResult(Dependencies.value());
-				Out.TotalFilesize = Dependencies.value().TotalFilesize;
-				Out.TotalFilesizeUncompressed = Dependencies.value().TotalFilesizeUncompressed;
+				Out.TotalFilesize = FModioUnsigned64(Dependencies.value().TotalFilesize);
+				Out.TotalFilesizeUncompressed = FModioUnsigned64(Dependencies.value().TotalFilesizeUncompressed);
 				AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() { Callback.ExecuteIfBound(ec, Out); }));
 			}
 			else
 			{
 				AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ec, {}); }));
 			}
+		});
+}
+
+void UModioSubsystem::AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+											  FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::AddModDependenciesAsync(ToModio(ModID), ToModio(Dependencies),
+		[WeakThis = MakeWeakObjectPtr(this), Callback](Modio::ErrorCode ec) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, Callback, ec]() {
+				if (WeakThis.IsValid())
+				{
+					TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+					Callback.ExecuteIfBound(ToUnreal(ec));
+				}
+			}));
+		});
+}
+
+void UModioSubsystem::DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies, 
+	FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::DeleteModDependenciesAsync(ToModio(ModID), ToModio(Dependencies),
+		[WeakThis = MakeWeakObjectPtr(this), Callback](Modio::ErrorCode ec) {
+			if (!WeakThis.IsValid())
+			{
+				return;
+			}
+			AsyncTask(ENamedThreads::GameThread, ([WeakThis, Callback, ec]() {
+				if (WeakThis.IsValid())
+				{
+					TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+					Callback.ExecuteIfBound(ToUnreal(ec));
+				}
+			}));
 		});
 }
 
@@ -1003,6 +1052,20 @@ void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, bool Recursi
 									Callback.ExecuteIfBound(
 										ec, FModioOptionalModDependencyList(MoveTempIfPossible(Dependencies)));
 								}));
+}
+
+void UModioSubsystem::K2_AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+	FOnErrorOnlyDelegate Callback)
+{
+	AddModDependenciesAsync(ModID, Dependencies, FOnErrorOnlyDelegateFast::CreateWeakLambda(this,
+		[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+}
+
+void UModioSubsystem::K2_DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+	FOnErrorOnlyDelegate Callback)
+{
+	DeleteModDependenciesAsync(ModID, Dependencies, FOnErrorOnlyDelegateFast::CreateWeakLambda(this,
+		[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 void UModioSubsystem::SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params)

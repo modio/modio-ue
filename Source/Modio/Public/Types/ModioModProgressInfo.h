@@ -20,24 +20,29 @@ namespace Modio
 	class ModProgressInfo;
 }
 
+/**
+ * @docpublic
+ * @brief Enum representing the possible states of mod progress
+ */
 UENUM(BlueprintType)
 enum class EModioModProgressState : uint8
 {
-	// Download information is being retrieved from mod.io servers
+	/** Download information is being retrieved from mod.io servers */
 	Initializing, 
-	// Mod archive is downloading from mod.io servers
+	/** Mod archive is downloading from mod.io servers */
 	Downloading, 
-	// Mod archive is downloaded and now extracting
+	/** Mod archive is downloaded and now extracting */
 	Extracting, 
-	// Mod archive is being compressed from files on disk
+	/** Mod archive is being compressed from files on disk */
 	Compressing, 
-	// Mod archive is uploading to mod.io servers
+	/** Mod archive is uploading to mod.io servers */
 	Uploading 
 };
 
 /**
- * Strong type struct representing the progress of a mod installation or update
- **/
+ * @docpublic
+ * @brief Strong type struct representing the progress of a mod installation or update
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModProgressInfo
 {
@@ -45,22 +50,32 @@ struct MODIO_API FModioModProgressInfo
 
 	friend class UModioUIEditorPreviewDataLibrary;
 
-	/**
-	 * The mod ID of the mod being processed
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief The mod ID of the mod being processed
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "ModProgressInfo")
 	FModioModID ID;
 
+	/** 
+	 * @docpublic
+	 * @brief Get the current state of mod progress
+	 * @return Current state of the mod
+	 */
 	EModioModProgressState GetCurrentState() const
 	{
 		return CurrentState;
 	}
 
-	/// @brief Retrieves the progress value for the specified state. CurrentProgress == TotalProgress for states
-	/// which have completed, for example if a mod is currently Extracting, then passing in Downloading would give
-	/// you a value equal to the total download size
-	/// @param State which state to query progress information for
-	/// @return Modio::FileSize for current progress in bytes
+	/** 
+	 * @docpublic
+	 * @brief Retrieves the progress value for the specified state. 
+	 * CurrentProgress == TotalProgress for states which have completed. 
+	 * For example, if a mod is currently Extracting, passing in Downloading 
+	 * would give you a value equal to the total download size
+	 * @param State The state to query progress information for
+	 * @return Modio::FileSize for current progress in bytes
+	 */
 	FModioUnsigned64 GetCurrentProgress(EModioModProgressState State) const
 	{
 		switch (State)
@@ -78,9 +93,12 @@ struct MODIO_API FModioModProgressInfo
 		}
 	}
 
-	/// @brief Retrieves the total amount of progress required for the specified state.
-	/// @param State which state to query total progress for
-	/// @return Modio::FileSize for total progress in bytes
+	/** 
+	 * @docpublic
+	 * @brief Retrieves the total amount of progress required for the specified state
+	 * @param State The state to query total progress for
+	 * @return Modio::FileSize for total progress in bytes
+	 */
 	FModioUnsigned64 GetTotalProgress(EModioModProgressState State) const
 	{
 		switch (State)
@@ -117,15 +135,17 @@ private:
 };
 
 /**
- * Struct strong type to wrap an optional value for the ModProgressInfo
- **/
+ * @docpublic
+ * @brief Struct strong type to wrap an optional value for the ModProgressInfo
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModProgressInfo
 {
 	GENERATED_BODY()
 
-	/**
-	 * Stored property for the optional ModProgressInfo
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Stored property for the optional ModProgressInfo
+	 */
 	TOptional<FModioModProgressInfo> Internal;
 };

@@ -50,6 +50,11 @@ void UModioEditModLibrary::SetMaturityFlags(FModioEditModParams& In, EModioMatur
 	In.MaturityFlags = MaturityFlags;
 }
 
+void UModioEditModLibrary::SetCommunityOptionsFlags(FModioEditModParams& In, EModioModCommunityOptionsFlags CommunityOptionsFlags)
+{
+	In.CommunityOptionsFlags = CommunityOptionsFlags;
+}
+
 void UModioEditModLibrary::SetMetadataBlob(FModioEditModParams& In, FString MetadataBlob)
 {
 	In.MetadataBlob = MetadataBlob;

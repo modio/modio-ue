@@ -18,22 +18,32 @@
 #include "ModioGamePlatform.generated.h"
 
 /**
- * Details about a platform that a Game supports
+ * @docpublic
+ * @brief Details about a platform that a Game supports
  */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioGamePlatform
 {
 	GENERATED_BODY()
 
-	/** @brief A platform supported by a title */
+	/**
+	 * @docpublic
+	 * @brief A platform supported by a title
+	 */
 	UPROPERTY(BlueprintReadOnly, Category="mod.io|GamePlatform")
 	EModioModfilePlatform Platform = EModioModfilePlatform::Windows;
 
-	/** @brief Whether ot not this platform is locked from having files submitted to it by players */
+	/**
+	 * @docpublic
+	 * @brief Whether or not this platform is locked from having files submitted to it by players
+	 */
 	UPROPERTY(BlueprintReadOnly, Category="mod.io|GamePlatform")
 	bool Locked = false;
 
-	/** @brief Whether or not this platform's file submissions are moderated or not */
+	/**
+	 * @docpublic
+	 * @brief Whether or not this platform's file submissions are moderated
+	 */
 	UPROPERTY(BlueprintReadOnly, Category="mod.io|GamePlatform")
 	bool Moderated = false;
 };

@@ -15,43 +15,67 @@
 #include "ModioModTag.generated.h"
 
 /**
-* Strong type struct to wrap a Mod tag
-**/
+ * @docpublic
+ * @brief Strong type struct to wrap a Mod tag
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModTag
 {
 	GENERATED_BODY()
 
-	/**
-	* A string that represents a mod tag
-	**/
+	/** 
+	 * @docpublic
+	 * @brief A string that represents a mod tag
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModTag")
 	FString Tag;
 
-	/**
-	 * A localized tag string
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief A localized tag string
+	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModTag")
 	FText TagLocalized;
 
+	/** 
+	 * @docpublic
+	 * @brief Default constructor initializes Tag to an empty string and TagLocalized to an empty FText
+	 */
 	FModioModTag()
 	{
 		Tag = "";
 		TagLocalized = FText();
 	}
 
+	/** 
+	 * @docpublic
+	 * @brief Constructor that initializes Tag with the specified string, TagLocalized is empty
+	 * @param InTag The tag string
+	 */
 	FModioModTag(const FString& InTag)
 	{
 		Tag = InTag;
 		TagLocalized = FText();
 	}
 
+	/** 
+	 * @docpublic
+	 * @brief Constructor that initializes both Tag and TagLocalized with the specified values
+	 * @param InTag The tag string
+	 * @param InTagLoc The localized tag string
+	 */
 	FModioModTag(const FString& InTag, const FText& InTagLoc)
 	{
 		Tag = InTag;
 		TagLocalized = InTagLoc;
 	}
 
+	/** 
+	 * @docpublic
+	 * @brief Compares two FModioModTag objects for equality
+	 * @param Other Another FModioModTag object to compare against
+	 * @return True if both Tag values are equal, otherwise false
+	 */
 	bool operator==(const FModioModTag& Other) const
 	{
 		return Tag == Other.Tag;

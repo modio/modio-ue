@@ -15,36 +15,48 @@
 
 #include "ModioModChangeMap.generated.h"
 
+/**
+ * @docpublic
+ * @brief Strong type struct to wrap mod change information
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModChangeMap
 {
-	GENERATED_BODY();
+	GENERATED_BODY()
 
+	/**
+	 * @docpublic
+	 * @brief A map representing mod change types for each mod ID
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|ModChangeMap")
 	TMap<FModioModID, EModioModChangeType> Changes;
 };
 
 /**
- * Strong type struct to wrap a ModDependencyList data as an optional value
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap a ModDependencyList data as an optional value
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModChangeMap
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioOptionalModChangeMap() = default;
 
 	/**
-	 * Convenience constructor that has a list of mod dependencies
-	 * @param ModDependencies An optional value that contains mod dependencies
-	 **/
-	FModioOptionalModChangeMap(TOptional<FModioModChangeMap>&& ModDependencies) : Internal(MoveTemp(Internal)) {}
+	 * @docpublic
+	 * @brief Convenience constructor that has a list of mod changes
+	 * @param ModDependencies An optional value that contains mod change information
+	 */
+	FModioOptionalModChangeMap(TOptional<FModioModChangeMap>&& ModDependencies) : Internal(MoveTemp(ModDependencies)) {}
 
 	/**
-	 * Stored optional ModioModDependencyList
-	 **/
+	 * @docpublic
+	 * @brief Stored optional ModioModChangeMap
+	 */
 	TOptional<FModioModChangeMap> Internal;
 };

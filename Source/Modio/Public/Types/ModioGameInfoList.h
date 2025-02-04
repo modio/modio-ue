@@ -23,43 +23,52 @@ namespace Modio
 
 #if CPP
 /**
- * Struct to bring forward a native version of FModioGameInfoList
- **/
+ * @docpublic
+ * @brief Struct to bring forward a native version of FModioGameInfoList
+ */
 struct MODIO_API FModioGameInfoList : public FModioPagedResult, public FModioList<TArray, FModioGameInfo>
 {
-
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioGameInfoList() = default;
 
 	/**
-	 * Constructor that takes an array game info and a index of paged results
-	 **/
+	 * @docpublic
+	 * @brief Constructor that takes an array of game info and an index of paged results
+	 * @param PagedResult A paged result object
+	 * @param GameInfoList A list of game info to store
+	 */
 	FModioGameInfoList(const FModioPagedResult& PagedResult, TArray<FModioGameInfo>&& GameInfoList);
 
 	/**
-	 * Constructor that takes a game info list to store in this struct
-	 **/
+	 * @docpublic
+	 * @brief Constructor that takes a game info list to store in this struct
+	 * @param GameInfoList A Modio::GameInfoList object to wrap
+	 */
 	FModioGameInfoList(const class Modio::GameInfoList& GameInfoList);
 };
 
 #else
 /**
- * Strong type struct to wrap multiple GameInfo indexed by a paged result
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap multiple GameInfo indexed by a paged result
+ */
 USTRUCT(NoExport, BlueprintType)
 struct MODIO_API FModioGameInfoList
 {
+	GENERATED_BODY()
+
 	/**
-	 * A paged result property
-	 **/
+	 * @brief A paged result property
+	 */
 	UPROPERTY()
 	FModioPagedResult PagedResult;
 
 	/**
-	 * Arrray of game info
-	 **/
+	 * @brief Array of game info
+	 */
 	UPROPERTY()
 	TArray<FModioGameInfo> InternalList;
 };
@@ -67,26 +76,28 @@ struct MODIO_API FModioGameInfoList
 #endif
 
 /**
- * Struct to wrap GameInfoList into an optional parameter
- **/
+ * @docpublic
+ * @brief Struct to wrap GameInfoList into an optional parameter
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalGameInfoList
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @brief Default constructor without parameters
+	 */
 	FModioOptionalGameInfoList() = default;
 
 	/**
-	 * Constructor with a game info list parameter to initialize an instance
-	 * @param GameInfoList Optional value of a FModioModInfoList
-	 **/
+	 * @docpublic
+	 * @brief Constructor with a game info list parameter to initialize an instance
+	 * @param GameInfoList An optional value of a FModioGameInfoList
+	 */
 	FModioOptionalGameInfoList(TOptional<FModioGameInfoList>&& GameInfoList);
 
 	/**
-	 * Stored optional ModioGameInfoList
-	 **/
+	 * @brief Stored optional ModioGameInfoList
+	 */
 	TOptional<FModioGameInfoList> Internal;
 };

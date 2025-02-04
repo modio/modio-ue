@@ -9,11 +9,23 @@
  */
 
 #include "Types/ModioErrorCode.h"
+
+#include "Modio.h"
 #include "ModioSDK.h"
 
 FModioErrorCode::FModioErrorCode(Modio::ErrorCode ec)
 {
 	InternalError = MakeUnique<Modio::ErrorCode>(ec);
+	if (*this)
+	{
+		UE_LOG(LogModio, Warning, TEXT("ModioErrorCode created: \"%s\" | Message: \"%s\""),
+			*FString::FromInt(GetValue()), *GetErrorMessage());
+	}
+	else
+	{
+		UE_LOG(LogModio, Verbose, TEXT("ModioErrorCode created: \"%s\" | Message: \"%s\""),
+			*FString::FromInt(GetValue()), *GetErrorMessage());
+	}
 }
 
 FModioErrorCode::FModioErrorCode()

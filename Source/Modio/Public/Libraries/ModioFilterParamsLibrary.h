@@ -17,12 +17,17 @@
 
 #include "ModioFilterParamsLibrary.generated.h"
 
+/**
+ * @docpublic
+ * @brief Utility functions for creating filter parameters
+ */
 UCLASS()
 class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods with the specified author User ID
 	 * @param ID The User ID to filter on
 	 * @return *this
@@ -31,6 +36,7 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	static FModioFilterParams& MatchingAuthor(UPARAM(ref) FModioFilterParams& Filter, const FModioUserID& ID);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods with the specified author User IDs
 	 * @param IDs The list of User IDs to filter on
 	 * @return *this
@@ -39,6 +45,7 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	static FModioFilterParams& MatchingAuthors(UPARAM(ref) FModioFilterParams& Filter, const TArray<FModioUserID>& IDs);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates the filter should only include the specified mods
 	 * @param IDs the set of mods to match
 	 * @return *this
@@ -51,6 +58,7 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	}
 
 	/**
+	 * @docpublic
 	 * @brief Indicates the filter should exclude the specified mods.
 	 * @param IDs the set of mods to exclude
 	 * @return *this
@@ -63,108 +71,121 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	}
 
 	/**
+	 * @docpublic
 	 * @brief Indicates results should be sorted using the specified field and direction
 	 * @param ByField Field to sort with
 	 * @param ByDirection Direction to sort
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& SortBy(UPARAM(ref) FModioFilterParams& Filter, EModioSortFieldType ByField,
 									  EModioSortDirection ByDirection);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods where the name contains the provided string
 	 * @param SearchString Search string
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& NameContains(UPARAM(ref) FModioFilterParams& Filter, const FString& SearchString);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods where the name contains the provided strings
-	 * @param SearchString Search string
+	 * @param SearchStrings Search strings
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& NameContainsStrings(UPARAM(ref) FModioFilterParams& Filter,
 												   const TArray<FString>& SearchStrings);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that were marked live (i.e released) after the specified date
 	 * @param LiveAfter Minimum date
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& MarkedLiveAfter(UPARAM(ref) FModioFilterParams& Filter, FDateTime LiveAfter);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that were marked live (i.e released) before the specified date
 	 * @param LiveBefore Maximum date
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& MarkedLiveBefore(UPARAM(ref) FModioFilterParams& Filter, FDateTime LiveBefore);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that have the specified tag
 	 * @param Tag Tag to include
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& WithTag(UPARAM(ref) FModioFilterParams& Filter, const FString& Tag);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that have all the specified tags (tag1 AND tag2 AND tagN...)
 	 * @param NewTags The set of tags to filter on
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& WithTags(UPARAM(ref) FModioFilterParams& Filter, const TArray<FString>& NewTags);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that do not have the specified tag
 	 * @param Tag Tag to exclude
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& WithoutTag(UPARAM(ref) FModioFilterParams& Filter, const FString& Tag);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods that do not have any of the specified tags ( NOT (tag1 OR tag2 OR tagN...))
 	 * @param NewTags Tags to exclude
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& WithoutTags(UPARAM(ref) FModioFilterParams& Filter, const TArray<FString>& NewTags);
 
 	/**
+	 * @docpublic
 	 * @brief Returns a sub-range of query results from StartIndex to StartIndex + ResultCount
 	 * @param StartIndex Zero-based index of first result to return
 	 * @param ResultCount Number of results to return
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& IndexedResults(UPARAM(ref) FModioFilterParams& Filter, int64 StartIndex,
 											  int64 ResultCount);
 
 	/**
+	 * @docpublic
 	 * @brief Returns a sub-range of query results based on a specified page size and index
 	 * @param PageNumber Zero-based index of page to return
 	 * @param PageSize Number of results in a page
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& PagedResults(UPARAM(ref) FModioFilterParams& Filter, int64 PageNumber, int64 PageSize);
 
 	/**
+	 * @docpublic
 	 * @brief Only include mods with a metadata blob containing the specified substring
 	 * @param SearchString The substring to search for
 	 * @return *this
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& MetadataLike(UPARAM(ref) FModioFilterParams& Filter, FString SearchString);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates results should exclude all mods which contain mature content
 	 * @return *this
 	 */
@@ -172,6 +193,7 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 	static FModioFilterParams& DisallowMatureContent(UPARAM(ref) FModioFilterParams& Filter);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates results should be filtered by maturity options
 	 * @param ByMaturity Maturity flags to filter by
 	 * @return *this
@@ -182,10 +204,27 @@ class MODIO_API UModioFilterParamsLibrary : public UBlueprintFunctionLibrary
 														  int32 ByMaturity);
 
 	/**
+	 * @docpublic
 	 * @brief Indicates results should be filtered by revenue type (free, paid, both)
 	 * @param RevenueType Revenue type to filter by
 	 * @return *this
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Filter")
 	static FModioFilterParams& RevenueType(UPARAM(ref) FModioFilterParams& Filter, EModioRevenueFilterType RevenueType);
+
+	/**
+	 * @docpublic
+	 * @brief Compares two filter parameters to check whether they're equal
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities|Filter",
+			  meta = (CompactNodeTitle = "==", Keywords = "== equal", DisplayName = "ModioFilterParams == ModioFilterParams"))
+	static bool EqualTo(const FModioFilterParams& A, const FModioFilterParams& B);
+
+	/**
+	 * @docpublic
+	 * @brief Compares two filter parameters to check whether they're not equal
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities|Filter",
+			  meta = (CompactNodeTitle = "!=", Keywords = "!= not equal", DisplayName = "ModioFilterParams != ModioFilterParams"))
+	static bool NotEqualTo(const FModioFilterParams& A, const FModioFilterParams& B);
 };

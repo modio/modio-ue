@@ -30,6 +30,16 @@ void UModioCreateModLibrary::SetHomepageURL(FModioCreateModParams& In, FString H
 	In.HomepageURL = HomepageURL;
 }
 
+void UModioCreateModLibrary::SetMaturityFlags(FModioCreateModParams& In, EModioMaturityFlags MaturityFlags)
+{
+	In.MaturityFlags = MaturityFlags;
+}
+
+void UModioCreateModLibrary::SetCommunityOptionsFlags(FModioCreateModParams& In, EModioModCommunityOptionsFlags CommunityOptionsFlags)
+{
+	In.CommunityOptionsFlags = CommunityOptionsFlags;
+}
+
 void UModioCreateModLibrary::SetMetadataBlob(FModioCreateModParams& In, FString MetadataBlob)
 {
 	In.MetadataBlob = MetadataBlob;

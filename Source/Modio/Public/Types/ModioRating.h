@@ -13,8 +13,9 @@
 #include "ModioRating.generated.h"
 
 /**
-* Enumerator with the rating a mod can receive
-**/
+ * @docpublic
+ * @brief Enumerator with the rating a mod can receive
+ */
 UENUM(BlueprintType)
 enum class EModioRating : uint8
 {

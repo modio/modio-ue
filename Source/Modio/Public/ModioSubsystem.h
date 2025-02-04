@@ -43,6 +43,7 @@
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioRating.h"
 #include "Types/ModioReportParams.h"
+#include "Types/ModioStorageInfo.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioTransactionRecord.h"
 #include "Types/ModioUser.h"
@@ -166,7 +167,6 @@ class UModioSubsystem : public UEngineSubsystem
 	GENERATED_BODY()
 
 protected:
-
 	TUniquePtr<FModioBackgroundThread> BackgroundThread;
 
 	friend class UModioUISubsystem;
@@ -192,7 +192,6 @@ private:
 	FModioInitializeOptions CachedInitializeOptions;
 
 public:
-
 	FOnUserProfileUpdatedDelegate OnUserProfileUpdatedDelegate;
 
 	/** Begin USubsystem interface */
@@ -205,13 +204,22 @@ public:
 	/// displayed in this language during authentication.
 	FGetCurrentLanguageDelegate GetCurrentLanguage;
 
+	/**
+	 * @docpublic
+	 * @brief Returns if the background thread is being used or not
+	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io")
 	MODIO_API bool IsUsingBackgroundThread();
 
+	/**
+	 * @docpublic
+	 * @brief Kills the background thread if it is running
+	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io")
 	MODIO_API void KillBackgroundThread();
 
 	/**
+	 * @docpublic
 	 * @brief Initializes the SDK for the given user. Loads the state of all mods installed on the system as well as the
 	 * set of mods the specified user has installed on this device
 	 * @param InitializeOptions Parameters to the function packed as a struct where all members needs to be initialized
@@ -226,6 +234,7 @@ public:
 								   FOnErrorOnlyDelegateFast OnInitComplete);
 
 	/**
+	 * @docpublic
 	 * @brief Sets the global logging level.
 	 * @note This is a transient function, and won't be stored to disk. So at the next engine start, the log level will
 	 * be restored to the one in your `ModioRuntimeSettings`
@@ -236,6 +245,7 @@ public:
 	MODIO_API void SetLogLevel(EModioLogLevel UnrealLogLevel);
 
 	/**
+	 * @docpublic
 	 * @brief Runs any pending mod.io work on the calling thread and invokes any callbacks passed to asynchronous
 	 * operations.
 	 */
@@ -243,16 +253,18 @@ public:
 	MODIO_API void RunPendingHandlers();
 
 	/**
+	 * @docpublic
 	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with an
 	 *OperationCanceled error category. This function will NOT block while the deinitialization occurs.
 	 * @param OnShutdownComplete Callback invoked when the plugin is shut down and calling
 	 *[`RunPendingHandlers`](#run-pending-handlers) is no longer required
 	 * @requires initialized-sdk
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
-	 **/
+	 */
 	MODIO_API void ShutdownAsync(FOnErrorOnlyDelegateFast OnShutdownComplete);
 
 	/**
+	 * @docpublic
 	 * @brief If the last request to the mod.io servers returned a validation failure, this function returns extended
 	 * information describing the fields that failed validation.
 	 * @return Collection of `ModioValidationError` objects, or empty collection if there were no validation failures
@@ -262,6 +274,7 @@ public:
 	MODIO_API TArray<FModioValidationError> GetLastValidationError();
 
 	/**
+	 * @docpublic
 	 * @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
 	 * marks the mod for local installation by the SDK
 	 * @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
@@ -275,11 +288,12 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod does not exist or was deleted
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	MODIO_API void SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies,
 									   FOnErrorOnlyDelegateFast OnSubscribeComplete);
 
 	/**
+	 * @docpublic
 	 * @brief Sends a request to the mod.io server to remove the specified mod from the user's list of subscriptions.
 	 * If no other local users are subscribed to the specified mod, this function will also mark the mod for
 	 * uninstallation by the SDK.
@@ -293,11 +307,12 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod does not exist or was deleted
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	MODIO_API void UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 										   FOnErrorOnlyDelegateFast OnUnsubscribeComplete);
 
 	/**
+	 * @docpublic
 	 * @brief Synchronises the local list of the current user's subscribed mods with the server. Any mods that have
 	 * been externally subscribed will be automatically marked for installation, and mods that have been externally
 	 * removed from the user's subscriptions may be uninstalled if no other local users have a current subscription.
@@ -308,10 +323,11 @@ public:
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
-	 **/
+	 */
 	MODIO_API void FetchExternalUpdatesAsync(FOnErrorOnlyDelegateFast OnFetchDone);
 
 	/**
+	 * @docpublic
 	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows you
 	 * to identify which mods will be modified by the next call to
 	 * [`FetchExternalUpdatesAsync`](#fetchexternalupdatesasync) in order to perform any content management (such as
@@ -325,10 +341,11 @@ public:
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
-	 **/
+	 */
 	MODIO_API void PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegateFast OnPreviewDone);
 
 	/**
+	 * @docpublic
 	 * @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
 	 * @param Callback This callback handler will be invoked with a
 	 * [`ModioModManagementEvent`](#modiomodmanagementevent) for each mod operation performed by the SDK
@@ -341,20 +358,23 @@ public:
 	MODIO_API FModioErrorCode EnableModManagement(FOnModManagementDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Disables automatic installation or uninstallation of mods based on the user's subscriptions. Allows
 	 * currently processing installation to complete. Will cancel any pending operations when called.
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Mod Management")
 	MODIO_API void DisableModManagement();
 
 	/**
+	 * @docpublic
 	 * @brief Checks if the automatic management process is currently installing or removing mods
 	 * @return True if automatic management is currently performing an operation
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Mod Management")
 	MODIO_API bool IsModManagementBusy();
 
 	/**
+	 * @docpublic
 	 * @brief Cancels or suspends the current mod update, installation, or upload, and begins processing a pending
 	 * operation for the specified mod ID
 	 * @param ModToPrioritize The ID for the mod to prioritize
@@ -368,6 +388,7 @@ public:
 	MODIO_API FModioErrorCode PrioritizeTransferForMod(FModioModID ModToPrioritize);
 
 	/**
+	 * @docpublic
 	 * @brief Provides progress information for a mod installation or update operation if one is currently in progress.
 	 * @return Optional `ModioModProgressInfo` object containing information regarding the progress of the installation
 	 * operation.
@@ -375,6 +396,7 @@ public:
 	MODIO_API TOptional<FModioModProgressInfo> QueryCurrentModUpdate();
 
 	/**
+	 * @docpublic
 	 * @brief Fetches the local view of the user's subscribed mods, including mods that are subscribed but not
 	 * yet installed
 	 * @return `TMap<FModioID, FModioModCollectionEntry>` providing information about the subscribed
@@ -384,22 +406,25 @@ public:
 	MODIO_API const TMap<FModioModID, FModioModCollectionEntry>& QueryUserSubscriptions();
 
 	/**
+	 * @docpublic
 	 * @brief Fetches the subset of the user's subscribed mods that are installed and ready for loading
 	 * @param bIncludeOutdatedMods Include subscribed mods that are installed but have an updated version on the server
 	 * that has not yet been installed
 	 * @return `TMap<FModioID, FModioModCollectionEntry>` providing information about the subscribed
 	 * mods
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|User")
 	MODIO_API TMap<FModioModID, FModioModCollectionEntry> QueryUserInstallations(bool bIncludeOutdatedMods);
 
 	/**
+	 * @docpublic
 	 * @brief Fetches the currently authenticated mod.io user profile if there is one.
 	 * @return Optional [`ModioUser`](#modiouser) object containing profile information
-	 **/
+	 */
 	MODIO_API TOptional<FModioUser> QueryUserProfile();
 
 	/**
+	 * @docpublic
 	 * @brief Fetches all mods installed on the system, including those installed by other users.
 	 * @return A `TMap<FModioModID, FModioModCollectionEntry>` of all mods installed on the system, including those
 	 * installed by other users.
@@ -408,6 +433,15 @@ public:
 	MODIO_API TMap<FModioModID, FModioModCollectionEntry> QuerySystemInstallations();
 
 	/**
+	 * @docpublic
+	 * @brief Retrieves a snapshot of current storage related information such as space consumed by mod
+	 * installations and total available space
+	 * @return A `FModioStorageInfo` Structure containing storage information
+	 */
+	MODIO_API FModioStorageInfo QueryStorageInfo();
+
+	/**
+	 * @docpublic
 	 * @brief Provides a list of mods for the current game that match the parameters specified in the filter
 	 * @param Filter [`ModioFilterParams`](#modiofilterparams) object containing any filters that should be applied to
 	 * the query
@@ -420,6 +454,7 @@ public:
 	MODIO_API void ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Provides a list of games for the current user that match the parameters specified in the filter
 	 * @param Filter [`ModioFilterParams`](#modiofilterparams) object containing any filters that should be applied to
 	 * the query
@@ -434,6 +469,7 @@ public:
 	MODIO_API void ListUserGamesAsync(const FModioFilterParams& Filter, FOnListUserGamesDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Fetches detailed information about the specified game
 	 * @param GameID Game ID of the game data to fetch
 	 * @param Callback Callback providing a status code and an optional `ModioGameInfo` object with the game's extended
@@ -444,10 +480,11 @@ public:
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `EntityNotFoundError`|Specified game does not exist or was deleted
 	 * @errorcategory `InvalidArgsError`|The supplied game ID is invalid
-	 **/
+	 */
 	MODIO_API void GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Fetches detailed information about the specified mod, including description and file metadata for the
 	 * most recent release
 	 * @param ModId Mod ID of the mod to fetch data
@@ -459,10 +496,11 @@ public:
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `EntityNotFoundError`|Specified mod does not exist or was deleted
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	MODIO_API void GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Downloads the logo for the specified mod. Will use existing file if it is already present on disk
 	 * @param ModId Mod ID for use in logo retrieval
 	 * @param LogoSize Parameter indicating the size of logo that's required
@@ -475,7 +513,7 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod media does not exist or was deleted
 	 * @errorcategory `InsufficientSpace`|Not enough space for the file
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioLogoSize LogoSize, FOnGetMediaDelegateFast Callback);
 
 private:
@@ -483,6 +521,7 @@ private:
 
 public:
 	/**
+	 * @docpublic
 	 * @brief Get a gallery image for the specified mod ID. If it already exists on disk the file will be reused unless
 	 * it is outdated
 	 * @param ModId The mod you want to retrieve an image for
@@ -496,7 +535,7 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod media does not exist or was deleted
 	 * @errorcategory `InsufficientSpace`|Not enough space for the file
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 									FOnGetMediaDelegateFast Callback);
 
@@ -506,6 +545,7 @@ private:
 
 public:
 	/**
+	 * @docpublic
 	 * @brief Downloads the creator avatar for a specified mod. Will use existing file if it is already present on disk
 	 * and not outdated
 	 * @param ModId ID of the mod the creator avatar will be retrieved for
@@ -519,7 +559,7 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod media does not exist or was deleted
 	 * @errorcategory `InsufficientSpace`|Not enough space for the file
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
 
 private:
@@ -527,6 +567,7 @@ private:
 
 public:
 	/**
+	 * @docpublic
 	 * @brief Fetches the available tags used on mods for the current game. These tags can them be used in conjunction
 	 * with the [`ModioFilterParams`](#modiofilterparams) passed to [`ListAllModsAsync`](#listallmodsasync)
 	 * Will be cached when first received
@@ -536,10 +577,11 @@ public:
 	 * @requires no-rate-limiting
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
-	 **/
+	 */
 	MODIO_API void GetModTagOptionsAsync(FOnGetModTagOptionsDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
 	 * @param ModID The mod to retrieve dependencies for
 	 * @param Recursive Include child dependencies in a recursive manner to a maximum depth of 5.
@@ -551,11 +593,48 @@ public:
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
 	 * @experimental
-	 **/
+	 */
 	MODIO_API void GetModDependenciesAsync(FModioModID ModID, bool Recursive,
 										   FOnGetModDependenciesDelegateFast Callback);
+										   
+	/**
+	 * @brief Adds dependencies to a specified mod, linking it with other mods that are required for it to function
+	 * @param ModID The mod to add dependencies to
+	 * @param Dependencies List of mod dependencies to add
+	 * @param Callback Callback providing a status code to indicate if the dependencies were added successfully
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod could not be found
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 */
+	MODIO_API void AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+									  FOnErrorOnlyDelegateFast Callback);
 
 	/**
+	 * @brief Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
+	 * @param ModID The mod to delete dependencies from
+	 * @param Dependencies List of mod IDs to delete as dependencies
+	 * @param Callback Callback providing a status code to indicate if the dependencies were deleted successfully
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod could not be found
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 */
+	MODIO_API void DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+                                             FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
 	 * @brief Gets a new mod handle for use with [`SubmitNewModAsync`](#submitnewmodasync).
 	 * @returns New handle
 	 * @experimental
@@ -563,6 +642,7 @@ public:
 	MODIO_API FModioModCreationHandle GetModCreationHandle();
 
 	/**
+	 * @docpublic
 	 * @brief Requests the creation of a new mod on the server with the specified parameters
 	 * @param Handle The `ModioModCreationHandle` for this submission. Once this method invokes your callback indicating
 	 * success, the `ModioModCreationHandle` is invalid for the rest of the session and you should request a new one for
@@ -582,6 +662,7 @@ public:
 									 FOnSubmitNewModDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Queues the upload of a new modfile release for the specified mod using the submitted parameters. This
 	 * function takes an `ModioCreateModFileParams` object to specify the path to the root folder of the new modfile.
 	 * The plugin will compress the folder's contents into a .zip archive and queue the result for upload. When the
@@ -600,6 +681,7 @@ public:
 	MODIO_API void SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
 
 	/**
+	 * @docpublic
 	 * @brief Edits the parameters of a mod by updating any fields set in the `Params` object to match the passed-in
 	 * values. Fields left empty on the `Params` object will not be updated.
 	 * @param Mod The ID of the mod you wish to edit
@@ -619,6 +701,7 @@ public:
 										 FOnGetModInfoDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the
 	 * specified email address.
 	 * @param EmailAddress The email address to send the code to
@@ -628,10 +711,11 @@ public:
 	 * @requires no-authenticated-user
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
-	 **/
+	 */
 	MODIO_API void RequestEmailAuthCodeAsync(const FModioEmailAddress& EmailAddress, FOnErrorOnlyDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Completes email authentication for the current session by submitting the one-time code sent to the user's
 	 * email address
 	 * @param AuthenticationCode User's authentication code
@@ -644,11 +728,12 @@ public:
 	 * @errorcategory `UserAlreadyAuthenticatedError`|Current user is already authenticated. De-authenticate the current
 	 * user with [`ClearUserDataAsync`](#clearuserdataasync), and re-initialize the SDK by calling
 	 * [`ShutdownAsync`](#shutdownasync) followed by [`InitializeAsync`](#initializeasync).
-	 **/
+	 */
 	MODIO_API void AuthenticateUserEmailAsync(const FModioEmailAuthCode& AuthenticationCode,
 											  FOnErrorOnlyDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Uses platform-specific authentication to associate a mod.io user account with the current platform user
 	 * @param User Authentication payload data to submit to the provider.
 	 * @param Provider The provider to use to perform the authentication
@@ -664,7 +749,7 @@ public:
 	 * @errorcategory `UserAlreadyAuthenticatedError`|Current user is already authenticated. De-authenticate the current
 	 * user with [`ClearUserDataAsync`](#clearuserdataasync), and re-initialize the SDK by calling
 	 * [`ShutdownAsync`](#shutdownasync) followed by [`InitializeAsync`](#initializeasync).
-	 **/
+	 */
 	MODIO_API void AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
 												 EModioAuthenticationProvider Provider,
 												 FOnErrorOnlyDelegateFast Callback);
@@ -691,37 +776,39 @@ public:
 	 * @requires initialized-sdk
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
-	 **/
+	 */
 	MODIO_API void GetTermsOfUseAsync(FOnGetTermsOfUseDelegateFast Callback);
 
 	/**
 	 * @docpublic
 	 * @brief Set language to get corresponding data from the server
 	 * @param Locale Language to set
-	 **/
+	 */
 	MODIO_API void SetLanguage(EModioLanguage Locale);
 
 	/**
 	 * @docpublic
 	 * @brief Get the currently applied language
 	 * @return Current language
-	 **/
+	 */
 	MODIO_API EModioLanguage GetLanguage();
 
 	/**
+	 * @docpublic
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
 	 * stored on the current device. Any mods that do not have other local users subscribed will be uninstalled
 	 * @param Callback Callback providing a status code indicating the outcome of clearing the user data. Error codes
 	 * returned by this function are informative only - it will always succeed.
-	 **/
+	 */
 	MODIO_API void ClearUserDataAsync(FOnErrorOnlyDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Downloads the avatar of the currently authenticated user. Will only perform a download if there is no
 	 * local cache of the avatar or if that cached copy is out-of-date.
 	 * @param AvatarSize Parameter specifying the size of avatar image to download
 	 * @param Callback Callback providing a status code for the download and an optional path to the downloaded image
-	 **/
+	 */
 	MODIO_API void GetUserMediaAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegateFast Callback);
 
 	/**
@@ -735,7 +822,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	MODIO_API void PurchaseModAsync(FModioModID ModID, uint64 ExpectedPrice, FOnPurchaseModDelegateFast Callback);
 
 	/**
@@ -747,7 +834,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	MODIO_API void GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegateFast Callback);
 
 	/**
@@ -758,7 +845,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	MODIO_API void FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegateFast Callback);
 
 	/**
@@ -768,7 +855,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	MODIO_API void GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDelegateFast Callback);
 
 	/**
@@ -779,7 +866,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Monetization")
 	MODIO_API TMap<FModioModID, FModioModInfo> QueryUserPurchasedMods();
 
@@ -788,6 +875,7 @@ private:
 
 public:
 	/**
+	 * @docpublic
 	 * @brief Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a
 	 * rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this
 	 * user.
@@ -806,6 +894,7 @@ public:
 	MODIO_API void SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide
 	 * their contact name or details in the `Report` parameter, this data may be shared with the person responsible for
 	 * the content being reported. For more information on what data in a report will be shared with whom, please see
@@ -823,6 +912,7 @@ public:
 	struct FModioImageCache& GetImageCache() const;
 
 	/**
+	 * @docpublic
 	 * @brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
 	 * exist should you choose to restore it at a later date. Archiving is restricted to team managers and
 	 * administrators only. Note that restoration and permanent deletion of a mod is possible only via web interface.
@@ -841,6 +931,7 @@ public:
 	MODIO_API void ArchiveModAsync(FModioModID Mod, FOnErrorOnlyDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Forcibly uninstalls a mod from the system. This can be used when the host application requires additional
 	 * space for other mods. The current user must not be subscribed to the mod to force uninstall. To remove a mod the
 	 * current user is subscribed to, first use [`UnsubscribeFromModAsync`](#unsubscribefrommodasync). If the mod does
@@ -869,7 +960,7 @@ public:
 	 */
 	MODIO_API void MuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegateFast Callback);
 
-	/*
+	/**
 	 * @docpublic
 	 * @brief Unmute a user. This allows mod.io to display mods authored by the now unmuted user when performing
 	 * searches.
@@ -883,7 +974,7 @@ public:
 	 */
 	MODIO_API void UnmuteUserAsync(FModioUserID UserID, FOnErrorOnlyDelegateFast Callback);
 
-	/*
+	/**
 	 * @docpublic
 	 * @brief List all the users that have been muted by the current user.
 	 * @param Callback Callback providing a status code indicating success or failure of the operation, and an
@@ -896,6 +987,7 @@ public:
 	MODIO_API void GetMutedUsersAsync(FOnMuteUsersDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Provides a list of mods that the user has submitted or is a team member of for the current game,
 	 * applying the parameters specified in the filter.
 	 * @param Filter Filter to apply to listing the user's created mods.
@@ -910,6 +1002,7 @@ public:
 	MODIO_API void ListUserCreatedModsAsync(FModioFilterParams Filter, FOnListUserCreatedModsDelegateFast Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
 	 * requiring the SDK to be initialized.
 	 * @param GameID The `ModioGameID` of the game that we're fetching the default mod installation directory for.
@@ -918,6 +1011,7 @@ public:
 	static MODIO_API FString GetDefaultModInstallationDirectory(FModioGameID GameID);
 
 	/**
+	 * @docpublic
 	 * @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
 	 * requiring the SDK to be initialized. This overload takes an `int64` for the `GameID` param, allowing other
 	 * modules to execute this function via a delegate without depending on this module and the `ModioGameID` type.
@@ -928,6 +1022,7 @@ public:
 	static MODIO_API FString GetDefaultModInstallationDirectory(int64 GameID);
 
 	/**
+	 * @docpublic
 	 * @brief Install every temp mod specified by `ModIds` if not already installed.
 	 * @param ModIds TArray of `ModioModID`s to install as temp mods
 	 * @return Error code indicating the status of the `TempModSet`. Will be empty if it was successful
@@ -939,6 +1034,7 @@ public:
 	MODIO_API FModioErrorCode InitTempModSet(TArray<FModioModID> ModIds);
 
 	/**
+	 * @docpublic
 	 * @brief  Add mods to a temp mod set.  Every temp mod specified by `ModIds` will be installed if not already
 	 * installed.
 	 * @param ModIds TArray of `ModioModID`s to install as temp mods
@@ -953,6 +1049,7 @@ public:
 	MODIO_API FModioErrorCode AddToTempModSet(TArray<FModioModID> ModIds);
 
 	/**
+	 * @docpublic
 	 * @brief  Remove mods from a temp mod set.  Every temp mod specified by `ModIds` will be uninstalled unless the
 	 * user is already subscribed.
 	 * @param ModIds TArray of `ModioModID`s to remove as temp mods
@@ -967,6 +1064,7 @@ public:
 	MODIO_API FModioErrorCode RemoveFromTempModSet(TArray<FModioModID> ModIds);
 
 	/**
+	 * @docpublic
 	 * @brief  Uninstall every temp mod unless the user is subscribed.
 	 * @return Error code indicating the status of the `TempModSet`. Will be empty if it was successful
 	 * @requires initialized-sdk
@@ -979,6 +1077,7 @@ public:
 	MODIO_API FModioErrorCode CloseTempModSet();
 
 	/**
+	 * @docpublic
 	 * @brief	Query every system and temp mod in `TempModSet`
 	 * @return `TMap<FModioModID, FModioModCollectionEntry>` providing information about mods in `TempModSet`
 	 */
@@ -1091,6 +1190,7 @@ public:
 #pragma region Blueprint methods
 
 	/**
+	 * @docpublic
 	 * @brief Initializes the SDK for the given user. Loads the state of mods installed on the system as well as the
 	 * set of mods the specified user has installed on this device
 	 * @param InitializeOptions Parameters to the function packed as a struct where all members needs to be initialized
@@ -1107,6 +1207,7 @@ public:
 									  FOnErrorOnlyDelegate OnInitComplete);
 
 	/**
+	 * @docpublic
 	 * @brief Sends a request to the mod.io server to add the specified mod to the user's list of subscriptions, and
 	 * marks the mod for local installation by the SDK
 	 * @param ModToSubscribeTo Mod ID of the mod requiring a subscription.
@@ -1120,21 +1221,23 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod does not exist or was deleted
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubscribeToModAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies,
 										  FOnErrorOnlyDelegate OnSubscribeComplete);
 
 	/**
+	 * @docpublic
 	 * @brief Cancels any running internal operations, frees SDK resources, and invokes any pending callbacks with
 	 * an `OperationCanceled` error category. This function will NOT block while the deinitialization occurs.
 	 * @param OnShutdownComplete Callback invoked when the plugin is shut down and calling
 	 *[`RunPendingHandlers`](#run-pending-handlers) is no longer required
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ShutdownAsync", Category = "mod.io")
 	MODIO_API void K2_ShutdownAsync(FOnErrorOnlyDelegate OnShutdownComplete);
 
 	/**
+	 * @docpublic
 	 * @brief Sends a request to the mod.io server to remove the specified mod from the user's list of subscriptions.
 	 * If no other local users are subscribed to the specified mod this function will also mark the mod for
 	 * uninstallation by the SDK.
@@ -1148,21 +1251,23 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod does not exist or was deleted
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "UnsubscribeFromModAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
 											  FOnErrorOnlyDelegate OnUnsubscribeComplete);
 
 	/**
+	 * @docpublic
 	 * @brief Synchronises the local list of the current user's subscribed mods with the server. Any mods that have
 	 * been externally subscribed will be automatically marked for installation, and mods that have been externally
 	 * removed from the user's subscriptions may be uninstalled if no other local users have a current subscription.
 	 * @param OnFetchDone Callback invoked when the external state has been retrieved and merged with the local data
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "FetchExternalUpdatesAsync", Category = "mod.io|Mod Management")
 	MODIO_API void K2_FetchExternalUpdatesAsync(FOnErrorOnlyDelegate OnFetchDone);
 
 	/**
+	 * @docpublic
 	 * @brief Retrieve a list of updates between the users local mod state, and the server-side state. This allows
 	 * you to identify which mods will be modified by the next call to
 	 *[`FetchExternalUpdatesAsync`](#fetchexternalupdatesasync) in order to perform any content management (such as
@@ -1170,11 +1275,12 @@ public:
 	 * @param OnPreviewDone Callback invoked when the external state has been retrieved. It contains a dictionary with
 	 * ModID as keys and change maps as values. Empty when there are no differences between local and the mod.io API
 	 *service
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "PreviewExternalUpdatesAsync", Category = "mod.io|Mod Management")
 	MODIO_API void K2_PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegate OnPreviewDone);
 
 	/**
+	 * @docpublic
 	 * @brief Enables the automatic management of installed mods on the system based on the user's subscriptions.
 	 * @param Callback This callback handler will be invoked with a
 	 * [`ModioModManagementEvent`](#modiomodmanagementevent) for each mod operation performed by the SDK
@@ -1188,6 +1294,7 @@ public:
 	MODIO_API FModioErrorCode K2_EnableModManagement(FOnModManagementDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Provides progress information for a mod installation or update operation if one is currently in progress.
 	 * @return `ModioOptionalModProgressInfo` object containing information regarding the progress of the installation
 	 * operation.
@@ -1196,6 +1303,7 @@ public:
 	MODIO_API FModioOptionalModProgressInfo K2_QueryCurrentModUpdate();
 
 	/**
+	 * @docpublic
 	 * @brief Forcibly uninstalls a mod from the system. This can be used when the host application requires additional
 	 * space for other mods. The current user must not be subscribed to the mod to force uninstall. To remove a mod the
 	 * current user is subscribed to, first use [`UnsubscribeFromModAsync`](#unsubscribefrommodasync). If the mod does
@@ -1212,13 +1320,15 @@ public:
 	MODIO_API void K2_ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Fetches the currently authenticated mod.io user profile if there is one
 	 * @return `ModioOptionalUser` object containing profile information
-	 **/
+	 */
 	UFUNCTION(BlueprintPure, DisplayName = "QueryUserProfile", Category = "mod.io|User")
 	MODIO_API FModioOptionalUser K2_QueryUserProfile();
 
 	/**
+	 * @docpublic
 	 * @brief Provides a list of mods for the current game that match the parameters specified in the filter
 	 * @param Filter [`ModioFilterParams`](#modiofilterparams) object containing any filters that should be applied to
 	 * the query
@@ -1232,6 +1342,7 @@ public:
 	MODIO_API void K2_ListAllModsAsync(const FModioFilterParams& Filter, FOnListAllModsDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Provides a list of games for the current user that match the parameters specified in the filter
 	 * @param Filter [`ModioFilterParams`](#modiofilterparams) object containing any filters that should be applied to
 	 * the query
@@ -1247,6 +1358,7 @@ public:
 	MODIO_API void K2_ListUserGamesAsync(const FModioFilterParams& Filter, FOnListUserGamesDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Fetches detailed information about the specified game
 	 * @param GameID Game ID of the game data to fetch
 	 * @param Callback Callback providing a status code and an optional `ModioGameInfo` object with the game's extended
@@ -1257,11 +1369,12 @@ public:
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `EntityNotFoundError`|Specified game does not exist
 	 * @errorcategory `InvalidArgsError`|The supplied game ID is invalid
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetGameInfoAsync", Category = "mod.io|Game")
 	MODIO_API void K2_GetGameInfoAsync(FModioGameID GameID, FOnGetGameInfoDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Fetches detailed information about the specified mod, including description and file metadata for the
 	 * most recent release
 	 * @param ModId Mod ID of the mod to fetch data
@@ -1273,11 +1386,12 @@ public:
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `EntityNotFoundError`|Specified mod does not exist or was deleted
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModInfoAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModInfoAsync(FModioModID ModId, FOnGetModInfoDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Downloads the logo for the specified mod. Will use existing file if it is already present on disk
 	 * @param ModId Mod ID for use in logo retrieval
 	 * @param LogoSize Parameter indicating the size of logo that's required
@@ -1290,11 +1404,12 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod media does not exist or was deleted
 	 * @errorcategory `InsufficientSpace`|Not enough space for the file
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Logo)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaLogoAsync(FModioModID ModId, EModioLogoSize LogoSize, FOnGetMediaDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Get a gallery image for the specified mod ID. If it already exists on disk the file will be reused unless
 	 * it is outdated
 	 * @param ModId The mod you want to retrieve an image for
@@ -1308,12 +1423,13 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod media does not exist or was deleted
 	 * @errorcategory `InsufficientSpace`|Not enough space for the file
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Gallery Image)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaGalleryImageAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
 												   FOnGetMediaDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Downloads the creator avatar for a specified mod. Will use existing file if it is already present on disk
 	 * and not outdated
 	 * @param ModId ID of the mod the creator avatar will be retrieved for
@@ -1327,12 +1443,13 @@ public:
 	 * @errorcategory `EntityNotFoundError`|Specified mod media does not exist or was deleted
 	 * @errorcategory `InsufficientSpace`|Not enough space for the file
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Avatar)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaAvatarAsync(FModioModID ModId, EModioAvatarSize AvatarSize,
 											 FOnGetMediaDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Fetches the available tags used on mods for the current game. These tags can them be used in conjunction
 	 * with the FilterParams passed to [`ListAllModsAsync`](#listallmodsasync)
 	 * Will be cached when first received
@@ -1342,11 +1459,12 @@ public:
 	 * @requires no-rate-limiting
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModTagOptionsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModTagOptionsAsync(FOnGetModTagOptionsDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief For a given Mod ID, fetches a list of any mods that the creator has marked as dependencies
 	 * @param ModID The mod to retrieve dependencies for
 	 * @param Recursive Fetches dependencies recursively up to a depth of 5
@@ -1358,12 +1476,51 @@ public:
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
 	 * @experimental
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModDependenciesAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModDependenciesAsync(FModioModID ModID, bool Recursive,
 											  FOnGetModDependenciesDelegate Callback);
 
 	/**
+	 * @brief Adds dependencies to a specified mod, linking it with other mods that are required for it to function
+	 * @param ModID The mod to add dependencies to
+	 * @param Dependencies List of mod dependencies to add
+	 * @param Callback Callback providing a status code to indicate if the dependencies were added successfully
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod could not be found
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "AddModDependenciesAsync", Category = "mod.io|Authentication")
+	MODIO_API void K2_AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+										  FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @brief Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
+	 * @param ModID The mod to delete dependencies from
+	 * @param Dependencies List of mod IDs to delete as dependencies
+	 * @param Callback Callback providing a status code to indicate if the dependencies were deleted successfully
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @errorcategory EntityNotFoundError|Specified mod could not be found
+	 * @error UserDataError::InvalidUser|No authenticated user
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "DeleteModDependenciesAsync", Category = "mod.io|Authentication")
+	MODIO_API void K2_DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+                                          FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
 	 * @brief Begins email authentication for the current session by requesting a one-time code be sent to the
 	 * specified email address.
 	 * @param EmailAddress The email address to send the code to
@@ -1376,11 +1533,12 @@ public:
 	 * @errorcategory `UserAlreadyAuthenticatedError`|Current user is already authenticated. De-authenticate the current
 	 * user with [`ClearUserDataAsync`](#clearuserdataasync), and re-initialize the SDK by calling
 	 * [`ShutdownAsync`](#shutdownasync) then [`InitializeAsync`](#initializeasync).
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "RequestEmailAuthCodeAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_RequestEmailAuthCodeAsync(const FModioEmailAddress& EmailAddress, FOnErrorOnlyDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Completes email authentication for the current session by submitting the one-time code sent to the user's
 	 * email address
 	 * @param AuthenticationCode User's authentication code
@@ -1393,12 +1551,13 @@ public:
 	 * @errorcategory `UserAlreadyAuthenticatedError`|Current user is already authenticated. De-authenticate the current
 	 * user with [`ClearUserDataAsync`](#clearuserdataasync), and re-initialize the SDK by calling
 	 * [`ShutdownAsync`](#shutdownasync) then [`InitializeAsync`](#initializeasync).
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "AuthenticateUserEmailAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AuthenticateUserEmailAsync(const FModioEmailAuthCode& AuthenticationCode,
 												 FOnErrorOnlyDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Uses platform-specific authentication to associate a mod.io user account with the current platform user
 	 * @param User Authentication payload data to submit to the provider
 	 * @param Provider The provider to use to perform the authentication
@@ -1414,7 +1573,7 @@ public:
 	 * @errorcategory `UserAlreadyAuthenticatedError`|Current user is already authenticated. De-authenticate the current
 	 * user with [`ClearUserDataAsync`](#clearuserdataasync), and re-initialize the SDK by calling
 	 * [`ShutdownAsync`](#shutdownasync) followed by [`InitializeAsync`](#initializeasync).
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "AuthenticateUserExternalAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
 													EModioAuthenticationProvider Provider,
@@ -1437,13 +1596,14 @@ public:
 	MODIO_API void K2_VerifyUserAuthenticationAsync(FOnErrorOnlyDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief This function retrieves the information required for a game to display the mod.io terms of use to a
 	 *player who wishes to create a mod.io account
 	 * @param Callback Callback invoked with the terms of use data once retrieved from the server
 	 * @requires initialized-sdk
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetTermsOfUseAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_GetTermsOfUseAsync(FOnGetTermsOfUseDelegate Callback);
 
@@ -1451,7 +1611,7 @@ public:
 	 * @docpublic
 	 * @brief Set language to get corresponding data from the server
 	 * @param Locale Language to set
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SetLanguage", Category = "mod.io")
 	MODIO_API void K2_SetLanguage(EModioLanguage Locale);
 
@@ -1459,11 +1619,12 @@ public:
 	 * @docpublic
 	 * @brief Get the currently applied language
 	 * @return Current language
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetLanguage", Category = "mod.io")
 	MODIO_API EModioLanguage K2_GetLanguage();
 
 	/**
+	 * @docpublic
 	 * @brief De-authenticates the current mod.io user for the current session, and clears all user-specific data
 	 * stored on the current device. Any subscribed mods that are installed but do not have other local users
 	 * subscribed will be uninstalled
@@ -1474,11 +1635,12 @@ public:
 	 * @requires authenticated-user
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ClearUserDataAsync", Category = "mod.io|User")
 	MODIO_API void K2_ClearUserDataAsync(FOnErrorOnlyDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Downloads the avatar of the currently authenticated user. Will only perform a download if there is no
 	 * local cache of the avatar or if that cached copy is out-of-date.
 	 * @param AvatarSize Parameter specifying the size of avatar image to download
@@ -1489,11 +1651,12 @@ public:
 	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetUserMediaAsync (Avatar)", Category = "mod.io|User")
 	MODIO_API void K2_GetUserMediaAvatarAsync(EModioAvatarSize AvatarSize, FOnGetMediaDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Submits a rating for a mod on behalf of the current user. Submit a neutral rating to effectively clear a
 	 * rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this
 	 * user.
@@ -1513,6 +1676,7 @@ public:
 	MODIO_API void K2_SubmitModRatingAsync(FModioModID Mod, EModioRating Rating, FOnErrorOnlyDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Gets a new mod handle for use with [`SubmitNewModAsync`](#submitnewmodasync).
 	 * @returns New handle
 	 * @experimental
@@ -1521,6 +1685,7 @@ public:
 	MODIO_API FModioModCreationHandle K2_GetModCreationHandle();
 
 	/**
+	 * @docpublic
 	 * @brief Requests the creation of a new mod on the server with the specified parameters
 	 * @param Handle The `ModioModCreationHandle` for this submission. Once this method invokes your callback indicating
 	 * success, the `ModioModCreationHandle` is invalid for the rest of the session. You should request a new one for
@@ -1541,6 +1706,7 @@ public:
 										FOnSubmitNewModDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Queues the upload of a new modfile release for the specified mod using the submitted parameters. This
 	 * function takes an `ModioCreateModFileParams` object to specify the path to the root folder of the new modfile.
 	 * The plugin will compress the folder's contents into a .zip archive and queue the result for upload. When the
@@ -1560,6 +1726,7 @@ public:
 	MODIO_API void K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
 
 	/**
+	 * @docpublic
 	 * @brief Edits the parameters of a mod by updating any fields set in the `Params` object to match the passed-in
 	 * values. Fields left empty on the `Params` object will not be updated.
 	 * @param Mod The ID of the mod you wish to edit
@@ -1580,6 +1747,7 @@ public:
 											FOnGetModInfoDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Sends a content report to mod.io. When using this function, please inform your users that if they provide
 	 * their contact name or details in the `Report` parameter, this data may be shared with the person responsible for
 	 * the content being reported. For more information on what data in a report will be shared with whom, please see
@@ -1595,6 +1763,7 @@ public:
 	MODIO_API void K2_ReportContentAsync(FModioReportParams Report, FOnErrorOnlyDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Archives a mod. This mod will no longer be able to be viewed or retrieved via the SDK, but it will still
 	 * exist should you choose to restore it at a later date. Archiving is restricted to team managers and
 	 * administrators only. Note that restoration and permanent deletion of a mod is possible only via web interface.
@@ -1657,6 +1826,7 @@ public:
 	MODIO_API void K2_GetMutedUsersAsync(FOnMuteUsersDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Provides a list of mods that the user has submitted or is a team member of for the current game,
 	 * applying the parameters specified in the filter.
 	 * @param Filter Filter to apply when listing the user's created mods.
@@ -1673,6 +1843,7 @@ public:
 											   FOnListUserCreatedModsDelegate Callback);
 
 	/**
+	 * @docpublic
 	 * @brief Returns the default mod installation directory for this game and platform, ignoring overrides and without
 	 * requiring the SDK to be initialized.
 	 * @param GameID The `ModioGameID` of the game we're fetching the default mod installation directory for.
@@ -1682,6 +1853,7 @@ public:
 	static MODIO_API FString K2_GetDefaultModInstallationDirectory(FModioGameID GameID);
 
 	/**
+	 * @docpublic
 	 * @brief Install every temp mod specified by `ModIds` if not already installed.
 	 * @param ModIds TArray of `ModioModID`s to install as temp mods
 	 * @return Error code indicating the status of the `TempModSet`. Will be empty if it was successful
@@ -1694,6 +1866,7 @@ public:
 	MODIO_API FModioErrorCode K2_InitTempModSet(TArray<FModioModID> ModIds);
 
 	/**
+	 * @docpublic
 	 * @brief  Add mods to a Temp Mod Set.  Every temp mod specified by `ModIds` will be installed if not already
 	 * installed.
 	 * @param ModIds TArray of `ModioModID`s to install as temp mods
@@ -1709,6 +1882,7 @@ public:
 	MODIO_API FModioErrorCode K2_AddToTempModSet(TArray<FModioModID> ModIds);
 
 	/**
+	 * @docpublic
 	 * @brief  Remove mods from a temp mod set.  Every temp mod specified by `ModIds` will be uninstalled unless the
 	 * user is already subscribed.
 	 * @param ModIds TArray of `ModioModID`s to remove as temp mods
@@ -1724,6 +1898,7 @@ public:
 	MODIO_API FModioErrorCode K2_RemoveFromTempModSet(TArray<FModioModID> ModIds);
 
 	/**
+	 * @docpublic
 	 * @brief  Uninstall every temp mod unless the user is subscribed.
 	 * @return Error code indicating the status of the `TempModSet`. Will be empty if it was successful
 	 * @requires initialized-sdk
@@ -1737,6 +1912,7 @@ public:
 	MODIO_API FModioErrorCode K2_CloseTempModSet();
 
 	/**
+	 * @docpublic
 	 * @brief	Query every system and temp mod in `TempModSet`
 	 * @return TMap using `ModioModID` as keys and `ModioModCollectionEntry` objects providing information about mods
 	 * in `TempModSet`
@@ -1755,7 +1931,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "PurchaseModAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_PurchaseModAsync(FModioModID ModID, FModioUnsigned64 ExpectedPrice,
 									   FOnPurchaseModDelegate Callback);
@@ -1767,7 +1943,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetUserDelegationTokenAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDelegate Callback);
 
@@ -1780,7 +1956,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetUserWalletBalanceAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegate Callback);
 
@@ -1792,7 +1968,7 @@ public:
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
-	 **/
+	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "FetchUserPurchasesAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_FetchUserPurchasesAsync(FOnFetchUserPurchasesDelegate Callback);
 
@@ -1877,6 +2053,15 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "MetricsSessionEndAsync", Category = "mod.io|Metrics")
 	MODIO_API void K2_MetricsSessionEndAsync(FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Fetches storage related information, including total availability and how much is being consumed by mod
+	 * installations.
+	 * @return A `FModioStorageInfo` Structure containing storage information
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "QueryStorageInfo", Category = "mod.io|Storage Info")
+	MODIO_API FModioStorageInfo K2_QueryStorageInfo();
 
 #pragma endregion
 

@@ -19,8 +19,9 @@ namespace Modio
 }
 
 /**
-* Enumeration for the type of report that a mod can receive
-**/
+ * @docpublic
+ * @brief Enumeration for the type of report that a mod can receive
+ */
 UENUM(BlueprintType)
 enum class EModioReportType : uint8
 {
@@ -41,120 +42,138 @@ enum class EModioReportType : uint8
 	/** Other type of mod report */
 	Other = 7
 };
+
 ENUM_RANGE_BY_FIRST_AND_LAST(EModioReportType, EModioReportType::Generic, EModioReportType::Other);
 
 /**
-* Struct type to store the parameters used to report a mod
-**/
+ * @docpublic
+ * @brief Struct type to store the parameters used to report a mod
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioReportParams
 {
-	GENERATED_BODY();
-	
-    /**
-    * Default constructor without parameters
-    **/
+	GENERATED_BODY()
+	;
+
+	/**
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioReportParams();
 
-	/// @docpublic
-	/// @brief Creates a content report for a game.
-	/// @param Mod The ID of the content being reported
-	/// @param Type The nature of the content report
+	/** 
+	 * @docpublic
+	 * @brief Creates a content report for a game.
+	 * @param Mod The ID of the content being reported
+	 * @param Type The nature of the content report
+	 */
 	FModioReportParams(struct FModioModID Mod, EModioReportType Type);
 
-	/// @docpublic
-	/// @brief Creates a content report for a game.
-	/// @param Game The ID of the game being reported
-	/// @param Type The nature of the content report
-	/// @param ReportDescription A description of why the content is being reported
-	/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
-	/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
-	/// empty
+	/** 
+	 * @docpublic
+	 * @brief Creates a content report for a game.
+	 * @param Game The ID of the game being reported
+	 * @param Type The nature of the content report
+	 * @param ReportDescription A description of why the content is being reported
+	 * @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
+	 * @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be empty
+	 */
 	FModioReportParams(struct FModioGameID Game, EModioReportType Type, FString ReportDescription,
-							TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
+	                   TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
 
-	/// @docpublic
-	/// @brief Creates a content report for a game.
-	/// @param User The ID of the User being reported
-	/// @param Type The nature of the content report
-	/// @param ReportDescription A description of why the content is being reported
-	/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
-	/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
-	/// empty
+	/** 
+	 * @docpublic
+	 * @brief Creates a content report for a game.
+	 * @param User The ID of the User being reported
+	 * @param Type The nature of the content report
+	 * @param ReportDescription A description of why the content is being reported
+	 * @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
+	 * @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be empty
+	 */
 	FModioReportParams(struct FModioUserID User, EModioReportType Type, FString ReportDescription,
-							TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
+	                   TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
 
-	/// @docpublic
-	/// @brief Creates a content report for a game.
-	/// @param Mod The ID of the content being reported
-	/// @param Type The nature of the content report
-	/// @param ReportDescription A description of why the content is being reported
-	/// @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
-	/// @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be
-	/// empty
+	/** 
+	 * @docpublic
+	 * @brief Creates a content report for a game.
+	 * @param Mod The ID of the content being reported
+	 * @param Type The nature of the content report
+	 * @param ReportDescription A description of why the content is being reported
+	 * @param ReporterName Name of the submitting user. Recommended for DMCA reports, but may be empty
+	 * @param ReporterContact Contact details of the submitting user. Recommended for DMCA reports, but may be empty
+	 */
 	FModioReportParams(struct FModioModID Mod, EModioReportType Type, FString ReportDescription,
-							TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
-	
-	/**
-	* Enumeration for a type of resource
-	**/
+	                   TOptional<FString> ReporterName, TOptional<FString> ReporterContact);
+
+	/** 
+	 * @docpublic
+	 * @brief Enumeration for a type of resource
+	 */
 	enum class ResourceType : uint8
 	{
-		/** Resource is a game **/
+		/** Resource is a game */
 		Game,
 
-		/** Resource is a mod **/
+		/** Resource is a mod */
 		Mod,
 
-		/** Resource is a user **/
+		/** Resource is a user */
 		User
 	};
 
-	/**
-	* Stored property to the resource type this report contains
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Stored property to the resource type this report contains
+	 */
 	ResourceType ReportedResourceType;
-	
-	/**
-	* Stored property for the resource ID
-	**/
+
+	/** 
+	 * @docpublic
+	 * @brief Stored property for the resource ID
+	 */
 	int64 ResourceID;
 
-	/**
-	* Stored property for the report type 
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Stored property for the report type 
+	 */
 	EModioReportType Type;
-	
-	/**
-	* Optional stored property of the reporter name
-	**/
+
+	/** 
+	 * @docpublic
+	 * @brief Optional stored property of the reporter name
+	 */
 	TOptional<FString> ReporterName;
 
-	/**
-	* Optional stored property of the reporter contact email
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Optional stored property of the reporter contact email
+	 */
 	TOptional<FString> ReporterContact;
 
-	/**
-	* Stored property for the report description
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Stored property for the report description
+	 */
 	FString ReportDescription;
 
-	/**
-    * Convenience constructor with the basic parameters
-	* @param ResourceID The ID for the resource to report
-	* @param ReportedResourceType The type of the resource
-	* @param Type What kind of report is
-	* @param ReportDescription Details of the report
-	* @param ReporterName Who is reporting this resource
-	* @param ReportContact How to contact the reporter
-    **/
+	/** 
+	 * @docpublic
+	 * @brief Convenience constructor with the basic parameters
+	 * @param ResourceID The ID for the resource to report
+	 * @param ReportedResourceType The type of the resource
+	 * @param Type What kind of report is
+	 * @param ReportDescription Details of the report
+	 * @param ReporterName Who is reporting this resource
+	 * @param ReporterContact How to contact the reporter
+	 */
 	FModioReportParams(int64 ResourceID, ResourceType ReportedResourceType, EModioReportType Type,
-				 FString ReportDescription, TOptional<FString> ReporterName,
-				 TOptional<FString> ReporterContact);
+	                   FString ReportDescription, TOptional<FString> ReporterName,
+	                   TOptional<FString> ReporterContact);
 
-	/**
-	* Bridge method to transform between FModio and Modio:: Report Params
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Bridge method to transform between FModio and Modio:: Report Params
+	 */
 	friend Modio::ReportParams ToModio(const FModioReportParams& In);
 };

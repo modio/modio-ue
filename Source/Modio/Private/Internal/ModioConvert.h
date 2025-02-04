@@ -22,6 +22,7 @@
 #include "Types/ModioModCollectionEntry.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModProgressInfo.h"
+#include "Types/ModioStorageInfo.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioTransactionRecord.h"
 #include "Types/ModioUser.h"
@@ -61,7 +62,8 @@ struct FModioGamePlatform ToUnreal(const Modio::GamePlatform& In);
 EModioModChangeType ToUnreal(const Modio::UserSubscriptionList::ChangeType& In);
 EModioLanguage ToUnreal(const Modio::Language& In);
 FEntitlementConsumptionStatus ToUnreal(const Modio::EntitlementConsumptionStatus& In);
-FModioEntitlementConsumptionVirtualCurrencyDetails ToUnreal(const Modio::EntitlementConsumptionVirtualCurrencyDetails& In);
+FModioEntitlementConsumptionVirtualCurrencyDetails ToUnreal(
+	const Modio::EntitlementConsumptionVirtualCurrencyDetails& In);
 FModioEntitlementWalletBalance ToUnreal(const Modio::EntitlementWalletBalance& In);
 EModioEntitlementConsumptionState ToUnreal(const Modio::EntitlementConsumptionState& In);
 EModioEntitlementType ToUnreal(const Modio::EntitlementType& In);
@@ -75,6 +77,8 @@ FModioTransactionRecord ToUnreal(const Modio::TransactionRecord& In);
 FModioModProgressInfo ToUnreal(const Modio::ModProgressInfo& In);
 EModioModProgressState ToUnreal(const Modio::ModProgressInfo::EModProgressState& In);
 FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In);
+FModioStorageInfo ToUnreal(const Modio::StorageInfo& In);
+EModioModCommunityOptionsFlags ToUnreal(const Modio::ModCommunityOptionsFlags& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
@@ -97,6 +101,9 @@ Modio::ModfilePlatform ToModio(EModioModfilePlatform Platform);
 Modio::Portal ToModio(EModioPortal Portal);
 Modio::Language ToModio(EModioLanguage Language);
 Modio::EntitlementParams ToModio(const FModioEntitlementParams& InParams);
+Modio::StorageLocation ToModio(EModioStorageLocation Location);
+Modio::StorageUsage ToModio(EModioStorageUsage Usage);
+Modio::ModCommunityOptionsFlags ToModio(EModioModCommunityOptionsFlags In);
 
 #pragma region ToModio implementation
 

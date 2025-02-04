@@ -16,23 +16,30 @@
 #include "ModioModInfoListLibrary.generated.h"
 
 
+/**
+ * @docpublic
+ * @brief Utility functions for accessing and managing lists of mod information
+ */
 UCLASS()
 class MODIO_API UModioModInfoListLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+public:
 	/**
-	 * Get the mods in a mod info list
-	 * @param ModInfoList
-	 * @return
+	 * @docpublic
+	 * @brief Retrieve the list of mods from the mod info list
+	 * @param ModInfoList The mod info list to retrieve the mods from
+	 * @return An array of FModioModInfo objects representing the mods in the list
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static const TArray<FModioModInfo>& GetMods(const FModioModInfoList& ModInfoList);
 
 	/**
-	 * Get the paged result that contains information of the data returned
-	 * @param ModInfoList
-	 * @return
+	 * @docpublic
+	 * @brief Retrieve paged result information for a mod info list
+	 * @param ModInfoList The mod info list to retrieve paged result information from
+	 * @return An FModioPagedResult containing metadata about the paginated data
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static const FModioPagedResult& GetPagedResult(const FModioModInfoList& ModInfoList);

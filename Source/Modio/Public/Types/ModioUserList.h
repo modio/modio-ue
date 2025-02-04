@@ -17,47 +17,56 @@
 #include "ModioUserList.generated.h"
 
 /**
- * Strong type struct to wrap multiple Users indexed by a paged result
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap multiple Users indexed by a paged result
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioUserList
 {
-	GENERATED_BODY();
+	GENERATED_BODY()
+	;
 
-	/**
-	 * A paged result property
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief A paged result property
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|UserList")
 	FModioPagedResult PagedResult;
 
-	/**
-	 * Internal array of users
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Internal array of users
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|UserList")
 	TArray<FModioUser> InternalList;
 };
 
 /**
- * Struct to wrap UserList into an optional parameter
- **/
+ * @docpublic
+ * @brief Struct to wrap UserList into an optional parameter
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalUserList
 {
-	GENERATED_BODY();
+	GENERATED_BODY()
+	;
 
-	/**
-	 * Default constructor without parameters
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioOptionalUserList() = default;
 
-	/**
-	 * Constructor with a user list parameter to initialize an instance
+	/** 
+	 * @docpublic
+	 * @brief Constructor with a user list parameter to initialize an instance
 	 * @param UserList Optional value of a FModioUserList
-	 **/
+	 */
 	FModioOptionalUserList(TOptional<FModioUserList>&& UserList);
 
-	/**
-	 * Stored optional ModioUserList
-	 **/
+	/** 
+	 * @docpublic
+	 * @brief Stored optional ModioUserList
+	 */
 	TOptional<FModioUserList> Internal;
 };

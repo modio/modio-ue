@@ -23,65 +23,75 @@ namespace Modio
 
 #if CPP
 /**
-* Strong type struct to wrap multiple ModTagInfo indexed by a paged result
-**/
+ * @docpublic
+ * @brief Strong type struct to wrap multiple ModTagInfo indexed by a paged result
+ */
 struct MODIO_API FModioModTagOptions : public FModioPagedResult, public FModioList<TArray, FModioModTagInfo>
 {
-	/**
-	* Default constructor without parameters
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioModTagOptions() = default;
 	
-	/**
-	* Copy constructor with a mod tag options parameter
-	* @param ModTagOptions Value that has mod tag options
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Copy constructor with a mod tag options parameter
+	 * @param ModInfoList Value that has mod tag options
+	 */
 	FModioModTagOptions(const Modio::ModTagOptions& ModInfoList);
 };
 
 #else
 /** 
-* Strong type struct to wrap multiple ModTagInfo indexed by a paged result
-**/
+ * @docpublic
+ * @brief Strong type struct to wrap multiple ModTagInfo indexed by a paged result
+ */
 USTRUCT(NoExport, BlueprintType)
 struct MODIO_API FModioModTagOptions
 {
-	/**
-	* Stored property to a paged result that indexes the current list of tag info
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Stored property to a paged result that indexes the current list of tag info
+	 */
 	UPROPERTY()
 	FModioPagedResult PagedResult;
 
-	/**
-	* List wrapping multiple mod tag info 
-	**/
+	/** 
+	 * @docpublic
+	 * @brief List wrapping multiple mod tag info
+	 */
 	UPROPERTY()
 	TArray<FModioModTagInfo> InternalList;
 };
 
 #endif
 
-/**
-* Strong type struct that wraps mod tag options in a optional value
-**/
+/** 
+ * @docpublic
+ * @brief Strong type struct that wraps mod tag options in an optional value
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModTagOptions
 {
 	GENERATED_BODY()
 
-	/**
-	* Default constructor without parameters
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioOptionalModTagOptions() = default;
 	
-	/**
-	* Constructor with mod tag options parameter
-	* @param ModTagOptions An optional value that has mod tag options
-	**/
+	/** 
+	 * @docpublic
+	 * @brief Constructor with mod tag options parameter
+	 * @param ModTagOptions An optional value that has mod tag options
+	 */
 	FModioOptionalModTagOptions(TOptional<FModioModTagOptions>&& ModTagOptions);
 
-	/**
-	* The stored property of mod tag options
-	**/
+	/** 
+	 * @docpublic
+	 * @brief The stored property of mod tag options
+	 */
 	TOptional<FModioModTagOptions> Internal;
 };

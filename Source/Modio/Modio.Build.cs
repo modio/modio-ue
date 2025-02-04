@@ -32,6 +32,17 @@ public class Modio : ModuleRules
     {
         return bDevelopmentModeOverride || File.Exists(Path.Combine(PluginDirectory, "../../.modio_development_mode"));
     }
+	private void ConditionalAddModuleDirectoryChecked(string DirectoryPath)
+	{
+		if (Directory.Exists(DirectoryPath))
+		{
+			ConditionalAddModuleDirectory(new DirectoryReference(DirectoryPath));
+		}
+		else
+		{
+			throw new BuildException("Required directory is missing. Is MODIO_DEVELOPMENT_MODE needed but not set?");
+		}
+	}
     private void ApplyProjectDefinitions(ReadOnlyTargetRules Target)
     {
         if (Target.ProjectDefinitions.Contains("MODIO_DEVELOPMENT_MODE"))
@@ -390,7 +401,7 @@ public class Modio : ModuleRules
 
     private void AddCommonGeneratedSource(string GeneratedSourcePath)
     {
-        ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedSourcePath, "core")));
+        ConditionalAddModuleDirectoryChecked(Path.Combine(GeneratedSourcePath, "core"));
     }
 
     private void AddCommonHeaderPaths(string GeneratedHeaderPath)
@@ -398,7 +409,7 @@ public class Modio : ModuleRules
         PublicIncludePaths.AddRange(new string[] {
                 Path.Combine(GeneratedHeaderPath, "Public") 
                 });
-        ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedHeaderPath, "Public")));
+        ConditionalAddModuleDirectoryChecked(Path.Combine(GeneratedHeaderPath, "Public"));
         // Add common private includes from the Native SDK
         PrivateIncludePaths.AddRange(new string[]
         {
@@ -445,7 +456,7 @@ public class Modio : ModuleRules
         foreach (string PlatformPath in Config.PlatformSourceFolderNames)
         {
             string RootPlatformName = PlatformPath.Replace('/', Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar).First();
-            ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedSourcePath, RootPlatformName)));
+            ConditionalAddModuleDirectoryChecked(Path.Combine(GeneratedSourcePath, RootPlatformName));
 
 #if ENABLE_TRACE_LOG
             InternalLog("Adding native platform source directory " + Path.Combine(GeneratedSourcePath, RootPlatformName));

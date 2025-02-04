@@ -17,12 +17,17 @@
 
 #include "ModioCommonTypesLibrary.generated.h"
 
+/**
+ * @docpublic
+ * @brief Utility functions for working with mod.io types
+ */
 UCLASS()
 class MODIO_API UModioCommonTypesLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
 	/**
+	 * @docpublic
 	 * @brief Create a game id from a integer. Should only be used in conjunction with
 	 * [`InitializeAsync`](#initializeasync)
 	 * @param GameId A positive integer that maps to your game
@@ -31,6 +36,7 @@ public:
 	static FModioGameID MakeGameId(int64 GameId);
 
 	/**
+	 * @docpublic
 	 * @brief Converts a game id to a string for debugging purposes
 	 * @param GameId Input Game Id
 	 * @return Empty if invalid
@@ -41,6 +47,7 @@ public:
 	static FString Conv_GameIDToString(FModioGameID GameId);
 
 	/**
+	 * @docpublic
 	 * @brief Creates a `ModioAuthenticationParams` object
 	 * @param AuthToken Authentication provider-supplied OAuth token
 	 * @param EmailAddress User email address, can be left blank
@@ -53,6 +60,7 @@ public:
 													 const bool bHasAcceptedTOS);
 
 	/**
+	 * @docpublic
 	 * @brief Create an ApiKey id from a string. Should only be used in conjunction with
 	 * [`InitializeAsync`](#initializeasync)
 	 * @param ApiKey The api key from your settings panel on mod.io
@@ -61,6 +69,7 @@ public:
 	static FModioApiKey MakeApiKey(const FString ApiKey);
 
 	/**
+	 * @docpublic
 	 * @brief Converts a `ModioApiKey` to a string for debugging purposes
 	 * @param ApiKey Input Api Key
 	 * @return Empty if invalid
@@ -71,6 +80,7 @@ public:
 	static FString Conv_ApiKeyToString(FModioApiKey ApiKey);
 
 	/**
+	 * @docpublic
 	 * @brief Converts a `ModioModID` to a string for debugging purposes
 	 * @param ModID Input Mod ID
 	 * @return Empty if invalid
@@ -80,6 +90,7 @@ public:
 	static FString Conv_ModIDToString(FModioModID ModID);
 
 	/**
+	 * @docpublic
 	 * @brief Converts an `FileMetadataID` to a string for debugging purposes
 	 * @param FileMetadataID Input File metadata ID
 	 * @return Empty if invalid
@@ -90,6 +101,7 @@ public:
 	static FString Conv_FileMetadataIDToString(FModioFileMetadataID FileMetadataID);
 
 	/**
+	 * @docpublic
 	 * @brief Converts a `ModioUserID` to a string for debugging purposes
 	 * @param UserID User ID to convert
 	 * @return Empty if invalid
@@ -100,6 +112,7 @@ public:
 	static FString Conv_UserIDToString(FModioUserID UserID);
 
 	/**
+	 * @docpublic
 	 * @brief Converts a `ModioEmailAddress` string for debugging purposes
 	 * @param EmailAddress Email address to convert
 	 * @return Empty if invalid
@@ -110,6 +123,7 @@ public:
 	static FString Conv_EmailAddressToString(FModioEmailAddress EmailAddress);
 
 	/**
+	 * @docpublic
 	 * @brief Converts a `ModioEmailAuthCode` string for debugging purposes
 	 * @param EmailAuthCode Email auth code to convert
 	 * @return Empty if invalid
@@ -120,6 +134,7 @@ public:
 	static FString Conv_EmailAuthCodeToString(FModioEmailAuthCode EmailAuthCode);
 
 	/**
+	 * @docpublic
 	 * @brief Make an email address from a string
 	 * @param Email Input string to convert
 	 * @return FModioEmailAddress object
@@ -130,6 +145,7 @@ public:
 	static FModioEmailAddress Conv_StringToEmailAddress(const FString& Email);
 
 	/**
+	 * @docpublic
 	 * @brief Make an email auth code from a string
 	 * @param AuthCode Input string to convert
 	 * @return Auth code for submission
@@ -140,6 +156,7 @@ public:
 	static FModioEmailAuthCode Conv_StringToEmailAuthCode(const FString& AuthCode);
 
 	/**
+	 * @docpublic
 	 * @brief Make [`ModioInitializeOptions`](#modioinitializeoptions). Should only be used in conjunction with
 	 * [`InitializeAsync`](#initializeasync).
 	 * @param GameId - A positive integer that maps to your game.  This can be found in the admin section of your game's
@@ -157,6 +174,7 @@ public:
 	                                                     EModioPortal PortalInUse = EModioPortal::None, bool bUseBackgroundThread = true);
 
 	/**
+	 * @docpublic
 	 * @brief Changes the game id for the provided set of [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param Options - The template [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param GameId - The new game id to use
@@ -166,6 +184,7 @@ public:
 	static FModioInitializeOptions SetGameId(const FModioInitializeOptions& Options, int64 GameId);
 
 	/**
+	 * @docpublic
 	 * @brief Changes the API key for the provided set of [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param Options - The template [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param APIKey - The new API key to use
@@ -175,6 +194,7 @@ public:
 	static FModioInitializeOptions SetAPIKey(const FModioInitializeOptions& Options, const FString& APIKey);
 
 	/**
+	 * @docpublic
 	 * @brief Changes the game environment for the provided set of [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param Options - The template [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param GameEnvironment - The new environment to use
@@ -186,6 +206,7 @@ public:
 													  EModioEnvironment GameEnvironment);
 
 	/**
+	 * @docpublic
 	 * @brief Changes the portal for the provided set of [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param Options - The template [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param PortalToUse - The new portal to use
@@ -195,6 +216,7 @@ public:
 	static FModioInitializeOptions SetPortal(const FModioInitializeOptions& Options, EModioPortal PortalToUse);
 
 	/**
+	 * @docpublic
 	 * @brief Changes the background thread usage for the provided set of [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param Options - The template [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param bUseBackgroundThread - Whether to use a background thread
@@ -205,17 +227,19 @@ public:
 	static FModioInitializeOptions SetBackgroundThread(const FModioInitializeOptions& Options, bool bUseBackgroundThread);
 
 	/**
+	 * @docpublic
 	 * @brief Changes the session identifier for the provided set of [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param Options - The template [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param SessionIdentifier - The new session id to use
 	 * @return New [`ModioInitializeOptions`](#modioinitializeoptions) object with the session identifier set to the
-	 *desired value
-	 **/
+	 * desired value
+	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options,
 														const FString& SessionIdentifier);
 
 	/**
+	 * @docpublic
 	 * @brief Sets extended initialization parameters for the provided set of
 	 * [`ModioInitializeOptions`](#modioinitializeoptions)
 	 * @param Options - The template [`ModioInitializeOptions`](#modioinitializeoptions)
@@ -228,6 +252,7 @@ public:
 		const FModioInitializeOptions& Options, const TMap<FString, FString>& ExtendedParameters);
 
 	/**
+	 * @docpublic
 	 * @brief Retrieves the raw underlying value from an `ModioModID`. `ModioModID`s are intended as opaque types, so
 	 * use with care.
 	 * @param In The `ModioModID` to retrieve the value for
@@ -235,7 +260,9 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities")
 	static int64 GetRawValueFromModID(const FModioModID& In);
+	
 	/**
+	 * @docpublic
 	 * @brief Compares two mod IDs to check whether they're equal
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
@@ -243,6 +270,7 @@ public:
 	static bool EqualTo(const FModioModID& A, const FModioModID& B);
 
 	/**
+	 * @docpublic
 	 * @brief Compares two mod IDs to check whether they're not equal
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
@@ -250,6 +278,7 @@ public:
 	static bool NotEqualTo(const FModioModID& A, const FModioModID& B);
 
 	/**
+	 * @docpublic
 	 * @brief Create entitlement parameters
 	 * @param ExtendedParameters A map to store extended parameters required by some portals
 	 */
@@ -257,6 +286,7 @@ public:
 	static FModioEntitlementParams MakeEntitlementParams(const TMap<FString, FString>& ExtendedParameters);
 
 	/**
+	 * @docpublic
 	 * @brief Create Metrics Session parameters
 	 * @param Ids The list of mods to store within the Metrics Session parameters
 	 */
@@ -264,6 +294,7 @@ public:
 	static FModioMetricsSessionParams MakeMetricsSessionParams(const TArray<FModioModID>& Ids);
 
 	/**
+	 * @docpublic
 	 * @brief Create a Guid from a string
 	 * @param Guid A string to wrap within a Guid struct
 	 */
@@ -271,6 +302,7 @@ public:
 	static FModioGuid MakeGuid(const FString Guid);
 
 	/**
+	 * @docpublic
 	 * @brief Changes the session identifier for the provided Metrics Session parameters
 	 * @param Params The template Metrics Session parameters
 	 * @param Id The intended Guid to store in the Metrics Session parameters

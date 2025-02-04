@@ -18,29 +18,36 @@
 #include "ModioModProgressInfoLibrary.generated.h"
 
 /**
- *
+ * @docpublic
+ * @brief Utility functions for accessing and managing mod operation progress
  */
 UCLASS()
 class MODIO_API UModioModProgressInfoLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
+
 public:
 	/**
-	 * @brief Returns a EModioModProgressState indicating which state the mod operation is in
+	 * @docpublic
+	 * @brief Get the current state of the mod operation
 	 * @param Info The progress struct to query
+	 * @return An EModioModProgressState indicating the current state of the mod operation
 	 */
 	UFUNCTION(BlueprintPure, Category = "ModProgressInfo")
 	static EModioModProgressState GetCurrentState(const FModioModProgressInfo& Info)
 	{
 		return Info.GetCurrentState();
 	}
+
 	/**
-	 * @brief Retrieves the progress value for the specified state. `CurrentProgress == TotalProgress` for states
-	 * which have completed, for example if a mod is currently Extracting, then passing in Downloading would give
-	 * you a value equal to the total download size because the download has completed
-	 * @param Info the progress struct to query
-	 * @param State which state to query progress information for
-	 * @return FModioUnsigned64 containing current progress in bytes
+	 * @docpublic
+	 * @brief Retrieve the progress value for a specified state
+	 * If the state has completed, `CurrentProgress` will equal `TotalProgress`. For example, if a mod 
+	 * is currently in the Extracting state, querying progress for the Downloading state will return a value 
+	 * equal to the total download size because the download is complete.
+	 * @param Info The progress struct to query
+	 * @param State The state to query progress information for
+	 * @return An FModioUnsigned64 representing the current progress in bytes
 	 */
 	UFUNCTION(BlueprintPure, Category = "ModProgressInfo")
 	static FModioUnsigned64 GetCurrentProgress(const FModioModProgressInfo& Info, EModioModProgressState State)
@@ -49,10 +56,11 @@ public:
 	}
 
 	/**
-	 * @brief Retrieves the total amount of progress required for the specified state.
-	 * @param Info the progress struct to query
-	 * @param State which state to query total progress for
-	 * @return `Modio::FileSize` for total progress in bytes
+	 * @docpublic
+	 * @brief Retrieve the total amount of progress required for a specified state
+	 * @param Info The progress struct to query
+	 * @param State The state to query total progress for
+	 * @return An FModioUnsigned64 representing the total progress in bytes
 	 */
 	UFUNCTION(BlueprintPure, Category = "ModProgressInfo")
 	static FModioUnsigned64 GetTotalProgress(const FModioModProgressInfo& Info, EModioModProgressState State)

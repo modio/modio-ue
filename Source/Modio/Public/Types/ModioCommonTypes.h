@@ -28,7 +28,7 @@ namespace Modio
 
 /**
  * @brief Enum representing which environment the game is deployed to: `Test` or `Live`.
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioEnvironment : uint8
 {
@@ -41,7 +41,7 @@ enum class EModioEnvironment : uint8
 
 /**
  * @brief Enum representing the store or service your game is being distributed through
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioPortal : uint8
 {
@@ -59,7 +59,7 @@ enum class EModioPortal : uint8
 
 /**
  * @brief Enum representing a named platform that the plugin is running on.
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioPlatformName : uint8
 {
@@ -78,7 +78,7 @@ enum class EModioPlatformName : uint8
 
 /**
  * @brief Enum representing the platform(s) that a modfile is enabled for
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioModfilePlatform : uint8
 {
@@ -98,7 +98,7 @@ enum class EModioModfilePlatform : uint8
 
 /**
  * Enum representing mod logo sizes
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioLogoSize : uint8
 {
@@ -114,7 +114,7 @@ enum class EModioLogoSize : uint8
 
 /**
  * Enum representing avatar image sizes
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioAvatarSize : uint8
 {
@@ -128,7 +128,7 @@ enum class EModioAvatarSize : uint8
 
 /**
  * Enumerator for the standard size a gallery image can use
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioGallerySize : uint8
 {
@@ -144,7 +144,7 @@ enum class EModioGallerySize : uint8
 
 /**
  * Degree of severity for the log output
- **/
+ */
 UENUM(BlueprintType)
 enum class EModioLogLevel : uint8
 {
@@ -165,8 +165,9 @@ enum class EModioLogLevel : uint8
 };
 
 /**
- * Enum representing the languages mod.io support responses in
- **/
+ * @docpublic
+ * @brief Enum representing the languages mod.io supports responses in
+ */
 UENUM(BlueprintType)
 enum class EModioLanguage : uint8
 {
@@ -192,6 +193,10 @@ enum class EModioLanguage : uint8
 };
 ENUM_RANGE_BY_COUNT(EModioLanguage, EModioLanguage::Count);
 
+/**
+ * @docpublic
+ * @brief Enum representing the types of changes that can occur to a mod in the user's list
+ */
 UENUM(BlueprintType)
 enum class EModioModChangeType : uint8
 {
@@ -204,95 +209,108 @@ enum class EModioModChangeType : uint8
 };
 
 /**
- * Strong type struct to wrap a ModID to uniquely identify user generated content
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap a ModID to uniquely identify user-generated content
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioModID
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @brief Default constructor without parameters
+	 */
 	FModioModID();
 
 	/**
-	 * Preferred constructor with ModID initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with ModID initialization parameter
 	 * @param InModId Base ModID to create this strong type
-	 **/
+	 */
 	constexpr explicit FModioModID(int64 InModId) : ModID(InModId) {}
 
 	/**
-	 * Transform a ModID into its 32 bit integer representation
+	 * @docpublic
+	 * @brief Transform a ModID into its 32-bit integer representation
 	 * @param UserID String type for the ModID to read its hash from
-	 * @return unsigned 32 bit integer that matches the hash of the ModID provided
-	 **/
+	 * @return unsigned 32-bit integer that matches the hash of the ModID provided
+	 */
 	MODIO_API friend uint32 GetTypeHash(FModioModID ModioModId);
 
 	/**
-	 * Comparison operator between ModID elements
-	 **/
+	 * @docpublic
+	 * @brief Comparison operator between ModID elements
+	 */
 	MODIO_API friend bool operator==(FModioModID A, FModioModID B)
 	{
 		return A.ModID == B.ModID;
 	}
 
 	/**
-	 * Comparison operator between ModID elements
-	 **/
+	 * @docpublic
+	 * @brief Comparison operator between ModID elements
+	 */
 	MODIO_API friend bool operator!=(FModioModID A, FModioModID B)
 	{
 		return A.ModID != B.ModID;
 	}
 
 	/**
-	 * Less than operator between ModID elements
-	 **/
+	 * @docpublic
+	 * @brief Less than operator between ModID elements
+	 */
 	friend bool operator<(FModioModID A, FModioModID B)
 	{
 		return A.ModID < B.ModID;
 	}
 
 	/**
-	 * More than operator between ModID elements
-	 **/
+	 * @docpublic
+	 * @brief Greater than operator between ModID elements
+	 */
 	friend bool operator>(FModioModID A, FModioModID B)
 	{
 		return A.ModID > B.ModID;
 	}
 
 	/**
-	 * Transform a ModID into its string representation
+	 * @docpublic
+	 * @brief Transform a ModID into its string representation
 	 * @return String value of the stored ModID
-	 **/
+	 */
 	FString ToString() const
 	{
 		return FString::Printf(TEXT("%lld"), ModID);
 	}
 
-	/// @docinternal
-	/// @brief Compare the ModID to the invalid state
+	/**
+	 * @docinternal
+	 * @brief Compare the ModID to the invalid state
+	 * @return True if ModID is not invalid (INDEX_NONE)
+	 */
 	bool IsValid() const
 	{
 		return ModID != INDEX_NONE;
 	}
 
 	/**
-	 * Stream forward operator to pass the ModID along
+	 * @docpublic
+	 * @brief Stream forward operator to pass the ModID along
 	 * @param Ar The archive class that receives information
 	 * @param ID The ModID to pass along this operator
 	 * @return FArchive The updated archive with the ModID passed along
-	 **/
+	 */
 	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioModID& ID)
 	{
 		return Ar << ID.ModID;
 	}
 
 	/**
-	 * Store this instance ModID into an archive
+	 * @docpublic
+	 * @brief Store this instance ModID into an archive
 	 * @param Ar The archive class that receives information
 	 * @return Always true when the ModID is forwarded to Ar
-	 **/
+	 */
 	bool Serialize(FArchive& Ar)
 	{
 		Ar << *this;
@@ -300,12 +318,13 @@ struct MODIO_API FModioModID
 	}
 
 	/**
-	 * Store this instance ModID into an archive with reference flag as parameter
+	 * @docpublic
+	 * @brief Store this instance ModID into an archive with reference flag as parameter
 	 * @param Ar The archive class that receives information
 	 * @param Map A dictionary from indices for network communication
 	 * @param bOutSuccess Flag to signal the result of this operation, True when stored
 	 * @return Always true when the ModID is forwarded to Ar
-	 **/
+	 */
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 	{
 		Ar << *this;
@@ -314,10 +333,12 @@ struct MODIO_API FModioModID
 	}
 
 private:
-	/// @brief Function for retrieving the underlying value of an FModioModID for use in custom serialization. Not
-	/// recommended for any other use. FModioModIDs should be treated as opaque.
-	/// @param In the FModioModID to retrieve the value for
-	/// @return the underlying numeric ID.
+	/**
+	 * @brief Function for retrieving the underlying value of an FModioModID for use in custom serialization. Not
+	 * recommended for any other use. FModioModIDs should be treated as opaque.
+	 * @param In The FModioModID to retrieve the value for
+	 * @return The underlying numeric ID
+	 */
 	MODIO_API friend int64 GetUnderlyingValue(const FModioModID& In)
 	{
 		return In.ModID;
@@ -339,105 +360,121 @@ struct TStructOpsTypeTraits<FModioModID> : public TStructOpsTypeTraitsBase2<FMod
 };
 
 /**
- * Strong type struct to wrap ModID as an optional value
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap ModID as an optional value
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModID
 {
 	GENERATED_BODY()
 
 	/**
-	 * Stored optional ModID
-	 **/
+	 * @docpublic
+	 * @brief Stored optional ModID
+	 */
 	TOptional<FModioModID> Internal;
 };
 
 /**
- * Strong type struct to wrap ModID as an optional value
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap ModID as an optional value
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalUInt64
 {
 	GENERATED_BODY()
 
 	/**
-	 * Stored optional uint64
-	 **/
+	 * @docpublic
+	 * @brief Stored optional uint64
+	 */
 	TOptional<uint64> Internal;
 };
 
 /**
- * Strong type struct to wrap a GameID to uniquely identify a single game in mod.io
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap a GameID to uniquely identify a single game in mod.io
+ */
 USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeGameId"))
 struct MODIO_API FModioGameID
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioGameID();
 
 	/**
-	 * Preferred constructor with GameID initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with GameID initialization parameter
 	 * @param InGameId Base GameID to create this strong type
-	 **/
+	 */
 	constexpr explicit FModioGameID(int64 InGameId) : GameId(InGameId) {}
 
 	/**
-	 * Transform a GameID into its 32 bit integer representation
+	 * @docpublic
+	 * @brief Transform a GameID into its 32-bit integer representation
 	 * @param ModioGameId String type for the GameID to read its hash from
-	 * @return unsigned 32 bit integer that matches the hash of the GameID provided
-	 **/
+	 * @return unsigned 32-bit integer that matches the hash of the GameID provided
+	 */
 	MODIO_API friend uint32 GetTypeHash(FModioGameID ModioGameId);
 
 	/**
-	 * Comparison operator between GameID elements
-	 **/
+	 * @docpublic
+	 * @brief Comparison operator between GameID elements
+	 */
 	MODIO_API friend bool operator==(FModioGameID A, FModioGameID B)
 	{
 		return A.GameId == B.GameId;
 	}
 
 	/**
-	 * Transform a GameID into its string representation
+	 * @docpublic
+	 * @brief Transform a GameID into its string representation
 	 * @return String value of the stored GameID
-	 **/
+	 */
 	FString ToString() const
 	{
 		return FString::Printf(TEXT("%lld"), GameId);
 	}
 
-	/// @docinternal
-	/// @brief Compare the GameID to the invalid state defined by the SDK
+	/**
+	 * @docinternal
+	 * @brief Compare the GameID to the invalid state defined by the SDK
+	 * @return True if the GameID is not in its invalid state
+	 */
 	bool IsValid() const
 	{
 		return GameId != InvalidGameID().GameId;
 	}
 
 	/**
-	 * An always invalid GameID, helpful to compare against other GameIDs
-	 * @return String value of the stored GameID
-	 **/
+	 * @docpublic
+	 * @brief An always invalid GameID, helpful to compare against other GameIDs
+	 * @return An invalid FModioGameID instance
+	 */
 	static FModioGameID InvalidGameID();
 
 	/**
-	 * Stream forward operator to pass the GameID along
+	 * @docpublic
+	 * @brief Stream forward operator to pass the GameID along
 	 * @param Ar The archive class that receives information
 	 * @param ID The GameID to pass along this operator
 	 * @return FArchive The updated archive with the GameID passed along
-	 **/
+	 */
 	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioGameID& ID)
 	{
 		return Ar << ID.GameId;
 	}
 
 	/**
-	 * Store this instance GameID into an archive
+	 * @docpublic
+	 * @brief Store this instance GameID into an archive
 	 * @param Ar The archive class that receives information
 	 * @return Always true when the GameID is forwarded to Ar
-	 **/
+	 */
 	bool Serialize(FArchive& Ar)
 	{
 		Ar << *this;
@@ -445,12 +482,13 @@ struct MODIO_API FModioGameID
 	}
 
 	/**
-	 * Store this instance GameID into an archive with reference flag as parameter
+	 * @docpublic
+	 * @brief Store this instance GameID into an archive with reference flag as parameter
 	 * @param Ar The archive class that receives information
 	 * @param Map A dictionary from indices for network communication
 	 * @param bOutSuccess Flag to signal the result of this operation, True when stored
 	 * @return Always true when the GameID is forwarded to Ar
-	 **/
+	 */
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 	{
 		Ar << *this;
@@ -477,71 +515,82 @@ struct TStructOpsTypeTraits<FModioGameID> : public TStructOpsTypeTraitsBase2<FMo
 };
 
 /**
- * Strong type struct to store the associated metadata to a mod file
- **/
+ * @docpublic
+ * @brief Strong type struct to store the associated metadata to a mod file
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioFileMetadataID
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioFileMetadataID();
 
 	/**
-	 * Preferred constructor with FileMetadadataID initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with FileMetadataID initialization parameter
 	 * @param InFileMetadataId Base FileMetadataID to create this strong type
-	 **/
+	 */
 	constexpr explicit FModioFileMetadataID(int64 InFileMetadataId) : FileMetadataID(InFileMetadataId) {}
 
 	/**
-	 * Transform a FileMetadataID into its 32 bit integer representation
+	 * @docpublic
+	 * @brief Transform a FileMetadataID into its 32-bit integer representation
 	 * @param FileMetadataID String type for the FileMetadataID to read its hash from
-	 * @return unsigned 32 bit integer that matches the hash of the FileMetadataID provided
-	 **/
+	 * @return unsigned 32-bit integer that matches the hash of the FileMetadataID provided
+	 */
 	MODIO_API friend uint32 GetTypeHash(FModioFileMetadataID FileMetadataID);
 
 	/**
-	 * Comparison operator between FileMetadataID elements
-	 **/
+	 * @docpublic
+	 * @brief Comparison operator between FileMetadataID elements
+	 */
 	MODIO_API friend bool operator==(FModioFileMetadataID A, FModioFileMetadataID B)
 	{
 		return A.FileMetadataID == B.FileMetadataID;
 	}
 
 	/**
-	 * Transform a FileMetadataID into its string representation
+	 * @docpublic
+	 * @brief Transform a FileMetadataID into its string representation
 	 * @return String value of the stored FileMetadataID
-	 **/
+	 */
 	FString ToString() const
 	{
 		return FString::Printf(TEXT("%lld"), FileMetadataID);
 	}
 
-	/// @docinternal
-	/// @brief Compare the FileMetadataID to the invalid state
+	/**
+	 * @docinternal
+	 * @brief Compare the FileMetadataID to the invalid state
+	 * @return True if the FileMetadataID is not in its invalid state
+	 */
 	bool IsValid() const
 	{
 		return FileMetadataID != INDEX_NONE;
 	}
 
 	/**
-	 * Stream forward operator to pass the FileMetadataID along
+	 * @docpublic
+	 * @brief Stream forward operator to pass the FileMetadataID along
 	 * @param Ar The archive class that receives information
 	 * @param ID The FileMetadataID to pass along this operator
 	 * @return FArchive The updated archive with the FileMetadataID passed along
-	 **/
+	 */
 	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioFileMetadataID& ID)
 	{
 		return Ar << ID.FileMetadataID;
 	}
 
 	/**
-	 * Store this instance FileMetadataID into an archive
+	 * @docpublic
+	 * @brief Store this instance FileMetadataID into an archive
 	 * @param Ar The archive class that receives information
 	 * @return Always true when the FileMetadataID is forwarded to Ar
-	 **/
+	 */
 	bool Serialize(FArchive& Ar)
 	{
 		Ar << *this;
@@ -549,12 +598,13 @@ struct MODIO_API FModioFileMetadataID
 	}
 
 	/**
-	 * Store this instance FileMetadataID into an archive with reference flag as parameter
+	 * @docpublic
+	 * @brief Store this instance FileMetadataID into an archive with reference flag as parameter
 	 * @param Ar The archive class that receives information
 	 * @param Map A dictionary from indices for network communication
 	 * @param bOutSuccess Flag to signal the result of this operation, True when stored
 	 * @return Always true when the FileMetadataID is forwarded to Ar
-	 **/
+	 */
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 	{
 		Ar << *this;
@@ -579,71 +629,82 @@ struct TStructOpsTypeTraits<FModioFileMetadataID> : public TStructOpsTypeTraitsB
 };
 
 /**
- * Strong type struct to wrap a UserID which uniquely identifies a user in mod.io
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap a UserID which uniquely identifies a user in mod.io
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioUserID
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioUserID();
 
 	/**
-	 * Preferred constructor with UserID initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with UserID initialization parameter
 	 * @param InUserID Base InUserID to create this strong type
-	 **/
+	 */
 	constexpr explicit FModioUserID(int64 InUserID) : UserID(InUserID) {}
 
 	/**
-	 * Transform a UserID into its 32 bit integer representation
+	 * @docpublic
+	 * @brief Transform a UserID into its 32-bit integer representation
 	 * @param UserID String type for the UserID to read its hash from
-	 * @return unsigned 32 bit integer that matches the hash of the UserID provided
-	 **/
+	 * @return unsigned 32-bit integer that matches the hash of the UserID provided
+	 */
 	MODIO_API friend uint32 GetTypeHash(FModioUserID UserID);
 
 	/**
-	 * Comparison operator between UserID elements
-	 **/
+	 * @docpublic
+	 * @brief Comparison operator between UserID elements
+	 */
 	MODIO_API friend bool operator==(FModioUserID A, FModioUserID B)
 	{
 		return A.UserID == B.UserID;
 	}
 
 	/**
-	 * Transform a UserID into its string representation
+	 * @docpublic
+	 * @brief Transform a UserID into its string representation
 	 * @return String value of the stored UserID
-	 **/
+	 */
 	FString ToString() const
 	{
 		return FString::Printf(TEXT("%lld"), UserID);
 	}
 
-	/// @docinternal
-	/// @brief Compare the UserID to the invalid state
+	/**
+	 * @docinternal
+	 * @brief Compare the UserID to the invalid state
+	 * @return True if the UserID is not in its invalid state
+	 */
 	bool IsValid() const
 	{
 		return UserID != INDEX_NONE;
 	}
 
 	/**
-	 * Stream forward operator to pass the UserID along
+	 * @docpublic
+	 * @brief Stream forward operator to pass the UserID along
 	 * @param Ar The archive class that receives information
 	 * @param ID The UserID to pass along this operator
 	 * @return FArchive The updated archive with the UserID passed along
-	 **/
+	 */
 	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioUserID& ID)
 	{
 		return Ar << ID.UserID;
 	}
 
 	/**
-	 * Store this instance UserID into an archive
+	 * @docpublic
+	 * @brief Store this instance UserID into an archive
 	 * @param Ar The archive class that receives information
 	 * @return Always true when the UserID is forwarded to Ar
-	 **/
+	 */
 	bool Serialize(FArchive& Ar)
 	{
 		Ar << *this;
@@ -651,12 +712,13 @@ struct MODIO_API FModioUserID
 	}
 
 	/**
-	 * Store this instance UserID into an archive with reference flag as parameter
+	 * @docpublic
+	 * @brief Store this instance UserID into an archive with reference flag as parameter
 	 * @param Ar The archive class that receives information
 	 * @param Map A dictionary from indices for network communication
 	 * @param bOutSuccess Flag to signal the result of this operation, True when stored
 	 * @return Always true when the UserID is forwarded to Ar
-	 **/
+	 */
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 	{
 		Ar << *this;
@@ -681,44 +743,52 @@ struct TStructOpsTypeTraits<FModioUserID> : public TStructOpsTypeTraitsBase2<FMo
 };
 
 /**
- * Strong type struct to wrap an ApiKey, used to communicate with the mod.io service
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap an ApiKey, used to communicate with the mod.io service
+ */
 USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeApiKey"))
 struct MODIO_API FModioApiKey
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioApiKey() = default;
 
 	/**
-	 * Preferred constructor with ApiKey initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with ApiKey initialization parameter
 	 * @param InApiKey Base ApiKey to create this strong type
-	 **/
+	 */
 	explicit FModioApiKey(const FString& InApiKey);
 
 	/**
-	 * Transform a ApiKey into its string representation
+	 * @docpublic
+	 * @brief Transform a ApiKey into its string representation
 	 * @return String value of the stored ApiKey
-	 **/
+	 */
 	const FString& ToString() const
 	{
 		return ApiKey;
 	}
 
-	/// @docinternal
-	/// @brief Compare the ApiKey to the invalid state defined by the SDK
+	/**
+	 * @docinternal
+	 * @brief Compare the ApiKey to the invalid state defined by the SDK
+	 * @return True if the ApiKey is not in its invalid state
+	 */
 	bool IsValid() const
 	{
 		return ApiKey != InvalidAPIKey().ToString();
 	}
 
 	/**
-	 * An always invalid APIKey, helpful to compare against other APIKeys
-	 * @return String value of the stored APIKey
-	 **/
+	 * @docpublic
+	 * @brief An always invalid APIKey, helpful to compare against other APIKeys
+	 * @return A default invalid ApiKey
+	 */
 	static FModioApiKey InvalidAPIKey();
 
 private:
@@ -728,51 +798,61 @@ private:
 };
 
 /**
- * Strong type struct to wrap a Guid, used to communicate with the mod.io metrics service
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap a Guid, used to communicate with the mod.io metrics service
+ */
 USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeGuid"))
 struct MODIO_API FModioGuid
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioGuid() = default;
 
 	/**
-	 * Generates a new Guid.
-	 * NOTE: This is a minimalistic implementation of generating a Guid for metrics, an improved more robust
+	 * @docpublic
+	 * @brief Generates a new Guid.
+	 * @note This is a minimalistic implementation of generating a Guid for metrics, an improved more robust
 	 * per-platform implementation is planned
+	 * @return A newly generated Guid
 	 */
 	static FModioGuid GenerateGuid();
 
 	/**
-	 * Preferred constructor with Guid initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with Guid initialization parameter
 	 * @param InGuid Base Guid to create this strong type
-	 **/
+	 */
 	explicit FModioGuid(const FString& InGuid);
 
 	/**
-	 * Transform a Guid into its string representation
+	 * @docpublic
+	 * @brief Transform a Guid into its string representation
 	 * @return String value of the stored Guid
-	 **/
+	 */
 	const FString& ToString() const
 	{
 		return InternalGuid;
 	}
 
-	/// @docinternal
-	/// @brief Compare the InternalGuid to the invalid state defined by the SDK
+	/**
+	 * @docinternal
+	 * @brief Compare the InternalGuid to the invalid state defined by the SDK
+	 * @return True if the Guid is not in its invalid state
+	 */
 	bool IsValid() const
 	{
 		return InternalGuid != InvalidGuid().InternalGuid;
 	}
 
 	/**
-	 * An always invalid Guid, helpful to compare against other Guids
+	 * @docpublic
+	 * @brief An always invalid Guid, helpful to compare against other Guids
 	 * @return Guid struct containing an invalid String value
-	 **/
+	 */
 	static FModioGuid InvalidGuid();
 
 private:
@@ -782,49 +862,58 @@ private:
 };
 
 /**
- * Strong type struct to wrap Guid as an optional value
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap Guid as an optional value
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalGuid
 {
 	GENERATED_BODY()
 
 	/**
-	 * Stored optional Guid
-	 **/
+	 * @docpublic
+	 * @brief Stored optional Guid
+	 */
 	TOptional<FModioGuid> Internal;
 };
 
 /**
- * Strong type struct to wrap an email address
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap an email address
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioEmailAddress
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioEmailAddress() = default;
 
 	/**
-	 * Preferred constructor with EmailAddress initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with EmailAddress initialization parameter
 	 * @param InEmailAddress Base EmailAddress to create this strong type
-	 **/
+	 */
 	FModioEmailAddress(const FString& InEmailAddress);
 
 	/**
-	 * Transform a EmailAddress into its string representation
+	 * @docpublic
+	 * @brief Transform a EmailAddress into its string representation
 	 * @return String value of the stored EmailAddress
-	 **/
+	 */
 	const FString& ToString() const
 	{
 		return EmailAddress;
 	}
 
-	/// @docinternal
-	/// @brief Compare the EmailAddress to the invalid state
+	/**
+	 * @docinternal
+	 * @brief Compare the EmailAddress to the invalid state
+	 * @return True if the EmailAddress has a non-empty value
+	 */
 	bool IsValid() const
 	{
 		return EmailAddress.Len() > 0;
@@ -835,35 +924,42 @@ private:
 };
 
 /**
- * Strong type struct to wrap the code sent to the email address to obtain an authentication token
- **/
+ * @docpublic
+ * @brief Strong type struct to wrap the code sent to the email address to obtain an authentication token
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioEmailAuthCode
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioEmailAuthCode() = default;
 
 	/**
-	 * Preferred constructor with EmailAuthCode initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with EmailAuthCode initialization parameter
 	 * @param InEmailAuthCode Base EmailAuthCode to create this strong type
-	 **/
+	 */
 	FModioEmailAuthCode(const FString& InEmailAuthCode);
 
 	/**
-	 * Transform a EmailAuthCode into its string representation
+	 * @docpublic
+	 * @brief Transform a EmailAuthCode into its string representation
 	 * @return String value of the stored EmailAuthCode
-	 **/
+	 */
 	const FString& ToString() const
 	{
 		return EmailAuthCode;
 	}
 
-	/// @docinternal
-	/// @brief Compare the EmailAuthCode to the invalid state
+	/**
+	 * @docinternal
+	 * @brief Compare the EmailAuthCode to the invalid state
+	 * @return True if the EmailAuthCode has a non-empty value
+	 */
 	bool IsValid() const
 	{
 		return EmailAuthCode.Len() > 0;
@@ -874,57 +970,65 @@ private:
 };
 
 /**
- * Simple struct to encapsulate portal-specific data required when consuming entitlements
- **/
+ * @docpublic
+ * @brief Simple struct to encapsulate portal-specific data required when consuming entitlements
+ */
 USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeEntitlementParams"))
 struct MODIO_API FModioEntitlementParams
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioEntitlementParams() = default;
 
 	/**
-	 * Preferred constructor with ExtendedParameters initialization parameter
+	 * @docpublic
+	 * @brief Preferred constructor with ExtendedParameters initialization parameter
 	 * @param InExtendedParameters Base ExtendedParameters to create this struct
-	 **/
+	 */
 	explicit FModioEntitlementParams(const TMap<FString, FString>& InExtendedParameters)
 		: ExtendedParameters(InExtendedParameters)
 	{}
 
 private:
 	friend struct Modio::EntitlementParams ToModio(const FModioEntitlementParams& In);
-	/// @brief ExtendedParameters A map to store extended parameters required by some portals.
+	
+	/** @brief ExtendedParameters A map to store extended parameters required by some portals. */
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
 	TMap<FString, FString> ExtendedParameters;
 };
 
 /**
- * Simple struct to store metric session specific parameters
- **/
+ * @docpublic
+ * @brief Simple struct to store metric session specific parameters
+ */
 USTRUCT(BlueprintType, meta = (HasNativeMake = "/Script/Modio.ModioCommonTypesLibrary:MakeMetricsSessionParams"))
 struct MODIO_API FModioMetricsSessionParams
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioMetricsSessionParams() = default;
 
 	/**
-	 * Preferred constructor with array of Mod Ids to track
+	 * @docpublic
+	 * @brief Preferred constructor with array of Mod Ids to track
 	 * @param InIds Mod Id array to create this struct
-	 **/
+	 */
 	explicit FModioMetricsSessionParams(const TArray<FModioModID>& InIds) : SessionId({}), ModIds(InIds) {}
 
 	/**
-	 * Constructor with custom Session Id and array of Mod Ids to track
+	 * @docpublic
+	 * @brief Constructor with custom Session Id and array of Mod Ids to track
 	 * @param InSessionId Custom Session Id to use
 	 * @param InIds Mod Id array to create this struct
-	 **/
+	 */
 	explicit FModioMetricsSessionParams(const FModioGuid& InSessionId, const TArray<FModioModID>& InIds)
 		: SessionId(InSessionId),
 		  ModIds(InIds)
@@ -932,17 +1036,19 @@ struct MODIO_API FModioMetricsSessionParams
 
 public:
 	friend struct Modio::MetricsSessionParams ToModio(const FModioMetricsSessionParams& In);
-	/// @brief Set a custom Session Id to be used in the metrics service for your session
+	
+	/** @brief Set a custom Session Id to be used in the metrics service for your session */
 	TOptional<FModioGuid> SessionId;
 
-	/// @brief Includes mods which will be tracked as part of the metrics service
+	/** @brief Includes mods which will be tracked as part of the metrics service */
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
 	TArray<FModioModID> ModIds;
 };
 
 /**
- * Enumerator with the possible memory measurement units
- **/
+ * @docpublic
+ * @brief Enumerator with the possible memory measurement units
+ */
 UENUM(BlueprintType)
 enum EFileSizeUnit
 {
@@ -958,73 +1064,85 @@ enum EFileSizeUnit
 	GB = 1024 * 1024 * 1024
 };
 
+/**
+ * @docpublic
+ * @brief Strong type struct to wrap Token Pack ID
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioTokenPackID
 {
 	GENERATED_BODY()
 
 	/**
-	 * Default constructor without parameters
-	 **/
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
 	FModioTokenPackID();
 
 	/**
-	 * Preferred constructor with Token Pack initialization parameter
-	 * @param InTokenPAckId Base Token Pack ID to create this strong type
-	 **/
+	 * @docpublic
+	 * @brief Preferred constructor with Token Pack initialization parameter
+	 * @param InTokenPackId Base Token Pack ID to create this strong type
+	 */
 	FModioTokenPackID(FString InTokenPackId)
 	{
 		TokenPackID = InTokenPackId;
 	}
 
 	/**
-	 * Transform a TokenPackID into its 32 bit integer representation
+	 * @docpublic
+	 * @brief Transform a TokenPackID into its 32 bit integer representation
 	 * @param ModioTokenPackId String type for the TokenPackID to read its hash from
 	 * @return unsigned 32 bit integer that matches the hash of the TokenPackID provided
-	 **/
+	 */
 	MODIO_API friend uint32 GetTypeHash(FModioTokenPackID ModioTokenPackId);
 
 	/**
-	 * Comparison operator between TokenPackID elements
-	 **/
+	 * @docpublic
+	 * @brief Comparison operator between TokenPackID elements
+	 */
 	MODIO_API friend bool operator==(FModioTokenPackID A, FModioTokenPackID B)
 	{
 		return A.TokenPackID == B.TokenPackID;
 	}
 
 	/**
-	 * Comparison operator between TokenPackID elements
-	 **/
+	 * @docpublic
+	 * @brief Comparison operator between TokenPackID elements
+	 */
 	MODIO_API friend bool operator!=(FModioTokenPackID A, FModioTokenPackID B)
 	{
 		return A.TokenPackID != B.TokenPackID;
 	}
 
 	/**
-	 * Transform a TokenPackID into its string representation
+	 * @docpublic
+	 * @brief Transform a TokenPackID into its string representation
 	 * @return String value of the stored TokenPackID
-	 **/
+	 */
 	FString ToString() const
 	{
 		return TokenPackID;
 	}
 
 	/**
-	 * Stream forward operator to pass the TokenPackID along
+	 * @docpublic
+	 * @brief Stream forward operator to pass the TokenPackID along
 	 * @param Ar The archive class that receives information
 	 * @param ID The TokenPackID to pass along this operator
 	 * @return FArchive The updated archive with the TokenPackID passed along
-	 **/
+	 */
 	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioTokenPackID& ID)
 	{
 		return Ar << ID.TokenPackID;
 	}
 
 	/**
-	 * Store this instance TokenPackID into an archive
+	 * @docpublic
+	 * @brief Store this instance TokenPackID into an archive
 	 * @param Ar The archive class that receives information
 	 * @return Always true when the TokenPackID is forwarded to Ar
-	 **/
+	 */
 	bool Serialize(FArchive& Ar)
 	{
 		Ar << *this;
@@ -1032,12 +1150,13 @@ struct MODIO_API FModioTokenPackID
 	}
 
 	/**
-	 * Store this instance TokenPackID into an archive with reference flag as parameter
+	 * @docpublic
+	 * @brief Store this instance TokenPackID into an archive with reference flag as parameter
 	 * @param Ar The archive class that receives information
 	 * @param Map A dictionary from indices for network communication
 	 * @param bOutSuccess Flag to signal the result of this operation, True when stored
 	 * @return Always true when the ModID is forwarded to Ar
-	 **/
+	 */
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 	{
 		Ar << *this;
@@ -1045,11 +1164,14 @@ struct MODIO_API FModioTokenPackID
 		return true;
 	}
 
-	private:
-	/// @brief Function for retrieving the underlying value of an FModioTokenPackID for use in custom serialization. Not
-	/// recommended for any other use. FModioTokenPackIDs should be treated as opaque.
-	/// @param In the FModioTokenPackID to retrieve the value for
-	/// @return the underlying string ID.
+private:
+	/**
+	 * @docinternal
+	 * @brief Function for retrieving the underlying value of an FModioTokenPackID for use in custom serialization.
+	 * Not recommended for any other use. FModioTokenPackIDs should be treated as opaque.
+	 * @param In the FModioTokenPackID to retrieve the value for
+	 * @return the underlying string ID.
+	 */
 	MODIO_API friend FString GetUnderlyingValue(const FModioTokenPackID& In)
 	{
 		return In.TokenPackID;

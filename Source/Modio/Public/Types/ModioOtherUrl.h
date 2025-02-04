@@ -15,18 +15,25 @@
 #include "ModioOtherUrl.generated.h"
 
 /**
- * Strong type struct representing creator defined urls to share
- **/
+ * @docpublic
+ * @brief Strong type struct representing creator defined urls to share
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOtherUrl
 {
 	GENERATED_BODY()
 
-	/** @brief Label of the link you are sharing */
+	/**
+	 * @docpublic
+	 * @brief Label of the link you are sharing
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|OtherUrl")
 	FString Label;
 
-	/** @brief The URL to be associated with the label */
+	/**
+	 * @docpublic
+	 * @brief The URL to be associated with the label
+	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|OtherUrl")
 	FString Url;
 };
