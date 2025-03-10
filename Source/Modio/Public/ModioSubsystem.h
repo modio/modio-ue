@@ -436,9 +436,18 @@ public:
 	 * @docpublic
 	 * @brief Retrieves a snapshot of current storage related information such as space consumed by mod
 	 * installations and total available space
-	 * @return A `FModioStorageInfo` Structure containing storage information
+	 * @return An `FModioStorageInfo` structure containing storage information
 	 */
 	MODIO_API FModioStorageInfo QueryStorageInfo();
+
+	/*
+	* @docpublic
+	* @brief Get the storage quota for a given `EModioStorageLocation` if one has been set.
+	* @param Location The type of storage to get the quota for.
+	* @return `FModioOptionalUInt64` of the storage quota in bytes for the specified `EModioStorageLocation`. Empty if no quota is set.
+	*/
+	UFUNCTION(BlueprintPure, Category = "mod.io|Storage Info")
+	MODIO_API FModioOptionalUInt64 GetStorageQuota(EModioStorageLocation Location);
 
 	/**
 	 * @docpublic
@@ -2058,7 +2067,7 @@ public:
 	 * @docpublic
 	 * @brief Fetches storage related information, including total availability and how much is being consumed by mod
 	 * installations.
-	 * @return A `FModioStorageInfo` Structure containing storage information
+	 * @return An `FModioStorageInfo` structure containing storage information
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "QueryStorageInfo", Category = "mod.io|Storage Info")
 	MODIO_API FModioStorageInfo K2_QueryStorageInfo();

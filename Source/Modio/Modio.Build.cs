@@ -63,6 +63,13 @@ public class Modio : ModuleRules
     }
     public class ModioPlatformConfigFile
     {
+        public class PlatformSpecificFileConfig
+        {
+            public string SourcePluginPath;
+            public string DestinationProjectPath;
+            public string CopyBehavior;  // "AppendIfExists", "Overwrite", "SkipIfExists"
+        }
+        
         public class PlatformConfig
         {
             public List<string> IncludeDirectories = new List<string>();
@@ -71,6 +78,7 @@ public class Modio : ModuleRules
             public List<string> SystemLibraryDependencies = new List<string>();
             public List<string> PlatformSourceFolderNames = new List<string>();
             public List<string> AndroidPluginPropertiesForReceipt = new List<string>();
+            public List<PlatformSpecificFileConfig> PlatformSpecificFiles = new List<PlatformSpecificFileConfig>();
 
         }
         public Dictionary<string, PlatformConfig> Platforms;
@@ -114,7 +122,22 @@ public class Modio : ModuleRules
 	        ParsedInnerPlatform.AndroidPluginPropertiesForReceipt = new List<string>(ParsedAndroidPluginPropertiesForReceipt);
         }
 
-		return ParsedInnerPlatform;
+        JsonObject[] ParsedPlatformSpecificFiles;
+        if (InnerPlatformObject.TryGetObjectArrayField("PlatformSpecificFiles", out ParsedPlatformSpecificFiles))
+        {
+            foreach (var PlatformSpecificFileObj in ParsedPlatformSpecificFiles)
+            {
+                ModioPlatformConfigFile.PlatformSpecificFileConfig PlatformSpecificFile = new ModioPlatformConfigFile.PlatformSpecificFileConfig
+                {
+                    SourcePluginPath = PlatformSpecificFileObj.GetStringField("SourcePluginPath"),
+                    DestinationProjectPath = PlatformSpecificFileObj.GetStringField("DestinationProjectPath"),
+                    CopyBehavior = PlatformSpecificFileObj.GetStringField("CopyBehavior")
+                };
+                ParsedInnerPlatform.PlatformSpecificFiles.Add(PlatformSpecificFile);
+            }
+        }
+
+        return ParsedInnerPlatform;
     }
     
     private ModioPlatformConfigFile TryLoadPlatformConfig(string PlatformConfigPath)
@@ -173,6 +196,10 @@ public class Modio : ModuleRules
         {
 	        InternalLog("System Library: " + SystemLibrary);
         }
+        foreach (var PlatformSpecificFile in Config.PlatformSpecificFiles)
+        {
+            InternalLog("Platform Specific File: " + PlatformSpecificFile.SourcePluginPath + " -> " + PlatformSpecificFile.DestinationProjectPath + " (" + PlatformSpecificFile.CopyBehavior + ")");
+        }
     }
 
     private ModioPlatformConfigFile.PlatformConfig LoadNativePlatformConfig()
@@ -221,6 +248,7 @@ public class Modio : ModuleRules
                             MergedConfig.ModuleDependencies.AddRange(Platform.Value.ModuleDependencies);
                             MergedConfig.SystemLibraryDependencies.AddRange(Platform.Value.SystemLibraryDependencies);
                             MergedConfig.AndroidPluginPropertiesForReceipt.AddRange(Platform.Value.AndroidPluginPropertiesForReceipt);
+                            MergedConfig.PlatformSpecificFiles.AddRange(Platform.Value.PlatformSpecificFiles);
                             bFoundPlatformConfig = true;
                         }
                     }
@@ -448,9 +476,55 @@ public class Modio : ModuleRules
             PrivateDependencyModuleNames.Add("UnrealEd");
         }
     }
+    
+    private void HandlePlatformSpecificFiles(ModioPlatformConfigFile.PlatformConfig Config)
+    {
+        foreach (var PlatformSpecificFile in Config.PlatformSpecificFiles)
+        {
+            string SourcePath = Path.Combine(PluginDirectory, PlatformSpecificFile.SourcePluginPath);
+            string DestPath = Path.Combine(Target.ProjectFile.Directory.FullName, PlatformSpecificFile.DestinationProjectPath);
+
+            // Create destination directory if it doesn't exist
+            string DestDir = Path.GetDirectoryName(DestPath);
+            if (!Directory.Exists(DestPath))
+            {
+                Directory.CreateDirectory(DestDir);
+            }
+
+            if (File.Exists(DestPath))
+            {
+                switch (PlatformSpecificFile.CopyBehavior)
+                {
+                    case "AppendIfExists":
+                        string SourceContent = File.ReadAllText(SourcePath);
+                        string DestContent = File.ReadAllText(DestPath);
+                        if (!DestContent.Contains(SourceContent))
+                        {
+                            InternalLog($"Appending content to existing file: {DestPath}");
+                            File.AppendAllText(DestPath, Environment.NewLine + SourceContent);
+                        }
+                        break;
+                    case "Overwrite":
+                        InternalLog($"Overwriting existing file: {DestPath}");
+                        File.Copy(SourcePath, DestPath, true);
+                        break;
+                    case "SkipIfExists":
+                        InternalLog($"Skipping existing file: {DestPath}");
+                        break;
+                }
+            }
+            else
+            {
+                InternalLog($"Copying new file: {DestPath}");
+                File.Copy(SourcePath, DestPath);
+            }
+        }
+    }
 
     private void ApplyNativePlatformConfig(ModioPlatformConfigFile.PlatformConfig Config, string GeneratedHeaderPath, string GeneratedSourcePath)
     {
+        HandlePlatformSpecificFiles(Config);
+        
         // Add only the source directory for the current platform to this module
         // Currently this is the portion which is not compatible with 4.25
         foreach (string PlatformPath in Config.PlatformSourceFolderNames)
@@ -627,6 +701,5 @@ public class Modio : ModuleRules
 
         // Apply internal testing config
         ApplyTestConfig(GeneratedHeaderPath, GeneratedSourcePath);
-
     }
 }

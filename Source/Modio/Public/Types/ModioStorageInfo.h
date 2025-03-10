@@ -27,6 +27,7 @@ UENUM(BlueprintType)
 enum class EModioStorageLocation : uint8
 {
 	Local,
+	Cache,
 
 	Count UMETA(Hidden)
 };
@@ -54,10 +55,10 @@ struct MODIO_API FStorageInfoKey
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "mod.io|Storage Info")
-	EModioStorageLocation Location;
+	EModioStorageLocation Location = EModioStorageLocation::Local;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "mod.io|Storage Info")
-	EModioStorageUsage Usage;
+	EModioStorageUsage Usage = EModioStorageUsage::Consumed;
 
 	bool operator==(const FStorageInfoKey& Other) const
 	{
@@ -105,7 +106,6 @@ struct MODIO_API FModioStorageInfo
 		{
 			return StorageData[StorageKey];
 		}
-
 		return FModioUnsigned64(0);
 	}
 

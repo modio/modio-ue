@@ -19,6 +19,8 @@ FORCEINLINE EModioStorageLocation ToUnreal(const Modio::StorageLocation& In)
 	{
 		case Modio::StorageLocation::Local:
 			return EModioStorageLocation::Local;
+		case Modio::StorageLocation::Cache:
+			return EModioStorageLocation::Cache;
 	}
 	UE_LOG(LogModio, Error, TEXT("Unhandled case in ToUnreal(EModioStorageLocation)"));
 	return EModioStorageLocation::Local;
@@ -65,6 +67,8 @@ Modio::StorageLocation ToModio(EModioStorageLocation Location)
 	{
 		case EModioStorageLocation::Local:
 			return Modio::StorageLocation::Local;
+		case EModioStorageLocation::Cache:
+			return Modio::StorageLocation::Cache;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EStorageLocation Location)"));

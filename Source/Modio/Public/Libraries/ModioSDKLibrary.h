@@ -238,6 +238,6 @@ public:
 	 * @param Portal The mod.io portal.
 	 * @return The purchase category ID as a string, or empty if not defined.
 	 */
-	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static MODIO_API FString GetMonetizationPurchaseCategory(EModioPortal Portal);
 };

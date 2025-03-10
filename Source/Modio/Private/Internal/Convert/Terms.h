@@ -31,6 +31,7 @@ FORCEINLINE FModioTerms ToUnreal(const Modio::Terms& In)
 	Out.WebsiteLink = ToUnreal(In.Links.Website);
 	Out.TermsLink = ToUnreal(In.Links.Terms);
 	Out.PrivacyLink = ToUnreal(In.Links.Privacy);
+	Out.RefundLink = ToUnreal(In.Links.Refund);
 	Out.ManageLink = ToUnreal(In.Links.Manage);
 	Out.TermsText = ToUnreal(In.TermsText);
 	return Out;

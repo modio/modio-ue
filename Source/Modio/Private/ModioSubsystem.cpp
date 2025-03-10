@@ -938,6 +938,18 @@ FModioStorageInfo UModioSubsystem::K2_QueryStorageInfo()
 	return QueryStorageInfo();
 }
 
+FModioOptionalUInt64 UModioSubsystem::GetStorageQuota(EModioStorageLocation Location)
+{
+	Modio::Optional<Modio::FileSize> Quota = Modio::StorageInfo::GetQuota(ToModio(Location));
+	if (Quota.has_value())
+	{
+		FModioOptionalUInt64 Ret;
+		Ret.Internal = Quota.value();
+		return Ret;
+	}
+	return {};
+}
+
 void UModioSubsystem::ForceUninstallModAsync(FModioModID ModToRemove, FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::ForceUninstallModAsync(ToModio(ModToRemove), [Callback](FModioErrorCode ec) {
@@ -1004,38 +1016,38 @@ void UModioSubsystem::AddModDependenciesAsync(FModioModID ModID, const TArray<FM
 											  FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::AddModDependenciesAsync(ToModio(ModID), ToModio(Dependencies),
-		[WeakThis = MakeWeakObjectPtr(this), Callback](Modio::ErrorCode ec) {
-			if (!WeakThis.IsValid())
-			{
-				return;
-			}
-			AsyncTask(ENamedThreads::GameThread, ([WeakThis, Callback, ec]() {
-				if (WeakThis.IsValid())
-				{
-					TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-					Callback.ExecuteIfBound(ToUnreal(ec));
-				}
-			}));
-		});
+								   [WeakThis = MakeWeakObjectPtr(this), Callback](Modio::ErrorCode ec) {
+									   if (!WeakThis.IsValid())
+									   {
+										   return;
+									   }
+									   AsyncTask(ENamedThreads::GameThread, ([WeakThis, Callback, ec]() {
+													 if (WeakThis.IsValid())
+													 {
+														 TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+														 Callback.ExecuteIfBound(ToUnreal(ec));
+													 }
+												 }));
+								   });
 }
 
-void UModioSubsystem::DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies, 
-	FOnErrorOnlyDelegateFast Callback)
+void UModioSubsystem::DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
+												 FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::DeleteModDependenciesAsync(ToModio(ModID), ToModio(Dependencies),
-		[WeakThis = MakeWeakObjectPtr(this), Callback](Modio::ErrorCode ec) {
-			if (!WeakThis.IsValid())
-			{
-				return;
-			}
-			AsyncTask(ENamedThreads::GameThread, ([WeakThis, Callback, ec]() {
-				if (WeakThis.IsValid())
-				{
-					TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-					Callback.ExecuteIfBound(ToUnreal(ec));
-				}
-			}));
-		});
+									  [WeakThis = MakeWeakObjectPtr(this), Callback](Modio::ErrorCode ec) {
+										  if (!WeakThis.IsValid())
+										  {
+											  return;
+										  }
+										  AsyncTask(ENamedThreads::GameThread, ([WeakThis, Callback, ec]() {
+														if (WeakThis.IsValid())
+														{
+															TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+															Callback.ExecuteIfBound(ToUnreal(ec));
+														}
+													}));
+									  });
 }
 
 FModioModCreationHandle UModioSubsystem::GetModCreationHandle()
@@ -1055,17 +1067,19 @@ void UModioSubsystem::K2_GetModDependenciesAsync(FModioModID ModID, bool Recursi
 }
 
 void UModioSubsystem::K2_AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-	FOnErrorOnlyDelegate Callback)
+												 FOnErrorOnlyDelegate Callback)
 {
-	AddModDependenciesAsync(ModID, Dependencies, FOnErrorOnlyDelegateFast::CreateWeakLambda(this,
-		[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+	AddModDependenciesAsync(ModID, Dependencies,
+							FOnErrorOnlyDelegateFast::CreateWeakLambda(
+								this, [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 void UModioSubsystem::K2_DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-	FOnErrorOnlyDelegate Callback)
+													FOnErrorOnlyDelegate Callback)
 {
-	DeleteModDependenciesAsync(ModID, Dependencies, FOnErrorOnlyDelegateFast::CreateWeakLambda(this,
-		[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
+	DeleteModDependenciesAsync(ModID, Dependencies,
+							   FOnErrorOnlyDelegateFast::CreateWeakLambda(
+								   this, [Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 void UModioSubsystem::SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params)

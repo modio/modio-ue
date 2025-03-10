@@ -93,6 +93,13 @@ struct MODIO_API FModioTerms
 
 	/** 
 	 * @docpublic
+	 * @brief Link to the mod.io Refund Policy
+	 */
+	UPROPERTY(BlueprintReadOnly, Category="Terms|Links")
+	FModioLink RefundLink;
+
+	/** 
+	 * @docpublic
 	 * @brief Link to the mod.io Manage User Account page
 	 */
 	UPROPERTY(BlueprintReadOnly, Category="Terms|Links")

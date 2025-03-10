@@ -377,7 +377,7 @@ struct MODIO_API FModioOptionalModID
 
 /**
  * @docpublic
- * @brief Strong type struct to wrap ModID as an optional value
+ * @brief Strong type struct to wrap uint64 as an optional value
  */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalUInt64
