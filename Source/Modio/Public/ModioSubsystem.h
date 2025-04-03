@@ -605,7 +605,7 @@ public:
 	 */
 	MODIO_API void GetModDependenciesAsync(FModioModID ModID, bool Recursive,
 										   FOnGetModDependenciesDelegateFast Callback);
-										   
+
 	/**
 	 * @brief Adds dependencies to a specified mod, linking it with other mods that are required for it to function
 	 * @param ModID The mod to add dependencies to
@@ -622,7 +622,7 @@ public:
 	 * @error GenericError::BadParameter|The supplied mod ID is invalid
 	 */
 	MODIO_API void AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-									  FOnErrorOnlyDelegateFast Callback);
+										   FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @brief Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
@@ -640,7 +640,7 @@ public:
 	 * @error GenericError::BadParameter|The supplied mod ID is invalid
 	 */
 	MODIO_API void DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-                                             FOnErrorOnlyDelegateFast Callback);
+											  FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -1507,7 +1507,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "AddModDependenciesAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-										  FOnErrorOnlyDelegate Callback);
+											  FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @brief Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
@@ -1526,7 +1526,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "DeleteModDependenciesAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-                                          FOnErrorOnlyDelegate Callback);
+												 FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @docpublic

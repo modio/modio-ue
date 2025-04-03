@@ -526,11 +526,12 @@ public class Modio : ModuleRules
         HandlePlatformSpecificFiles(Config);
         
         // Add only the source directory for the current platform to this module
-        // Currently this is the portion which is not compatible with 4.25
         foreach (string PlatformPath in Config.PlatformSourceFolderNames)
         {
             string RootPlatformName = PlatformPath.Replace('/', Path.DirectorySeparatorChar).Split(Path.DirectorySeparatorChar).First();
-            ConditionalAddModuleDirectoryChecked(Path.Combine(GeneratedSourcePath, RootPlatformName));
+            // Do not use ConditionalAddModuleDirectoryChecked here, because some platforms have no ipp files in their module and therefore
+            // do not have a source directory to add to module directories therefore this directory being missing is not an error
+            ConditionalAddModuleDirectory(new DirectoryReference(Path.Combine(GeneratedSourcePath, RootPlatformName)));
 
 #if ENABLE_TRACE_LOG
             InternalLog("Adding native platform source directory " + Path.Combine(GeneratedSourcePath, RootPlatformName));

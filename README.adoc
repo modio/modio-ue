@@ -8,7 +8,7 @@ image:https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=d
 image:https://img.shields.io/badge/docs-master-green.svg[alt="Master Docs", link="https://docs.mod.io/unreal/"]
 image:https://img.shields.io/badge/Unreal-4.26%2B-dea309[alt="Unreal Engine", link="https://www.unrealengine.com"]
 
-Welcome to the mod.io Unreal Engine plugin repository. It allows game developers to host and automatically install user-created mods in their Unreal Engine games. It provides a UI for mod discovery, installation and collection management, and a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io[mod.io REST API].
+Welcome to the mod.io Unreal Engine plugin repository. It allows game developers to host and automatically install user-created mods in their Unreal Engine games. It provides a UI for mod discovery, installation and collection management, and a C++ and Blueprint interface around the mod.io SDK, which connects to the https://docs.mod.io/restapiref/[mod.io REST API].
 
 ++++
 <!--- <p align="center"><a href="https://www.unrealengine.com/marketplace/en-US/slug/mod-browser-manager"><img src="https://image.mod.io/members/c4ca/1/profileguides/unreal.png" alt="unreal" width="380" height="133"></a></p> --->
@@ -36,8 +36,7 @@ The mod.io plugin is generally maintained to support the 3 most recent versions 
 
 The mod.io plugin supports Windows, Linux, LinuxArm64, Mac, iOS and Android as part of the public release.
 
-For access to Windows (GDK), XBox, Playstation 4, Playstation 5 or Switch, please <<contact-us,(Contact Us)>>.
-
+For access to Windows (GDK), XBox, Playstation 4, Playstation 5 or Switch, please https://docs.mod.io/support/contacts/[contact us].
 
 ## Features
 
@@ -49,6 +48,9 @@ For access to Windows (GDK), XBox, Playstation 4, Playstation 5 or Switch, pleas
 * Email / Steam / EGS / Consoles / Custom SSO authentication
 * Mod Browsing / Filtering
 
+== Documentation
+Comprehensive documentation for this plugin including installation, getting started, and more https://docs.mod.io/unreal/[can be found here].
+
 == Installation
 
 === Adding plugin files to your project
@@ -58,6 +60,8 @@ For access to Windows (GDK), XBox, Playstation 4, Playstation 5 or Switch, pleas
 +
 In the directory with your .uproject file: `git submodule add https://github.com/modio/modio-ue Plugins/Modio`
 . Initialize our submodules with `git submodule update --init --recursive`
+
+NOTE: On first run, or any time you update the git submodule for the plugin, you must set the MODIO_DEVELOPMENT_MODE environment variable to 1. This will tell the plugin to regenerate the files it produces from the internal copy of the mod.io C++ SDK. This environment variable does not need to be set if you are using the standalone release zips, or during normal development when you have not updated the Plugin via git. Once these files are regenerated, simply leave the environment variable unset and the regenerated files can be added to your version control system. This allows you to update the plugin via Git without interfering with daily use of Perforce or similar version control that requires files be marked read-only.
 
 ==== In a non-git project, or without submodules
 
@@ -101,21 +105,24 @@ Before release, you will be able to setup a "hidden" Live environment that will 
 
 == Further reading
 
-To begin using the Plugin, either from Blueprint or from C++, please read our https://docs.mod.io/unreal/[Getting Started Guide] for a detailed explanation of initialization and usage.
+To begin using the plugin with either Blueprint or C++, please read our https://docs.mod.io/unreal/getting-started/[Getting Started Guide].  
 
-* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-initialization-and-teardown[SDK initialization and event loop]
-* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-user-authentication[Authentication]
-* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-browsing-available-mods[Mod Browsing]
-* https://docs.mod.io/unreal/getting-started/#plugin-quick-start-mod-subscriptions-and-management[Mod Subscription Management]
-* https://docs.mod.io/unreal/mod-creation-tool/[Content Creation & Upload Tool]
+This section contains many detailed guides including: 
+
+* https://docs.mod.io/unreal/getting-started/initialization[Initializing the plugin] 
+* https://docs.mod.io/unreal/getting-started/user-authentication[Authentication] 
+* https://docs.mod.io/unreal/getting-started/browsing-mods[Browsing mods] 
+* https://docs.mod.io/unreal/getting-started/mod-subscriptions[Managing subscriptions] 
 
 === User Interface
 
-mod.io also provides a separate plugin for building an in-game UI. This includes a template for mod browsing, searching, collection management etc, as well as a set of components for customizing or building your own in-game UI. You can download that from the  https://github.com/modio/modio-ue-component-ui[Component UI Repository].
+mod.io also provides a separate plugin for building an in-game UI. This includes a template for mod browsing, searching, collection management etc, as well as a set of components for customizing or building your own in-game UI. 
+
+This plugin is available at the https://github.com/modio/modio-ue-component-ui[Component UI repository].
 
 === Profiling
 
-The mod.io SDK ships with some profiling features that are integrated into Unreal's stat commands. You can read more about enabling profiling link:Doc/profiling.adoc[here].
+The mod.io SDK ships with some profiling features that are integrated into Unreal's stat commands. You can read more about enabling profiling https://docs.mod.io/unreal/profiling/[here].
 
 === Sample Projects
 
