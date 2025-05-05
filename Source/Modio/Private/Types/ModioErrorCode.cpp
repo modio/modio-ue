@@ -13,6 +13,8 @@
 #include "Modio.h"
 #include "ModioSDK.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioErrorCode)
+
 FModioErrorCode::FModioErrorCode(Modio::ErrorCode ec)
 {
 	InternalError = MakeUnique<Modio::ErrorCode>(ec);

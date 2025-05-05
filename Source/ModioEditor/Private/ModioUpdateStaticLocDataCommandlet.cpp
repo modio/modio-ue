@@ -3,7 +3,6 @@
 #include "ModioUpdateStaticLocDataCommandlet.h"
 
 #if WITH_EDITOR
-
 	#include "AssetRegistry/AssetRegistryModule.h"
 	#include "Internationalization/StringTable.h"
 	#include "Internationalization/StringTableCore.h"
@@ -16,6 +15,11 @@
 	#include "Types/ModioModManagementEvent.h"
 	#include "Types/ModioModProgressInfo.h"
 	#include "Types/ModioReportParams.h"
+#endif
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioUpdateStaticLocDataCommandlet)
+
+#if WITH_EDITOR
 
 DEFINE_LOG_CATEGORY_STATIC(LogModioUpdateStaticLocDataCommandlet, All, All);
 

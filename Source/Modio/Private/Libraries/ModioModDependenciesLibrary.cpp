@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioModDependenciesLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioModDependenciesLibrary)
+
 const TArray<FModioModDependency>& UModioModDependenciesLibrary::GetDependencies(
 	const FModioModDependencyList& DependencyList)
 {

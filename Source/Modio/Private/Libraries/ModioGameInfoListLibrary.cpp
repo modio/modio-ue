@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioGameInfoListLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioGameInfoListLibrary)
+
 const TArray<FModioGameInfo>& UModioGameInfoListLibrary::GetGames(const FModioGameInfoList& GameInfoList)
 {
 	return GameInfoList.GetRawList();

@@ -434,6 +434,17 @@ public class Modio : ModuleRules
 
     private void AddCommonHeaderPaths(string GeneratedHeaderPath)
     {
+        // Ensure these directories exist regardless of development mode
+        if (!Directory.Exists(Path.Combine(GeneratedHeaderPath, "Public")))
+        {
+            Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Public"));
+        }
+    
+        if (!Directory.Exists(Path.Combine(GeneratedHeaderPath, "Private")))
+        {
+            Directory.CreateDirectory(Path.Combine(GeneratedHeaderPath, "Private"));
+        }
+        
         PublicIncludePaths.AddRange(new string[] {
                 Path.Combine(GeneratedHeaderPath, "Public") 
                 });

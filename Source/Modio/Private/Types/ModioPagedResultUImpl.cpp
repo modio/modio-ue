@@ -11,6 +11,8 @@
 #include "Types/ModioPagedResult.h"
 #include "ModioSDK.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioPagedResult)
+
 FModioPagedResult::FModioPagedResult(const Modio::PagedResult& PagedResult)
 	: PageIndex(PagedResult.GetPageIndex()),
 	  PageSize(PagedResult.GetPageSize()),

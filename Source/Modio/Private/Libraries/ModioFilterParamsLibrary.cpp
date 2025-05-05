@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioFilterParamsLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioFilterParamsLibrary)
+
 FModioFilterParams& UModioFilterParamsLibrary::MatchingAuthor(FModioFilterParams& Filter, const FModioUserID& ID)
 {
 	return Filter.MatchingAuthor(ID);

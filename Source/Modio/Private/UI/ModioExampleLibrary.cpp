@@ -17,6 +17,8 @@
 #include "ModioSDK.h"
 #include "Misc/EngineVersionComparison.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioExampleLibrary)
+
 EModioAvatarSize UModioExampleLibrary::GetAvatarThumbnailSize()
 {
 	return EModioAvatarSize::Original;

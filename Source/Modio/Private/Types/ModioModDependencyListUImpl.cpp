@@ -10,6 +10,7 @@
 #include "Templates/UnrealTemplate.h"
 #include "Types/ModioModDependencyList.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioModDependencyList)
 
 FModioOptionalModDependencyList::FModioOptionalModDependencyList(TOptional<FModioModDependencyList>&& ModDependencies)
 	: Internal(MoveTemp(ModDependencies))

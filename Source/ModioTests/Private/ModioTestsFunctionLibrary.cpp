@@ -7,6 +7,8 @@
 #include "ModioTestSettings.h"
 #include "Types/ModioCommonTypes.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioTestsFunctionLibrary)
+
 #if WITH_DEV_AUTOMATION_TESTS
 FModioInitializeOptions UModioTestsFunctionLibrary::GetAutomationTestOptions()
 {

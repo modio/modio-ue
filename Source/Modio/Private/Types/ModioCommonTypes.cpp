@@ -13,6 +13,8 @@
 
 #include "Internal/ModioConvert.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioCommonTypes)
+
 FModioModID::FModioModID() : ModID(INDEX_NONE) {}
 
 uint32 GetTypeHash(FModioModID ModioModId)

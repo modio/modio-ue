@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioModCollectionLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioModCollectionLibrary)
+
 EModioModState UModioModCollectionLibrary::GetModState(const FModioModCollectionEntry& Entry)
 {
 	return Entry.GetModState();

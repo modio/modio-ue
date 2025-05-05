@@ -10,6 +10,8 @@
 
 #include "Objects/ModioStaticExecutionBase.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioStaticExecutionBase)
+
 UModioStaticExecutionBase::UModioStaticExecutionBase()
 	: Super()
 {}

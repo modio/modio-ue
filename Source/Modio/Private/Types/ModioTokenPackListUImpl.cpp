@@ -13,6 +13,8 @@
 #include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioTokenPackList)
+
 template const TArray<FModioTokenPack>& FModioList<TArray, FModioTokenPack>::GetRawList() const;
 
 FModioTokenPackList::FModioTokenPackList(const FModioPagedResult& PagedResult, TArray<FModioTokenPack>&& TokenPackList)

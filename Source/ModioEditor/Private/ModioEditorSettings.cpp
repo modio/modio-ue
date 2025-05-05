@@ -14,6 +14,8 @@
 #include "Objects/ModioOpenSettingsAction.h"
 #include "Objects/ModioOpenWeblinkAction.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioEditorSettings)
+
 #define LOCTEXT_NAMESPACE "ModioEditorSettings"
 
 UModioEditorSettings::UModioEditorSettings(const FObjectInitializer& Initializer) : Super(Initializer)

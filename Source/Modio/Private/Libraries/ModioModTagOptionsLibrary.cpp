@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioModTagOptionsLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioModTagOptionsLibrary)
+
 const TArray<FModioModTagInfo>& UModioModTagOptionsLibrary::GetTags(const FModioModTagOptions& ModTags)
 {
 	return ModTags.GetRawList();

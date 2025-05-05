@@ -11,6 +11,8 @@
 #include "Libraries/ModioErrorConditionLibrary.h"
 #include "ModioSDK.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioErrorConditionLibrary)
+
 bool UModioErrorConditionLibrary::ErrorCodeMatches(FModioErrorCode ErrorCode, EModioErrorCondition Condition)
 {
 	if (Condition == EModioErrorCondition::NoError)

@@ -13,6 +13,8 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioReportParams.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioReportParams)
+
 FModioReportParams::FModioReportParams(FModioGameID Game, EModioReportType Type, FString ReportDescription,
 			 TOptional<FString> ReporterName, TOptional<FString> ReporterContact)
 	: FModioReportParams(ToModio(Game), FModioReportParams::ResourceType::Game, Type, ReportDescription, ReporterName,

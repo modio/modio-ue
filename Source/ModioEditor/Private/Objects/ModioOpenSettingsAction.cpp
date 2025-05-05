@@ -12,6 +12,8 @@
 
 #include "ModioEditorUtilityFunctions.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioOpenSettingsAction)
+
 bool UModioOpenSettingsAction::ExecuteAction(FString Args) const
 {
 	UModioEditorUtilityFunctions::OpenModioSettings();

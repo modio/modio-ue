@@ -3,8 +3,11 @@
 
 #include "Libraries/ModioPlatformHelpersLibrary.h"
 
+#include "Misc/ConfigCacheIni.h"
 #include "Types/ModioAuthenticationParams.h"
 #include "Types/ModioCommonTypes.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioPlatformHelpersLibrary)
 
 EModioPlatformName UModioPlatformHelpersLibrary::GetCurrentPlatform()
 {
@@ -83,8 +86,19 @@ EModioAuthenticationProvider UModioPlatformHelpersLibrary::GetDefaultAuthProvide
 		case EModioPlatformName::Windows:
 		case EModioPlatformName::Mac:
 		case EModioPlatformName::Linux:
+		{
 			// We should be handling other Auth Providers for desktop platforms here.
-			return EModioAuthenticationProvider::Steam;
+			FString InterfaceString;
+			GConfig->GetString(TEXT("OnlineSubsystem"), TEXT("NativePlatformService"), InterfaceString, GEngineIni);
+			if (InterfaceString == TEXT("GOG"))
+				return EModioAuthenticationProvider::GoG;
+			else if (InterfaceString == TEXT("Steam"))
+				return EModioAuthenticationProvider::Steam;
+			else if (InterfaceString == TEXT("EOS"))
+				return EModioAuthenticationProvider::Epic;
+			else
+				return EModioAuthenticationProvider::Steam;
+		}
 		case EModioPlatformName::PS4:
 		case EModioPlatformName::PS5:
 			return EModioAuthenticationProvider::PSN;

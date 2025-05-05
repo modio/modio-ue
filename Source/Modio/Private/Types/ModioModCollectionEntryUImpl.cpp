@@ -11,6 +11,8 @@
 #include "Internal/ModioConvert.h"
 #include "Types/ModioModCollectionEntry.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioModCollectionEntry)
+
 EModioModState FModioModCollectionEntry::GetModState() const
 {
 	return ModState;

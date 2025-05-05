@@ -44,7 +44,10 @@
 #include "Libraries/ModioSDKLibrary.h"
 #include "ModioSettings.h"
 #include "ProfilingDebugging/CpuProfilerTrace.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 #include <map>
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioSubsystem)
 
 FModioBackgroundThread::FModioBackgroundThread(UModioSubsystem* ModioSubsystem)
 {
@@ -173,8 +176,6 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 		BackgroundThread = MakeUnique<FModioBackgroundThread>(this);
 	}
 
-	CachedInitializeOptions = Options;
-
 #if WITH_EDITOR
 	if (const UModioSettings* Settings = GetMutableDefault<UModioSettings>())
 	{
@@ -192,15 +193,20 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 	}
 #endif
 
-	Modio::InitializeAsync(ToModio(Options), [WeakThis = MakeWeakObjectPtr(this), OnInitComplete](Modio::ErrorCode ec) {
+	Modio::InitializeAsync(ToModio(Options), [WeakThis = MakeWeakObjectPtr(this), OnInitComplete, Options](Modio::ErrorCode ec) {
 		if (!WeakThis.IsValid())
 		{
 			return;
 		}
-		AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnInitComplete, ec]() {
+		AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnInitComplete, ec, Options]() {
 					  if (WeakThis.IsValid())
 					  {
 						  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+						  if (!ec &&
+							  !UModioErrorConditionLibrary::ErrorCodeMatches(ec, EModioErrorCondition::SDKAlreadyInitialized))
+						  {
+							  WeakThis->CachedInitializeOptions = Options;
+						  }
 						  WeakThis->InvalidateUserSubscriptionCache();
 						  OnInitComplete.ExecuteIfBound(ToUnreal(ec));
 					  }

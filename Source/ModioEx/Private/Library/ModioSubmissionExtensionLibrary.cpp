@@ -21,6 +21,7 @@
 #include "Serialization/BufferArchive.h"
 #include "Engine/Engine.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioSubmissionExtensionLibrary)
 
 static const FString ModFileName(TEXT("Mod.modfile"));
 static const FString LogoFileName(TEXT("ModLogo.png"));

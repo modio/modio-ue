@@ -15,6 +15,8 @@
 #include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioModInfoList)
+
 template const TArray<FModioModInfo>& FModioList<TArray, FModioModInfo>::GetRawList() const;
 
 FModioModInfoList::FModioModInfoList(const Modio::ModInfoList& ModInfoList)

@@ -31,6 +31,8 @@
 	#define MODIO_UE_TEXTURE_RESOURCE_TYPE FTexture2DDynamicResource
 #endif
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioImageWrapper)
+
 #if !UE_SERVER
 static TOptional<TArray<uint8>> GetImageData(TSharedPtr<IImageWrapper> ImageWrapper, ERGBFormat InFormat);
 static ERGBFormat GetDesiredErgbFormat();

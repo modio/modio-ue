@@ -17,6 +17,8 @@
 #include "UnrealEdMisc.h"
 #endif
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioSettings)
+
 UModioSettings::UModioSettings()
 	: LogLevel(EModioLogLevel::Info),
 	  LocalizationStringTable("/Modio/Data/ST_ModioStaticLocData.ST_ModioStaticLocData")

@@ -20,6 +20,8 @@
 #include "ISettingsModule.h"
 #include "Objects/ModioStaticExecutionBase.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioEditorUtilityFunctions)
+
 void UModioEditorUtilityFunctions::SelectAssetsInContentBrowser(const TArray<FString>& AssetPaths)
 {
 	TGuardValue<bool> UnattendedScriptGuard(GIsRunningUnattendedScript, true);

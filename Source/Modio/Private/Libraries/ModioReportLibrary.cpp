@@ -11,6 +11,8 @@
 #include "Libraries/ModioReportLibrary.h"
 #include "Types/ModioCommonTypes.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioReportLibrary)
+
 FModioReportParams UModioReportLibrary::MakeReportForGame(FModioGameID Game, EModioReportType Type,
 														  FString ReportDescription, FString ReporterName,
 														  FString ReporterContact)

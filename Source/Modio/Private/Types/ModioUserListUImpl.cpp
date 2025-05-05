@@ -10,6 +10,8 @@
 #include "Templates/UnrealTemplate.h"
 #include "Types/ModioUserList.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioUserList)
+
 
 FModioOptionalUserList::FModioOptionalUserList(TOptional<FModioUserList>&& ModDependencies)
 	: Internal(MoveTemp(ModDependencies))

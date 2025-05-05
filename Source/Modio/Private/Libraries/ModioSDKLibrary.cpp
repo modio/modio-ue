@@ -17,6 +17,7 @@
 #include "Misc/EngineVersionComparison.h"
 #include "Libraries/ModioPlatformHelpersLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioSDKLibrary)
 
 FModioGameID UModioSDKLibrary::GetProjectGameId()
 {

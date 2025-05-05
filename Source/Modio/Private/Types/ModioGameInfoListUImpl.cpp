@@ -18,6 +18,8 @@
 #include "Internal/Convert/List.h"
 #include "ModioSDK.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioGameInfoList)
+
 template const TArray<FModioGameInfo>& FModioList<TArray, FModioGameInfo>::GetRawList() const;
 
 FModioGameInfoList::FModioGameInfoList(const Modio::GameInfoList& GameInfoList)

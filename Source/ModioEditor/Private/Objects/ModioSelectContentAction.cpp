@@ -12,6 +12,8 @@
 
 #include "ModioEditorUtilityFunctions.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioSelectContentAction)
+
 bool UModioSelectContentAction::ExecuteAction(FString Args) const
 {
 	if (!Args.IsEmpty())

@@ -14,6 +14,8 @@
 #include "EditorUtilityWidgetBlueprint.h"
 #include "Editor.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioOpenEditorWidgetAction)
+
 bool UModioOpenEditorWidgetAction::ExecuteAction(FString Args) const
 {
 	if (Args.IsEmpty())

@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioEditModLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioEditModLibrary)
+
 void UModioEditModLibrary::SetName(FModioEditModParams& In, FString Name)
 {
 	In.Name = Name;

@@ -11,6 +11,8 @@
 #include "Libraries/ModioCommonTypesLibrary.h"
 #include "Types/ModioAuthenticationParams.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioCommonTypesLibrary)
+
 FModioGameID UModioCommonTypesLibrary::MakeGameId(int64 GameId)
 {
 	return FModioGameID(GameId);

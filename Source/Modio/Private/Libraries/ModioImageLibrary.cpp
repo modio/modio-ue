@@ -12,6 +12,8 @@
 #include "Engine/Texture.h"
 #include "Internal/ModioPrivateDefines.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioImageLibrary)
+
 class UTexture2DDynamic* UModioImageLibrary::GetTexture(const FModioImageWrapper& Image)
 {
 	return Image.GetTexture();

@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioCreateModLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioCreateModLibrary)
+
 void UModioCreateModLibrary::SetInitialVisibility_DEPRECATED(FModioCreateModParams& In, bool InitialVisibility)
 {
 	In.bVisible_DEPRECATED = InitialVisibility;

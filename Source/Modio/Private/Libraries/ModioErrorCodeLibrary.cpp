@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioErrorCodeLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioErrorCodeLibrary)
+
 bool UModioErrorCodeLibrary::IsError(const FModioErrorCode& Error)
 {
 	return Error;

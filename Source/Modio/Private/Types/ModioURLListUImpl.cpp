@@ -13,6 +13,8 @@
 
 #include "ModioSDK.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioURLList)
+
 template const TArray<FString>& FModioList<TArray, FString>::GetRawList() const;
 
 FModioYoutubeURLList::FModioYoutubeURLList(const Modio::YoutubeURLList& URLList)

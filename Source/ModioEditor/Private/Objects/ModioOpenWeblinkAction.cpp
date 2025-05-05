@@ -10,6 +10,8 @@
 
 #include "Objects/ModioOpenWeblinkAction.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioOpenWeblinkAction)
+
 bool UModioOpenWeblinkAction::ExecuteAction(FString Args) const
 {
 	if(FPlatformProcess::CanLaunchURL(*Args))

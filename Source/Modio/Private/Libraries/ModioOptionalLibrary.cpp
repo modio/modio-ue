@@ -17,6 +17,8 @@
 #include "Types/ModioUser.h"
 #include "Types/ModioModChangeMap.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioOptionalLibrary)
+
 template<typename BPOptionalType>
 bool IsSetInternal(const BPOptionalType& Optional)
 {

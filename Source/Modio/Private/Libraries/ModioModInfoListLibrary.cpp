@@ -10,6 +10,8 @@
 
 #include "Libraries/ModioModInfoListLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(ModioModInfoListLibrary)
+
 const TArray<FModioModInfo>& UModioModInfoListLibrary::GetMods(const FModioModInfoList& ModInfoList)
 {
 	return ModInfoList.GetRawList();
