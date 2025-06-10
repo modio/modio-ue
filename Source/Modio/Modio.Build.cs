@@ -638,20 +638,25 @@ public class Modio : ModuleRules
         ApplyProjectDefinitions(Target);
         PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
         PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
-#if UE_5_5_OR_LATER
+#if UE_5_6_OR_LATER
+        CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
+#elif UE_5_5_OR_LATER
         UndefinedIdentifierWarningLevel = WarningLevel.Off;
 #else
         bEnableUndefinedIdentifierWarnings = false;
 #endif
 
-#if UE_5_3_OR_LATER
-	    IWYUSupport = IWYUSupport.Full;
+#if UE_5_6_OR_LATER
+        IWYUSupport = IWYUSupport.Full;
+        CppStandard = CppStandardVersion.EngineDefault;
+#elif UE_5_3_OR_LATER
+        IWYUSupport = IWYUSupport.Full;
 	    CppStandard = CppStandardVersion.Cpp17;
 #else
 		bEnforceIWYU = true;
 #endif
-		//bUseUnity = false;
-		bAllowConfidentialPlatformDefines = true;
+        //bUseUnity = false;
+        bAllowConfidentialPlatformDefines = true;
 
         if (IsDevelopmentMode())
         {

@@ -30,6 +30,7 @@ The mod.io plugin is generally maintained to support the 3 most recent versions 
 |UE5.3 | Current
 |UE5.4 | Current
 |UE5.5 | Current
+|UE5.6 | Current
 |===
 
 ### Platform compatability
