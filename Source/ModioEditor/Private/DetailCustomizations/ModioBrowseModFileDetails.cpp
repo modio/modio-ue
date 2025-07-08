@@ -9,14 +9,15 @@
  */
 
 #include "DetailCustomizations/ModioBrowseModFileDetails.h"
-#include "Widgets/SModioEditorWindowCompoundWidget.h"
 #include "DetailCategoryBuilder.h"
 #include "DetailCustomizations/SModFileRow.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailWidgetRow.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Objects/ModioBrowseModFileCollectionObject.h"
 #include "Objects/ModioBrowseModFileObject.h"
-#include "Misc/EngineVersionComparison.h"
+#include "Widgets/SModioEditorWindowCompoundWidget.h"
+#include "Widgets/Views/SListView.h"
 #include "WindowManager.h"
 
 TSharedRef<IDetailCustomization> ModioBrowseModFileDetails::MakeInstance()
@@ -46,78 +47,57 @@ void ModioBrowseModFileDetails::DrawBrowseModFile(IDetailLayoutBuilder& DetailBu
 {
 	TSharedRef<IPropertyHandle> ItemsProperty = DetailBuilder.GetProperty("Items");
 	DetailBuilder.HideProperty(ItemsProperty);
-	
+
 	for (int32 i = 0; i < Target->Items.Num(); i++)
 	{
 		Source.Add(Target->Items[i].ToSharedPtr());
 	}
-	
-	IDetailCategoryBuilder& ModPropertiesCategory = DetailBuilder.EditCategory("Modio Browse Mod File Params", FText::FromString("Modfile"));
+
+	IDetailCategoryBuilder& ModPropertiesCategory =
+		DetailBuilder.EditCategory("Modio Browse Mod File Params", FText::FromString("Modfile"));
 	ModPropertiesCategory.AddCustomRow(FText::FromString(""))
-	.WholeRowContent()
-	[
-		SAssignNew(ListView, SListView<TSharedPtr<FModioBrowseModFileStruct>>)
-		.SelectionMode(ESelectionMode::Multi)
-		.ListItemsSource(&Source)
-		.OnGenerateRow_Lambda([this](TSharedPtr<FModioBrowseModFileStruct> Item, const TSharedRef<STableViewBase>& OwnerTable)->TSharedRef<ITableRow>
-		{
-			return SNew(SModFileRow, OwnerTable).Item(Item);
-		})
-		.HeaderRow
-		(
-			SNew(SHeaderRow)
+		.WholeRowContent()
+			[SAssignNew(ListView, SListView<TSharedPtr<FModioBrowseModFileStruct>>)
+				 .SelectionMode(ESelectionMode::Multi)
+				 .ListItemsSource(&Source)
+				 .OnGenerateRow_Lambda([this](TSharedPtr<FModioBrowseModFileStruct> Item,
+											  const TSharedRef<STableViewBase>& OwnerTable) -> TSharedRef<ITableRow> {
+					 return SNew(SModFileRow, OwnerTable).Item(Item);
+				 })
+				 .HeaderRow(
+					 SNew(SHeaderRow)
 
-			+ SHeaderRow::Column("Name")
-			[
-				SNew(SHorizontalBox)
+					 + SHeaderRow::Column(
+						   "Name")[SNew(SHorizontalBox)
 
-				+SHorizontalBox::Slot()
-				.Padding(5.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				[
-					SNew(STextBlock).Text(FText::FromString("Name"))
-				]
-			]
+								   + SHorizontalBox::Slot()
+										 .Padding(5.f)
+										 .HAlign(HAlign_Left)
+										 .VAlign(VAlign_Center)[SNew(STextBlock).Text(FText::FromString("Name"))]]
 
-			+ SHeaderRow::Column("Platform")
-			[
-				SNew(SHorizontalBox)
+					 +
+					 SHeaderRow::Column(
+						 "Platform")[SNew(SHorizontalBox)
 
-				+ SHorizontalBox::Slot()
-				.Padding(5.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				[
-					SNew(STextBlock).Text(FText::FromString("Platform"))
-				]
-			]
+									 + SHorizontalBox::Slot()
+										   .Padding(5.f)
+										   .HAlign(HAlign_Left)
+										   .VAlign(VAlign_Center)[SNew(STextBlock).Text(FText::FromString("Platform"))]]
 
-			+ SHeaderRow::Column("Version")
-			[
-				SNew(SHorizontalBox)
+					 + SHeaderRow::Column(
+						   "Version")[SNew(SHorizontalBox)
 
-				+ SHorizontalBox::Slot()
-				.Padding(5.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				[
-					SNew(STextBlock).Text(FText::FromString("Version"))
-				]
-			]
+									  + SHorizontalBox::Slot()
+											.Padding(5.f)
+											.HAlign(HAlign_Left)
+											.VAlign(VAlign_Center)[SNew(STextBlock).Text(FText::FromString("Version"))]]
 
-			+ SHeaderRow::Column("Status")
-			[
-				SNew(SHorizontalBox)
+					 +
+					 SHeaderRow::Column(
+						 "Status")[SNew(SHorizontalBox)
 
-				+ SHorizontalBox::Slot()
-				.Padding(5.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				[
-					SNew(STextBlock).Text(FText::FromString("Status"))
-				]
-			]
-		)
-	];
+								   + SHorizontalBox::Slot()
+										 .Padding(5.f)
+										 .HAlign(HAlign_Left)
+										 .VAlign(VAlign_Center)[SNew(STextBlock).Text(FText::FromString("Status"))]])];
 }

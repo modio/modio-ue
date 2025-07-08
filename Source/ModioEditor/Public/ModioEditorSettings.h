@@ -24,9 +24,6 @@ public:
 	UModioEditorSettings(const FObjectInitializer& Initializer);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "modio Editor")
-	bool bShowGettingStartedOnStartup = true;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "modio Editor")
 	bool bDisplayToolsMenuItem = true;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Config, Category = "modio Editor|Getting Started")

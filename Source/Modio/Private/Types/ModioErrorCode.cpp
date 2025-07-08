@@ -94,6 +94,12 @@ FModioErrorCode FModioErrorCode::SystemError()
 	return ec;
 }
 
+FModioErrorCode FModioErrorCode::CancelledError()
+{
+	static FModioErrorCode ec = FModioErrorCode(Modio::make_error_code(Modio::GenericError::OperationCanceled));
+	return ec;
+}
+
 int32 FModioErrorCode::GetCategoryID()
 {
 	if (InternalError)

@@ -12,7 +12,7 @@
 
 #include "CoreMinimal.h"
 #include "IDetailCustomization.h"
-#include "SlateBasics.h"
+#include "Widgets/Views/SListView.h"
 
 class UModioBrowseModFileCollectionObject;
 class SSearchBox;
@@ -23,13 +23,11 @@ struct FModioBrowseModFileStruct;
 class MODIOEDITOR_API ModioBrowseModFileDetails : public IDetailCustomization
 {
 public:
-
 	static TSharedRef<IDetailCustomization> MakeInstance();
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 	void DrawBrowseModFile(IDetailLayoutBuilder& DetailBuilder);
 
 private:
-
 	UModioBrowseModFileCollectionObject* Target;
 	TSharedPtr<SListView<TSharedPtr<FModioBrowseModFileStruct>>> ListView;
 	TArray<TSharedPtr<FModioBrowseModFileStruct>> Source;

@@ -791,6 +791,11 @@ public:
 	/**
 	 * @docpublic
 	 * @brief Set language to get corresponding data from the server
+	 * @note Setting the language invalidates your local cache of mod and game info
+	 * The next time this data is fetched, it will be in the new language
+	 * To get this localized content immediately, you must call
+	 * [`FetchExternalUpdatesAsync`](#fetchexternalupdatesasync) yourself after changing the language
+	 * Without calling  [`FetchExternalUpdatesAsync`](#fetchexternalupdatesasync), mod and game info may be returned in a previous language.
 	 * @param Locale Language to set
 	 */
 	MODIO_API void SetLanguage(EModioLanguage Locale);
@@ -946,6 +951,8 @@ public:
 	 * current user is subscribed to, first use [`UnsubscribeFromModAsync`](#unsubscribefrommodasync). If the mod does
 	 * not uninstall (due to a different user on the same system remaining subscribed), `ForceUninstallModAsync` can be
 	 * called next.
+	 * @note This function reports its outcome (success or failure) exclusively through the provided `Callback`.
+	 * It **does not** emit a separate `Uninstalled` event.
 	 * @param ModToRemove The mod ID to force uninstall.
 	 * @param Callback Callback indicating success or failure of the uninstallation.
 	 * @errorcategory `SDKNotInitialized`|SDK not initialized
@@ -1619,6 +1626,11 @@ public:
 	/**
 	 * @docpublic
 	 * @brief Set language to get corresponding data from the server
+	 * @note Setting the language invalidates your local cache of mod and game info
+	 * The next time this data is fetched, it will be in the new language
+	 * To get this localized content immediately, you must call
+	 * [`FetchExternalUpdatesAsync`](#fetchexternalupdatesasync) yourself after changing the language.
+	 * Without calling  [`FetchExternalUpdatesAsync`](#fetchexternalupdatesasync), mod and game info may be returned in a previous language.
 	 * @param Locale Language to set
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SetLanguage", Category = "mod.io")

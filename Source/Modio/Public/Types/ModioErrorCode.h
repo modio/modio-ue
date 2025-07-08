@@ -73,6 +73,13 @@ struct MODIO_API FModioErrorCode
 	 */
 	static FModioErrorCode SystemError();
 
+	/**
+	 * @docpublic
+	 * @brief Static method to return a cancelled error instance
+	 * @return FModioErrorCode instance representing a cancelled error
+	 */
+	static FModioErrorCode CancelledError();
+
 	/** @docpublic
 	 * @brief Get the category ID associated with the error
 	 * @return category ID as an integer

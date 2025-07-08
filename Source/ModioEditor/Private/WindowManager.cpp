@@ -11,40 +11,37 @@
 #include "WindowManager.h"
 #include "Misc/EngineVersionComparison.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
-	#include "DesktopPlatform/Public/IDesktopPlatform.h"
 	#include "DesktopPlatform/Public/DesktopPlatformModule.h"
+	#include "DesktopPlatform/Public/IDesktopPlatform.h"
 #else
 	#include "DesktopPlatformModule.h"
 	#include "IDesktopPlatform.h"
 #endif
-#include "DetailCustomizations/ModioCreateModParamsDetails.h"
 #include "DetailCustomizations/ModioBrowseModFileDetails.h"
 #include "DetailCustomizations/ModioBrowseModsParamsDetails.h"
 #include "DetailCustomizations/ModioCreateModFileParamsDetails.h"
+#include "DetailCustomizations/ModioCreateModParamsDetails.h"
 #include "DetailCustomizations/ModioEditModParamsDetails.h"
+#include "Framework/Application/SlateApplication.h"
 #include "Objects/ModioCreateModParamsObject.h"
-#include "Widgets/SWindow.h"
 #include "Widgets/SModioEditorWindowCompoundWidget.h"
+#include "Widgets/SWindow.h"
 
 TSharedPtr<SWindow> WindowManager::GetWindow()
 {
-	if (!Window.IsValid()) 
+	if (!Window.IsValid())
 	{
 		Window = SNew(SWindow)
-		.Title(FText::FromString("mod.io - Content Creation & Upload Tool"))
-		.SupportsMaximize(false)
-		.SupportsMinimize(false)
-		.HasCloseButton(true)
-		.ClientSize(FVector2D(900.f, 600.f))
-		.SizingRule(ESizingRule::FixedSize)
-		.AutoCenter(EAutoCenter::PreferredWorkArea)
-		.ScreenPosition(FVector2D(0, 0))
-		.LayoutBorder(FMargin(3.f))
-		[
-			SAssignNew(RootWidget, SModioEditorWindowCompoundWidget)
-		];
-		Window->SetOnWindowClosed(FOnWindowClosed::CreateLambda([this](const TSharedRef<SWindow>& WindowRef) 
-		{
+					 .Title(FText::FromString("mod.io - Content Creation & Upload Tool"))
+					 .SupportsMaximize(false)
+					 .SupportsMinimize(false)
+					 .HasCloseButton(true)
+					 .ClientSize(FVector2D(900.f, 600.f))
+					 .SizingRule(ESizingRule::FixedSize)
+					 .AutoCenter(EAutoCenter::PreferredWorkArea)
+					 .ScreenPosition(FVector2D(0, 0))
+					 .LayoutBorder(FMargin(3.f))[SAssignNew(RootWidget, SModioEditorWindowCompoundWidget)];
+		Window->SetOnWindowClosed(FOnWindowClosed::CreateLambda([this](const TSharedRef<SWindow>& WindowRef) {
 			RootWidget->UnloadResources();
 			RootWidget = nullptr;
 			Window = nullptr;
@@ -60,7 +57,7 @@ FPropertyEditorModule& WindowManager::GetPropertyModule()
 	return FModuleManager::GetModuleChecked<FPropertyEditorModule>(PROPERTY_EDITOR);
 }
 
-void WindowManager::OpenFolderDialog(const FString& Title, FString& OutFolder) 
+void WindowManager::OpenFolderDialog(const FString& Title, FString& OutFolder)
 {
 	if (Window.IsValid())
 	{
@@ -72,7 +69,8 @@ void WindowManager::OpenFolderDialog(const FString& Title, FString& OutFolder)
 			if (DesktopPlatform)
 			{
 				FString OutFolderName;
-				if(DesktopPlatform->OpenDirectoryDialog(ParentWindowHandle, Title, FPaths::ProjectDir(), OutFolderName))
+				if (DesktopPlatform->OpenDirectoryDialog(ParentWindowHandle, Title, FPaths::ProjectDir(),
+														 OutFolderName))
 				{
 					OutFolder = OutFolderName;
 				}
@@ -81,7 +79,8 @@ void WindowManager::OpenFolderDialog(const FString& Title, FString& OutFolder)
 	}
 }
 
-void WindowManager::OpenFileDialog(const FString& Title, const FString& Filters, bool AllowMultipleSelection, TArray<FString>& OutFiles) 
+void WindowManager::OpenFileDialog(const FString& Title, const FString& Filters, bool AllowMultipleSelection,
+								   TArray<FString>& OutFiles)
 {
 	if (Window.IsValid())
 	{
@@ -93,7 +92,8 @@ void WindowManager::OpenFileDialog(const FString& Title, const FString& Filters,
 			if (DesktopPlatform)
 			{
 				TArray<FString> OutFileName;
-				if (DesktopPlatform->OpenFileDialog(ParentWindowHandle, Title, TEXT(""), TEXT(""), Filters, AllowMultipleSelection, OutFileName))
+				if (DesktopPlatform->OpenFileDialog(ParentWindowHandle, Title, TEXT(""), TEXT(""), Filters,
+													AllowMultipleSelection, OutFileName))
 				{
 					OutFiles = OutFileName;
 				}
@@ -102,8 +102,8 @@ void WindowManager::OpenFileDialog(const FString& Title, const FString& Filters,
 	}
 }
 
-void WindowManager::CloseWindow() 
-{	
+void WindowManager::CloseWindow()
+{
 	if (Window.IsValid())
 	{
 		Window->RequestDestroyWindow();
@@ -117,21 +117,26 @@ void WindowManager::RegisterCustomClassLayout(FName ClassName, FOnGetDetailCusto
 	GetPropertyModule().RegisterCustomClassLayout(ClassName, DetailLayoutDelegate);
 }
 
-void WindowManager::RegisterObjectCustomizations() 
+void WindowManager::RegisterObjectCustomizations()
 {
-	RegisterCustomClassLayout("ModioCreateModParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(&ModioCreateModParamsDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioBrowseModsObject", FOnGetDetailCustomizationInstance::CreateStatic(&ModioBrowseModsParamsDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioEditModParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(&ModioEditModParamsDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioBrowseModFileCollectionObject", FOnGetDetailCustomizationInstance::CreateStatic(&ModioBrowseModFileDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioCreateNewModFileParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(&ModioCreateModFileParamsDetails::MakeInstance));
+	RegisterCustomClassLayout("ModioCreateModParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(
+																&ModioCreateModParamsDetails::MakeInstance));
+	RegisterCustomClassLayout("ModioBrowseModsObject", FOnGetDetailCustomizationInstance::CreateStatic(
+														   &ModioBrowseModsParamsDetails::MakeInstance));
+	RegisterCustomClassLayout("ModioEditModParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(
+															  &ModioEditModParamsDetails::MakeInstance));
+	RegisterCustomClassLayout("ModioBrowseModFileCollectionObject", FOnGetDetailCustomizationInstance::CreateStatic(
+																		&ModioBrowseModFileDetails::MakeInstance));
+	RegisterCustomClassLayout("ModioCreateNewModFileParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(
+																	   &ModioCreateModFileParamsDetails::MakeInstance));
 }
 
-void WindowManager::UnregisterObjectCustomizations() 
+void WindowManager::UnregisterObjectCustomizations()
 {
-	if (FModuleManager::Get().IsModuleLoaded(PROPERTY_EDITOR)) 
+	if (FModuleManager::Get().IsModuleLoaded(PROPERTY_EDITOR))
 	{
 		FPropertyEditorModule& PropertyModule = GetPropertyModule();
-		for (auto registry = RegisteredClassNames.CreateConstIterator(); registry; ++registry) 
+		for (auto registry = RegisteredClassNames.CreateConstIterator(); registry; ++registry)
 		{
 			if (registry->IsValid())
 			{

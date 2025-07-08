@@ -19,6 +19,7 @@
 #include "Templates/UnrealTemplate.h"
 #include "ISettingsModule.h"
 #include "Objects/ModioStaticExecutionBase.h"
+#include "ModioEditorPerProjectUserSettings.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ModioEditorUtilityFunctions)
 
@@ -53,10 +54,10 @@ void UModioEditorUtilityFunctions::SelectAssetsInContentBrowser(const TArray<FSt
 
 void UModioEditorUtilityFunctions::SetDisplayGettingStartedWidgetOnStartup(bool bNewValue)
 {
-	if (UModioEditorSettings* EditorSettings = GetMutableDefault<UModioEditorSettings>())
+	if (UModioEditorPerProjectUserSettings* EditorUserSettings = GetMutableDefault<UModioEditorPerProjectUserSettings>())
 	{
-		EditorSettings->bShowGettingStartedOnStartup = bNewValue;
-		EditorSettings->SaveConfig();
+		EditorUserSettings->bShowGettingStartedOnStartup = bNewValue;
+		EditorUserSettings->SaveConfig();
 	}
 }
 

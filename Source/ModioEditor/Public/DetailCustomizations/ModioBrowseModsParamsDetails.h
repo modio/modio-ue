@@ -12,7 +12,7 @@
 
 #include "CoreMinimal.h"
 #include "IDetailCustomization.h"
-#include "SlateBasics.h"
+#include "Widgets/Views/SListView.h"
 
 class UModioBrowseModsObject;
 class SSearchBox;
@@ -21,13 +21,11 @@ struct FModioModInfo;
 class MODIOEDITOR_API ModioBrowseModsParamsDetails : public IDetailCustomization
 {
 public:
-
 	static TSharedRef<IDetailCustomization> MakeInstance();
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 	void DrawEditMod(IDetailLayoutBuilder& DetailBuilder);
 
 private:
-
 	UModioBrowseModsObject* Target;
 	TSharedPtr<SSearchBox> SearchBox;
 	TSharedPtr<SListView<TSharedPtr<FModioModInfo>>> ListView;

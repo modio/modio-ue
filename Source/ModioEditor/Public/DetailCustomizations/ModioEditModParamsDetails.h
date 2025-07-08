@@ -12,21 +12,20 @@
 
 #include "CoreMinimal.h"
 #include "IDetailCustomization.h"
-#include "SlateBasics.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/Input/SMultiLineEditableTextBox.h"
 
 class UModioEditModParamsObject;
 struct FModioModInfo;
 
 class MODIOEDITOR_API ModioEditModParamsDetails : public IDetailCustomization
 {
-
 public:
 	static TSharedRef<IDetailCustomization> MakeInstance();
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 	void DrawEditMod(IDetailLayoutBuilder& DetailBuider);
 
 private:
-
 	UModioEditModParamsObject* Target;
 	TSharedPtr<SEditableTextBox> PathToLogoFileEditableTextBox;
 	TSharedPtr<SEditableTextBox> NameEditableTextBox;

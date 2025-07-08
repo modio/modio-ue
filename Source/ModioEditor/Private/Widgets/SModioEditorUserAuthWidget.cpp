@@ -7,25 +7,22 @@
  *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
  *
  */
-
 #include "Widgets/SModioEditorUserAuthWidget.h"
-
-#include "Libraries/ModioSDKLibrary.h"
-#include "WindowManager.h"
-
-#include "EngineMinimal.h"
+#include "Engine/Engine.h"
 #include "Libraries/ModioErrorConditionLibrary.h"
-
+#include "Libraries/ModioSDKLibrary.h"
 #include "Misc/MessageDialog.h"
+#include "Widgets/Images/SThrobber.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Text/SRichTextBlock.h"
 #include "Widgets/Text/STextBlock.h"
-#include "Widgets/Images/SThrobber.h"
+#include "WindowManager.h"
 
 #define LOCTEXT_NAMESPACE "ModioEditorUserAuthWidget"
 
 void SModioEditorUserAuthWidget::Construct(const FArguments& InArgs)
 {
+	// clang-format off
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -43,12 +40,13 @@ void SModioEditorUserAuthWidget::Construct(const FArguments& InArgs)
 			SAssignNew(RootWidget, SVerticalBox)
 		]
 	];
-
+	// clang-format on
 	DrawThrobberWidget();
 	LoadModioSubsystem();
 }
 
-void SModioEditorUserAuthWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+void SModioEditorUserAuthWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
+									  const float InDeltaTime)
 {
 	if (ModioSubsystem && !ModioSubsystem->IsUsingBackgroundThread())
 	{
@@ -80,14 +78,21 @@ void SModioEditorUserAuthWidget::LoadModioSubsystem()
 
 void SModioEditorUserAuthWidget::OnInitCallback(FModioErrorCode ErrorCode)
 {
-	if (!ErrorCode.GetValue() || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
+	if (!ErrorCode.GetValue() ||
+		UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
-		UE_LOG(LogTemp, Display, TEXT("ModioSubsystem - UserAuthWidget - OnInitCallback - ModioSubsystem initialized."));
-		ModioSubsystem->VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserAuthWidget::OnUserAuthCheckResponse));
+		UE_LOG(LogTemp, Display,
+			   TEXT("ModioSubsystem - UserAuthWidget - OnInitCallback - ModioSubsystem initialized."));
+		ModioSubsystem->VerifyUserAuthenticationAsync(
+			FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserAuthWidget::OnUserAuthCheckResponse));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("ModioSubsystem - UserAuthWidget - OnInitCallback - Could not initialize ModioSubsystem - ErrorCode: %d | " "ErrorMessage: %s"), ErrorCode.GetValue(), *ErrorCode.GetErrorMessage());
+		UE_LOG(LogTemp, Error,
+			   TEXT("ModioSubsystem - UserAuthWidget - OnInitCallback - Could not initialize ModioSubsystem - "
+					"ErrorCode: %d | "
+					"ErrorMessage: %s"),
+			   ErrorCode.GetValue(), *ErrorCode.GetErrorMessage());
 		WindowManager::Get().CloseWindow();
 	}
 }
@@ -106,7 +111,7 @@ void SModioEditorUserAuthWidget::ClearAllWidgets()
 void SModioEditorUserAuthWidget::DrawThrobberWidget()
 {
 	ClearAllWidgets();
-
+	// clang-format off
 	RootWidget->AddSlot()
 		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
 		.HAlign(HAlign_Center)
@@ -115,6 +120,7 @@ void SModioEditorUserAuthWidget::DrawThrobberWidget()
 			SNew(SCircularThrobber)
 			.Radius(50.f)
 		];
+	// clang-format on
 }
 
 void SModioEditorUserAuthWidget::OnUserAuthCheckResponse(FModioErrorCode ErrorCode)
@@ -132,7 +138,7 @@ void SModioEditorUserAuthWidget::OnUserAuthCheckResponse(FModioErrorCode ErrorCo
 void SModioEditorUserAuthWidget::DrawLoginWidget()
 {
 	ClearAllWidgets();
-
+	// clang-format off
 	RootWidget->AddSlot()
 	.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
 	.HAlign(HAlign_Center)
@@ -182,21 +188,23 @@ void SModioEditorUserAuthWidget::DrawLoginWidget()
 			]
 		]
 	];
+	// clang-format on
 }
 
 FReply SModioEditorUserAuthWidget::OnLoginButtonClicked()
 {
 	if (ModioEmailEditableTextBox->GetText().ToString().IsEmpty())
 	{
-		FText Message = LOCTEXT("ModioLoginInvalid", "Unable to login, please enter a valid email address for mod.io!"); 
+		FText Message = LOCTEXT("ModioLoginInvalid", "Unable to login, please enter a valid email address for mod.io!");
 		FMessageDialog::Open(EAppMsgType::Ok, Message);
 		WindowManager::Get().GetWindow()->BringToFront();
 		return FReply::Handled();
 	}
 
 	DrawThrobberWidget();
-	ModioSubsystem->RequestEmailAuthCodeAsync(FModioEmailAddress(ModioEmailEditableTextBox->GetText().ToString()), 
-						FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserAuthWidget::OnRequestEmailAuthCodeCompleted));
+	ModioSubsystem->RequestEmailAuthCodeAsync(
+		FModioEmailAddress(ModioEmailEditableTextBox->GetText().ToString()),
+		FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserAuthWidget::OnRequestEmailAuthCodeCompleted));
 	return FReply::Handled();
 }
 
@@ -225,7 +233,7 @@ void SModioEditorUserAuthWidget::OnRequestEmailAuthCodeCompleted(FModioErrorCode
 void SModioEditorUserAuthWidget::DrawAuthenticateWidget()
 {
 	ClearAllWidgets();
-
+	// clang-format off
 	RootWidget->AddSlot()
 		.Padding(FMargin(15.f, 15.f, 15.f, 5.f))
 		.HAlign(HAlign_Center)
@@ -286,6 +294,7 @@ void SModioEditorUserAuthWidget::DrawAuthenticateWidget()
 			]
 		]
 	];
+	// clang-format on
 }
 
 FReply SModioEditorUserAuthWidget::OnAuthenticateButtonClicked()

@@ -5,40 +5,42 @@ slug: /unreal/
 custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/index.mdx
 ---
 
-The mod.io Unreal Engine plugin enables game developers to easily integrate mods into their Unreal Engine 5 games. 
+The mod.io Unreal Engine suite of plugins enables game developers to easily integrate mods into their Unreal Engine 5 games. 
+There are four primary products that comprise mod.io's Unreal Engine support, offering targeted, simplified solutions for common modding requirements. Select a product below to learn more about it, or dive straight into the repository.
 
-The plugin provides a C++ and Blueprint interface around the [mod.io SDK](/cppsdk/) to connect to the [mod.io REST API](https://docs.mod.io/restapiref/). Also included is a set of UI components to easily create a custom user interface that matches your game's style, plus a comprehensive template UI to get you started. 
+<div className="card-grid">
 
-You can download the [mod.io Unreal Engine plugin from GitHub](https://github.com/modio/modio-ue). Once you have, follow the [installation guide](installation-and-setup/) for installing and configuring the plugin.  A series of [quick-start guides](getting-started/) are also available to familiarize yourself with the plugin's core features.
+  <Card
+    shadow="tl"
+    title="Core Plugin"
+    image="/img/icon_modio.svg"
+    text="Facilitates core mod.io service functionality, such as authentication, searching & filtering, and subscription management."
+    moreLink="/unreal/core-plugin/"
+    githubLink="https://github.com/modio/modio-ue"
+  />
+    <Card
+    shadow="tl"
+    title="ModioUGC"
+    image="/img/icon_ue.svg"
+    text="An opinionated modding framework for Unreal Engine that supports cooking mods, loading PAK files, and content loading."
+    moreLink="/unreal/modio-ugc/overview/"
+    githubLink="https://github.com/modio/modio-ue-modiougc"
+  />
+  <Card
+    shadow="tl"
+    title="Component UI"
+    image="/img/icon_cui.svg"
+    text="A set of interfaces and UI components that assist in integrating mod.io functionality into your own games user interface."
+    moreLink="/unreal/component-ui/overview/"
+    githubLink="https://github.com/modio/modio-ue-component-ui"
+  />
+  <Card
+    shadow="tl"
+    title="Template UI"
+    image="/img/icon_tui.svg"
+    text="A generic standalone user interface that is built using Component UI and supports core mod.io functionality."
+    moreLink="/unreal/template-ui/ui-overview/"
+    githubLink="https://github.com/modio/modio-ue-component-ui"
+  />
 
-## Engine & platform compatability
-
-The mod.io plugin is generally maintained to support the 3 most recent versions of Unreal Engine. If you are using an older version of the engine, you can access the last supported release of the engine from our [releases page](https://github.com/modio/modio-ue/releases) on GitHub.
-
-### Engine compatability
-
-|Engine Version | Last Release |
-|---|---|
-|UE4.26 | 2023.11 |
-|UE4.27 | 2023.11 |
-|UE5.0 | 2023.11 |
-|UE5.1 | 2024.6 |
-|UE5.2 | 2025.2 |
-|UE5.3 | Current |
-|UE5.4 | Current |
-|UE5.5 | Current |
-
-### Platform compatability
-
-The mod.io Unreal Engine plugin supports Windows, Linux, LinuxArm64, Android and macOS as part of the public release. For access to Windows (GDK), Xbox, PlayStation®4, PlayStation®5 or Switch, follow the [instructions here](/platforms/console-sdks/).
-
-## Features
-
-* C++ and Blueprint support
-* UGC browsing and filtering
-* Automatic downloads and updates
-* Customizable component-based user interface
-* Permissive MIT/BSL-license
-* Async delegate-based interface
-* Non-blocking IO
-* SSO authentication for Steam, Epic Games Store, console platform and custom implementations
+</div>

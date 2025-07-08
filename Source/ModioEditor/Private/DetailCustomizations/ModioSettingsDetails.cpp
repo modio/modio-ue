@@ -14,7 +14,6 @@
 #include "Widgets/SModioEditorGameInfoWidget.h"
 #include "Widgets/SModioEditorUserGamesList.h"
 #include "ModioSettings.h"
-#include "WindowManager.h"
 
 #include "Widgets/Input/SButton.h"
 #include "DetailLayoutBuilder.h"

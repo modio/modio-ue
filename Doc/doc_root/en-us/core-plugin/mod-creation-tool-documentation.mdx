@@ -1,0 +1,174 @@
+---
+id: ue-mod-creation-tool
+title: Mod Upload Tool
+slug: /unreal/core-plugin/mod-creation-tool/
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/mod-creation-tool-documentation.mdx
+---
+
+## Mod Creation & Upload Tool
+
+The mod.io Unreal Engine's plugin includes an editor module which provides an embedded mod.io - Content Creation and Upload Tool.
+
+### Editor-specific plugin modules
+
+| Module Name | Description | Module Type |
+|   ---           |   ---           |   ---           |
+| ModioEditor | Editor details customization and asset factories for UE content creation and upload tool classes | Editor |
+
+### Opening the tool
+Click the mod.io icon in Unreal Engine to show a drop down menu, click the **Create & Upload** menu. Once opened, it may require mod.io authentication as below.
+
+![how_to_open_tool](img/Tool/how_to_open_tool.jpg)
+
+### Authenticating
+
+Authentication may be required either being a first time user of the module or not logged in previously. If you are already logged in, you will automatically be redirected to creating or editing mods.
+
+The user will be authenticated if not already logged in to mod.io account.
+
+**Email:**
+Enter your email in the text box shown below and click Login, a verification code will be sent to the submitted email address.
+
+![auth_enter_email](img/Tool/auth_enter_email.jpg)
+
+#### Verification Code
+
+**Verification Code:** Enter the code received in your email and click Authenticate.
+
+![auth_enter_code](img/Tool/auth_enter_code.jpg)
+
+If everything goes correctly, you will be authenticated successfully.
+
+### Create or Edit Mods
+After successfull authentication, you can either **Create Mod** or **Edit Mods**.
+
+![create_or_upload_mod](img/Tool/create_or_upload_mod.jpg)
+
+#### Create Mod
+
+**Create Mod** lets you create a new mod.
+
+![create_mod](img/Tool/create_mod.jpg)
+
+#### Edit Mods
+
+**Edit Mods** lets you edit existing mods and change any specific values or mod files on them.
+
+![edit_mods](img/Tool/edit_mods.jpg)
+
+### Create a Mod
+Creating a mod is made easy directly from within Unreal Engine described in the
+process below.
+
+#### Create Mod
+
+Click **Create Mod** and fill the following required fields:
+
+**Create Mod Properties** 
+
+| Fields | Description |
+|   ---      |   ---           | 
+| Path to Logo File | Browse to select your **.png** file for logo |
+| Name | Name of the mod |
+| Summary | A brief summary of the mod |
+
+![create_mod_properties](img/Tool/create_mod_properties.jpg)
+
+Once filled all the required fields, click **Submit** to create the mod.
+
+![create_mod_properties_submit](img/Tool/create_mod_properties_submit.jpg)
+
+**TIP**: You may get an error dialog if the game doesn't support your platform or the game is locked.
+
+![error_platform_not_supported](img/Tool/error_platform_not_supported.jpg)
+![error_game_locked](img/Tool/error_game_locked.jpg)
+
+Once everything goes successful you will be asked  if you also want to upload a mod file right away. 
+
+![mod_created_modfile_prompt](img/Tool/mod_created_modfile_prompt.jpg)
+
+If **Yes** is selected you will be redirected to **STEP 6**.
+
+### Edit existing mods
+Editing existing mods is made easy in the same way as creating a mod directly from within Unreal Engine described in the process below.
+
+#### Edit Mods
+
+By clicking **Edit Mods**, a list of mods will be shown to edit. You can select a mod by clicking on it.
+
+**Browse Mods** 
+
+| Name   | Description |
+|   ---      |   ---           | 
+| Your mod name | Your mod description |
+
+![browse_mods](img/Tool/browse_mods.jpg)
+
+Once a mod is selected, click **Edit Mod** to edit the mod.
+
+![browse_mods_edit_mods](img/Tool/browse_mods_edit_mods.jpg)
+
+**Edit Mod Properties** 
+
+| Field  | Description |
+|   ---      |   ---           | 
+| Name | Your mod name |
+| Summary | Your mod summary |
+| Homepage URL | Your mod homepage url |
+
+![edit_mod_properties](img/Tool/edit_mod_properties.jpg)
+
+If you want to change the mod properties, make desirable changes to above fields and click **Submit**. 
+
+![edit_mod_properties_submit](img/Tool/edit_mod_properties_submit.jpg)
+
+Then click **Edit Files** to see list of existing mod files.
+
+![edit_mod_properties_edit_files](img/Tool/edit_mod_properties_edit_files.jpg)
+
+**Modfile** 
+
+| Name | Platform | Version  | Status |
+|   ---    | ---          |   ---        |   ---      |
+| Your mod file name | Your mod platform | Your mod file version | Your mod file status |
+
+![browse_modfile](img/Tool/browse_modfile.jpg)
+
+### Uploading a new modfile
+To upload a mod file, a workspace directory path is mandatory which is described in the process below.
+
+Click **New Modfile**
+
+![browse_modfile_new_modfile](img/Tool/browse_modfile_new_modfile.jpg)
+
+You may need to select **Create mod for PC**
+
+![create_mod_for_pc](img/Tool/create_mod_for_pc.jpg)
+
+Fill the required fields:
+
+TIP: You may get an error dialog if the game doesn't support your platform or the game is locked.
+
+**Upload Mod File** 
+
+| Field | Description |
+|   ---     |   ---           |
+| Version | Your mod file version | 
+| Changelog | Your mod file platform |
+| Set as Active Release | Whether to set as Active Release |
+| Path to Mod Root Directory | Path to the workspace directory |
+
+![upload_modfile](img/Tool/upload_modfile.jpg)
+
+Once all fields are filled out, click **Submit**
+
+![upload_modfile_submit](img/Tool/upload_modfile_submit.jpg)
+
+Once submitted, the progress bar will be displayed about the workspace directory being zipped and uploaded with all other information provided for the new mod file.
+
+![upload_modfile_submit_status](img/Tool/upload_modfile_submit_status.jpg)
+
+### Mod file upload
+**TIP**: You may get an error dialog if the game doesn't support your platform or the game is locked or any error that occurs due to internet or any other circumstances.
+
+![modfile_successfully_uploaded](img/Tool/modfile_successfully_uploaded.jpg)

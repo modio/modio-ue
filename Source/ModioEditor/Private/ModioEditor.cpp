@@ -19,6 +19,7 @@
 	#include "WindowManager.h"
 	#include "Misc/MessageDialog.h"
 	#include "GenericPlatform/GenericPlatformMisc.h"
+	#include "ModioEditorPerProjectUserSettings.h"
 #endif
 
 #include "ModioSettings.h"
@@ -45,8 +46,13 @@ void FModioEditor::StartupModule()
 			"Project", "Plugins", "mod.io Editor", LOCTEXT("EditorSettingsName", "mod.io Editor"),
 			LOCTEXT("EditorSettingsDescription", "Configure the mod.io plugin's editor-specific behaviour"),
 			GetMutableDefault<UModioEditorSettings>());
+
+		SettingsModule->RegisterSettings(
+			"Project", "Plugins", "mod.io User Editor", LOCTEXT("UserEditorSettingsName", "mod.io Editor User"),
+			LOCTEXT("UserEditorSettingsDescription", "Configure the mod.io plugin's editor-specific behaviour"),
+			GetMutableDefault<UModioEditorPerProjectUserSettings>());
 	}
-	if (GetMutableDefault<UModioEditorSettings>()->bShowGettingStartedOnStartup)
+	if (GetMutableDefault<UModioEditorPerProjectUserSettings>()->bShowGettingStartedOnStartup)
 	{
 		IMainFrameModule& MainFrameModule = IMainFrameModule::Get();
 		if (MainFrameModule.IsWindowInitialized())

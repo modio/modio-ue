@@ -9,9 +9,10 @@
  */
 
 #include "DetailCustomizations/SModFileRow.h"
+#include "Framework/Views/ITypedTableView.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Widgets/SModioEditorWindowCompoundWidget.h"
 #include "WindowManager.h"
-#include "Misc/EngineVersionComparison.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
 	#include "Launch/Resources/Version.h"
 #endif
@@ -36,45 +37,29 @@ TSharedRef<SWidget> SModFileRow::GenerateWidgetForColumn(const FName& ColumnName
 	{
 		return SNew(SHorizontalBox)
 
-			+SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
-			[
-				SNew(STextBlock)
-			   .Text(FText::FromString(Item->Name))
-			];
+			   + SHorizontalBox::Slot().Padding(
+					 FMargin(5.f, 10.f, 0.f, 10.f))[SNew(STextBlock).Text(FText::FromString(Item->Name))];
 	}
 	else if (ColumnName == TEXT("Platform"))
 	{
 		return SNew(SHorizontalBox)
 
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
-			[
-				SNew(STextBlock)
-				.Text(FText::FromString(PlatformString))
-			];
+			   + SHorizontalBox::Slot().Padding(
+					 FMargin(5.f, 10.f, 0.f, 10.f))[SNew(STextBlock).Text(FText::FromString(PlatformString))];
 	}
 	else if (ColumnName == TEXT("Version"))
 	{
 		return SNew(SHorizontalBox)
 
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
-			[
-				SNew(STextBlock)
-				.Text(FText::FromString(Item->Version))
-			];
+			   + SHorizontalBox::Slot().Padding(
+					 FMargin(5.f, 10.f, 0.f, 10.f))[SNew(STextBlock).Text(FText::FromString(Item->Version))];
 	}
 	else if (ColumnName == TEXT("Status"))
 	{
 		return SNew(SHorizontalBox)
 
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(5.f, 10.f, 0.f, 10.f))
-			[
-				SNew(STextBlock)
-				.Text(FText::FromString(Item->Status))
-			];
+			   + SHorizontalBox::Slot().Padding(
+					 FMargin(5.f, 10.f, 0.f, 10.f))[SNew(STextBlock).Text(FText::FromString(Item->Status))];
 	}
 	else
 	{

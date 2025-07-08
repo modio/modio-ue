@@ -11,17 +11,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SlateFwd.h"
-#include "SlateBasics.h"
-#include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Framework/Views/ITypedTableView.h"
+#include "Framework/Views/TableViewMetadata.h"
 #include "Objects/ModioBrowseModFileObject.h"
+#include "SlateBasics.h"
+#include "SlateFwd.h"
+#include "Templates/SharedPointer.h"
+#include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Widgets/Views/SHeaderRow.h"
 #include "Widgets/Views/STableRow.h"
+#include "Widgets/Views/STableViewBase.h"
 
 class MODIOEDITOR_API SModFileRow : public SMultiColumnTableRow<TSharedPtr<FModioBrowseModFileStruct>>
 {
-
 public:
-
 	SLATE_BEGIN_ARGS(SModFileRow) : _Item() {}
 	SLATE_ARGUMENT(TSharedPtr<FModioBrowseModFileStruct>, Item)
 	SLATE_END_ARGS()

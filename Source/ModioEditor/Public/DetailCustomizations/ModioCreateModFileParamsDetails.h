@@ -12,7 +12,7 @@
 
 #include "CoreMinimal.h"
 #include "IDetailCustomization.h"
-#include "SlateBasics.h"
+#include "Widgets/Input/SEditableTextBox.h"
 
 class UModioCreateNewModFileParamsObject;
 class SSearchBox;
@@ -21,13 +21,11 @@ struct FModioModInfo;
 class MODIOEDITOR_API ModioCreateModFileParamsDetails : public IDetailCustomization
 {
 public:
-
 	static TSharedRef<IDetailCustomization> MakeInstance();
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 	void DrawCreateNewModFile(IDetailLayoutBuilder& DetailBuilder);
 
 private:
-
 	UModioCreateNewModFileParamsObject* Target;
 	TSharedPtr<SEditableTextBox> PathToModRootDirectoryEditableTextBox;
 };

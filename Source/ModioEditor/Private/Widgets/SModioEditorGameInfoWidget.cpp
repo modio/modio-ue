@@ -10,23 +10,22 @@
 
 #include "Widgets/SModioEditorGameInfoWidget.h"
 
-#include "EngineMinimal.h"
-
 #include "Libraries/ModioSDKLibrary.h"
-#include "WindowManager.h"
 #include "ModioSettings.h"
+#include "WindowManager.h"
 
 #include "Widgets/Text/STextBlock.h"
 
-#include "Widgets/Images/SThrobber.h"
-#include "Interfaces/IPluginManager.h"
+#include "Engine/Engine.h"
 #include "HAL/FileManagerGeneric.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Interfaces/IPluginManager.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 #include "Misc/FileHelper.h"
 #include "SHyperlinkLaunchURL.h"
-#include "Libraries/ModioErrorConditionLibrary.h"
+#include "Widgets/Images/SThrobber.h"
 
 #define LOCTEXT_NAMESPACE "ModioEditorGameInfoWidget"
 
@@ -48,7 +47,8 @@ void SModioEditorGameInfoWidget::LoadModioSubsystem()
 
 void SModioEditorGameInfoWidget::OnInitCallback(FModioErrorCode ErrorCode)
 {
-	if (!ErrorCode || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
+	if (!ErrorCode ||
+		UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
 		UE_LOG(LogTemp, Display,
 			   TEXT("ModioSubsystem - UserAuthWidget - OnInitCallback - ModioSubsystem initialized."));
@@ -69,8 +69,8 @@ void SModioEditorGameInfoWidget::OnInitCallback(FModioErrorCode ErrorCode)
 void SModioEditorGameInfoWidget::Construct(const SModioEditorGameInfoWidget::FArguments& InArgs)
 {
 	LoadResources();
-	
-	if(!InArgs._GameId)
+
+	if (!InArgs._GameId)
 	{
 		GameId = TOptional<FModioGameID>();
 	}
@@ -79,23 +79,17 @@ void SModioEditorGameInfoWidget::Construct(const SModioEditorGameInfoWidget::FAr
 		GameId = InArgs._GameId;
 	}
 
-	ChildSlot
-	[	
-		SNew(SVerticalBox)
-		+ SVerticalBox::Slot()
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Top)
-		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-		[
-			SAssignNew(RootWidget, SVerticalBox)
-		]
-	];
-	
+	ChildSlot[SNew(SVerticalBox) + SVerticalBox::Slot()
+									   .HAlign(HAlign_Fill)
+									   .VAlign(VAlign_Top)
+									   .Padding(FMargin(15.f, 15.f, 15.f, 15.f))[SAssignNew(RootWidget, SVerticalBox)]];
+
 	DrawThrobberWidget();
 	LoadModioSubsystem();
 }
 
-void SModioEditorGameInfoWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+void SModioEditorGameInfoWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
+									  const float InDeltaTime)
 {
 	if (ModioSubsystem && !ModioSubsystem->IsUsingBackgroundThread())
 	{
@@ -122,10 +116,7 @@ void SModioEditorGameInfoWidget::DrawThrobberWidget()
 		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
 		.HAlign(HAlign_Fill)
 		.VAlign(VAlign_Fill)
-		.FillHeight(1.f)
-		[
-			SNew(SCircularThrobber).Radius(50.f)
-		];
+		.FillHeight(1.f)[SNew(SCircularThrobber).Radius(50.f)];
 }
 
 void SModioEditorGameInfoWidget::LoadResources()
@@ -184,8 +175,8 @@ void SModioEditorGameInfoWidget::DownloadGameLogo(FString URL)
 
 	Request->SetURL(URL);
 	Request->SetVerb("GET");
-	Request->OnProcessRequestComplete().BindLambda([&](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
-		{
+	Request->OnProcessRequestComplete().BindLambda([&](FHttpRequestPtr Request, FHttpResponsePtr Response,
+													   bool bWasSuccessful) {
 		const TArray<uint8> bytes = Response->GetContent();
 		const FString content = Response->GetContentAsString();
 
@@ -214,7 +205,7 @@ void SModioEditorGameInfoWidget::DownloadGameLogo(FString URL)
 
 void SModioEditorGameInfoWidget::OnLoadGameInfoResponse(FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo)
 {
-	if(ErrorCode == 0 && GameInfo.IsSet())
+	if (ErrorCode == 0 && GameInfo.IsSet())
 	{
 		LoadedGameInfo = TSharedPtr<FModioGameInfo>(&GameInfo.GetValue());
 		FString LogoPath = ResourcesPath + "Downloaded/" + "Logo_" + LoadedGameInfo->GameID.ToString() + ".png";
@@ -229,7 +220,6 @@ void SModioEditorGameInfoWidget::OnLoadGameInfoResponse(FModioErrorCode ErrorCod
 			if (LoadedGameLogo.IsValid())
 				LoadedGameLogo->SetImage(TexturePool[Key]);
 		}
-		
 	}
 	else
 	{
@@ -242,34 +232,24 @@ void SModioEditorGameInfoWidget::DrawGameInfo()
 	ClearAllWidgets();
 
 	RootWidget->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 20.f))
-	.MaxHeight(175.f)
-	.HAlign(HAlign_Center)
-	.VAlign(VAlign_Top)
-	.AutoHeight()
-	[
-		SAssignNew(LoadedGameLogo, SImage)
-	];
+		.Padding(FMargin(15.f, 15.f, 15.f, 20.f))
+		.MaxHeight(175.f)
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Top)
+		.AutoHeight()[SAssignNew(LoadedGameLogo, SImage)];
 	RootWidget->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-	.MaxHeight(175.f)
-	.HAlign(HAlign_Center)
-	.VAlign(VAlign_Fill)
-	[
-		SNew(STextBlock)
-			.Text(FText::FromString(LoadedGameInfo->Summary))
-	];
+		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
+		.MaxHeight(175.f)
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Fill)[SNew(STextBlock).Text(FText::FromString(LoadedGameInfo->Summary))];
 	RootWidget->AddSlot()
 		.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
 		.HAlign(HAlign_Center)
 		.VAlign(VAlign_Center)
-		.AutoHeight()
-		[
-			SNew(SHyperlinkLaunchURL, LoadedGameInfo->ProfileUrl)
+		.AutoHeight()[SNew(SHyperlinkLaunchURL, LoadedGameInfo->ProfileUrl)
 						  .Text(LOCTEXT("GameIntructionsURL", "Game Page"))
 						  .ToolTipText(LOCTEXT("GameInstructionURLTooltip",
-											   "Opens the given game's modding instructions URL."))
-		];
+											   "Opens the given game's modding instructions URL."))];
 }
 
 void SModioEditorGameInfoWidget::DrawGameInfoInvalid(FModioErrorCode ErrorCode)
@@ -279,11 +259,7 @@ void SModioEditorGameInfoWidget::DrawGameInfoInvalid(FModioErrorCode ErrorCode)
 		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
 		.MaxHeight(175.f)
 		.HAlign(HAlign_Center)
-		.VAlign(VAlign_Fill)
-		[
-			SNew(STextBlock)
-				.Text(FText::FromString("Bad Response: " + ErrorCode.GetErrorMessage()))
-		];
+		.VAlign(VAlign_Fill)[SNew(STextBlock).Text(FText::FromString("Bad Response: " + ErrorCode.GetErrorMessage()))];
 }
 
 #undef LOCTEXT_NAMESPACE

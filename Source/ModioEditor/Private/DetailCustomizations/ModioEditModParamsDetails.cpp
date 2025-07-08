@@ -11,7 +11,6 @@
 #include "DetailCustomizations/ModioEditModParamsDetails.h"
 #include "Engine/StaticMesh.h"
 #include "Objects/ModioEditModParamsObject.h"
-#include "PropertyEditing.h"
 #include "Widgets/Input/SCheckBox.h"
 #include "Misc/EngineVersionComparison.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
@@ -21,6 +20,7 @@
 	#include "DesktopPlatformModule.h"
 	#include "IDesktopPlatform.h"
 #endif
+#include "DetailLayoutBuilder.h"
 #include "Framework/Application/SlateApplication.h"
 #include "WindowManager.h"
 #include "Widgets/Images/SThrobber.h"

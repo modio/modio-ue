@@ -9,14 +9,17 @@
  */
 
 #include "DetailCustomizations/ModioBrowseModsParamsDetails.h"
+
+#include "DetailLayoutBuilder.h"
 #include "Engine/StaticMesh.h"
-#include "Objects/ModioBrowseModsObject.h"
-#include "PropertyEditing.h"
 #include "Framework/Application/SlateApplication.h"
-#include "WindowManager.h"
+#include "Misc/EngineVersionComparison.h"
+#include "Objects/ModioBrowseModsObject.h"
 #include "PropertyCustomizationHelpers.h"
 #include "Widgets/Input/SSearchBox.h"
-#include "Misc/EngineVersionComparison.h"
+#include "Widgets/Text/STextBlock.h"
+#include "Widgets/Views/SHeaderRow.h"
+#include "WindowManager.h"
 
 #define LOCTEXT_NAMESPACE "ModioBrowseModsParamsDetails"
 
@@ -56,15 +59,12 @@ void ModioBrowseModsParamsDetails::DrawEditMod(IDetailLayoutBuilder& DetailBuild
 	}
 	Source = OriginalSource;
 
-	IDetailCategoryBuilder& ModPropertiesCategory = DetailBuilder.EditCategory("Browse Mods Params", FText::FromString("Browse Mods"));
+	IDetailCategoryBuilder& ModPropertiesCategory =
+		DetailBuilder.EditCategory("Browse Mods Params", FText::FromString("Browse Mods"));
 
 	ModPropertiesCategory.AddCustomRow(FText::FromString(""))
-	.WholeRowContent()
-	[
-		SAssignNew(SearchBox, SSearchBox)
-		.OnTextChanged_Lambda([this](const FText& NewText)
-		{
-			if(NewText.IsEmpty())
+		.WholeRowContent()[SAssignNew(SearchBox, SSearchBox).OnTextChanged_Lambda([this](const FText& NewText) {
+			if (NewText.IsEmpty())
 			{
 				Source = OriginalSource;
 			}
@@ -80,73 +80,51 @@ void ModioBrowseModsParamsDetails::DrawEditMod(IDetailLayoutBuilder& DetailBuild
 					ListView->RequestListRefresh();
 				}
 			}
-		})
-	];
+		})];
 
 	ModPropertiesCategory.AddCustomRow(FText::FromString(""))
-	.WholeRowContent()
-	[
-		SAssignNew(ListView, SListView<TSharedPtr<FModioModInfo>>)
+		.WholeRowContent()
+			[SAssignNew(ListView, SListView<TSharedPtr<FModioModInfo>>)
 #if UE_VERSION_OLDER_THAN(5, 5, 0)
-		.ItemHeight(50)
+				 .ItemHeight(50)
 #endif
-		.ListItemsSource(&Source)
-		.HeaderRow
-		(
-			SNew(SHeaderRow)
+				 .ListItemsSource(&Source)
+				 .HeaderRow(
+					 SNew(SHeaderRow)
 
-			+ SHeaderRow::Column("Name")
-			[
-				SNew(SHorizontalBox)
+					 + SHeaderRow::Column(
+						   "Name")[SNew(SHorizontalBox)
 
-				+SHorizontalBox::Slot()
-				.Padding(5.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				[
-					SNew(STextBlock).Text(FText::FromString("Name"))
-				]
-			]
+								   + SHorizontalBox::Slot()
+										 .Padding(5.f)
+										 .HAlign(HAlign_Left)
+										 .VAlign(VAlign_Center)[SNew(STextBlock).Text(FText::FromString("Name"))]]
 
-			+ SHeaderRow::Column("Description")
-			[
-				SNew(SHorizontalBox)
+					 + SHeaderRow::Column("Description")
+						   [SNew(SHorizontalBox)
 
-				+ SHorizontalBox::Slot()
-				.Padding(5.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				[
-					SNew(STextBlock).Text(FText::FromString("Description"))
-				]
-			]
-		)
-		.OnGenerateRow_Lambda([this](TSharedPtr<FModioModInfo> Item, const TSharedRef<STableViewBase>& OwnerTable)
-		{
-			return SNew(STableRow< TSharedPtr<FModioModInfo> >, OwnerTable)
-				   .Padding(2.0f)
-				   [
-					   SNew(SHorizontalBox)
+							+ SHorizontalBox::Slot()
+								  .Padding(5.f)
+								  .HAlign(HAlign_Left)
+								  .VAlign(VAlign_Center)[SNew(STextBlock).Text(FText::FromString("Description"))]])
+				 .OnGenerateRow_Lambda([this](TSharedPtr<FModioModInfo> Item,
+											  const TSharedRef<STableViewBase>& OwnerTable) {
+					 return SNew(STableRow<TSharedPtr<FModioModInfo>>, OwnerTable)
+						 .Padding(2.0f)
+							 [SNew(SHorizontalBox)
 
-					   +SHorizontalBox::Slot()
-					   [
-							SNew(STextBlock).Text(FText::FromString(*Item.Get()->ProfileName))
-					   ]
-						
-						+SHorizontalBox::Slot()
-					   [
-							SNew(STextBlock).Text(FText::FromString(*Item.Get()->ProfileDescription))
-					   ]
-				   ];
-		})
-		.OnSelectionChanged_Lambda([this](TSharedPtr<FModioModInfo> Item, ESelectInfo::Type SelectInfoType)
-		{
-			if (Item.IsValid())
-			{
-				Target->SelectedItem = Item;
-			}
-		})
-	];
+							  +
+							  SHorizontalBox::Slot()[SNew(STextBlock).Text(FText::FromString(*Item.Get()->ProfileName))]
+
+							  + SHorizontalBox::Slot()[SNew(STextBlock)
+														   .Text(FText::FromString(*Item.Get()->ProfileDescription))]];
+				 })
+				 .OnSelectionChanged_Lambda([this](TSharedPtr<FModioModInfo> Item, ESelectInfo::Type SelectInfoType) {
+					 if (Item.IsValid())
+					 {
+						 Target->SelectedItem = Item;
+					 }
+				 })];
 }
 
 #undef LOCTEXT_NAMESPACE

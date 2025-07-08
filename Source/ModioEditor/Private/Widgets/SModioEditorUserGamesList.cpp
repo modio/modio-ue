@@ -10,21 +10,20 @@
 
 #include "Widgets/SModioEditorUserGamesList.h"
 
-#include "EngineMinimal.h"
+#include "Engine/Engine.h"
+#include "IDetailsView.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
+#include "Libraries/ModioSDKLibrary.h"
 #include "Misc/EngineVersionComparison.h"
-
 #include "Widgets/Images/SThrobber.h"
 #include "Widgets/SOverlay.h"
-#include "IDetailsView.h"
-
-#include "Libraries/ModioSDKLibrary.h"
 #include "WindowManager.h"
-#include "Libraries/ModioErrorConditionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "EditorGamesListWidget"
 
 void SModioEditorUserGamesList::Construct(const FArguments& InArgs)
 {
+	// clang-format off
 	ChildSlot
 	[	
 		SNew(SOverlay)
@@ -36,7 +35,7 @@ void SModioEditorUserGamesList::Construct(const FArguments& InArgs)
 			SAssignNew(Root, SVerticalBox)
 		]
 	];
-
+	// clang-format on
 	DrawThrobber();
 	LoadModioSubsystem();
 }
@@ -61,14 +60,16 @@ void SModioEditorUserGamesList::LoadModioSubsystem()
 		if (ModioSubsystem)
 		{
 			ModioSubsystem->InitializeAsync(
-				InitializeOptions, FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserGamesList::OnModioInitCallback));
+				InitializeOptions,
+				FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserGamesList::OnModioInitCallback));
 		}
 	}
 }
 
 void SModioEditorUserGamesList::OnModioInitCallback(FModioErrorCode ErrorCode)
 {
-	if (!ErrorCode || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
+	if (!ErrorCode ||
+		UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
 		DrawGameList();
 	}
@@ -93,7 +94,7 @@ void SModioEditorUserGamesList::ClearWidget()
 void SModioEditorUserGamesList::DrawThrobber()
 {
 	ClearWidget();
-
+	// clang-format off
 	Root->AddSlot()
 		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
 		.HAlign(HAlign_Center)
@@ -102,16 +103,17 @@ void SModioEditorUserGamesList::DrawThrobber()
 		[
 			SNew(SCircularThrobber).Radius(50.f)
 		];
+	// clang-format on
 }
 
 void SModioEditorUserGamesList::DrawGameList()
 {
 	DrawThrobber();
-	
-	ModioSubsystem->ListUserGamesAsync( FModioFilterParams(), FOnListUserGamesDelegateFast::CreateLambda([&]
-		(const FModioErrorCode ErrorCode, TOptional<FModioGameInfoList> GamesList)
-		{
-			if(ErrorCode)
+
+	ModioSubsystem->ListUserGamesAsync(
+		FModioFilterParams(), FOnListUserGamesDelegateFast::CreateLambda([&](const FModioErrorCode ErrorCode,
+																			 TOptional<FModioGameInfoList> GamesList) {
+			if (ErrorCode)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Error when getting user game list: %s"), *ErrorCode.GetErrorMessage());
 				return;
@@ -119,13 +121,13 @@ void SModioEditorUserGamesList::DrawGameList()
 			if (GamesList.IsSet() && GamesList.GetValue().GetTotalResultCount() > 0)
 			{
 				Games.Empty();
-				for(FModioGameInfo Game : GamesList.GetValue().InternalList)
+				for (FModioGameInfo Game : GamesList.GetValue().InternalList)
 				{
 					Games.Add(MakeShared<FModioGameInfo>(Game));
 				}
 
 				ClearWidget();
-
+				// clang-format off
 				Root->AddSlot()
 					.FillHeight(1.f)
 					.VAlign(VAlign_Fill)
@@ -154,14 +156,15 @@ void SModioEditorUserGamesList::DrawGameList()
 								.OnSelectionChanged(this, &SModioEditorUserGamesList::OnGameSelectedFromList)
 							]
 					];
+				// clang-format on
 			}
-		}
-	));
+		}));
 }
 
 TSharedRef<ITableRow> SModioEditorUserGamesList::GenerateGameInfoRow(TSharedPtr<FModioGameInfo> GameInfo,
 																	 const TSharedRef<STableViewBase>& OwnerTable)
 {
+	// clang-format off
 	return SNew(STableRow<TSharedPtr<FModioGameInfo>>, OwnerTable)
 		[
 				SNew(SHorizontalBox)
@@ -182,9 +185,11 @@ TSharedRef<ITableRow> SModioEditorUserGamesList::GenerateGameInfoRow(TSharedPtr<
 					.Text(FText::FromString(GameInfo.Get()->GameID.ToString()))
 				]
 		];
+	// clang-format on
 }
 
-void SModioEditorUserGamesList::OnGameSelectedFromList(TSharedPtr<FModioGameInfo> SelectedGame, ESelectInfo::Type SelectInfo)
+void SModioEditorUserGamesList::OnGameSelectedFromList(TSharedPtr<FModioGameInfo> SelectedGame,
+													   ESelectInfo::Type SelectInfo)
 {
 	OnGameSelected.ExecuteIfBound(FModioErrorCode(), *SelectedGame.Get());
 }

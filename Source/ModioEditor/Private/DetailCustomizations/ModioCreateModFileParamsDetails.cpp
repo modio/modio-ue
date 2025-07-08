@@ -9,12 +9,14 @@
  */
 
 #include "DetailCustomizations/ModioCreateModFileParamsDetails.h"
-#include "DetailLayoutBuilder.h"
-#include "Objects/ModioCreateNewModFileParamsObject.h"
-#include "Widgets/Input/SEditableTextBox.h"
-#include "WindowManager.h"
 #include "DetailCategoryBuilder.h"
+#include "DetailLayoutBuilder.h"
 #include "DetailWidgetRow.h"
+#include "Objects/ModioCreateNewModFileParamsObject.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/Text/STextBlock.h"
+#include "WindowManager.h"
 
 TSharedRef<IDetailCustomization> ModioCreateModFileParamsDetails::MakeInstance()
 {
@@ -53,44 +55,27 @@ void ModioCreateModFileParamsDetails::DrawCreateNewModFile(IDetailLayoutBuilder&
 	DetailBuilder.HideProperty(MetadataBlob);
 	DetailBuilder.HideProperty(ModfilePlatforms);
 
-	IDetailCategoryBuilder& ModPropertiesCategory = DetailBuilder.EditCategory("Modio Create New Mod File Params", FText::FromString("Upload Mod File"));
+	IDetailCategoryBuilder& ModPropertiesCategory =
+		DetailBuilder.EditCategory("Modio Create New Mod File Params", FText::FromString("Upload Mod File"));
 
 	ModPropertiesCategory.AddCustomRow(FText::FromString("PathToModRootDirectory"))
-	.NameContent()
-	[	
-		PathToModRootDirectory->CreatePropertyNameWidget()
-	]
-	.ValueContent()
-	[
-		SNew(SHorizontalBox)
-		+ SHorizontalBox::Slot()
-		.HAlign(HAlign_Left)
-		.VAlign(VAlign_Center)
-		.MaxWidth(256.f)
-		.AutoWidth()
-		[
-			SAssignNew(PathToModRootDirectoryEditableTextBox, SEditableTextBox)
-			.MinDesiredWidth(256.f)
-			.OnTextChanged_Lambda([this](const FText& InText)
-			{
-				Target->PathToModRootDirectory = InText.ToString();
-			})
-		]
+		.NameContent()[PathToModRootDirectory->CreatePropertyNameWidget()]
+		.ValueContent()[SNew(SHorizontalBox) +
+						SHorizontalBox::Slot()
+							.HAlign(HAlign_Left)
+							.VAlign(VAlign_Center)
+							.MaxWidth(256.f)
+							.AutoWidth()[SAssignNew(PathToModRootDirectoryEditableTextBox, SEditableTextBox)
+											 .MinDesiredWidth(256.f)
+											 .OnTextChanged_Lambda([this](const FText& InText) {
+												 Target->PathToModRootDirectory = InText.ToString();
+											 })]
 
-		+ SHorizontalBox::Slot()
-		.MaxWidth(128.f)
-		.AutoWidth()
-		[
-			SNew(SButton)
-			.OnClicked_Lambda([this]()
-			{
-				WindowManager::Get().OpenFolderDialog("Choose your workspace:", Target->PathToModRootDirectory);
-				PathToModRootDirectoryEditableTextBox->SetText(FText::FromString(Target->PathToModRootDirectory));
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock).Text(FText::FromString("Browse"))
-			]
-		]
-	];
+						+ SHorizontalBox::Slot().MaxWidth(128.f).AutoWidth()[SNew(SButton).OnClicked_Lambda([this]() {
+							  WindowManager::Get().OpenFolderDialog("Choose your workspace:",
+																	Target->PathToModRootDirectory);
+							  PathToModRootDirectoryEditableTextBox->SetText(
+								  FText::FromString(Target->PathToModRootDirectory));
+							  return FReply::Handled();
+						  })[SNew(STextBlock).Text(FText::FromString("Browse"))]]];
 }
