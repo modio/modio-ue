@@ -12,6 +12,8 @@
 
 #include "CoreMinimal.h"
 #include "EditorUtilityLibrary.h"
+#include "Types/ModioCommonTypes.h"
+
 #include "ModioEditorUtilityFunctions.generated.h"
 
 /**
@@ -23,7 +25,6 @@ class MODIOEDITOR_API UModioEditorUtilityFunctions : public UEditorUtilityLibrar
 	GENERATED_BODY()
 
 public:
-
 	UFUNCTION(BlueprintCallable, Category = "Modio|EditorUtilities")
 	static void SelectAssetsInContentBrowser(const TArray<FString>& AssetPaths);
 
@@ -43,5 +44,8 @@ public:
 	static void AddGettingStartedWidgetEntries(TSet<struct FModioGettingStartedEntry> NewEntries);
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "Context", Category = "Modio|EditorUtilities"))
-	static bool ExecuteStaticExecutor(UObject* Context, TSubclassOf<class UModioStaticExecutionBase> Executor, FString Args);
+	static bool ExecuteStaticExecutor(UObject* Context, TSubclassOf<class UModioStaticExecutionBase> Executor,
+									  FString Args);
+
+	static TArray<TPair<FText, EModioModfilePlatform>> GetModfilePlatformOptions();
 };

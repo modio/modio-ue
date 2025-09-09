@@ -26,7 +26,7 @@ FModioModTagOptions::FModioModTagOptions(const Modio::ModTagOptions& ModTagList)
 {
     TArray<FModioModTagInfo> Result;
 
-    Result.Reserve(ModTagList.Size());
+    Result.Reserve(size_t(ModTagList.Size()));
     for (const Modio::ModTagInfo& It : ModTagList)
     {
         Result.Emplace(ToUnreal(It));

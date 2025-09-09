@@ -355,7 +355,7 @@ struct MODIO_API FModioPresetFilterParams
 			.WithTags(Tags)
 			.WithoutTags(ExcludedTags)
 			.SortBy(SortField, Direction)
-			.IndexedResults(0, Count);
+			.IndexedResults(0, uint64_t(Count));
 	}
 };
 

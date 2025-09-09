@@ -27,19 +27,19 @@ EModioPlatformName UModioPlatformHelpersLibrary::GetCurrentPlatform()
 		return EModioPlatformName::Linux;
 	#endif
 
-	#if PLATFORM_PS4
+	#if defined(PLATFORM_PS4) && PLATFORM_PS4
 		return EModioPlatformName::PS4;
 	#endif
 
-	#if PLATFORM_PS5
+	#if defined(PLATFORM_PS5) && PLATFORM_PS5
 		return EModioPlatformName::PS5;
 	#endif
 
-	#if PLATFORM_XBOXONE
+	#if defined(PLATFORM_XBOXONE) && PLATFORM_XBOXONE
 		return EModioPlatformName::XBoxOne;
 	#endif
 
-	#if PLATFORM_XSX
+	#if defined(PLATFORM_XSX) && PLATFORM_XSX
 		return EModioPlatformName::XSX;
 	#endif
 
@@ -110,6 +110,9 @@ EModioAuthenticationProvider UModioPlatformHelpersLibrary::GetDefaultAuthProvide
 		case EModioPlatformName::Android:
 			// By default, we use the ServerSideToken for Google Auth as opposed to an ID Token
 			return EModioAuthenticationProvider::GoogleServerSideToken;
+
+		case EModioPlatformName::iOS:
+		case EModioPlatformName::Unknown:
 		default:;
 	}
 

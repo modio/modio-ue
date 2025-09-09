@@ -137,7 +137,7 @@ TArray<DestValueType> ToUnreal(const std::vector<SourceValueType, OtherParams...
 {
 	TArray<DestValueType> Result;
 
-	Result.Reserve(OriginalArray.size());
+	Result.Reserve(int32(OriginalArray.size()));
 	for (const auto& It : OriginalArray)
 	{
 		Result.Emplace(ToUnreal(It));
@@ -151,7 +151,7 @@ template<typename DestKeyType, typename DestValueType, typename SourceKeyType, t
 TMap<DestKeyType, DestValueType> ToUnreal(const std::map<SourceKeyType, SourceValueType, OtherParams...>& OriginalMap)
 {
 	TMap<DestKeyType, DestValueType> Result;
-	Result.Reserve(OriginalMap.size());
+	Result.Reserve(int32(OriginalMap.size()));
 
 	for (const auto& [Key, Value] : OriginalMap)
 	{
@@ -184,7 +184,7 @@ template<typename DestValueType, typename SourceValueType>
 std::vector<DestValueType> ToModio(const TArray<SourceValueType>& OriginalArray)
 {
 	std::vector<DestValueType> Out;
-	Out.reserve(OriginalArray.Num());
+	Out.reserve(size_t(OriginalArray.Num()));
 	for (const SourceValueType& Element : OriginalArray)
 	{
 		Out.emplace_back(ToModio(Element));

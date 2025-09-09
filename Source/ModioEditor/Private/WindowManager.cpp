@@ -17,11 +17,6 @@
 	#include "DesktopPlatformModule.h"
 	#include "IDesktopPlatform.h"
 #endif
-#include "DetailCustomizations/ModioBrowseModFileDetails.h"
-#include "DetailCustomizations/ModioBrowseModsParamsDetails.h"
-#include "DetailCustomizations/ModioCreateModFileParamsDetails.h"
-#include "DetailCustomizations/ModioCreateModParamsDetails.h"
-#include "DetailCustomizations/ModioEditModParamsDetails.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Objects/ModioCreateModParamsObject.h"
 #include "Widgets/SModioEditorWindowCompoundWidget.h"
@@ -32,16 +27,20 @@ TSharedPtr<SWindow> WindowManager::GetWindow()
 	if (!Window.IsValid())
 	{
 		Window = SNew(SWindow)
-					 .Title(FText::FromString("mod.io - Content Creation & Upload Tool"))
-					 .SupportsMaximize(false)
-					 .SupportsMinimize(false)
-					 .HasCloseButton(true)
-					 .ClientSize(FVector2D(900.f, 600.f))
-					 .SizingRule(ESizingRule::FixedSize)
-					 .AutoCenter(EAutoCenter::PreferredWorkArea)
-					 .ScreenPosition(FVector2D(0, 0))
-					 .LayoutBorder(FMargin(3.f))[SAssignNew(RootWidget, SModioEditorWindowCompoundWidget)];
-		Window->SetOnWindowClosed(FOnWindowClosed::CreateLambda([this](const TSharedRef<SWindow>& WindowRef) {
+		.Title(FText::FromString("mod.io - Content Creation & Upload Tool"))
+		.SupportsMaximize(false)
+		.SupportsMinimize(false)
+		.HasCloseButton(true)
+		.ClientSize(FVector2D(1000.f, 720.f))
+		.SizingRule(ESizingRule::FixedSize)
+		.AutoCenter(EAutoCenter::PreferredWorkArea)
+		.ScreenPosition(FVector2D(0, 0))
+		.LayoutBorder(FMargin(3.f))
+		[
+			SAssignNew(RootWidget, SModioEditorWindowCompoundWidget)
+		];
+		Window->SetOnWindowClosed(FOnWindowClosed::CreateLambda([this](const TSharedRef<SWindow>& WindowRef) 
+		{
 			RootWidget->UnloadResources();
 			RootWidget = nullptr;
 			Window = nullptr;
@@ -119,16 +118,7 @@ void WindowManager::RegisterCustomClassLayout(FName ClassName, FOnGetDetailCusto
 
 void WindowManager::RegisterObjectCustomizations()
 {
-	RegisterCustomClassLayout("ModioCreateModParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(
-																&ModioCreateModParamsDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioBrowseModsObject", FOnGetDetailCustomizationInstance::CreateStatic(
-														   &ModioBrowseModsParamsDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioEditModParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(
-															  &ModioEditModParamsDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioBrowseModFileCollectionObject", FOnGetDetailCustomizationInstance::CreateStatic(
-																		&ModioBrowseModFileDetails::MakeInstance));
-	RegisterCustomClassLayout("ModioCreateNewModFileParamsObject", FOnGetDetailCustomizationInstance::CreateStatic(
-																	   &ModioCreateModFileParamsDetails::MakeInstance));
+
 }
 
 void WindowManager::UnregisterObjectCustomizations()

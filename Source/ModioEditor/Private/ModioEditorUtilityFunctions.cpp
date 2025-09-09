@@ -12,14 +12,14 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "CoreGlobals.h"
 #include "Editor.h"
+#include "ISettingsModule.h"
 #include "LevelEditor.h"
 #include "Misc/EngineVersionComparison.h"
+#include "ModioEditorPerProjectUserSettings.h"
 #include "ModioEditorSettings.h"
 #include "Modules/ModuleManager.h"
-#include "Templates/UnrealTemplate.h"
-#include "ISettingsModule.h"
 #include "Objects/ModioStaticExecutionBase.h"
-#include "ModioEditorPerProjectUserSettings.h"
+#include "Templates/UnrealTemplate.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ModioEditorUtilityFunctions)
 
@@ -54,7 +54,8 @@ void UModioEditorUtilityFunctions::SelectAssetsInContentBrowser(const TArray<FSt
 
 void UModioEditorUtilityFunctions::SetDisplayGettingStartedWidgetOnStartup(bool bNewValue)
 {
-	if (UModioEditorPerProjectUserSettings* EditorUserSettings = GetMutableDefault<UModioEditorPerProjectUserSettings>())
+	if (UModioEditorPerProjectUserSettings* EditorUserSettings =
+			GetMutableDefault<UModioEditorPerProjectUserSettings>())
 	{
 		EditorUserSettings->bShowGettingStartedOnStartup = bNewValue;
 		EditorUserSettings->SaveConfig();
@@ -95,22 +96,40 @@ void UModioEditorUtilityFunctions::AddGettingStartedWidgetEntries(TSet<FModioGet
 }
 
 bool UModioEditorUtilityFunctions::ExecuteStaticExecutor(UObject* Context,
-														 TSubclassOf <UModioStaticExecutionBase> Executor,
-														 FString Args)
+														 TSubclassOf<UModioStaticExecutionBase> Executor, FString Args)
 {
 	if (Executor)
 	{
-		if(UModioStaticExecutionBase* ExecutorRef = NewObject<UModioStaticExecutionBase>(Context, Executor))
+		if (UModioStaticExecutionBase* ExecutorRef = NewObject<UModioStaticExecutionBase>(Context, Executor))
 		{
 			return ExecutorRef->ExecuteAction(Args);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Tried to execute a Static Executor, but failed to create the object provided."));
+			UE_LOG(LogTemp, Warning,
+				   TEXT("Tried to execute a Static Executor, but failed to create the object provided."));
 			return false;
 		}
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("Tried to execute a Static Executor, but null class was provided."));
 	return false;
+}
+
+TArray<TPair<FText, EModioModfilePlatform>> UModioEditorUtilityFunctions::GetModfilePlatformOptions()
+{
+	TArray<TTuple<FText, EModioModfilePlatform>> PlatformOptions;
+
+	UEnum* ModfilePlatformEnum = StaticEnum<EModioModfilePlatform>();
+	for (int32 i = 0; i < static_cast<int32>(EModioModfilePlatform::Count); ++i)
+	{
+		EModioModfilePlatform Platform = static_cast<EModioModfilePlatform>(i);
+		FText DisplayName = ModfilePlatformEnum->GetDisplayNameTextByValue(i);
+		if (!DisplayName.IsEmpty())
+		{
+			PlatformOptions.Emplace(DisplayName, Platform);
+		}
+	}
+
+	return PlatformOptions;
 }

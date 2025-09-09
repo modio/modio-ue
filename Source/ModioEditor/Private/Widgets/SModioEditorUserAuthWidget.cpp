@@ -12,8 +12,10 @@
 #include "Libraries/ModioErrorConditionLibrary.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Misc/MessageDialog.h"
+#include "ModioEditor.h"
 #include "Widgets/Images/SThrobber.h"
 #include "Widgets/Input/SButton.h"
+#include "Widgets/Input/SHyperlink.h"
 #include "Widgets/Text/SRichTextBlock.h"
 #include "Widgets/Text/STextBlock.h"
 #include "WindowManager.h"
@@ -22,25 +24,66 @@
 
 void SModioEditorUserAuthWidget::Construct(const FArguments& InArgs)
 {
+	ParentWindow = InArgs._ParentWindow;
+	BackHandler = InArgs._BackHandler;
+
 	// clang-format off
 	ChildSlot
 	[
-		SNew(SVerticalBox)
-		+ SVerticalBox::Slot()
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Top)
-		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
+		SNew(SBox)
+		.MinDesiredWidth(900)
+		.MinDesiredHeight(500)
 		[
-			SNew(SRichTextBlock)
-			.Text(LOCTEXT("Preamble", "Authenticate with mod.io via email.\n\rIf you have not made an account yet sign up at mod.io"))
-		]
-		+ SVerticalBox::Slot()
-		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-		[
-			SAssignNew(RootWidget, SVerticalBox)
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			.FillHeight(0.8f)
+			.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
+			[
+				SAssignNew(RootWidget, SVerticalBox)
+			]
+
+			+ SVerticalBox::Slot()
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Bottom)
+			[
+				CreateTermsAndPrivacyLinks()
+			]
+
+			+ SVerticalBox::Slot()
+			.Padding(FMargin(0, 12))
+			.FillHeight(0.1f)
+			.VAlign(VAlign_Bottom)
+			[
+				SNew(SSeparator)
+				.SeparatorImage(ParentWindow->BoldSeperatorBrush)
+				.Thickness(1.0f)
+			]
+
+			+ SVerticalBox::Slot()
+			.VAlign(VAlign_Bottom)
+			.Padding(2.5f)
+			.FillHeight(0.2f)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.HAlign(HAlign_Left)
+				.VAlign(VAlign_Bottom)
+				[
+					SNew(SButton)
+					.ContentPadding(ParentWindow->BottomButtonPadding)
+					.Text(LOCTEXT("Back", "Back"))
+					.OnClicked_Lambda([this]()
+					{ 
+						BackHandler.ExecuteIfBound();
+						return FReply::Handled();
+					})
+					.IsEnabled_Lambda([this]() { return !bIsLoading; })
+				]
+			]
 		]
 	];
 	// clang-format on
+
 	DrawThrobberWidget();
 	LoadModioSubsystem();
 }
@@ -99,6 +142,8 @@ void SModioEditorUserAuthWidget::OnInitCallback(FModioErrorCode ErrorCode)
 
 void SModioEditorUserAuthWidget::ClearAllWidgets()
 {
+	bIsLoading = false;
+
 	if (RootWidget.IsValid())
 	{
 		if (RootWidget->GetAllChildren()->Num() > 0)
@@ -111,6 +156,9 @@ void SModioEditorUserAuthWidget::ClearAllWidgets()
 void SModioEditorUserAuthWidget::DrawThrobberWidget()
 {
 	ClearAllWidgets();
+
+	bIsLoading = true;
+
 	// clang-format off
 	RootWidget->AddSlot()
 		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
@@ -135,60 +183,99 @@ void SModioEditorUserAuthWidget::OnUserAuthCheckResponse(FModioErrorCode ErrorCo
 	}
 }
 
+FReply SModioEditorUserAuthWidget::OnLoginLandingButtonClicked()
+{
+	DrawLoginWidget();
+	return FReply::Handled();
+}
+
 void SModioEditorUserAuthWidget::DrawLoginWidget()
 {
 	ClearAllWidgets();
+
 	// clang-format off
+	
 	RootWidget->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-	.HAlign(HAlign_Center)
-	.VAlign(VAlign_Top)
 	.AutoHeight()
+	.HAlign(HAlign_Fill)
 	[
-		SNew(SBorder)
-		.BorderBackgroundColor(FColor::White)
-		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
+		SNew(SVerticalBox)
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Center)
+		.Padding(0, 0, 0, 0)
 		[
-			SNew(SHorizontalBox)
-			// Modio Email Label
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Top)
-			.AutoWidth()
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("ModioEmail", "Log in with Email:"))
-			]
-			// Modio Email EditableTextBox
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
+			SNew(STextBlock)
+			.Text(LOCTEXT("EmailAuth", "Email Authentication"))
+			.Font(ParentWindow->HeaderLargeTextStyle)
+			.Justification(ETextJustify::Center)
+		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		.Padding(0, 0, 0, 16)
+		[
+			SNew(SBox)
 			.VAlign(VAlign_Center)
-			.AutoWidth()
+			.MinDesiredWidth(700)
 			[
-				SAssignNew(ModioEmailEditableTextBox, SEditableTextBox)
-				.MinDesiredWidth(256.f)
-			]
-			// Login Button
-			+ SHorizontalBox::Slot()
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SNew(SButton)
-				.DesiredSizeScale(FVector2D(1.f, 1.f))
-				.OnClicked(this, &SModioEditorUserAuthWidget::OnLoginButtonClicked)
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.AutoWidth()
 				[
-					// Login Button Text
 					SNew(STextBlock)
-					.Text(LOCTEXT("Login", "Login"))
-					.Justification(ETextJustify::Center)
+					.Justification(ETextJustify::Left)
+					.Text(LOCTEXT("EnterEmail", "Enter your email address"))
+				]
+				+ SHorizontalBox::Slot()
+				.Padding(8, 0)
+				.FillWidth(0.9f)
+				.VAlign(VAlign_Center)
+				[
+					SAssignNew(ModioEmailEditableTextBox, SEditableTextBox)
+					.MinDesiredWidth(256.f)
 				]
 			]
 		]
+		
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		.Padding(0, 0, 0, 16)
+		[
+			SNew(SBox)
+			.MinDesiredWidth(500)
+			.MinDesiredHeight(100)
+			[
+				SNew(SButton)
+					.HAlign(HAlign_Center)
+					.VAlign(VAlign_Center)
+					.OnClicked(this, &SModioEditorUserAuthWidget::OnLoginButtonClicked)
+					.Text(LOCTEXT("SendCode", "Send Code"))
+			]
+		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		[
+			SNew(SButton)
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			.ContentPadding(8)
+			.OnClicked(this, &SModioEditorUserAuthWidget::OnAlreadyHaveCodeClicked)
+			.Text(LOCTEXT("AlreadyHaveCode", "I already have a code"))
+
+		]
 	];
+
 	// clang-format on
+}
+
+FReply SModioEditorUserAuthWidget::OnAlreadyHaveCodeClicked()
+{
+	DrawAuthenticateWidget();
+	return FReply::Handled();
 }
 
 FReply SModioEditorUserAuthWidget::OnLoginButtonClicked()
@@ -202,6 +289,7 @@ FReply SModioEditorUserAuthWidget::OnLoginButtonClicked()
 	}
 
 	DrawThrobberWidget();
+
 	ModioSubsystem->RequestEmailAuthCodeAsync(
 		FModioEmailAddress(ModioEmailEditableTextBox->GetText().ToString()),
 		FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorUserAuthWidget::OnRequestEmailAuthCodeCompleted));
@@ -233,68 +321,98 @@ void SModioEditorUserAuthWidget::OnRequestEmailAuthCodeCompleted(FModioErrorCode
 void SModioEditorUserAuthWidget::DrawAuthenticateWidget()
 {
 	ClearAllWidgets();
+
+	// clang-format off
+	FSlateFontInfo CodeFont = ParentWindow->GetTextStyle("EmbossedText", "Bold", 40);
+	CodeFont.LetterSpacing = 75;
+
 	// clang-format off
 	RootWidget->AddSlot()
-		.Padding(FMargin(15.f, 15.f, 15.f, 5.f))
-		.HAlign(HAlign_Center)
-		.VAlign(VAlign_Top)
+	.AutoHeight()
+	.HAlign(HAlign_Fill)
+	[
+		SNew(SVerticalBox)
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Center)
+		.Padding(0, 0, 0, 32)
 		[
 			SNew(STextBlock)
-				.Text(LOCTEXT("AuthPromptText", "Please enter the authentication code sent to your email."))
-		];
-
-
-	RootWidget->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-	.AutoHeight()
-	[
-		SNew(SBorder)
-		.BorderBackgroundColor(FColor::White)
-		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
+			.Text(LOCTEXT("EmailAuth", "Email Authentication"))
+			.Font(ParentWindow->HeaderLargeTextStyle)
+			.Justification(ETextJustify::Center)
+		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Center)
+		.AutoHeight()
+		.Padding(0, 0, 0, 8)
 		[
-			SNew(SHorizontalBox)
-
-			// Modio Authentication  Label
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("AuthCode", "Authentication Code:"))
-			]
-
-			// Modio Authentication EditableTextBox
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
+			SNew(STextBlock)
+			.Text(LOCTEXT("EnterCode", "Enter Authentication Code"))
+			.Font(ParentWindow->GetTextStyle("EmbossedText", "Normal", 10))
+			.Justification(ETextJustify::Center)
+		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.AutoHeight()
+		.Padding(0, 0, 0, 0)
+		[
+			SNew(SBox)
+			.MinDesiredWidth(300)
+			.MinDesiredHeight(80)
 			[
 				SAssignNew(ModioAuthenticationCodeEditableTextBox, SEditableTextBox)
+				.Font(CodeFont)
+				.OnTextChanged(this, &SModioEditorUserAuthWidget::OnAuthCodeTextChanged)
+				.Justification(ETextJustify::Center)
 				.MinDesiredWidth(256.f)
 			]
-
-			// Authenticate Button
-			+ SHorizontalBox::Slot()
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
+		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		.Padding(24)
+		.AutoHeight()
+		[
+			SNew(SBox)		
+			.MinDesiredWidth(500)
+			.MinDesiredHeight(50)
 			[
 				SNew(SButton)
-				.DesiredSizeScale(FVector2D(1.f, 1.f))
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				.ContentPadding(12)
 				.OnClicked(this, &SModioEditorUserAuthWidget::OnAuthenticateButtonClicked)
-				[
-					// Authenticate Button Text
-					SNew(STextBlock)
-					.Text(LOCTEXT("ModioAuth", "Authenticate"))
-					.Justification(ETextJustify::Center)
-				]
+				.Text(LOCTEXT("SubmitCode", "Submit Code"))
 			]
+		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.VAlign(VAlign_Center)
+		.Padding(24)
+		[
+			SNew(SBox)		
+			.MinDesiredWidth(300)
+			.MinDesiredHeight(50)
+			[
+				SNew(SButton)
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				.ContentPadding(8)
+				.OnClicked(this, &SModioEditorUserAuthWidget::OnUseDifferentEmailClicked)
+				.Text(LOCTEXT("DifferentEmail", "Enter a different email"))
+			]
+
 		]
 	];
 	// clang-format on
+}
+
+FReply SModioEditorUserAuthWidget::OnUseDifferentEmailClicked()
+{
+	DrawLoginWidget();
+	return FReply::Handled();
 }
 
 FReply SModioEditorUserAuthWidget::OnAuthenticateButtonClicked()
@@ -307,17 +425,89 @@ FReply SModioEditorUserAuthWidget::OnAuthenticateButtonClicked()
 	return FReply::Handled();
 }
 
+void SModioEditorUserAuthWidget::OnAuthCodeTextChanged(const FText& InText) const
+{
+	ModioAuthenticationCodeEditableTextBox->SetText(FText::FromString(InText.ToString().Left(5).ToUpper()));
+}
+
 void SModioEditorUserAuthWidget::OnAuthCodeCompleted(FModioErrorCode ErrorCode)
 {
 	AuthenticationResult = ErrorCode;
 	if (ErrorCode == 0)
 	{
-		OnAuthenticationComplete.ExecuteIfBound(AuthenticationResult);
+		ParentWindow->DrawToolLanding();
 	}
 	else
 	{
-		DrawLoginWidget();
+		DrawAuthenticateWidget();
+
+		FText Message = FText::FromString("Error: " + ErrorCode.GetErrorMessage());
+		FMessageDialog::Open(EAppMsgType::Ok, Message);
+		WindowManager::Get().GetWindow()->BringToFront();
 	}
+}
+
+TSharedRef<SWidget> SModioEditorUserAuthWidget::CreateTermsAndPrivacyLinks()
+{
+	// clang-format off
+	return SNew(SHorizontalBox) 
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
+		[
+			SNew(SHyperlink)
+			.Text(LOCTEXT("ModioTermsAndConditions", "Terms & Conditions"))
+			.OnNavigate(this, &SModioEditorUserAuthWidget::LaunchTermsUrl)
+		] 
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
+		[
+			SNew(SHyperlink)
+			.Text(LOCTEXT("ModioPrivacyPolicy", "Privacy Policy"))
+			.OnNavigate(this, &SModioEditorUserAuthWidget::LaunchPrivacyUrl)
+		];
+	// clang-format on
+}
+
+void SModioEditorUserAuthWidget::LaunchTermsUrl()
+{
+	ModioSubsystem->GetTermsOfUseAsync(
+		FOnGetTermsOfUseDelegateFast::CreateLambda([](FModioErrorCode ec, TOptional<FModioTerms> Terms) {
+			if (ec)
+			{
+				UE_LOG(ModioEditor, Error, TEXT("Failed to fetch terms and conditions: %s"), *ec.GetErrorMessage())
+				return;
+			}
+
+			if (!Terms.IsSet())
+			{
+				UE_LOG(ModioEditor, Error, TEXT("Terms were not set when fetching terms and conditions"))
+				return;
+			}
+
+			FPlatformProcess::LaunchURL(*Terms.GetValue().TermsLink.URL, nullptr, nullptr);
+		}));
+}
+
+void SModioEditorUserAuthWidget::LaunchPrivacyUrl()
+{
+	ModioSubsystem->GetTermsOfUseAsync(
+		FOnGetTermsOfUseDelegateFast::CreateLambda([](FModioErrorCode ec, TOptional<FModioTerms> Terms) {
+			if (ec)
+			{
+				UE_LOG(ModioEditor, Error, TEXT("Failed to fetch terms of use: %s"), *ec.GetErrorMessage())
+				return;
+			}
+
+			if (!Terms.IsSet())
+			{
+				UE_LOG(ModioEditor, Error, TEXT("Terms were not set when fetching terms of use"))
+				return;
+			}
+
+			FPlatformProcess::LaunchURL(*Terms.GetValue().PrivacyLink.URL, nullptr, nullptr);
+		}));
 }
 
 #undef LOCTEXT_NAMESPACE

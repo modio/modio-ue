@@ -39,7 +39,8 @@ UENUM(BlueprintType)
 enum class EModioVirusStatus : uint8
 {
 	NoThreat = 0,
-	Malicious = 1
+	Malicious = 1,
+	PotentiallyHarmful = 2
 };
 
 /**

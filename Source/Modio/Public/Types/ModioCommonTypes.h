@@ -82,19 +82,23 @@ enum class EModioPlatformName : uint8
 UENUM(BlueprintType)
 enum class EModioModfilePlatform : uint8
 {
-	Windows,
-	Mac,
-	Linux,
-	Android,
-	iOS,
-	XboxOne,
-	XboxSeriesX,
-	PS4,
-	PS5,
-	Switch,
-	Oculus,
-	Source
+	Windows UMETA(DisplayName = "Windows"),
+	Mac UMETA(DisplayName = "Mac"),
+	Linux UMETA(DisplayName = "Linux"),
+	Android UMETA(DisplayName = "Android"),
+	iOS UMETA(DisplayName = "iOS"),
+	XboxOne UMETA(DisplayName = "Xbox One"),
+	XboxSeriesX UMETA(DisplayName = "Xbox Series X"),
+	PS4 UMETA(DisplayName = "PS4"),
+	PS5 UMETA(DisplayName = "PS5"),
+	Switch UMETA(DisplayName = "Switch"),
+	Oculus UMETA(DisplayName = "Oculus"),
+	Source UMETA(DisplayName = "Source"),
+	WindowsServer UMETA(DisplayName = "Windows Server"),
+	LinuxServer UMETA(DisplayName = "Linux Server"),
+	Count UMETA(Hidden)
 };
+ENUM_RANGE_BY_COUNT(EModioModfilePlatform, EModioModfilePlatform::Count);
 
 /**
  * Enum representing mod logo sizes
@@ -201,11 +205,11 @@ UENUM(BlueprintType)
 enum class EModioModChangeType : uint8
 {
 	// The user's list has a new mod to synchronize
-	Added, 
+	Added,
 	// The user's list must remove a mod to synchronize
-	Removed, 
+	Removed,
 	// The user's list must update a mod to synchronize
-	Updated 
+	Updated
 };
 
 /**
@@ -995,7 +999,7 @@ struct MODIO_API FModioEntitlementParams
 
 private:
 	friend struct Modio::EntitlementParams ToModio(const FModioEntitlementParams& In);
-	
+
 	/** @brief ExtendedParameters A map to store extended parameters required by some portals. */
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true), Category = "mod.io|CommonTypes")
 	TMap<FString, FString> ExtendedParameters;
@@ -1036,7 +1040,7 @@ struct MODIO_API FModioMetricsSessionParams
 
 public:
 	friend struct Modio::MetricsSessionParams ToModio(const FModioMetricsSessionParams& In);
-	
+
 	/** @brief Set a custom Session Id to be used in the metrics service for your session */
 	TOptional<FModioGuid> SessionId;
 

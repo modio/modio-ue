@@ -1,0 +1,120 @@
+<a href="https://mod.io"><img src="https://mod.io/images/branding/modio-logo-bluedark.svg" alt="mod.io" width="360" align="right"/></a>
+
+# mod.io Unreal Engine Plugin
+
+![License](https://img.shields.io/badge/license-MIT-brightgreen.svg) [![Discord](https://img.shields.io/discord/389039439487434752.svg?label=Discord&logo=discord&color=7289DA&labelColor=2C2F33)](https://discord.mod.io) [![Master Docs](https://img.shields.io/badge/docs-master-green.svg)](https://docs.mod.io/unreal/) [![Unreal Engine](https://img.shields.io/badge/Unreal-5.3%2B-dea309)](https://www.unrealengine.com)
+
+Welcome to the mod.io Unreal Engine plugin repository. This plugin allows developers to implement mod.io support into their games, allowing developers to host and manage user-created mods into their Unreal Engine games. Its part of the mod.io suite of products, which includes [Component UI](https://github.com/modio/modio-ue-component-ui) (for building in-game UIs for discovery and consumption of UGC) and [Modio UGC](https://github.com/modio/modio-ue-modiougc) for dynamic management of mods via PAK files.
+
+You can find a sample project demonstrating all core mod.io functionality [here](https://github.com/modio/modio-ue-actionrpg).
+
+## Engine & Platform Compatibility
+
+The mod.io plugin is generally maintained to support the 3 most recent versions of Unreal Engine. If you are using an older version of the engine, you can access the last supported release of the engine from the Releases page.
+
+### Engine compatibility
+
+| Engine Version | Last Release |
+|---------------|-------------|
+| UE4.26        | 2023.11     |
+| UE4.27        | 2023.11     |
+| UE5.0         | 2023.11     |
+| UE5.1         | 2024.6      |
+| UE5.2         | 2025.2      |
+| UE5.3         | Current     |
+| UE5.4         | Current     |
+| UE5.5         | Current     |
+| UE5.6         | Not Yet Supported |
+
+### Platform compatibility
+
+The mod.io plugin supports Windows, Linux, LinuxArm64, Mac, iOS and Android as part of the public release.
+
+For access to Windows (GDK), XBox, Playstation 4, Playstation 5 or Switch, please [contact us](https://docs.mod.io/support/contacts/).
+
+## Features
+
+* C++ and Blueprint support
+* User Authentication via Email or Platform SSO
+* Mod Browsing & Filtering
+* Mod subscription management, automatic downloading and updating
+* Submission & management tools for Creators
+* Async delegate-based interface
+* Non-blocking IO
+* Permissive MIT/BSL-license
+
+## Documentation
+Comprehensive documentation for this plugin including installation, getting started, and more [can be found here](https://docs.mod.io/unreal/).
+
+## Installation
+
+### Adding plugin files to your project
+#### As a git submodule
+
+1. Add this repository as a submodule to your repository in your project's `Plugins/Modio` directory
+   
+   In the directory with your .uproject file:
+   ```sh
+   git submodule add https://github.com/modio/modio-ue Plugins/Modio
+   ```
+2. Initialize our submodules:
+   ```sh
+   git submodule update --init --recursive
+   ```
+
+> **NOTE:** On first run, or any time you update the git submodule for the plugin, you must set the `MODIO_DEVELOPMENT_MODE` environment variable to `1`. This will tell the plugin to regenerate the files it produces from the internal copy of the mod.io C++ SDK. This environment variable does not need to be set if you are using the standalone release zips, or during normal development when you have not updated the Plugin via git. Once these files are regenerated, simply leave the environment variable unset and the regenerated files can be added to your version control system. This allows you to update the plugin via Git without interfering with daily use of Perforce or similar version control that requires files be marked read-only.
+
+#### In a non-git project, or without submodules
+
+1. Grab the latest release zip from the Releases section on this page, and extract the contents to your project's `Plugins/Modio` directory
+
+![Get Latest Release](Doc/img/get_latest_release.png)
+![Get Latest Release 2](Doc/img/get_latest_release2.png)
+
+> **NOTE:** The automatically generated zips on the release page, or the 'Code' dropdown here, will not work! They do not contain our submodule dependencies.
+
+### Enabling the plugin
+
+Start the editor, then enable the Modio Core plugin in the Unreal Engine settings:
+![Plugin Window](Doc/img/plugin_window.png)
+
+Once this is done, you can configure the plugin and get started.
+
+### Plugin Configuration
+
+The plugin requires some configuration information to behave correctly. You can access the configuration settings in the Project Settings window:
+
+![Plugin Settings](Doc/img/plugin_settings.png)
+
+The settings have the following parameters:
+
+| Parameter              | Description                                                        |
+|------------------------|--------------------------------------------------------------------|
+| **Game Id**            | Your mod.io-provided Game Id for the target environment             |
+| **API Key**            | Your mod.io-provided API key for the target environment             |
+| **Environment**        | Your current environment, Live or Test                              |
+| **Log Level**          | The default logging level to use. Messages with a lower log level will be silently discarded. |
+| **Portal**             | The default portal to use. This usually corresponds to the store your game will be distributed through. |
+| **Use Background Thread** | Run the mod.io plugin on a managed background thread.           |
+
+> **NOTE:** The Test environment is available for usage in limited circumstances. All games should be setup on the Live environment. If you require access to Test, please contact us.
+
+### mod.io Plugin Suite
+
+This plugin is a part of the full suite of mod.io suite to support implementation of UGC support in Unreal Engine.
+
+#### Component & Template UI
+Component & Template UI is a plugin for building an in-game mod browser & discovery UI. This includes a template for mod browsing, searching, collection management etc, as well as a set of components for customizing or building your own in-game UI.
+Component UI is available at the [Component UI repository](https://github.com/modio/modio-ue-component-ui).
+
+#### Modio UGC
+Modio UGC is a plugin that facilitates dynamic management of UGC in the form of PAK files.
+Modio UGC is available at the [Modio UGC Repository](https://github.com/modio/modio-ue-modiougc).
+
+## Game studios and Publishers
+
+If you need assistance with 1st party approvals, or require a private, white-label UGC solution, [Contact us](mailto:developers@mod.io) to discuss.
+
+## Contributions Welcome
+
+Our Unreal Engine plugin is public and open source. Game developers are welcome to utilize it directly, to add support for mods in their games, or fork it for their games customized use. Want to make changes to our plugin? Submit a pull request with your recommended changes to be reviewed.

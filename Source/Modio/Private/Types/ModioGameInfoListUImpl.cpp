@@ -27,7 +27,7 @@ FModioGameInfoList::FModioGameInfoList(const Modio::GameInfoList& GameInfoList)
 {
     TArray<FModioGameInfo> Result;
 
-    Result.Reserve(GameInfoList.Size());
+    Result.Reserve(size_t(GameInfoList.Size()));
     for (const Modio::GameInfo& It : GameInfoList)
     {
         Result.Emplace(ToUnreal(It));

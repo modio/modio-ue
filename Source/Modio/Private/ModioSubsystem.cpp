@@ -13,6 +13,7 @@
 #include "Engine/Engine.h"
 #include "Internal/Convert/AuthParams.h"
 #include "Internal/Convert/CreateModFileParams.h"
+#include "Internal/Convert/CreateSourceFileParams.h"
 #include "Internal/Convert/CreateModParams.h"
 #include "Internal/Convert/EditModParams.h"
 #include "Internal/Convert/Entitlements.h"
@@ -393,7 +394,7 @@ void UModioSubsystem::K2_FetchExternalUpdatesAsync(FOnErrorOnlyDelegate OnFetchD
 void UModioSubsystem::K2_PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegate OnPreviewDone)
 {
 	PreviewExternalUpdatesAsync(FOnPreviewExternalUpdatesDelegateFast::CreateLambda(
-		[this, OnPreviewDone](FModioErrorCode ec, TOptional<FModioModChangeMap> PreviewMap) {
+		[OnPreviewDone](FModioErrorCode ec, TOptional<FModioModChangeMap> PreviewMap) {
 			OnPreviewDone.ExecuteIfBound(ec, ToBP<FModioOptionalModChangeMap>(PreviewMap));
 		}));
 }
@@ -603,7 +604,7 @@ void UModioSubsystem::GetModMediaAsync(FModioModID ModId, EModioGallerySize Gall
 	}
 	PendingModMediaGalleryRequests.Add(ModIdSizeIndexTuple).Add(Callback);
 	Modio::GetModMediaAsync(
-		ToModio(ModId), ToModio(GallerySize), Index,
+		ToModio(ModId), ToModio(GallerySize), Modio::GalleryIndex(Index),
 		[WeakThis = MakeWeakObjectPtr(this), ModIdSizeIndexTuple](Modio::ErrorCode ec,
 																  Modio::Optional<std::string> Path) {
 			if (!WeakThis.IsValid())
@@ -1093,6 +1094,11 @@ void UModioSubsystem::SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFil
 	Modio::SubmitNewModFileForMod(ToModio(Mod), ToModio(Params));
 }
 
+void UModioSubsystem::SubmitNewSourceFileForMod(FModioModID Mod, FModioCreateSourceFileParams Params)
+{
+	Modio::SubmitNewModSourceFile(ToModio(Mod), ToModio(Params));
+}
+
 void UModioSubsystem::SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
 											FOnGetModInfoDelegateFast Callback)
 {
@@ -1107,6 +1113,11 @@ void UModioSubsystem::SubmitModChangesAsync(FModioModID Mod, FModioEditModParams
 void UModioSubsystem::K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params)
 {
 	SubmitNewModFileForMod(Mod, Params);
+}
+
+void UModioSubsystem::K2_SubmitNewSourceFileForMod(FModioModID Mod, FModioCreateSourceFileParams Params)
+{
+	SubmitNewSourceFileForMod(Mod, Params);
 }
 
 FModioModCreationHandle UModioSubsystem::K2_GetModCreationHandle()

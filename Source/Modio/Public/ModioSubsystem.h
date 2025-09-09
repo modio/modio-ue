@@ -24,6 +24,7 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioCreateModFileParams.h"
 #include "Types/ModioCreateModParams.h"
+#include "Types/ModioCreateSourceFileParams.h"
 #include "Types/ModioEditModParams.h"
 #include "Types/ModioEntitlementConsumptionStatusList.h"
 #include "Types/ModioErrorCode.h"
@@ -688,6 +689,22 @@ public:
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
 	 */
 	MODIO_API void SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
+
+	/**
+	* @docpublic
+	* @brief Queues the upload of source files for a modfile to defined platforms. This function
+	* takes a Modio::CreateSourceFileParams struct that defines the options needed to upload the source
+	* files. The files present in the root folder defined in the params will be compressed to a .zip archive and
+	* uploaded.
+	* @param Mod The mod to upload source files for
+	* @param Params Descriptor containing information regarding the modfile
+	* @requires initialized-sdk
+	* @requires no-rate-limiting
+	* @requires authenticated-user
+	* @requires management-enabled
+	* @error GenericError::BadParameter|The supplied mod ID is invalid
+	*/
+	MODIO_API void SubmitNewSourceFileForMod(FModioModID Mod, FModioCreateSourceFileParams Params);
 
 	/**
 	 * @docpublic
@@ -1745,6 +1762,23 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModFileForMod", Category = "mod.io|Mods|Submission")
 	MODIO_API void K2_SubmitNewModFileForMod(FModioModID Mod, FModioCreateModFileParams Params);
+
+	/**
+	 * @docpublic
+	 * @brief Queues the upload of source files for a modfile to defined platforms. This function
+	 * takes a Modio::CreateSourceFileParams struct that defines the options needed to upload the source
+	 * files. The files present in the root folder defined in the params will be compressed to a .zip archive and
+	 * uploaded.
+	 * @param Mod The mod to upload source files for
+	 * @param Params Descriptor containing information regarding the modfile
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @error GenericError::BadParameter|The supplied mod ID is invalid
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewSourceFileForMod", Category = "mod.io|Mods|Submission")
+	void K2_SubmitNewSourceFileForMod(FModioModID Mod, FModioCreateSourceFileParams Params);
 
 	/**
 	 * @docpublic

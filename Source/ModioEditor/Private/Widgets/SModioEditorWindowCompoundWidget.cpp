@@ -9,24 +9,26 @@
  */
 
 #include "Widgets/SModioEditorWindowCompoundWidget.h"
-#include "SlateOptMacros.h"
 #include "Delegates/DelegateSignatureImpl.inl"
 #include "Misc/EngineVersionComparison.h"
+#include "SlateOptMacros.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
-	#include "DesktopPlatform/Public/IDesktopPlatform.h"
 	#include "DesktopPlatform/Public/DesktopPlatformModule.h"
+	#include "DesktopPlatform/Public/IDesktopPlatform.h"
 #else
 	#include "DesktopPlatformModule.h"
 	#include "IDesktopPlatform.h"
 #endif
-#include "HttpModule.h"
+#include "Engine/Engine.h"
 #include "HAL/FileManagerGeneric.h"
+#include "HttpModule.h"
+#include "IStructureDetailsView.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "Interfaces/IPluginManager.h"
-#include "IStructureDetailsView.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "Misc/FileHelper.h"
+#include "Misc/MessageDialog.h"
 #include "ModioErrorCondition.h"
 #include "ModioSubsystem.h"
 #include "Objects/ModioBrowseModFileCollectionObject.h"
@@ -35,24 +37,27 @@
 #include "Objects/ModioCreateModParamsObject.h"
 #include "Objects/ModioCreateNewModFileParamsObject.h"
 #include "Objects/ModioEditModParamsObject.h"
+#include "SHyperlinkLaunchURL.h"
 #include "Styling/SlateBrush.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioModInfo.h"
+#include "Widgets/Input/SFilePathPicker.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
-#include "Widgets/Layout/SWrapBox.h"
 #include "Widgets/Layout/SHeader.h"
-#include "WindowManager.h"
+#include "Widgets/Layout/SWrapBox.h"
 #include "Widgets/SOverlay.h"
-#include "Engine/Engine.h"
-#include "Misc/MessageDialog.h"
 #include "Widgets/SWindow.h"
+#include "WindowManager.h"
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
 	#include "Launch/Resources/Version.h"
 #endif
-#include "ModioEditor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Libraries/ModioErrorConditionLibrary.h"
-
+#include "ModioEditor.h"
+#include "ModioEditorSettings.h"
+#include "Types/ModioToolWindowEntry.h"
+#include "Widgets/Input/SHyperlink.h"
+#include "Widgets/SModioEditorUserAuthWidget.h"
 
 #define LOCTEXT_NAMESPACE "LocalizedText"
 
@@ -63,7 +68,8 @@ BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SModioEditorWindowCompoundWidget::Construct(const FArguments& InArgs)
 {
 	LoadResources();
-	
+
+	// clang-format off
 	ChildSlot
 	[	
 		SNew(SOverlay)
@@ -77,21 +83,69 @@ void SModioEditorWindowCompoundWidget::Construct(const FArguments& InArgs)
 
 		+ SOverlay::Slot()
 		[
-			SAssignNew(GameInfoVerticalBoxList, SVerticalBox)
+			SNew(SVerticalBox)
+			+SVerticalBox::Slot()
+			//.FillHeight(0.4f)
+			.AutoHeight()
+			[
+				SAssignNew(GameInfoVerticalBoxList, SVerticalBox)
+			]
+
+			+SVerticalBox::Slot()
+			.VAlign(VAlign_Center)
+			.HAlign(HAlign_Center)
+			.Padding(32.f)
+			.AutoHeight()
+			[
+				SAssignNew(VerticalBoxList, SVerticalBox)
+			]
 		]
 
-		+SOverlay::Slot()
-		.Padding(FMargin(15.f, 215.f, 15.f, 15.f))
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Center)
 		[
-			SAssignNew(VerticalBoxList, SVerticalBox)
+			SAssignNew(ProgressBarBox, SBox)
+			.Visibility(EVisibility::Collapsed)
+			.WidthOverride(300)
+			.HeightOverride(300)
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SVerticalBox)
+				+ SVerticalBox::Slot()
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Top)
+				[
+					SAssignNew(ProgressTitle, STextBlock)
+					.Font(HeaderLargeTextStyle)
+					.Visibility(EVisibility::Collapsed)
+				]
+				+ SVerticalBox::Slot()
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				[
+					SNew(SBox)
+					.MinDesiredWidth(300)
+					.MinDesiredHeight(50)
+					.MaxDesiredWidth(300)
+					.MaxDesiredHeight(50)
+					[
+						SAssignNew(ProgressBar, SProgressBar)
+						.Percent(Percentage)
+						.Visibility(EVisibility::Collapsed)
+					]
+				]
+			]
 		]
 	];
-	
+	// clang-format on
+
 	DrawThrobberWidget();
 	LoadModioSubsystem();
 }
 
-void SModioEditorWindowCompoundWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+void SModioEditorWindowCompoundWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
+											const float InDeltaTime)
 {
 	if (ModioSubsystem && !ModioSubsystem->IsUsingBackgroundThread())
 	{
@@ -116,14 +170,26 @@ void SModioEditorWindowCompoundWidget::LoadResources()
 		for (FString File : Files)
 		{
 			FString Key = FPaths::GetBaseFilename(File);
-			FSlateDynamicImageBrush* DynamicImageBrush = new FSlateDynamicImageBrush(FName(*File), Key.Contains("Logo_") ? GameLogoSize : DefaultImageSize);
+			FSlateDynamicImageBrush* DynamicImageBrush =
+				new FSlateDynamicImageBrush(FName(*File), Key.Contains("Logo_") ? GameLogoSize : DefaultImageSize);
 			TexturePool.Add(Key, DynamicImageBrush);
 		}
 	}
 
+	LoginButtonBrush = new FSlateImageBrush(
+		TSoftObjectPtr<UObject>(FSoftObjectPath("/ModioUGC/UI/Materials/M_UI_Cog_ModioUGC.M_UI_Cog_ModioUGC"))
+			.LoadSynchronous(),
+		FVector2D(32, 32));
+
 	HeaderBackgroundBrush = new FSlateBrush();
 	HeaderBackgroundBrush->TintColor = FLinearColor(0.025f, 0.025f, 0.025f, 1.f);
 	HeaderBackgroundBrush->SetImageSize(FVector2D(64.f, 64.f));
+
+	PanelBackgroundBrush = new FSlateBrush();
+	PanelBackgroundBrush->TintColor = FLinearColor(0.015f, 0.015f, 0.015f, 1.f);
+
+	BoldSeperatorBrush = new FSlateBrush();
+	BoldSeperatorBrush->TintColor = FLinearColor(0.05, 0.05, 0.05, 1.0f);
 
 	BackgroundBrush = new FSlateBrush();
 #if ENGINE_MAJOR_VERSION >= 5
@@ -134,47 +200,56 @@ void SModioEditorWindowCompoundWidget::LoadResources()
 
 	HeaderLargeTextStyle = GetTextStyle("EmbossedText", "Normal", 14);
 	HeaderSmallTextStyle = GetTextStyle("EmbossedText", "Normal", 11);
+
 	ButtonTextStyle = GetTextStyle("EmbossedText", "Normal", 10);
+
+	FButtonStyle NoBackButtonStyle;
 }
 
 void SModioEditorWindowCompoundWidget::LoadModioSubsystem()
 {
-	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
-	
+	FModioInitializeOptions InitializeOptions =
+		UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
+
 	if (GEngine)
 	{
 		ModioSubsystem = GEngine->GetEngineSubsystem<UModioSubsystem>();
 		if (ModioSubsystem)
 		{
-			ModioSubsystem->InitializeAsync(InitializeOptions, FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnInitCallback));
+			ModioSubsystem->InitializeAsync(
+				InitializeOptions,
+				FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnInitCallback));
 		}
 	}
 }
 
 void SModioEditorWindowCompoundWidget::EnableModManagement()
 {
-	ModioSubsystem->EnableModManagement(FOnModManagementDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnModManagementCallback));
+	ModioSubsystem->EnableModManagement(
+		FOnModManagementDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnModManagementCallback));
 }
 
-void SModioEditorWindowCompoundWidget::OnModManagementCallback(FModioModManagementEvent Event) 
+void SModioEditorWindowCompoundWidget::OnModManagementCallback(FModioModManagementEvent Event)
 {
-	UE_LOG(ModioEditor, Warning, TEXT("ModEvent: %d, ID: %s, Msg: %s"), (int)Event.Event, *Event.ID.ToString(), *Event.Status.GetErrorMessage());
+	UE_LOG(ModioEditor, Warning, TEXT("ModEvent: %d, ID: %s, Msg: %s"), (int) Event.Event, *Event.ID.ToString(),
+		   *Event.Status.GetErrorMessage());
 
 	if (Event.ID == UploadModID)
 	{
 		if (Event.Status.GetValue() != 0)
 		{
-			if (Event.Event == EModioModManagementEventType::BeginUpload || Event.Event == EModioModManagementEventType::Uploaded)
-			{
-				HideProgressBar();
+			HideProgressBar();
 
-				FText Message = Localize("ModFileNotUploaded", FString::Printf(TEXT("Your mod file could not be uploaded, see error message below:\n\n%s\n\nErrorCode: %d, EventType: %d."), *Event.Status.GetErrorMessage(), Event.Status.GetValue(), (int)Event.Event));
-				FMessageDialog::Open(EAppMsgType::Ok, Message);
-				WindowManager::Get().GetWindow()->BringToFront();
-				
-				ModioSubsystem->DisableModManagement();
-				EnableModManagement();
-			}
+			FText Message =
+				Localize("ModFileNotUploaded",
+						 FString::Printf(TEXT("Your mod file could not be uploaded, see error message "
+											  "below:\n\n%s\n\nErrorCode: %d, EventType: %d."),
+										 *Event.Status.GetErrorMessage(), Event.Status.GetValue(), (int) Event.Event));
+			FMessageDialog::Open(EAppMsgType::Ok, Message);
+			WindowManager::Get().GetWindow()->BringToFront();
+
+			ModioSubsystem->DisableModManagement();
+			EnableModManagement();
 			return;
 		}
 
@@ -191,271 +266,280 @@ void SModioEditorWindowCompoundWidget::OnModManagementCallback(FModioModManageme
 
 void SModioEditorWindowCompoundWidget::OnInitCallback(FModioErrorCode ErrorCode)
 {
-	if (!ErrorCode || UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
+	if (!ErrorCode ||
+		UModioErrorConditionLibrary::ErrorCodeMatches(ErrorCode, EModioErrorCondition::SDKAlreadyInitialized))
 	{
 		EnableModManagement();
 
-		ModioSubsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(), FOnGetGameInfoDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) 
-		{
-			if (ErrorCode)
-			{
-				FText Message = Localize("ModioGameInfoError", FString::Printf(TEXT("Could not retrieve game information from mod.io\n%s"), *ErrorCode.GetErrorMessage()));
-				FMessageDialog::Open(EAppMsgType::Ok, Message);
-				WindowManager::Get().GetWindow()->BringToFront();
-				WindowManager::Get().CloseWindow();
-				return;
-			}
-			if (GameInfo.IsSet())
-			{
-				ModioGameInfo = GameInfo;
-				
-				FString LogoPath = ResourcesPath + "Downloaded/" + "Logo_" + GameInfo->GameID.ToString() + ".png";
-				if (!FPaths::FileExists(LogoPath))
-				{
-					DownloadGameLogo(GameInfo->Logo.Thumb320x180);
-				}
-				else
-				{
-					DrawLogoWidget();
+		ModioSubsystem->GetGameInfoAsync(
+			UModioSDKLibrary::GetProjectGameId(),
+			FOnGetGameInfoDelegateFast::CreateLambda(
+				[this](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) {
+					if (ErrorCode)
+					{
+						FText Message =
+							Localize("ModioGameInfoError",
+									 FString::Printf(TEXT("Could not retrieve game information from mod.io\n%s"),
+													 *ErrorCode.GetErrorMessage()));
+						FMessageDialog::Open(EAppMsgType::Ok, Message);
+						WindowManager::Get().GetWindow()->BringToFront();
+						WindowManager::Get().CloseWindow();
+						return;
+					}
+					if (GameInfo.IsSet())
+					{
+						ModioGameInfo = GameInfo;
 
-					FString Key = FPaths::GetBaseFilename(LogoPath);
-					ModioGameLogo->SetImage(TexturePool[Key]);
+						FString HeaderPath =
+							ResourcesPath + "Downloaded/" + "Header_" + GameInfo->GameID.ToString() + ".png";
 
-					ModioSubsystem->VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnVerifyCurrentUserAuthenticationCompleted));
-				}
-			}
-		}));
+						auto OnHeaderObtained = FSimpleDelegate::CreateSPLambda(this, [this, HeaderPath]() {
+							DrawLogoWidget();
+							FString Key = FPaths::GetBaseFilename(HeaderPath);
+							FSlateDynamicImageBrush* LogoBrush = TexturePool[Key];
+							LogoBrush->DrawAs = ESlateBrushDrawType::Box;
+							LogoBrush->Margin = FMargin(0.f);
+							ModioGameLogo->SetImage(LogoBrush);
+							ModioSubsystem->VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast::CreateRaw(
+								this, &SModioEditorWindowCompoundWidget::OnVerifyCurrentUserAuthenticationCompleted));
+						});
+
+						if (!FPaths::FileExists(HeaderPath))
+						{
+							DownloadGameImage(GameInfo->HeaderImage.Original, HeaderPath, OnHeaderObtained);
+						}
+						else
+						{
+							OnHeaderObtained.ExecuteIfBound();
+						}
+					}
+				}));
 	}
 	else
 	{
-		UE_LOG(ModioEditor, Error, TEXT("ModioSubsystem - OnInitCallback - Could not initialize ModioSubsystem - ErrorCode: %d | ErrorMessage: %s"), ErrorCode.GetValue(), *ErrorCode.GetErrorMessage());
+		UE_LOG(ModioEditor, Error,
+			   TEXT("ModioSubsystem - OnInitCallback - Could not initialize ModioSubsystem - ErrorCode: %d | "
+					"ErrorMessage: %s"),
+			   ErrorCode.GetValue(), *ErrorCode.GetErrorMessage());
 		WindowManager::Get().CloseWindow();
 	}
 }
 
 void SModioEditorWindowCompoundWidget::OnVerifyCurrentUserAuthenticationCompleted(FModioErrorCode ErrorCode)
 {
-	if (!ErrorCode)
-	{
-		TOptional<FModioUser> CurrentUser = ModioSubsystem->QueryUserProfile();
-		if (CurrentUser.IsSet())
-		{
-			FString FileName = FPaths::ProjectSavedDir() + "ModioEditorExtension.txt";
-			if (FPaths::FileExists(FileName))
-			{
-				DrawModCreationToolWidget();
-				return;
-			}
+	DrawToolLanding();
+}
 
-			const FText Title = Localize("UserInfo", "User Information");
-			const FText Message = Localize("UserInfoMessage", FString::Printf(TEXT("Modio user '%s' already logged in on this platform"), *CurrentUser->Username));
-#if UE_VERSION_OLDER_THAN(5, 3, 0)
-			EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, &Title);
-			#else
-			EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, Title);
-			#endif
-			if (UserSelection == EAppReturnType::Ok)
-			{
-				DrawModCreationToolWidget();
-				WindowManager::Get().GetWindow()->BringToFront();
-				FFileHelper::SaveStringToFile(CurrentUser->Username, *FileName);
-			}
-		}
+void SModioEditorWindowCompoundWidget::DrawToolLanding()
+{
+	TOptional<FModioUser> CurrentUser = ModioSubsystem->QueryUserProfile();
+
+	ClearAllWidgets();
+
+	TSharedPtr<SVerticalBox> VBoxContent;
+
+	// clang-format off
+
+	VerticalBoxList->AddSlot()
+	[
+		SNew(SBox)
+		.MinDesiredWidth(900)
+		.MinDesiredHeight(500)
+		[
+			SAssignNew(VBoxContent, SVerticalBox)
+		]
+	];
+	
+	VBoxContent->AddSlot()
+		.VAlign(VAlign_Top)
+		.FillHeight(0.15)
+		.Padding(FMargin(0, 16))
+		[
+			// landing header
+			SNew(STextBlock)
+				.Text(LOCTEXT(
+					"ModioLandingHeaderFmt",
+					"Please choose where you would like to begin:"))
+				.AutoWrapText(true)
+				.Justification(ETextJustify::Center)
+		];
+
+	VBoxContent->AddSlot()
+		.Padding(0, 24, 0, 0)
+		[
+			SAssignNew(LandingCategoryList, SVerticalBox)
+		];
+
+	if(!CurrentUser)
+	{
+		VBoxContent->AddSlot()
+		[
+			SNew(SBox)
+				.WidthOverride(350)
+				.HeightOverride(60)
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				[
+					SNew(SButton)
+					.ContentPadding(FMargin(100, 12))
+					.OnClicked(this, &SModioEditorWindowCompoundWidget::OnLoginLandingButtonClicked)
+					.HAlign(HAlign_Fill)
+					.VAlign(VAlign_Center)
+					[
+						SNew(SHorizontalBox)
+						+ SHorizontalBox::Slot()
+						.AutoWidth()
+						.Padding(8, 0)
+						.HAlign(HAlign_Right)
+						.VAlign(VAlign_Center)
+						[
+							SNew(SBox)
+							.WidthOverride(32)
+							.HeightOverride(32)
+							[
+								SNew(SImage)
+								.Image(LoginButtonBrush)
+								.DesiredSizeOverride(FVector2D(32, 32))
+							]
+						]
+						+ SHorizontalBox::Slot()
+						.FillWidth(1.0f)
+						.Padding(8, 0)
+						.HAlign(HAlign_Left)
+						.VAlign(VAlign_Center)
+						[
+							SNew(STextBlock)
+							.Text(LOCTEXT("ModioLandingLogin", "Login to mod.io"))
+							.AutoWrapText(true)
+							.Justification(ETextJustify::Left)
+							.Font(ButtonTextStyle)
+						]
+					]
+				]
+		];
+
+		VBoxContent->AddSlot()
+			.VAlign(VAlign_Center)
+			.FillHeight(0.15)
+			[
+				SNew(SVerticalBox)
+				+ SVerticalBox::Slot()
+				[
+					SNew(STextBlock)
+					.Text(Localize("ModioLandingAccount",
+								FString::Printf(TEXT("A mod.io account is required to upload and manage mods to %s."), *ModioGameInfo->Name)))
+					.AutoWrapText(true)
+					.Justification(ETextJustify::Center)
+				]
+				+ SVerticalBox::Slot()
+				.HAlign(HAlign_Center)
+				[
+					SNew(SHyperlink)
+					.Text(LOCTEXT("ModioTermsAndConditions", "Click here to create a new account"))
+					.OnNavigate_Lambda([this]() {
+						FPlatformProcess::LaunchURL(TEXT("http://mod.io"), nullptr, nullptr);
+					})
+				]
+			];
 	}
 	else
 	{
-		DrawLoginWidget();
+		VBoxContent->AddSlot()
+			.VAlign(VAlign_Bottom)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.HAlign(HAlign_Right)
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(STextBlock)
+					.Text(FText::Format(LOCTEXT("ModioLandingLoggedInAs",
+								"Logged in as {0}."), FText::FromString(CurrentUser->Username)))
+					.AutoWrapText(true)
+					.Justification(ETextJustify::Center)
+				]
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Left)
+				.Padding(4, 0)
+				[
+					SNew(SButton)
+					.ContentPadding(6)
+					.OnClicked_Lambda([this]()
+					{
+						Logout(false);
+						DrawToolLanding();
+						return FReply::Handled();
+					})
+					.HAlign(HAlign_Center)
+					.Text(LOCTEXT("LogoutButton", "Log Out"))
+				]
+			];
 	}
+
+	// clang-format on
+
+	// Populate LandingCategoryList with entries
+	UModioEditorSettings* Settings = GetMutableDefault<UModioEditorSettings>();
+	for (auto Entry : Settings->ToolLandingEntries)
+	{
+		if (Entry.bRequiresAuth && (!ModioSubsystem || !ModioSubsystem->QueryUserProfile()))
+			continue;
+
+		TSharedPtr<SWidget> EntryWidget = CreateToolEntryWidget(Entry);
+		if (EntryWidget.IsValid())
+		{
+			LandingCategoryList->AddSlot().AttachWidget(EntryWidget.ToSharedRef());
+		}
+	}
+
+	for (auto Entry : Settings->SubmoduleToolLandingEntries)
+	{
+		if (Entry.bRequiresAuth && (!ModioSubsystem || !ModioSubsystem->QueryUserProfile()))
+			continue;
+
+		TSharedPtr<SWidget> EntryWidget = CreateToolEntryWidget(Entry);
+		if (EntryWidget.IsValid())
+		{
+			LandingCategoryList->AddSlot().AttachWidget(EntryWidget.ToSharedRef());
+		}
+	}
+}
+
+void SModioEditorWindowCompoundWidget::DrawSubwindowWidget(TSharedPtr<SWidget> Widget)
+{
+	if (!Widget.IsValid())
+	{
+		return;
+	}
+
+	ClearAllWidgets();
+
+	VerticalBoxList->AddSlot().AutoHeight().AttachWidget(Widget.ToSharedRef());
+}
+
+FReply SModioEditorWindowCompoundWidget::OnLoginLandingButtonClicked()
+{
+	DrawLoginWidget();
+	return FReply::Handled();
 }
 
 void SModioEditorWindowCompoundWidget::DrawLoginWidget()
 {
 	ClearAllWidgets();
 
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-	.AutoHeight()
-	[
-		SNew(SBorder)
-		.BorderBackgroundColor(FColor::White)
-		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-		[
-			SNew(SHorizontalBox)
+	// clang-format offld
 
-			// Modio Email Label
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SNew(STextBlock)
-				.Text(Localize("ModioEmail", "Log in with Email:"))
-			]
-
-			// Modio Email EditableTextBox
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SAssignNew(ModioEmailEditableTextBox, SEditableTextBox)
-				.MinDesiredWidth(256.f)
-			]
-
-			// Login Button
-			+ SHorizontalBox::Slot()
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SNew(SButton)
-				.DesiredSizeScale(FVector2D(1.f, 1.f))
-						
-				.OnClicked(this, &SModioEditorWindowCompoundWidget::OnLoginButtonClicked)
-				[
-					// Login Button Text
-					SNew(STextBlock)
-					.Font(ButtonTextStyle)
-					.Text(Localize("Login", "Login"))
-					.Justification(ETextJustify::Center)
-				]
-			]	
-		]
-	];
+	VerticalBoxList->AddSlot().AutoHeight()[SNew(SModioEditorUserAuthWidget)
+												.ParentWindow(this)
+												.BackHandler(this, &SModioEditorWindowCompoundWidget::DrawToolLanding)];
+	// clang-format on
 }
 
-FReply SModioEditorWindowCompoundWidget::OnLoginButtonClicked()
+void SModioEditorWindowCompoundWidget::ClearAllWidgets()
 {
-	if (ModioEmailEditableTextBox->GetText().ToString().IsEmpty())
-	{
-		FText Message = Localize("ModioLoginInvalid", "Unable to login, please enter a valid email address for mod.io!"); 
-		FMessageDialog::Open(EAppMsgType::Ok, Message);
-		WindowManager::Get().GetWindow()->BringToFront();
-		return FReply::Handled();
-	}
-
-	DrawThrobberWidget();
-	ModioSubsystem->RequestEmailAuthCodeAsync(FModioEmailAddress(ModioEmailEditableTextBox->GetText().ToString()), FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnRequestEmailAuthCodeCompleted));
-	return FReply::Handled();
-}
-
-void SModioEditorWindowCompoundWidget::OnRequestEmailAuthCodeCompleted(FModioErrorCode ErrorCode)
-{
-	if (ErrorCode.GetValue() == 0)
-	{
-		DrawAuthenticateWidget();
-	}
-	else if (ErrorCode.GetValue() == 20993)
-	{
-		DrawModCreationToolWidget();
-
-		FText Message = Localize("ModioEmailAlreadyAuthenticated", FString::Printf(TEXT("%s!"), *ErrorCode.GetErrorMessage()));
-		FMessageDialog::Open(EAppMsgType::Ok, Message);
-		WindowManager::Get().GetWindow()->BringToFront();
-	}
-	else
-	{
-		DrawLoginWidget();
-
-		const FString LastValidationError = [this]() -> FString
-		{
-			if (ModioSubsystem && ModioSubsystem->GetLastValidationError().Num() > 0)
-			{
-				return FString::Printf(TEXT("\n\"%s\": \"%s\""), *ModioSubsystem->GetLastValidationError()[0].FieldName, *ModioSubsystem->GetLastValidationError()[0].ValidationFailureDescription);
-			}
-			return FString();
-		}();
-		if (ModioSubsystem)
-		{
-			FText Message = Localize("ModioAuthFailed", FString::Printf(TEXT("Authentication failed, see message for detail\n%s%s"), *ErrorCode.GetErrorMessage(), *LastValidationError));
-			FMessageDialog::Open(EAppMsgType::Ok, Message);
-			WindowManager::Get().GetWindow()->BringToFront();
-		}
-	}
-}
-
-void SModioEditorWindowCompoundWidget::DrawAuthenticateWidget()
-{
-	ClearAllWidgets();
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-	.AutoHeight()
-	[
-		SNew(SBorder)
-		.BorderBackgroundColor(FColor::White)
-		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-		[
-			SNew(SHorizontalBox)
-
-			// Modio Authentication  Label
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SNew(STextBlock)
-				.Text(Localize("AuthCode", "Authentication Code:"))
-			]
-
-			// Modio Authentication EditableTextBox
-			+ SHorizontalBox::Slot()
-			.Padding(FMargin(15.f, 0.f, 15.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SAssignNew(ModioAuthenticationCodeEditableTextBox, SEditableTextBox)
-				.MinDesiredWidth(256.f)
-			]
-
-			// Authenticate Button
-			+ SHorizontalBox::Slot()
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			.AutoWidth()
-			[
-				SNew(SButton)
-				.DesiredSizeScale(FVector2D(1.f, 1.f))
-				.OnClicked(this, &SModioEditorWindowCompoundWidget::OnAuthenticateButtonClicked)
-				[
-					// Authenticate Button Text
-					SNew(STextBlock)
-					.Font(ButtonTextStyle)
-					.Text(Localize("ModioAuth", "Authenticate"))
-					.Justification(ETextJustify::Center)
-				]
-			]
-		]
-	];
-}
-
-FReply SModioEditorWindowCompoundWidget::OnAuthenticateButtonClicked()
-{
-	DrawThrobberWidget();
-
-	ModioSubsystem->AuthenticateUserEmailAsync(FModioEmailAuthCode(ModioAuthenticationCodeEditableTextBox->GetText().ToString()), FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnAuthCodeCompleted));
-	return FReply::Handled();
-}
-
-void SModioEditorWindowCompoundWidget::OnAuthCodeCompleted(FModioErrorCode ErrorCode)
-{
-	if (ErrorCode == 0)
-	{
-		DrawModCreationToolWidget();
-	}
-	else
-	{
-		DrawLoginWidget();
-	}
-}
-
-void SModioEditorWindowCompoundWidget::ClearAllWidgets() 
-{
-	if (VerticalBoxList.IsValid()) 
+	if (VerticalBoxList.IsValid())
 	{
 		if (VerticalBoxList->GetAllChildren()->Num() > 0)
 		{
@@ -464,11 +548,11 @@ void SModioEditorWindowCompoundWidget::ClearAllWidgets()
 	}
 }
 
-void SModioEditorWindowCompoundWidget::DrawLogoWidget() 
+void SModioEditorWindowCompoundWidget::DrawLogoWidget()
 {
+	// clang-format off
 	GameInfoVerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 60.f))
-	.MaxHeight(175.f)
+	.Padding(FMargin(0.f, 0.f, 0.f, 0.f))
 	.AutoHeight()
 	[
 		SNew(SOverlay)
@@ -483,17 +567,12 @@ void SModioEditorWindowCompoundWidget::DrawLogoWidget()
 		]
 		
 		+SOverlay::Slot()
-		.Padding(FMargin(15.f))
-		.HAlign(HAlign_Left)
-		.VAlign(VAlign_Center)
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Fill)
 		[
-			SNew(SHorizontalBox)
-
-			// Modio Icon
-			+ SHorizontalBox::Slot()
+			SAssignNew(ModioGameLogoContainer, SScaleBox) 
+			.Stretch(EStretch::ScaleToFit)
 			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Top)
-			.AutoWidth()
 			[
 				SAssignNew(ModioGameLogo, SImage)
 			]
@@ -576,6 +655,8 @@ void SModioEditorWindowCompoundWidget::DrawLogoWidget()
 		]
 	];
 
+	// clang-format on
+
 	if (ModioGameInfo.IsSet())
 	{
 		GameName->SetText(Localize("GameName", ModioGameInfo->Name));
@@ -588,920 +669,24 @@ void SModioEditorWindowCompoundWidget::DrawThrobberWidget()
 {
 	ClearAllWidgets();
 
+	// clang-format on
 	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
-	.HAlign(HAlign_Center)
-	.VAlign(VAlign_Center)
-	.AutoHeight()
-	[
-		SNew(SCircularThrobber)
-		.Radius(50.f)	
-	];
-}
-
-void SModioEditorWindowCompoundWidget::DrawModCreationToolWidget()
-{
-	ClearAllWidgets();
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f))
-	.AutoHeight()
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.HAlign(HAlign_Left)
+		.Padding(FMargin(15.f, 15.f, 15.f, 15.f))
+		.HAlign(HAlign_Center)
 		.VAlign(VAlign_Center)
-		.AutoWidth()
-		[
-			SNew(SButton)
-			.ButtonColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			[
-				SNew(SHorizontalBox)
-
-				+SHorizontalBox::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.AutoWidth()
-				[	
-					SNew(SImage)
-					.Image(TexturePool["icon_CreateMod"])
-				]
-
-				+ SHorizontalBox::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.Padding(15.f, 0.f, 100.f, 0.f)
-				.MaxWidth(100.f)
-				[
-					SNew(STextBlock)
-					.ColorAndOpacity(FLinearColor::White)
-					.Font(ButtonTextStyle)
-					.Text(Localize("CreateMod", "Create " + ToNonPlural(ModioGameInfo->UgcName)))
-					.Justification(ETextJustify::Center)
-				]
-
-				+ SHorizontalBox::Slot()
-				.Padding(0.f, 0.f, 0.f, 0.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.MaxWidth(700.f)
-				[
-					SNew(STextBlock)
-					.ColorAndOpacity(FLinearColor::White)
-					.MinDesiredWidth(700.f)
-					.AutoWrapText(true)
-					.Font(ButtonTextStyle)
-					.Text(Localize("CreateModDesc", "Create a new " + ToNonPlural(ModioGameInfo->UgcName) + " for " + ModioGameInfo->Name))
-					.Justification(ETextJustify::Left)
-				]
-			]
-			.OnClicked_Lambda([this]() 
-			{
-				 ClearAllWidgets();
-
-				 UModioCreateModParamsObject* ModProperties = NewObject<UModioCreateModParamsObject>();
-				 FDetailsViewArgs DetailsViewArgs;
-				 DetailsViewArgs.bHideSelectionTip = true;
-				 DetailsViewArgs.bAllowSearch = false;
-				 DetailsViewArgs.DefaultsOnlyVisibility = EEditDefaultsOnlyNodeVisibility::Hide;
-				 TSharedPtr<IDetailsView> CreateModDetailsView = WindowManager::Get().GetPropertyModule().CreateDetailView(DetailsViewArgs);
-
-				 VerticalBoxList->AddSlot()
-				 [
-					CreateModDetailsView.ToSharedRef()
-				 ];
-
-				 VerticalBoxList->AddSlot()
-				.HAlign(HAlign_Right)
-				.VAlign(VAlign_Bottom)
-				 [
-					SNew(SHorizontalBox)
-
-					+ SHorizontalBox::Slot()
-					 .Padding(5.0f, 0.f, 5.0f, 25.f)
-					.HAlign(HAlign_Fill)
-					.VAlign(VAlign_Center)
-					.MaxWidth(128.f)
-					[
-						SNew(SButton)
-						.DesiredSizeScale(FVector2D(2.f, 1.f))
-						.OnClicked_Lambda([this, ModProperties]()
-						{				
-							if (ModioSubsystem)
-							{
-								ModioSubsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(), FOnGetGameInfoDelegateFast::CreateLambda([this, ModProperties](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) 
-								{
-									if (GameInfo.IsSet())
-									{
-										FModioModCreationHandle Handle = ModioSubsystem->GetModCreationHandle();
-
-										FModioCreateModParams Params;
-										Params.Name = ModProperties->Name;
-										Params.Description = ModProperties->Summary;
-										Params.PathToLogoFile = ModProperties->PathToLogoFile;
-										Params.Summary = ModProperties->Summary;
-
-										SubmitThrobber->SetVisibility(EVisibility::Visible);
-								
-										ModioSubsystem->SubmitNewModAsync(Handle, Params, FOnSubmitNewModDelegateFast::CreateLambda( [this, Params](FModioErrorCode ErrorCode, TOptional<FModioModID> ModId) 
-										{
-											if (!ErrorCode)
-											{
-												UE_LOG(ModioEditor, Warning, TEXT("Mod (%s) Submitted Successfully"), *ModId->ToString());
-
-												const FText Title = Localize("ModCreated", "Mod Created");
-												const FText Message = Localize("ModCreatedMessage", "Would you like to add a mod file?");
-#if UE_VERSION_OLDER_THAN(5, 3, 0)
-												EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::YesNo, Message, &Title);
-#else
-												EAppReturnType::Type UserSelection =
-													FMessageDialog::Open(EAppMsgType::YesNo, Message, Title);
-#endif
-												if (UserSelection == EAppReturnType::Yes) 
-												{
-													DrawCreateModFileToolWidget(ModId.GetValue());
-												}
-												else if (UserSelection == EAppReturnType::No)
-												{
-													DrawModCreationToolWidget();
-												}
-											}
-											else
-											{
-												const FString LastValidationError = [this]() -> FString
-												{
-													if (ModioSubsystem && ModioSubsystem->GetLastValidationError().Num() > 0)
-													{
-														return FString::Printf(TEXT("\n\"%s\": \"%s\""), *ModioSubsystem->GetLastValidationError()[0].FieldName, *ModioSubsystem->GetLastValidationError()[0].ValidationFailureDescription);
-													}
-													return FString();
-												}();
-												FText Message = Localize("ModCreationFailed", FString::Printf(TEXT("Mod creation failed, please see the message below and try again.\nError Message: %s%s"), *ErrorCode.GetErrorMessage(), *LastValidationError));
-												EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message);
-											}
-											WindowManager::Get().GetWindow()->BringToFront(true);
-											SubmitThrobber->SetVisibility(EVisibility::Hidden);
-										}));
-									}
-								}));
-								
-							}
-
-							return FReply::Handled();
-						})
-						[
-							SNew(STextBlock)
-							.Text(Localize("ModSubmit", "Submit"))
-							.Justification(ETextJustify::Center)
-						]
-					]
-
-					+ SHorizontalBox::Slot()
-					.Padding(5.0f, 0.f, 25.0f, 25.f)
-					.HAlign(HAlign_Left)
-					.VAlign(VAlign_Center)
-					.AutoWidth()
-					[
-						SAssignNew(SubmitThrobber, SCircularThrobber)
-						.Radius(15.f)
-						.Visibility(EVisibility::Hidden)
-					]
-
-					+ SHorizontalBox::Slot()
-					.Padding(5.0f, 0.f, 25.0f, 25.f)
-					.HAlign(HAlign_Fill)
-					.VAlign(VAlign_Center)
-					.MaxWidth(128.f)
-					[
-						SNew(SButton)
-						.DesiredSizeScale(FVector2D(2.f, 1.f))
-						.OnClicked_Lambda([this, ModProperties]()
-						{
-							DrawModCreationToolWidget();
-							return FReply::Handled();
-						})
-						[
-							SNew(STextBlock)
-							.Text(Localize("ModCreationToolBack", "Back"))
-							.Justification(ETextJustify::Center)
-						]
-					]
-				];
-				CreateModDetailsView->SetObject(ModProperties);
-				return FReply::Handled();
-			})
-		]
-	];
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f))
-	.AutoHeight()
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.HAlign(HAlign_Left)
-		.VAlign(VAlign_Center)
-		.AutoWidth()
-		[
-			SNew(SButton)
-			.ButtonColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 0.f))
-			.OnClicked_Lambda([this]() 
-			{
-				DrawThrobberWidget();
-				
-				FModioFilterParams FilterParams;
-				ModioSubsystem->ListUserCreatedModsAsync(FilterParams, FOnListAllModsDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioModInfoList> OptionalModList)
-				{
-					if (ErrorCode == false)
-					{
-						TArray<FModioModInfo> ModInfo = OptionalModList.GetValue().GetRawList();
-
-						DrawBrowseModsWidget(ModInfo);
-						
-					}
-				}));
-				return FReply::Handled();
-			})
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			[
-				SNew(SHorizontalBox)
-
-				+SHorizontalBox::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.AutoWidth()
-				[	
-					SNew(SImage)
-					.Image(TexturePool["icon_EditMod"])
-				]
-
-				+ SHorizontalBox::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.Padding(15.f, 0.f, 100.f, 0.5f)
-				.MaxWidth(100.f)
-				[
-					SNew(STextBlock)
-					.ColorAndOpacity(FLinearColor::White)
-					.Font(ButtonTextStyle)
-					.Text(Localize("EditMods", "Edit " + ModioGameInfo->UgcName))
-					.Justification(ETextJustify::Center)
-				]
-
-				+ SHorizontalBox::Slot()
-				.Padding(0.f, 0.f, 0.f, 0.f)
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.MaxWidth(700.f)
-				[
-					SNew(STextBlock)
-					.ColorAndOpacity(FLinearColor::White)
-					.MinDesiredWidth(700.f)
-					.AutoWrapText(true)
-					.Font(ButtonTextStyle)
-					.Text(Localize("EditModsDesc", "Edit your existing " + ModioGameInfo->UgcName + " for " + ModioGameInfo->Name))
-					.Justification(ETextJustify::Left)
-				]
-			]
-		]
-	];
-
-	VerticalBoxList->AddSlot()
-	.HAlign(HAlign_Right)
-	.VAlign(VAlign_Bottom)
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this]()
-			{
-				Logout(true);
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("ModioLogout", "Logout"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-	];
-}
-
-void SModioEditorWindowCompoundWidget::DrawBrowseModsWidget(TArray<FModioModInfo> ModInfoList)
-{
-	ClearAllWidgets();
-
-	UModioBrowseModsObject* BrowseModsProperties = NewObject<UModioBrowseModsObject>();
-	BrowseModsProperties->Items = ModInfoList;
-	FDetailsViewArgs DetailsViewArgs;
-	DetailsViewArgs.bHideSelectionTip = true;
-	DetailsViewArgs.bAllowSearch = false;
-	DetailsViewArgs.DefaultsOnlyVisibility = EEditDefaultsOnlyNodeVisibility::Hide;
-	TSharedPtr<IDetailsView> EditModDetailsView = WindowManager::Get().GetPropertyModule().CreateDetailView(DetailsViewArgs);
-
-	VerticalBoxList->AddSlot()
-	.MaxHeight(256.f)
-	.AutoHeight()
-	[
-		EditModDetailsView.ToSharedRef()
-	];
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(0.f, 30.f, 0.f, 0.f))
-	.HAlign(HAlign_Right)
-	.VAlign(VAlign_Bottom)
-	.AutoHeight()
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this, BrowseModsProperties]()
-			{
-				if (!BrowseModsProperties->SelectedItem.IsValid())
-				{
-					FText Message = Localize("SelectMod", "Please select a mod to edit.");
-					FMessageDialog::Open(EAppMsgType::Ok, Message);
-					WindowManager::Get().GetWindow()->BringToFront();
-					return FReply::Handled();;
-				}
-
-				DrawEditModWidget(BrowseModsProperties);
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("BrowseModsEditMod", "Edit Mod"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this]()
-			{
-				DrawModCreationToolWidget();
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("BrowseModsBack", "Back"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-	];
-
-	EditModDetailsView->SetObject(BrowseModsProperties);
-}
-
-void SModioEditorWindowCompoundWidget::DrawEditModWidget(UModioBrowseModsObject* BrowseModsProperties)
-{
-	ClearAllWidgets();
-
-	UModioEditModParamsObject* EditModParams = NewObject<UModioEditModParamsObject>();
-	EditModParams->Name = BrowseModsProperties->SelectedItem->ProfileName;
-	EditModParams->Summary = BrowseModsProperties->SelectedItem->ProfileSummary;
-	EditModParams->HomepageURL = BrowseModsProperties->SelectedItem->ProfileURL;
-
-	FDetailsViewArgs DetailsViewArgs;
-	DetailsViewArgs.bHideSelectionTip = true;
-	DetailsViewArgs.bAllowSearch = false;
-	DetailsViewArgs.DefaultsOnlyVisibility = EEditDefaultsOnlyNodeVisibility::Hide;
-	TSharedPtr<IDetailsView> EditModDetailsView = WindowManager::Get().GetPropertyModule().CreateDetailView(DetailsViewArgs);
-
-	VerticalBoxList->AddSlot()
-	[
-		EditModDetailsView.ToSharedRef()
-	];
-
-	VerticalBoxList->AddSlot()
-	.HAlign(HAlign_Right)
-	.VAlign(VAlign_Bottom)
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 5.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this, BrowseModsProperties, EditModParams]()
-			{
-				SubmitThrobber->SetVisibility(EVisibility::Visible);
-
-				FModioEditModParams Params;
-				Params.Name = EditModParams->Name;
-				Params.Summary = EditModParams->Summary;
-				Params.HomepageURL = EditModParams->HomepageURL;
-
-				ModioSubsystem->SubmitModChangesAsync(BrowseModsProperties->SelectedItem->ModId, Params, FOnGetModInfoDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioModInfo> ModInfo)
-				{
-					if (ErrorCode == 0)
-					{
-						FText Message = Localize("ModChangedSuccessfully", FString::Printf(TEXT("Your mod changes submitted successfully.\n%s!"), *ErrorCode.GetErrorMessage()));
-						FMessageDialog::Open(EAppMsgType::Ok, Message);
-
-						DrawThrobberWidget();
-
-						FModioFilterParams FilterParams;
-						ModioSubsystem->ListUserCreatedModsAsync(FilterParams, FOnListAllModsDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioModInfoList> OptionalModList)
-						{
-							if (ErrorCode == false)
-							{
-								TArray<FModioModInfo> ModInfo = OptionalModList.GetValue().GetRawList();
-								DrawBrowseModsWidget(ModInfo);
-
-							}
-						}));
-					}
-					else
-					{
-						FText Message = Localize("ModChangedFailed", FString::Printf(TEXT("%s!"), *ErrorCode.GetErrorMessage()));
-						FMessageDialog::Open(EAppMsgType::Ok, Message);
-					}
-					SubmitThrobber->SetVisibility(EVisibility::Hidden);
-					WindowManager::Get().GetWindow()->BringToFront();
-				}));
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("EditModsSubmit", "Submit"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Left)
-		.VAlign(VAlign_Center)
-		.AutoWidth()
-		[
-			SAssignNew(SubmitThrobber, SCircularThrobber)
-			.Radius(15.f)
-			.Visibility(EVisibility::Hidden)
-		]
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this, BrowseModsProperties]()
-			{
-				DrawThrobberWidget();
-
-				ModioSubsystem->GetModInfoAsync(BrowseModsProperties->SelectedItem->ModId, FOnGetModInfoDelegateFast::CreateLambda([this, BrowseModsProperties](FModioErrorCode ErrorCode, TOptional<FModioModInfo> ModInfo)
-				{
-					if (ErrorCode == 0)
-					{
-						DrawBrowseModFileWidget(ModInfo.GetValue());
-					}
-					else
-					{
-						DrawEditModWidget(BrowseModsProperties);
-					}
-				}));
-
-				
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("EditModsEditFiles", "Edit Files"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this]()
-			{
-				DrawThrobberWidget();
-
-				FModioFilterParams FilterParams;
-				ModioSubsystem->ListUserCreatedModsAsync(FilterParams, FOnListAllModsDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioModInfoList> OptionalModList)
-				{
-					if (ErrorCode == false)
-					{
-						TArray<FModioModInfo> ModInfo = OptionalModList.GetValue().GetRawList();
-						DrawBrowseModsWidget(ModInfo);
-
-					}
-				}));
-				return FReply::Handled();
-				})
-				[
-					SNew(STextBlock)
-					.Text(Localize("Back", "Back"))
-					.Justification(ETextJustify::Center)
-				]
-		]
-	];
-
-	EditModDetailsView->SetObject(EditModParams);
-}
-
-void SModioEditorWindowCompoundWidget::DrawCreateModFileToolWidget(FModioModID ModID)
-{
-	ClearAllWidgets();
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f))
-	.AutoHeight()
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.HAlign(HAlign_Left)
-		.VAlign(VAlign_Center)
-		.AutoWidth()
-		[
-			SNew(SButton)
-			.ButtonColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, 0.f))
-			.HAlign(HAlign_Left)
-			.VAlign(VAlign_Center)
-			[
-				SNew(SHorizontalBox)
-
-				+SHorizontalBox::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.AutoWidth()
-				[	
-					SNew(SImage)
-					.Image(TexturePool["icon_CreateModPC"])
-				]
-
-				+ SHorizontalBox::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.Padding(15.f, 0.f, 75.f, 0.f)
-				.MaxWidth(200.f)
-				[
-					SNew(STextBlock)
-					.ColorAndOpacity(FLinearColor::White)
-					.Font(ButtonTextStyle)
-					.Text(Localize("CreatePCMod", "Create a mod"))
-					.Justification(ETextJustify::Center)
-				]
-
-				+ SHorizontalBox::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Center)
-				.MaxWidth(700.f)
-				[	
-					SNew(STextBlock)
-					.ColorAndOpacity(FLinearColor::White)
-					.MinDesiredWidth(700.f)
-					.AutoWrapText(true)
-					.Font(ButtonTextStyle)
-					.Text(Localize("CreatePCModDesc", "Lets you create a mod."))
-					.Justification(ETextJustify::Left)
-				]
-			]
-			.OnClicked_Lambda([this, ModID]() 
-			{
-				DrawCreateOrEditModFileWidget(ModID, {});
-				return FReply::Handled();
-			})
-		]
-	];
-
-	VerticalBoxList->AddSlot()
-	.HAlign(HAlign_Right)
-	.VAlign(VAlign_Bottom)
-		[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this]()
-			{
-				DrawModCreationToolWidget();
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("Back", "Back"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-	];
-}
-
-void SModioEditorWindowCompoundWidget::DrawCreateOrEditModFileWidget(FModioModID ModID, FModioBrowseModFileStruct BrowseModFileObject)
-{
-	ClearAllWidgets();
-
-	UModioCreateNewModFileParamsObject* ModFileParams = NewObject<UModioCreateNewModFileParamsObject>();
-
-	if (!BrowseModFileObject.Name.IsEmpty())
-	{
-		ModFileParams->PathToModRootDirectory = BrowseModFileObject.ModInfo.FileInfo.Filename;
-		ModFileParams->Changelog = BrowseModFileObject.ModInfo.FileInfo.Changelog;
-		ModFileParams->VersionString = BrowseModFileObject.Version;
-	}
-
-	FDetailsViewArgs DetailsViewArgs;
-	DetailsViewArgs.bHideSelectionTip = true;
-	DetailsViewArgs.bAllowSearch = false;
-	DetailsViewArgs.DefaultsOnlyVisibility = EEditDefaultsOnlyNodeVisibility::Hide;
-	TSharedPtr<IDetailsView> ModFileDetailsView = WindowManager::Get().GetPropertyModule().CreateDetailView(DetailsViewArgs);
-	
-	VerticalBoxList->AddSlot()
-	.MaxHeight(200.f)
-	.AutoHeight()
-	[
-		ModFileDetailsView.ToSharedRef()
-	];
-	ModFileDetailsView->SetObject(ModFileParams);
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(0.f, 15.f, 0.f, 0.f))
-	.HAlign(HAlign_Right)
-	.VAlign(VAlign_Bottom)
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SAssignNew(ModfileSubmitButton, SButton)
-			.Visibility(EVisibility::Visible)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this, ModFileParams, ModID, BrowseModFileObject]()
-			{
-				if(ModFileParams->PathToModRootDirectory.IsEmpty() || !FPaths::DirectoryExists(ModFileParams->PathToModRootDirectory))
-				{
-					FText Message = Localize("ChooseValidDir", "Uploading new mod file requires a valid workspace directory for the mod.");
-					FMessageDialog::Open(EAppMsgType::Ok, Message);
-					WindowManager::Get().GetWindow()->BringToFront();
-					return FReply::Handled();
-				}
-
-				UploadModID = ModID;
-				ShowProgressBar();
-
-				FModioCreateModFileParams Params;
-				Params.PathToModRootDirectory = ModFileParams->PathToModRootDirectory;
-				Params.VersionString = ModFileParams->VersionString;
-				Params.Changelog = ModFileParams->Changelog;
-				Params.bSetAsActiveRelease = ModFileParams->bSetAsActiveRelease;
-				Params.ModfilePlatforms = ModFileParams->ModfilePlatforms;
-				Params.MetadataBlob = ModFileParams->MetadataBlob;
-				ModioSubsystem->SubmitNewModFileForMod(ModID, Params);
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("Submit", "Submit"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SAssignNew(ModfileBackButton, SButton)
-			.Visibility(EVisibility::Visible)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this]()
-			{
-				DrawThrobberWidget();
-
-				FModioFilterParams FilterParams;
-				ModioSubsystem->ListUserCreatedModsAsync(FilterParams, FOnListAllModsDelegateFast::CreateLambda([this](FModioErrorCode ErrorCode, TOptional<FModioModInfoList> OptionalModList)
-				{
-					if (ErrorCode == false)
-					{
-						TArray<FModioModInfo> ModInfo = OptionalModList.GetValue().GetRawList();
-						DrawBrowseModsWidget(ModInfo);
-
-					}
-				}));
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("Back", "Back"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-	];
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f, 15.f, 5.f, 5.f))
-	.HAlign(HAlign_Left)
-	.VAlign(VAlign_Bottom)
-	.MaxHeight(15.f)
-	[
-		SNew(SHorizontalBox)
-
-		+SHorizontalBox::Slot()
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Fill)
-		.AutoWidth()
-		[
-			SAssignNew(ProgressTitle, STextBlock)
-			.Visibility(EVisibility::Hidden)
-		]
-	];
-
-	VerticalBoxList->AddSlot()
-	.Padding(FMargin(15.f, 5.f, 15.f, 15.f))
-	.HAlign(HAlign_Fill)
-	.VAlign(VAlign_Bottom)
-	.AutoHeight()
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Fill)
-		.MaxWidth(WindowManager::Get().GetWindow()->GetSizeInScreen().X)
-		[
-			SAssignNew(ProgressBar, SProgressBar)
-			.Visibility(EVisibility::Hidden)
-			.Percent(Percentage)
-		]
-
-		+SHorizontalBox::Slot()
-		.Padding(FMargin(15.f, 0.f, 0.f, 0.f))
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Fill)
-		.AutoWidth()
-		[
-			SAssignNew(PercentageText, STextBlock)
-			.Visibility(EVisibility::Hidden)
-		]
-	];
-}
-
-void SModioEditorWindowCompoundWidget::DrawBrowseModFileWidget(FModioModInfo ModInfo)
-{
-	ClearAllWidgets();
-
-	FModioBrowseModFileStruct BrowseModFileParams;
-	BrowseModFileParams.ModInfo = ModInfo;
-	FModioFileMetadata ModioFileMetaData = ModInfo.FileInfo;
-	BrowseModFileParams.Name = ModioFileMetaData.Filename;
-	BrowseModFileParams.Version = ModioFileMetaData.Version;
-	BrowseModFileParams.Platform = EModioModfilePlatform::Windows;
-
-	#if ENGINE_MAJOR_VERSION >= 5
-	static const UEnum* ModStatusEnum = FindObject<UEnum>(nullptr, TEXT("/Script/Modio.EModioModServerSideStatus"));
-#else
-	static const UEnum* ModStatusEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EModioModServerSideStatus"));
-#endif
-	FString Status = ModStatusEnum->GetNameStringByIndex(static_cast<uint32>(ModInfo.ModStatus));
-	BrowseModFileParams.Status = FName::NameToDisplayString(Status, true);
-
-	UModioBrowseModFileCollectionObject* ModFiles = NewObject<UModioBrowseModFileCollectionObject>();
-	ModFiles->Items.Add(BrowseModFileParams);
-	
-	FDetailsViewArgs DetailsViewArgs;
-	DetailsViewArgs.bHideSelectionTip = true;
-	DetailsViewArgs.bAllowSearch = false;
-	DetailsViewArgs.DefaultsOnlyVisibility = EEditDefaultsOnlyNodeVisibility::Hide;
-	TSharedPtr<IDetailsView> BrowseModFileDetailsView = WindowManager::Get().GetPropertyModule().CreateDetailView(DetailsViewArgs);
-
-	VerticalBoxList->AddSlot()
-	[
-		BrowseModFileDetailsView.ToSharedRef()
-	];
-
-	BrowseModFileDetailsView->SetObject(ModFiles);
-
-	VerticalBoxList->AddSlot()
-	.HAlign(HAlign_Right)
-	.VAlign(VAlign_Bottom)
-	[
-		SNew(SHorizontalBox)
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this, ModInfo, BrowseModFileParams]()
-			{
-				ModioSubsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(), FOnGetGameInfoDelegateFast::CreateLambda([this, ModInfo, BrowseModFileParams](FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo) 
-				{
-					if (ErrorCode)
-					{
-						FText Message = Localize("ModioGameInfoError", FString::Printf(TEXT("Could not retrieve game information from mod.io\n%s"), *ErrorCode.GetErrorMessage()));
-						FMessageDialog::Open(EAppMsgType::Ok, Message);
-						WindowManager::Get().GetWindow()->BringToFront();
-						WindowManager::Get().CloseWindow();
-						return;
-					}
-					if (GameInfo.IsSet())
-					{
-						DrawCreateOrEditModFileWidget(ModInfo.ModId, BrowseModFileParams);
-					}
-				}));
-				
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("NewModfile", "New Modfile"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-
-		+ SHorizontalBox::Slot()
-		.Padding(5.0f, 0.f, 25.0f, 25.f)
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Center)
-		.MaxWidth(128.f)
-		[
-			SNew(SButton)
-			.DesiredSizeScale(FVector2D(2.f, 1.f))
-			.OnClicked_Lambda([this, ModFiles, BrowseModFileDetailsView]()
-			{
-				DrawThrobberWidget();
-
-				FModioFilterParams FilterParams;
-				ModioSubsystem->ListUserCreatedModsAsync(FilterParams, FOnListAllModsDelegateFast::CreateLambda([this, ModFiles, BrowseModFileDetailsView](FModioErrorCode ErrorCode, TOptional<FModioModInfoList> OptionalModList)
-				{
-					if (ErrorCode == false)
-					{
-						TArray<FModioModInfo> ModInfo = OptionalModList.GetValue().GetRawList();
-						DrawBrowseModsWidget(ModInfo);
-					}
-				}));
-				return FReply::Handled();
-			})
-			[
-				SNew(STextBlock)
-				.Text(Localize("Back", "Back"))
-				.Justification(ETextJustify::Center)
-			]
-		]
-	];
+		.AutoHeight()[SNew(SCircularThrobber).Radius(50.f)];
+	// clang-format off
 }
 
 void SModioEditorWindowCompoundWidget::ShowProgressBar()
 {
 	WindowManager::Get().GetWindow()->EnableWindow(false);
+
+	VerticalBoxList->SetVisibility(EVisibility::Collapsed);
+	ProgressBarBox->SetVisibility(EVisibility::Visible);
+
 	ProgressBar->SetVisibility(EVisibility::Visible);
 	ProgressTitle->SetVisibility(EVisibility::Visible);
-	PercentageText->SetVisibility(EVisibility::Visible);
-	ModfileSubmitButton->SetVisibility(EVisibility::Hidden);
-	ModfileBackButton->SetVisibility(EVisibility::Hidden);
 }
 
 void SModioEditorWindowCompoundWidget::UpdateProgressBar()
@@ -1513,19 +698,24 @@ void SModioEditorWindowCompoundWidget::UpdateProgressBar()
 		{
 			FModioUnsigned64 CurrentProgress = ProgressInfo->GetCurrentProgress(EModioModProgressState::Compressing);
 			FModioUnsigned64 TotalProgress = ProgressInfo->GetTotalProgress(EModioModProgressState::Compressing);
-			Percentage = (float)CurrentProgress / (float)TotalProgress;
-			ProgressTitle->SetText(Localize("CompressingModfile", "Compressing Modfile ..."));
+			Percentage = (float) CurrentProgress / (float) TotalProgress;
+			ProgressTitle->SetText(Localize("CompressingModfile", "Compressing"));
 			ProgressBar->SetPercent(Percentage);
-			PercentageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), (int)(Percentage * 100)) + " %"));
 		}
 		else if (ProgressInfo->GetCurrentState() == EModioModProgressState::Uploading)
 		{
 			FModioUnsigned64 CurrentProgress = ProgressInfo->GetCurrentProgress(EModioModProgressState::Uploading);
 			FModioUnsigned64 TotalProgress = ProgressInfo->GetTotalProgress(EModioModProgressState::Uploading);
-			Percentage = (float)CurrentProgress / (float)TotalProgress;
-			ProgressTitle->SetText(Localize("UploadingModfile", "Uploading Modfile ..."));
+			Percentage = (float) CurrentProgress / (float) TotalProgress;
+			ProgressTitle->SetText(Localize("UploadingModfile", "Uploading"));
 			ProgressBar->SetPercent(Percentage);
-			PercentageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), (int)(Percentage * 100)) + " %"));
+		}
+		else
+		{
+			if(ProgressBar->GetVisibility() == EVisibility::Visible)
+			{
+				HideProgressBar();
+			}
 		}
 	}
 }
@@ -1533,50 +723,36 @@ void SModioEditorWindowCompoundWidget::UpdateProgressBar()
 void SModioEditorWindowCompoundWidget::HideProgressBar()
 {
 	WindowManager::Get().GetWindow()->EnableWindow(true);
+	
+	VerticalBoxList->SetVisibility(EVisibility::Visible);
+	ProgressBarBox->SetVisibility(EVisibility::Collapsed);
+
+
 	ProgressBar->SetVisibility(EVisibility::Hidden);
 	ProgressTitle->SetVisibility(EVisibility::Hidden);
-	PercentageText->SetVisibility(EVisibility::Hidden);
-	ModfileSubmitButton->SetVisibility(EVisibility::Visible);
-	ModfileBackButton->SetVisibility(EVisibility::Visible);
 }
 
 void SModioEditorWindowCompoundWidget::Logout(bool Exit)
 {
 	if (ModioSubsystem)
 	{
-		ModioSubsystem->ClearUserDataAsync(FOnErrorOnlyDelegateFast::CreateLambda([this, Exit](FModioErrorCode ErrorCode) 
-			{
+		ModioSubsystem->ClearUserDataAsync(
+			FOnErrorOnlyDelegateFast::CreateLambda([this, Exit](FModioErrorCode ErrorCode) {
 				if (ErrorCode == 0)
 				{
-					DrawLoginWidget();
 					WindowManager::Get().GetWindow()->BringToFront();
 				}
-			
-			ModioSubsystem->ShutdownAsync(FOnErrorOnlyDelegateFast::CreateLambda([this, Exit](FModioErrorCode ErrorCode)
-			{
-				if (ErrorCode == 0) 
-				{
-					if (Exit)
-					{
-						WindowManager::Get().CloseWindow();
-					}
-				}
 			}));
-		}));
 	}
 }
 
-void SModioEditorWindowCompoundWidget::UnloadResources() 
+void SModioEditorWindowCompoundWidget::UnloadResources()
 {
-	ModioEmailEditableTextBox = nullptr;
-	ModioAuthenticationCodeEditableTextBox = nullptr;
 	HeaderBackgroundBrush = nullptr;
 	BackgroundBrush = nullptr;
 	SubmitThrobber = nullptr;
 	ProgressBar = nullptr;
 	PercentageText = nullptr;
-	ModfileSubmitButton = nullptr;
-	ModfileBackButton = nullptr;
 	GameInfoVerticalBoxList = nullptr;
 	VerticalBoxList = nullptr;
 	TexturePool.Empty();
@@ -1595,7 +771,7 @@ FSlateFontInfo SModioEditorWindowCompoundWidget::GetTextStyle(FName PropertyName
 	return FontInfo;
 }
 
-void SModioEditorWindowCompoundWidget::DownloadGameLogo(FString URL)
+void SModioEditorWindowCompoundWidget::DownloadGameImage(FString URL, FString SaveAs, FSimpleDelegate OnComplete)
 {
 	FHttpModule* httpModule = &FHttpModule::Get();
 
@@ -1607,29 +783,27 @@ void SModioEditorWindowCompoundWidget::DownloadGameLogo(FString URL)
 
 	Request->SetURL(URL);
 	Request->SetVerb("GET");
-	Request->OnProcessRequestComplete().BindLambda([this, URL](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) 
-	{
-		const TArray<uint8> bytes = Response->GetContent();
-		const FString content = Response->GetContentAsString();
+	Request->OnProcessRequestComplete().BindLambda(
+		[this, URL, SaveAs, OnComplete](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+			const TArray<uint8> bytes = Response->GetContent();
+			const FString content = Response->GetContentAsString();
 
-		if (!bWasSuccessful || !Response.IsValid() || !EHttpResponseCodes::IsOk(Response->GetResponseCode()))
-		{
-			UE_LOG(ModioEditor, Error, TEXT("DownloadGameLogo - Request Failed -_url: %s | content: %s"), *URL, *content);
-			return;
-		}
+			if (!bWasSuccessful || !Response.IsValid() || !EHttpResponseCodes::IsOk(Response->GetResponseCode()))
+			{
+				UE_LOG(ModioEditor, Error, TEXT("DownloadGameImage - Request Failed -_url: %s | content: %s"), *URL,
+					   *content);
+				return;
+			}
 
-		FString LogoPath = ResourcesPath + "Downloaded/" + "Logo_" + ModioGameInfo->GameID.ToString() + ".png";
-		FFileHelper::SaveArrayToFile(bytes, *LogoPath);
+			FString ImagePath = SaveAs;
+			FFileHelper::SaveArrayToFile(bytes, *SaveAs);
 
-		FString Key = FPaths::GetBaseFilename(LogoPath);
-		FSlateDynamicImageBrush* DynamicImageBrush = new FSlateDynamicImageBrush(FName(*LogoPath), GameLogoSize);
-		TexturePool.Add(Key, DynamicImageBrush);
-			
-		DrawLogoWidget();
-		ModioGameLogo->SetImage(TexturePool[Key]);
+			FString Key = FPaths::GetBaseFilename(SaveAs);
+			FSlateDynamicImageBrush* DynamicImageBrush = new FSlateDynamicImageBrush(FName(*SaveAs), GameLogoSize);
+			TexturePool.Add(Key, DynamicImageBrush);
 
-		ModioSubsystem->VerifyUserAuthenticationAsync(FOnErrorOnlyDelegateFast::CreateRaw(this, &SModioEditorWindowCompoundWidget::OnVerifyCurrentUserAuthenticationCompleted));
-	});
+			OnComplete.ExecuteIfBound();
+		});
 	Request->ProcessRequest();
 }
 
@@ -1644,25 +818,108 @@ FString SModioEditorWindowCompoundWidget::ToNonPlural(const FString& String)
 	return String;
 }
 
-EModioModfilePlatform SModioEditorWindowCompoundWidget::ToPlatformEnum(FString PlatformString) 
+EModioModfilePlatform SModioEditorWindowCompoundWidget::ToPlatformEnum(FString PlatformString)
 {
-#if ENGINE_MAJOR_VERSION >= 5
 	static const UEnum* PlatformEnum = FindObject<UEnum>(nullptr, TEXT("/Script/Modio.EModioModfilePlatform"));
-#else
-	static const UEnum* PlatformEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EModioModfilePlatform"));
-#endif
 	int32 Index = PlatformEnum->GetIndexByNameString(PlatformString);
-	return EModioModfilePlatform((uint8)Index);
+	return EModioModfilePlatform((uint8) Index);
 }
 
-FString SModioEditorWindowCompoundWidget::ToPlatformString(EModioModfilePlatform Platform) 
+FString SModioEditorWindowCompoundWidget::ToPlatformString(EModioModfilePlatform Platform)
 {
-#if ENGINE_MAJOR_VERSION >= 5 
 	static const UEnum* PlatformEnum = FindObject<UEnum>(nullptr, TEXT("/Script/Modio.EModioModfilePlatform"));
-#else
-	static const UEnum* PlatformEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("EModioModfilePlatform"));
-#endif
 	return PlatformEnum->GetNameStringByIndex(static_cast<uint32>(Platform));
+}
+
+TSharedPtr<SWidget> SModioEditorWindowCompoundWidget::CreateToolEntryWidget(FModioToolWindowEntry Entry)
+{
+	if (!Entry.CreateWindowAction.IsBound() || !Entry.bEnabled)
+	{
+		UE_LOG(ModioEditor, Error, TEXT("Failed to create entry widget for modio tools window: %s"),
+			   *Entry.Name.ToString())
+		return nullptr;
+	}
+
+	TextureAssetPool.Add(Entry.Icon, FSlateImageBrush(Entry.Icon.LoadSynchronous(), FVector2D(45, 45)));
+
+	FOnClicked OnClicked = FOnClicked::CreateLambda([this, CreateWidget = Entry.CreateWindowAction]() {
+		DrawSubwindowWidget(CreateWidget.Execute(this));
+		return FReply::Handled();
+	});
+
+	static FButtonStyle MyHoverBorderStyle;
+	static bool bStyleInitialized = false;
+
+	if (!bStyleInitialized)
+	{
+		const FName BorderBrushName = "SButton.Border";
+    
+		FSlateBorderBrush HoveredAndPressedBrush(
+			BorderBrushName,
+			FMargin(1.0f),
+			FLinearColor(1.0f, 1.0f, 1.0f, 0.7f)
+		);
+
+		MyHoverBorderStyle = FButtonStyle()
+			.SetNormal(FSlateNoResource())
+			.SetHovered(HoveredAndPressedBrush)
+			.SetPressed(HoveredAndPressedBrush)
+			.SetNormalPadding(FMargin(1))
+			.SetPressedPadding(FMargin(1));
+
+		bStyleInitialized = true;
+	}
+
+	// Each game has it's own name for UGC, so we replace the placeholder in the entry name and description
+	FString EntryName = Entry.Name.ToString().Replace(TEXT("[UGC_NAME]"), *ModioGameInfo->UgcName);
+	FString EntryDescription = Entry.Description.ToString().Replace(TEXT("[UGC_NAME]"), *ModioGameInfo->UgcName);
+
+	// clang-format off
+	return 
+		SNew(SBox)
+		[
+			SNew(SButton)
+			.OnClicked(OnClicked)
+			.ContentPadding(12)
+			.ButtonStyle(&MyHoverBorderStyle)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Center)
+				.AutoWidth()
+				[
+					SNew(SScaleBox)
+					.Stretch(EStretch::None)
+					.VAlign(VAlign_Center)
+					.HAlign(HAlign_Center)
+					[
+						SNew(SImage)
+						.Image(&TextureAssetPool[Entry.Icon])
+					]
+				]
+				+ SHorizontalBox::Slot()
+				.FillWidth(0.2f)
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Left)
+				.Padding(12, 0)
+				[
+					SNew(STextBlock)
+					.Text(FText::FromString(EntryName))
+				]
+				+ SHorizontalBox::Slot()
+				.VAlign(VAlign_Center)
+				.HAlign(HAlign_Left)
+				.FillWidth(0.8f)
+				[
+					SNew(STextBlock)
+					.Text(FText::FromString(EntryDescription))
+					.AutoWrapText(true)
+					.MinDesiredWidth(256.f)
+				]
+			]
+		];
+	// clang-format on
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

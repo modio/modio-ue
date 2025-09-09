@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -11,8 +11,11 @@
 #include "ModioEditorSettings.h"
 
 #include "Interfaces/IPluginManager.h"
+#include "ModioSubsystem.h"
 #include "Objects/ModioOpenSettingsAction.h"
 #include "Objects/ModioOpenWeblinkAction.h"
+#include "Types/ModioToolWindowEntry.h"
+#include "Widgets/ModioEditorUploadAndManageUGCWidget.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ModioEditorSettings)
 
@@ -23,7 +26,7 @@ UModioEditorSettings::UModioEditorSettings(const FObjectInitializer& Initializer
 	GettingStartedWidget = TSoftObjectPtr<UEditorUtilityWidgetBlueprint>(
 		FSoftObjectPath("/Modio/GettingStarted/OnboardingGuideWidget.OnboardingGuideWidget"));
 
-	//Maybe move these to some other file/namespace just for neatness.
+	// Maybe move these to some other file/namespace just for neatness.
 	GettingStartedEntries.Add(FModioGettingStartedEntry(
 		true, LOCTEXT("DocumentationEntryName", "Documentation"),
 		LOCTEXT("DocumentationEntryDescription", "Plugin's concepts, how to guides, and class documentation"),
@@ -41,24 +44,36 @@ UModioEditorSettings::UModioEditorSettings(const FObjectInitializer& Initializer
 		UModioOpenWeblinkAction::StaticClass(), "https://github.com/modio"));
 	GettingStartedEntries.Add(FModioGettingStartedEntry(
 		true, LOCTEXT("DiscordEntryName", "mod.io Discord"),
-		LOCTEXT("DiscordEntryDescription", "Join our Discord to ask questions or talk to other developers adding UGC to their titles"),
+		LOCTEXT("DiscordEntryDescription",
+				"Join our Discord to ask questions or talk to other developers adding UGC to their titles"),
 		TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Modio/GettingStarted/T_discord_D.T_discord_D")),
 		UModioOpenWeblinkAction::StaticClass(), "https://discord.mod.io"));
-	GettingStartedEntries.Add(FModioGettingStartedEntry(
-		true, LOCTEXT("RestApiEntryName", "REST API Documentation"),
-		LOCTEXT("RestApiEntryDescription", "Documentation for our low-level REST API"),
-		TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Modio/GettingStarted/T_api_D.T_api_D")),
-		UModioOpenWeblinkAction::StaticClass(), "https://docs.mod.io/restapiref/"));
+	GettingStartedEntries.Add(
+		FModioGettingStartedEntry(true, LOCTEXT("RestApiEntryName", "REST API Documentation"),
+								  LOCTEXT("RestApiEntryDescription", "Documentation for our low-level REST API"),
+								  TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Modio/GettingStarted/T_api_D.T_api_D")),
+								  UModioOpenWeblinkAction::StaticClass(), "https://docs.mod.io/restapiref/"));
 
 	const TSharedPtr<IPlugin> ComponentUIPlugin = IPluginManager::Get().FindPlugin("ModioComponentUI");
 	if (!ComponentUIPlugin.IsValid() || !ComponentUIPlugin->IsEnabled())
 	{
 		GettingStartedEntries.Add(FModioGettingStartedEntry(
 			true, LOCTEXT("DownloadComponentUIName", "Download Component UI"),
-			LOCTEXT("DownloadComponentUIDescription", "Download the mod.io Component UI Plugin for building custom UGC Browser UIs"),
+			LOCTEXT("DownloadComponentUIDescription",
+					"Download the mod.io Component UI Plugin for building custom UGC Browser UIs"),
 			TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Modio/GettingStarted/T_modbrowser_D.T_modbrowser_D")),
 			UModioOpenWeblinkAction::StaticClass(), "https://github.com/modio/modio-ue-component-ui"));
 	}
+
+	ToolLandingEntries.Add(FModioToolWindowEntry(
+		true, LOCTEXT("UploadAndManageUGCName", "Upload and Manage [UGC_NAME]"),
+		LOCTEXT("UploadAndManageUGCEntryDescription", "Create a new mod entry on the mod.io server, upload new files "
+													  "for existing mods, or modify existing mod data."),
+		TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Modio/GettingStarted/T_documentation_D.T_documentation_D")),
+		FModioToolWindowEntry::CreateSubwindow::CreateLambda([](SModioEditorWindowCompoundWidget* Widget) {
+			return SNew(SModioEditorUploadAndManageUGCWidget).ParentWindow(Widget);
+		}),
+		true));
 }
 
 #undef LOCTEXT_NAMESPACE

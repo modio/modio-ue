@@ -22,9 +22,9 @@ FModioPagedResult::FModioPagedResult(const Modio::PagedResult& PagedResult)
 {}
 
 FModioPagedResult::FModioPagedResult(int32 ResultOffset, int32 PageSize, int32 TotalResultCount, int32 ResultCount)
-	: PageIndex( FMath::FloorToInt( ResultOffset / (float) PageSize) ),
+	: PageIndex(FMath::FloorToInt(double(ResultOffset) / double(PageSize))),
 	  PageSize(PageSize),
-	  PageCount(FMath::CeilToInt(TotalResultCount / (float) PageSize) ),
+	  PageCount(FMath::CeilToInt(double(TotalResultCount) / double(PageSize))),
 	  TotalResultCount(TotalResultCount),
 	  ResultCount(ResultCount)
 {}
