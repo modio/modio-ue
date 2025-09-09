@@ -69,6 +69,8 @@ Modio::StorageLocation ToModio(EModioStorageLocation Location)
 			return Modio::StorageLocation::Local;
 		case EModioStorageLocation::Cache:
 			return Modio::StorageLocation::Cache;
+		case EModioStorageLocation::Count:
+			break;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EStorageLocation Location)"));
@@ -83,6 +85,8 @@ Modio::StorageUsage ToModio(EModioStorageUsage Usage)
 			return Modio::StorageUsage::Available;
 		case EModioStorageUsage::Consumed:
 			return Modio::StorageUsage::Consumed;
+		case EModioStorageUsage::Count:
+			break;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EStorageUsage Usage)"));

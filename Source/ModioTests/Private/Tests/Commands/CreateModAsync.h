@@ -50,9 +50,8 @@ class FModioSubmitModFileAsyncCommand : public FModioTestLatentCommandBase
 	FModioModID ModID;
 	FModioCreateModFileParams Params;
 	TSharedPtr<TOptional<FModioErrorCode>> SharedState;
-public:
-	
 
+public:
 	//needs to take in some shared state with the mod management loop stuff
 	FModioSubmitModFileAsyncCommand(FAutomationTestBase* AssociatedTest,
 		FModioModID ModID, FModioCreateModFileParams Params, TSharedPtr<TOptional<FModioErrorCode>> SharedErrorCode)
@@ -79,6 +78,42 @@ public:
 		return FModioTestLatentCommandBase::Update();
 	}
 };
+class FModioSubmitSourceFileAsyncCommand : public FModioTestLatentCommandBase
+{
+	FModioModID ModID;
+	FModioCreateSourceFileParams Params;
+	TSharedPtr<TOptional<FModioErrorCode>> SharedState;
+
+public:
+	// needs to take in some shared state with the mod management loop stuff
+	FModioSubmitSourceFileAsyncCommand(FAutomationTestBase* AssociatedTest, FModioModID ModID,
+									FModioCreateSourceFileParams Params,
+									TSharedPtr<TOptional<FModioErrorCode>> SharedErrorCode)
+		: FModioTestLatentCommandBase(AssociatedTest),
+		  ModID(ModID),
+		  Params(Params),
+		  SharedState(SharedErrorCode)
+	{}
+
+	virtual void Start() override
+	{
+		Modio->SubmitNewSourceFileForMod(ModID, Params);
+	}
+	virtual bool Update() override
+	{
+		CurrentTest->TestValid("Shared state should always be valid", SharedState);
+		// The optional inside the shared state may not be set yet because the upload isn't complete
+		if (SharedState->IsSet())
+		{
+			// If the optional inside the shared state is set, then it means that the upload is complete and we can
+			// check the error code itself
+			CurrentTest->TestEqual("Submit Source File should complete without errors", SharedState->GetValue(), false);
+			Done();
+		}
+		return FModioTestLatentCommandBase::Update();
+	}
+};
+
 
 
 #endif

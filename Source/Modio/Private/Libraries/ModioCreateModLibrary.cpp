@@ -77,3 +77,24 @@ void UModioCreateModLibrary::SetMarkAsActiveRelease(FModioCreateModFileParams& I
 {
 	In.bSetAsActiveRelease = bMarkAsActiveRelease;
 }
+
+void UModioCreateModLibrary::SetSourceFileVersionString(FModioCreateSourceFileParams& In, FString Version)
+{
+	In.VersionString = Version;
+}
+
+void UModioCreateModLibrary::SetSourceFileChangelogString(FModioCreateSourceFileParams& In, FString Changelog)
+{
+	In.Changelog = Changelog;
+}
+
+void UModioCreateModLibrary::SetSourceFileMetadataBlob(FModioCreateSourceFileParams& In, FString MetadataBlob)
+{
+	In.MetadataBlob = MetadataBlob;
+}
+
+void UModioCreateModLibrary::SetSourceFilePlatforms(FModioCreateSourceFileParams& In,
+												 TArray<EModioModfilePlatform>& Platforms)
+{
+	In.ModfilePlatforms = Platforms;
+}

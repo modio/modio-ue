@@ -1,6 +1,6 @@
 [submodule "Source/ThirdParty/NativeSDK"]
 	path = Source/ThirdParty/NativeSDK
-	url = ../modio-sdk.git
+	url = https://github.com/modio/modio-sdk.git
 	branch = main
 [submodule "Source/ThirdParty/liburing"]
 	path = Source/ThirdParty/liburing

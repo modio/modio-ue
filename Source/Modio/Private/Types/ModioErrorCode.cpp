@@ -42,7 +42,7 @@ FModioErrorCode::FModioErrorCode(const FModioErrorCode& Other)
 
 FModioErrorCode::FModioErrorCode(int32 Value, int32 CategoryID)
 {
-	InternalError = MakeUnique<Modio::ErrorCode>(Value, Modio::Detail::GetModioErrorCategoryByID(CategoryID));
+	InternalError = MakeUnique<Modio::ErrorCode>(Value, Modio::Detail::GetModioErrorCategoryByID(uint64(CategoryID)));
 }
 
 FModioErrorCode& FModioErrorCode::operator=(const FModioErrorCode& ec)
@@ -104,7 +104,7 @@ int32 FModioErrorCode::GetCategoryID()
 {
 	if (InternalError)
 	{
-		return Modio::Detail::ModioErrorCategoryID(InternalError->category());
+		return int32_t(Modio::Detail::ModioErrorCategoryID(InternalError->category()));
 	}
 	else
 	{

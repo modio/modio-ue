@@ -606,17 +606,19 @@ public class Modio : ModuleRules
 
         // Pass-through of SDK version identifier with Unreal prefix
         string VersionFilePath = Path.Combine(ModuleDirectory, "../ThirdParty/NativeSDK/.modio");
+        string EngineVersion = string.Format("{0}.{1}.{2}", Target.Version.MajorVersion, Target.Version.MinorVersion, Target.Version.PatchVersion);
+
         if (File.Exists(VersionFilePath))
         {
             string VersionString = File.ReadAllText(VersionFilePath);
             VersionString = VersionString.Trim();
-            PrivateDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-{0}\"", VersionString));
+            PrivateDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-{0}-{1}\"", VersionString, EngineVersion));
             // Add dependency on version file so if it is changed we trigger a rebuild
             ExternalDependencies.Add(VersionFilePath);
         }
         else
         {
-            PrivateDefinitions.Add("MODIO_COMMIT_HASH=\"UNREAL-DEV\"");
+            PrivateDefinitions.Add(string.Format("MODIO_COMMIT_HASH=\"UNREAL-DEV-{0}\"", EngineVersion));
         }
 
        
@@ -638,15 +640,20 @@ public class Modio : ModuleRules
         ApplyProjectDefinitions(Target);
         PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
         PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
-#if UE_5_5_OR_LATER
+#if UE_5_6_OR_LATER
+        CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
+#elif UE_5_5_OR_LATER
         UndefinedIdentifierWarningLevel = WarningLevel.Off;
 #else
         bEnableUndefinedIdentifierWarnings = false;
 #endif
 
-#if UE_5_3_OR_LATER
-	    IWYUSupport = IWYUSupport.Full;
-	    CppStandard = CppStandardVersion.Cpp17;
+#if UE_5_6_OR_LATER
+        IWYUSupport = IWYUSupport.Full;
+        CppStandard = CppStandardVersion.EngineDefault;
+#elif UE_5_3_OR_LATER
+        IWYUSupport = IWYUSupport.Full;
+        CppStandard = CppStandardVersion.Cpp17;
 #else
 		bEnforceIWYU = true;
 #endif

@@ -25,7 +25,7 @@ FModioModInfoList::FModioModInfoList(const Modio::ModInfoList& ModInfoList)
 {
     TArray<FModioModInfo> Result;
 
-    Result.Reserve(ModInfoList.Size());
+    Result.Reserve(size_t(ModInfoList.Size()));
     for (const Modio::ModInfo& It : ModInfoList)
     {
         Result.Emplace(ToUnreal(It));

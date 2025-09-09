@@ -80,6 +80,7 @@ static FString ToString(EFileSizeUnit Unit)
 			return TEXT("MB");
 		case EFileSizeUnit::GB:
 			return TEXT("GB");
+		case EFileSizeUnit::Largest:
 		default:
 			return TEXT("Unknown unit");
 	}
@@ -104,7 +105,7 @@ EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned
 
 EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit(int64 FileSize)
 {
-	return UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64(FileSize));
+	return UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64(uint64(FileSize)));
 }
 
 FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, int32 MinDecimals, int32 MaxDecimals,
@@ -116,7 +117,7 @@ FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, 
 
 	if (Unit == EFileSizeUnit::Largest)
 	{
-		Unit = GetDesiredFileSizeUnit(FileSize.Underlying);
+		Unit = GetDesiredFileSizeUnit(int64_t(FileSize.Underlying));
 	}
 
 	const double InNewUnit = FileSize / static_cast<double>(Unit);
@@ -145,7 +146,8 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals /* =
 										  int32 MaxDecimals /** = 2*/,
 										  EFileSizeUnit Unit /**= EFileSizeUnit::Largest*/, bool bIncludeUnitName /**= true*/)
 {
-	return UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64(FileSize), MinDecimals, MaxDecimals, Unit, bIncludeUnitName);
+	return UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64(uint64(FileSize)), MinDecimals, MaxDecimals,
+														  Unit, bIncludeUnitName);
 }
 
 bool UModioSDKLibrary::IsValidEmailAddressFormat(const FString& String)
@@ -190,7 +192,7 @@ FText UModioSDKLibrary::Conv_Int64ToText(int64 Value, bool bAlwaysSign /* = fals
 
 float UModioSDKLibrary::Pct_Int64Int64(int64 Part, int64 Whole)
 {
-	return Part / static_cast<double>(Whole);
+	return float(double(Part) / static_cast<double>(Whole));
 }
 
 FText UModioSDKLibrary::RoundNumberString(FText inputText)

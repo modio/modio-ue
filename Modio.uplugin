@@ -2,12 +2,12 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "2.0",
-	"FriendlyName": "mod.io",
-	"Description": "Powerful Mod API",
-	"Category": "Other",
+	"FriendlyName": "Modio Core",
+	"Description": "Plugin for the core functionality of the mod.io platform.",
+	"Category": "mod.io",
 	"CreatedBy": "mod.io",
 	"CreatedByURL": "https://mod.io",
-	"DocsURL": "",
+	"DocsURL": "https://docs.mod.io/unreal/core-plugin/",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/1ab22ed2961a4cc19b9151bd072df998",
 	"SupportURL": "http://discord.mod.io",
 	"CanContainContent": true,
@@ -54,8 +54,7 @@
 	"LocalizationTargets": [
 		{
 			"Name": "Modio",
-			"LoadingPolicy": "Always",
-			"ConfigGenerationPolicy": "Never"
+			"LoadingPolicy": "Always"
 		}
 	],
 	"Plugins": [

@@ -180,19 +180,19 @@ void WriteRawToTexture_RenderThread(MODIO_UE_TEXTURE_RESOURCE_TYPE* TextureResou
 	// Using auto keyword as the type is different after 4.25 but is used in the same manner
 	auto TextureRHI = TextureResource->GetTexture2DRHI();
 
-	int32 Width = TextureRHI->GetSizeX();
-	int32 Height = TextureRHI->GetSizeY();
+	uint32 Width = TextureRHI->GetSizeX();
+	uint32 Height = TextureRHI->GetSizeY();
 
 	uint32 DestStride = 0;
 	uint8* DestData =
 		reinterpret_cast<uint8*>(RHILockTexture2D(TextureRHI, 0, RLM_WriteOnly, DestStride, false, false));
 
-	for (int32 y = 0; y < Height; y++)
+	for (uint32 y = 0; y < Height; y++)
 	{
 		uint8* DestPtr = &DestData[(Height - 1 - y) * DestStride];
 
 		const FColor* SrcPtr = &((FColor*) (RawData.GetData()))[(Height - 1 - y) * Width];
-		for (int32 x = 0; x < Width; x++)
+		for (uint32 x = 0; x < Width; x++)
 		{
 			*DestPtr++ = SrcPtr->B;
 			*DestPtr++ = SrcPtr->G;

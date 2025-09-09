@@ -10,18 +10,20 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Widgets/SCompoundWidget.h"
-#include "Types/ModioGameInfo.h"
-#include "Widgets/DeclarativeSyntaxSupport.h"
 #include "Brushes/SlateDynamicImageBrush.h"
-#include "Widgets/SBoxPanel.h"
-#include "Widgets/Text/STextBlock.h"
-#include "Widgets/Input/SEditableTextBox.h"
+#include "CoreMinimal.h"
+#include "Types/ModioGameInfo.h"
+#include "Types/ModioUser.h"
+#include "Widgets/DeclarativeSyntaxSupport.h"
+#include "Widgets/Images/SImage.h"
 #include "Widgets/Images/SThrobber.h"
 #include "Widgets/Input/SButton.h"
+#include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/Layout/SScaleBox.h"
 #include "Widgets/Notifications/SProgressBar.h"
-#include "Widgets/Images/SImage.h"
+#include "Widgets/SBoxPanel.h"
+#include "Widgets/SCompoundWidget.h"
+#include "Widgets/Text/STextBlock.h"
 
 class UModioSubsystem;
 class UModioBrowseModsObject;
@@ -32,14 +34,16 @@ struct FModioBrowseModFileStruct;
 struct FModioModManagementEvent;
 
 /**
- * @brief A compound widget class used for Modio Editor Functionality to upload and edit mods with detail customizations.
+ * @brief A compound widget class used for Modio Editor Functionality to upload and edit mods with detail
+ * customizations.
  */
 class MODIOEDITOR_API SModioEditorWindowCompoundWidget : public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(SModioEditorWindowCompoundWidget)
-	{}
+	SLATE_BEGIN_ARGS(SModioEditorWindowCompoundWidget) {}
 	SLATE_END_ARGS()
+
+	DECLARE_DELEGATE(FOnBackPressed);
 
 	/** @brief Stored property to a ModioSubsystem pointer loaded by ModioSubsystem.cpp */
 	UModioSubsystem* ModioSubsystem;
@@ -50,14 +54,27 @@ public:
 	/** @brief Stored property to the game thumbnail for which the ModioSubsystem is initialized. */
 	TSharedPtr<SImage> ModioGameLogo;
 
+	/** @breif Stored property to the game banner container */
+	TSharedPtr<SScaleBox> ModioGameLogoContainer;
+
 	/** @brief Stored property to all PNG brushes in Resources directory. */
 	TMap<FString, FSlateDynamicImageBrush*> TexturePool;
+
+	/** @brief Stored property to loaded brushes from assets */
+	TMap<TSoftObjectPtr<UObject>, FSlateImageBrush> TextureAssetPool;
 
 	/** @brief Stored property to a vertical box container that will show game information at the top of the widget. */
 	TSharedPtr<SVerticalBox> GameInfoVerticalBoxList;
 
 	/** @brief Stored property to a vertical box container that will show other widgets below the game information. */
 	TSharedPtr<SVerticalBox> VerticalBoxList;
+
+	/** @brief Box that contains the progress bar for mod uploading / compressing */
+	TSharedPtr<SBox> ProgressBarBox;
+
+	/** @brief Stored property to a vertical box container that will show the categories linked to from the landing
+	 * page. */
+	TSharedPtr<SVerticalBox> LandingCategoryList;
 
 	/** @brief Stored property to the game name text block. */
 	TSharedPtr<STextBlock> GameName;
@@ -67,12 +84,6 @@ public:
 
 	/** @brief Stored property to the description text block. */
 	TSharedPtr<STextBlock> Description;
-
-	/** @brief Stored property to the email text box. */
-	TSharedPtr<SEditableTextBox> ModioEmailEditableTextBox;
-
-	/** @brief Stored property to the authentication code text box. */
-	TSharedPtr<SEditableTextBox> ModioAuthenticationCodeEditableTextBox;
 
 	/** @brief Stored property to the throbber widget when a submit button is pressed. */
 	TSharedPtr<SCircularThrobber> SubmitThrobber;
@@ -85,12 +96,6 @@ public:
 
 	/** @brief Stored property to the percentage text block. */
 	TSharedPtr<STextBlock> PercentageText;
-
-	/** @brief Stored property to the submit button on upload mod file widget. */
-	TSharedPtr<SButton> ModfileSubmitButton;
-
-	/** @brief Stored property to the back button on upload mod file widget. */
-	TSharedPtr<SButton> ModfileBackButton;
 
 	/** @brief The id of the mod that is being uploaded. */
 	FModioModID UploadModID;
@@ -107,6 +112,11 @@ public:
 	/** @brief Stored property to the game information background brush at the top. */
 	FSlateBrush* HeaderBackgroundBrush;
 
+	FSlateImageBrush* LoginButtonBrush;
+
+	/** @brief Stored property to the background brush used to distiguish content panels. */
+	FSlateBrush* PanelBackgroundBrush;
+
 	/** @brief Stored property to the main widget's background brush. */
 	FSlateBrush* BackgroundBrush;
 
@@ -118,6 +128,15 @@ public:
 
 	/** @brief Stored property to a text style used for buttons. */
 	FSlateFontInfo ButtonTextStyle;
+
+	/** @brief Brush for a bolder seperator */
+	FSlateBrush* BoldSeperatorBrush;
+
+	/** @brief Separation Between Panel elements */
+	float PanelPadding = 2.5f;
+
+	/** @brief Content Padding on bottom navigation buttons */
+	float BottomButtonPadding = 12;
 
 	void Construct(const FArguments& InArgs);
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
@@ -142,9 +161,20 @@ public:
 	 */
 	void OnVerifyCurrentUserAuthenticationCompleted(FModioErrorCode ErrorCode);
 
+	void DrawToolLanding();
+	void DrawSubwindowWidget(TSharedPtr<SWidget> Widget);
+
+	FReply OnLoginLandingButtonClicked();
+
 	/** @brief Draws the 'login widget' on the window client. */
 	void DrawLoginWidget();
 	FReply OnLoginButtonClicked();
+
+	/** @brief Draws the 'authenticate widget' on the window client. */
+	FReply OnAlreadyHaveCodeClicked();
+
+	/** @brief Draws the 'login widget' on the window client. */
+	FReply OnUseDifferentEmailClicked();
 
 	/**
 	 * @brief Determines if an authentication code is sent successfully.
@@ -171,40 +201,6 @@ public:
 	/** @brief Draws the 'circular throbber' widget on the window client. */
 	void DrawThrobberWidget();
 
-	/** @brief Draws the mod creation tool widget on the window client. */
-	void DrawModCreationToolWidget();
-
-	/**
-	 * @brief Draws the 'browse mods widget' on the window client.
-	 * @param ModInfoList An array of mods passed for detail customization.
-	 */
-	void DrawBrowseModsWidget(TArray<FModioModInfo> ModInfoList);
-
-	/**
-	 * @brief Draws the 'edit mod widget' on the window client.
-	 * @param BrowseModsProperties Contains a list of mods for detail customization.
-	 */
-	void DrawEditModWidget(UModioBrowseModsObject* BrowseModsProperties);
-
-	/**
-	 * @brief Draws the 'create mod file tool widget' on the window client.
-	 * @param ModID A mod id is required to create a mod file for the mod.
-	 */
-	void DrawCreateModFileToolWidget(FModioModID ModID);
-
-	/**
-	 * @brief Draws the 'create or edit mod file widget' on the window client.
-	 * @param ModID A mod id is required to create or edit a mod file for the mod.
-	 * @param BrowseModFileObject A browse mod file object is passed for detail customization.
-	 */
-	void DrawCreateOrEditModFileWidget(FModioModID ModID, FModioBrowseModFileStruct BrowseModFileObject);
-
-	/**
-	 * @brief Draws the 'browse mod file widget' on the window client.
-	 * @param ModID A mod id is required to show the mod file(s) for the mod.
-	 */
-	void DrawBrowseModFileWidget(FModioModInfo ModID);
-	
 	/** @brief Draws the progress bar on the window client when a file is submitted for compress and upload. */
 	void ShowProgressBar();
 
@@ -244,10 +240,12 @@ public:
 	 * @brief Downloads the game thumbnails from the URL received by GetGameInfoAsyn function.
 	 * @param URL The url of the game's thumbnail.
 	 */
-	void DownloadGameLogo(FString URL);
+	void DownloadGameImage(FString URL, FString SaveAs, FSimpleDelegate OnComplete);
 
 	FString ToNonPlural(const FString& String);
 
 	EModioModfilePlatform ToPlatformEnum(FString Platform);
 	FString ToPlatformString(EModioModfilePlatform Platform);
+
+	TSharedPtr<SWidget> CreateToolEntryWidget(struct FModioToolWindowEntry Entry);
 };

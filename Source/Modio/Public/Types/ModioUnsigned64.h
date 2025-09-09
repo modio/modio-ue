@@ -223,7 +223,7 @@ struct MODIO_API FModioUnsigned64
 	 */
 	FORCEINLINE friend double operator/(const FModioUnsigned64& LHS, double Divisor)
 	{
-		return LHS.Underlying / Divisor;
+		return double(LHS.Underlying) / Divisor;
 	}
 
 	/** 
@@ -428,7 +428,7 @@ public:
 		meta = (DisplayName = "To Text (ModioUnsigned64)", BlueprintAutocast))
 	static FText Conv_FModioUnsigned64ToText(const FModioUnsigned64& In)
 	{
-		return UKismetTextLibrary::Conv_Int64ToText(In.Underlying);
+		return UKismetTextLibrary::Conv_Int64ToText(int64_t(In.Underlying));
 	}
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Unsigned64",

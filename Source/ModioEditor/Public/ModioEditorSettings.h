@@ -11,11 +11,12 @@
 #pragma once
 
 #include "Types/ModioGettingStartedEntry.h"
+#include "Types/ModioToolWindowEntry.h"
 
 #include "ModioEditorSettings.generated.h"
 
 UCLASS(Config = Editor, defaultconfig)
-class UModioEditorSettings : public UObject
+class MODIOEDITOR_API UModioEditorSettings : public UObject
 {
 	GENERATED_BODY()
 
@@ -35,4 +36,11 @@ public:
 	/* This set is populated automatically by submodules on load */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "modio Editor|Getting Started")
 	TSet<FModioGettingStartedEntry> SubmoduleGettingStartedEntries;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Config, Category = "modio Editor|Tool Window")
+	TSet<FModioToolWindowEntry> ToolLandingEntries;
+
+	/* This set is populated automatically by submodules on load */
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "modio Editor|Tool Window")
+	TSet<FModioToolWindowEntry> SubmoduleToolLandingEntries;
 };

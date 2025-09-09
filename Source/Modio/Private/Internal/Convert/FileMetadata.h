@@ -44,6 +44,8 @@ FORCEINLINE EModioVirusStatus ToUnreal(Modio::FileMetadata::VirusStatus VirusSta
 			return EModioVirusStatus::NoThreat;
 		case Modio::FileMetadata::VirusStatus::Malicious:
 			return EModioVirusStatus::Malicious;
+		case Modio::FileMetadata::VirusStatus::PotentiallyHarmful:
+			return EModioVirusStatus::PotentiallyHarmful;
 	}
 
 	return EModioVirusStatus::NoThreat;

@@ -1,29 +1,39 @@
+/*
+ *  Copyright (C) 2025 mod.io Pty Ltd. <https://mod.io>
+ *
+ *  This file is part of the mod.io UE Plugin.
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
+ *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
+ *
+ */
+
 #include "ModioEditor.h"
+#include "Misc/EngineVersionComparison.h"
 #include "ModioEditorSettings.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "Misc/EngineVersionComparison.h"
 
 #if WITH_EDITOR
-	#include "ISettingsModule.h"
-	#include "Modules/ModuleManager.h"
-	#include "EditorUtilityWidgetBlueprint.h"
 	#include "Editor.h"
-	#include "Interfaces/IMainFrameModule.h"
 	#include "EditorUtilitySubsystem.h"
+	#include "EditorUtilityWidgetBlueprint.h"
+	#include "ISettingsModule.h"
+	#include "Interfaces/IMainFrameModule.h"
+	#include "Modules/ModuleManager.h"
 
-	#include "ModioEditorWindowStyle.h"
-	#include "ModioEditorWindowCommands.h"
-	#include "Libraries/ModioSDKLibrary.h"
-	#include "ToolMenus.h"
-	#include "Interfaces/IPluginManager.h"
-	#include "WindowManager.h"
-	#include "Misc/MessageDialog.h"
 	#include "GenericPlatform/GenericPlatformMisc.h"
+	#include "Interfaces/IPluginManager.h"
+	#include "Libraries/ModioSDKLibrary.h"
+	#include "Misc/MessageDialog.h"
 	#include "ModioEditorPerProjectUserSettings.h"
+	#include "ModioEditorWindowCommands.h"
+	#include "ModioEditorWindowStyle.h"
+	#include "ToolMenus.h"
+	#include "WindowManager.h"
 #endif
 
-#include "ModioSettings.h"
 #include "DetailCustomizations/ModioSettingsDetails.h"
+#include "ModioSettings.h"
 
 DEFINE_LOG_CATEGORY(ModioEditor);
 
@@ -69,14 +79,16 @@ void FModioEditor::StartupModule()
 	FModioEditorWindowStyle::ReloadTextures();
 
 	FModioEditorWindowCommands::Register();
-	
+
 	PluginCommands = MakeShareable(new FUICommandList);
 
-	PluginCommands->MapAction(FModioEditorWindowCommands::Get().OpenPluginWindow, FExecuteAction::CreateRaw(this, &FModioEditor::PluginButtonClicked), FCanExecuteAction());
+	PluginCommands->MapAction(FModioEditorWindowCommands::Get().OpenPluginWindow,
+							  FExecuteAction::CreateRaw(this, &FModioEditor::PluginButtonClicked), FCanExecuteAction());
 
 	if (GetMutableDefault<UModioEditorSettings>()->bDisplayToolsMenuItem)
 	{
-		UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FModioEditor::RegisterMenus));
+		UToolMenus::RegisterStartupCallback(
+			FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FModioEditor::RegisterMenus));
 	}
 
 	WindowManager::Get().RegisterObjectCustomizations();
@@ -126,21 +138,22 @@ void FModioEditor::DisplayGettingStarted()
 #endif
 }
 
-
 void FModioEditor::PluginButtonClicked()
 {
-	FModioInitializeOptions InitializeOptions = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
+	FModioInitializeOptions InitializeOptions =
+		UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FString("ModioUnrealEditor"));
 	if (!InitializeOptions.GameId.IsValid() || !InitializeOptions.ApiKey.IsValid())
 	{
 		const FText Title = FText::FromString("mod.io");
-		const FText Message = FText::FromString("Please specify a valid Game Id and Api Key in 'Project Settings->Plugins->mod.io'");
+		const FText Message =
+			FText::FromString("Please specify a valid Game Id and Api Key in 'Project Settings->Plugins->mod.io'");
 
 		UE_LOG(LogTemp, Error, TEXT("%s"), *Message.ToString());
 #if UE_VERSION_OLDER_THAN(5, 3, 0)
 		EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, &Title);
-		#else
+#else
 		EAppReturnType::Type UserSelection = FMessageDialog::Open(EAppMsgType::Ok, Message, Title);
-		#endif
+#endif
 		if (UserSelection == EAppReturnType::Ok)
 		{
 			return;
@@ -178,10 +191,11 @@ void FModioEditor::RegisterMenus()
 		{
 			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection(ExtensionPoint);
 			{
-				FToolMenuEntry& EntryComboButton = Section.AddEntry(FToolMenuEntry::InitComboButton("Modio", FUIAction(),
-					FNewToolMenuChoice(FOnGetContent::CreateRaw(this, &FModioEditor::PopulateComboButton, PluginCommands)),
-					LOCTEXT("modio", "mod.io"), 
-					LOCTEXT("modio", "mod.io"),
+				FToolMenuEntry& EntryComboButton = Section.AddEntry(FToolMenuEntry::InitComboButton(
+					"Modio", FUIAction(),
+					FNewToolMenuChoice(
+						FOnGetContent::CreateRaw(this, &FModioEditor::PopulateComboButton, PluginCommands)),
+					LOCTEXT("modio", "mod.io"), LOCTEXT("modio", "mod.io"),
 					FModioEditorWindowCommands::Get().OpenPluginWindow->GetIcon(), false));
 				EntryComboButton.SetCommandList(PluginCommands);
 			}

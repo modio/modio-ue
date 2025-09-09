@@ -99,16 +99,16 @@ FModioFilterParams& FModioFilterParams::WithoutTags(const TArray<FString>& NewTa
 FModioFilterParams& FModioFilterParams::IndexedResults(uint64 StartIndex, uint64 ResultCount)
 {
 	isPaged = false;
-	Index = StartIndex;
-	Count = ResultCount;
+	Index = int64_t(StartIndex);
+	Count = int64_t(ResultCount);
 	return *this;
 }
 
 FModioFilterParams& FModioFilterParams::PagedResults(uint64 PageNumber, uint64 PageSize)
 {
 	isPaged = true;
-	Index = PageNumber;
-	Count = PageSize;
+	Index = int64_t(PageNumber);
+	Count = int64_t(PageSize);
 	return *this;
 }
 

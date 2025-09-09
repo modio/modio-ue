@@ -72,13 +72,13 @@ FModioFilterParams& UModioFilterParamsLibrary::WithoutTag(FModioFilterParams& Fi
 FModioFilterParams& UModioFilterParamsLibrary::IndexedResults(FModioFilterParams& Filter, int64 StartIndex,
 															  int64 ResultCount)
 {
-	return Filter.IndexedResults(StartIndex, ResultCount);
+	return Filter.IndexedResults(uint64(StartIndex), uint64(ResultCount));
 }
 
 FModioFilterParams& UModioFilterParamsLibrary::PagedResults(FModioFilterParams& Filter, int64 PageNumber,
 															int64 PageSize)
 {
-	return Filter.PagedResults(PageNumber, PageSize);
+	return Filter.PagedResults(uint64(PageNumber), uint64(PageSize));
 }
 
 FModioFilterParams& UModioFilterParamsLibrary::MetadataLike(FModioFilterParams& Filter, FString SearchString)

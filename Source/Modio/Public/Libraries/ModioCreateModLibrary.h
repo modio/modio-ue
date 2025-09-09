@@ -14,6 +14,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioCreateModFileParams.h"
+#include "Types/ModioCreateSourceFileParams.h"
 #include "Types/ModioCreateModParams.h"
 #include "Types/ModioEditModParams.h"
 #include "Types/ModioModInfo.h"
@@ -129,5 +130,42 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Mod File Params")
 	static void SetModfilePlatforms(UPARAM(ref) FModioCreateModFileParams& In,
+									UPARAM(ref) TArray<EModioModfilePlatform>& Platforms);
+
+	/**
+	 * @docpublic
+	 * @brief Sets the version string of the source file
+	 * @param In The source file creation parameters to modify
+	 * @param Version The version string of the source file
+	 */
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Source File Params")
+	static void SetSourceFileVersionString(UPARAM(ref) FModioCreateSourceFileParams& In, FString Version);
+
+	/**
+	 * @docpublic
+	 * @brief Sets the changelog string of the source file
+	 * @param In The source file creation parameters to modify
+	 * @param Changelog The changelog string of the source file
+	 */
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Source File Params")
+	static void SetSourceFileChangelogString(UPARAM(ref) FModioCreateSourceFileParams& In, FString Changelog);
+
+	/**
+	 * @docpublic
+	 * @brief Sets the source file metadata blob of the source file
+	 * @param In The source file creation parameters to modify
+	 * @param MetadataBlob The source file metadata blob of the source file
+	 */
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Source File Params")
+	static void SetSourceFileMetadataBlob(UPARAM(ref) FModioCreateSourceFileParams& In, FString MetadataBlob);
+
+	/**
+	 * @docpublic
+	 * @brief Sets the source file platforms of the source file
+	 * @param In The source file creation parameters to modify
+	 * @param Platforms The source file platforms of the source file
+	 */
+	UFUNCTION(BlueprintCallable, Category = "mod.io|Create Source File Params")
+	static void SetSourceFilePlatforms(UPARAM(ref) FModioCreateSourceFileParams& In,
 									UPARAM(ref) TArray<EModioModfilePlatform>& Platforms);
 };

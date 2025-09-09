@@ -80,6 +80,8 @@ struct MODIO_API FModioModProgressInfo
 	{
 		switch (State)
 		{
+			case EModioModProgressState::Initializing:
+				return FModioUnsigned64(0);
 			case EModioModProgressState::Downloading:
 				return FModioUnsigned64(DownloadCurrent);
 			case EModioModProgressState::Extracting:
@@ -103,6 +105,8 @@ struct MODIO_API FModioModProgressInfo
 	{
 		switch (State)
 		{
+			case EModioModProgressState::Initializing:
+				return FModioUnsigned64(0);
 			case EModioModProgressState::Downloading:
 				return FModioUnsigned64(DownloadTotal);
 			case EModioModProgressState::Extracting:

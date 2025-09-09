@@ -63,7 +63,7 @@ void FModioModule::StartupModule()
 			{
 				{
 					TRACE_CPUPROFILER_EVENT_SCOPE(ModioLogSerialize);
-					ModioLog->Serialize(const_cast<char*>(Message.c_str()), Message.size());
+					ModioLog->Serialize(const_cast<char*>(Message.c_str()), int64_t(Message.size()));
 				}
 			}
 		}

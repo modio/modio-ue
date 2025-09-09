@@ -47,7 +47,7 @@ FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 
 	Out.MetadataKvp = ToUnreal<FModioMetadata>(In.MetadataKvp);
 	Out.Tags = ToUnreal<FModioModTag>(In.Tags);
-	Out.NumGalleryImages = ToUnreal(In.NumGalleryImages);
+	Out.NumGalleryImages = int32_t(ToUnreal(In.NumGalleryImages));
 	Out.YoutubeURLs = ToUnreal(In.YoutubeURLs);
 	Out.SketchfabURLs = ToUnreal(In.SketchfabURLs);
 	Out.Stats = ToUnreal(In.Stats);

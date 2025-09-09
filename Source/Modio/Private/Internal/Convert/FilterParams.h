@@ -80,11 +80,11 @@ FORCEINLINE Modio::FilterParams ToModio(const FModioFilterParams& In)
 
 	if (In.isPaged)
 	{
-		Out.PagedResults(In.Index, In.Count);
+		Out.PagedResults(size_t(In.Index), size_t(In.Count));
 	}
 	else
 	{
-		Out.IndexedResults(In.Index, In.Count);
+		Out.IndexedResults(size_t(In.Index), size_t(In.Count));
 	}
 
 	if (In.DateRangeBegin)

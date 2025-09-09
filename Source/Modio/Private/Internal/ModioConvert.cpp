@@ -21,7 +21,7 @@ std::string ToModio(const FString& String)
 std::vector<std::string> ToModio(const TArray<FString>& StringArray)
 {
 	std::vector<std::string> Result;
-	Result.reserve(StringArray.Num());
+	Result.reserve(size_t(StringArray.Num()));
 	for (const FString& It : StringArray)
 	{
 		Result.emplace_back(TCHAR_TO_UTF8(*It));
@@ -32,7 +32,7 @@ std::vector<std::string> ToModio(const TArray<FString>& StringArray)
 std::vector<Modio::ModID> ToModio(const TArray<FModioModID>& ModIDArray)
 {
 	std::vector<Modio::ModID> Result;
-	Result.reserve(ModIDArray.Num());
+	Result.reserve(size_t(ModIDArray.Num()));
 	for (const FModioModID& It : ModIDArray)
 	{
 		Result.emplace_back(ToModio(It));
@@ -247,6 +247,10 @@ Modio::ModfilePlatform ToModio(EModioModfilePlatform Platform)
 			return Modio::ModfilePlatform::XboxSeriesX;
 		case EModioModfilePlatform::Source:
 			return Modio::ModfilePlatform::Source;
+		case EModioModfilePlatform::WindowsServer:
+			return Modio::ModfilePlatform::WindowsServer;
+		case EModioModfilePlatform::LinuxServer:
+			return Modio::ModfilePlatform::LinuxServer;
 	}
 	checkf(false, TEXT("Unhandled value in ToModio(EModioModfilePlatform Platform)"));
 	return Modio::ModfilePlatform::Windows;
@@ -331,6 +335,8 @@ Modio::Language ToModio(EModioLanguage Language)
 			return Modio::Language::Ukrainian;
 		case EModioLanguage::Arabic:
 			return Modio::Language::Arabic;
+		case EModioLanguage::Count:
+			break;
 	}
 
 	checkf(false, TEXT("Missed a case in ToModio(EModioLanguage Language)"));
@@ -405,6 +411,10 @@ EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& PlatformIn)
 			return EModioModfilePlatform::Oculus;
 		case Modio::ModfilePlatform::Source:
 			return EModioModfilePlatform::Source;
+		case Modio::ModfilePlatform::WindowsServer:
+			return EModioModfilePlatform::WindowsServer;
+		case Modio::ModfilePlatform::LinuxServer:
+			return EModioModfilePlatform::LinuxServer;
 	}
 	checkf(false, TEXT("Missed a case in ToUnreal(const Modio::ModfilePlatform& PlatformIn)"));
 	return EModioModfilePlatform::Windows;
@@ -459,6 +469,12 @@ EModioLanguage ToUnreal(const Modio::Language& In)
 			return EModioLanguage::ChineseSimplified;
 		case Modio::Language::ChineseTraditional:
 			return EModioLanguage::ChineseTraditional;
+
+		case Modio::Language::SpanishLatinAmerican:
+		case Modio::Language::Turkish:
+		case Modio::Language::Ukrainian:
+		case Modio::Language::Arabic:
+			break;
 	}
 
 	checkf(false, TEXT("Missed a case in ToUnreal(Modio::Language Language)"));
