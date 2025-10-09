@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -77,6 +77,16 @@ struct MODIO_API FModioUser
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "User")
 	FString DisplayNamePortal;
+
+	bool operator==(const FModioUser& Other) const
+	{
+		return UserId == Other.UserId;
+	}
+
+	MODIO_API friend uint32 GetTypeHash(const FModioUser& User)
+	{
+		return FCrc::MemCrc32(&User.UserId, sizeof(FModioUserID));
+	}
 };
 
 /**

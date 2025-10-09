@@ -1,0 +1,113 @@
+---
+id: ue-installation
+title: Installation
+slug: /unreal/installation
+---
+
+# Installation
+
+The Unreal Engine Core Plugin is the foundation that the rest of our features depend on. It provides functionality for your game to interact with mod.io's services, such as user authentication, content searching, subscription management and more. The following guides will take you through the fundamentals of what the plugin offers.
+
+Before you activate UGC functionality, you'll need to set up the Unreal Engine Plugin in a way that's suitable for your game, as well as connect it to your mod.io game account. 
+
+If you have any questions or need some help join our [Discord server](https://discord.mod.io).
+
+This guide covers: 
+
+* [Prerequisites](#prerequisites)
+* [Adding plugin files to your project](#adding-plugin-files-to-your-project)
+* [Connecting to mod.io](#connecting-to-modio)
+* [Enabling the plugin](#enabling-the-plugin)
+* [Plugin configuration](#plugin-configuration)
+* [Using a background thread](#using-a-background-thread)
+* [Using the Live environment](#using-the-live-environment)
+
+:::tip[Navigation tip]
+Use the menu on the right to navigate the key points of this guide &rarr;
+:::
+
+## Prerequisites
+
+If you are building for other platforms, you can follow each platform's configuration requirements below:
+
+* [Consoles](https://docs.mod.io/platforms/console-sdks/)
+* [Android](/unreal/android-configuration/)
+* [Meta Quest](/unreal/meta-configuration/)
+
+## Adding plugin files to your project
+
+Download the Unreal Engine plugin from the [mod.io GitHub repository](https://github.com/modio/modio-ue) using one of the following methods:
+
+### As a git submodule
+
+- In the directory with your `.uproject` file, add and download the mod.io plugin as a git submodule with the command: 
+
+   `git submodule add https://github.com/modio/modio-ue.git Plugins/Modio`
+
+- Next, initialize our submodules and dependencies: 
+   
+   `git submodule update --init --recursive`
+
+
+On first run, or any time you update the git submodule for the plugin, you must set the MODIO_DEVELOPMENT_MODE environment variable to 1. This will tell the plugin to regenerate the files it produces from the internal copy of the mod.io C++ SDK. This environment variable does not need to be set if you are using the standalone release zips, or during normal development when you have not updated the Plugin via git. 
+
+Once these files are regenerated, simply leave the environment variable unset and the regenerated files can be added to your version control system. This allows you to update the plugin via Git without interfering with daily use of Perforce or similar version control that requires files be marked read-only.
+
+### In a non-git project, or without submodules
+
+- Grab the latest release zip from the [releases section](https://github.com/modio/modio-ue/releases) on GitHub and extract the contents to your project’s `Plugins/Modio` directory
+
+![get_latest_release](img/get_latest_release.png) ![get_latest_release2](img/get_latest_release2.png)
+
+:::note[Note on Zips]
+GitHub's automatically generated zips will not work! They do not contain our submodule dependencies. Ensure you download the zip file from the releases page as highlighted above.
+:::
+
+## Connecting to mod.io
+
+If you haven't already, you'll need to create a **Game Account** with mod.io before proceeding. You can do so by following Step 1 of the [mod.io Getting Started Guide](https://docs.mod.io/getting-started/).
+
+## Enabling the plugin
+
+Start the editor and enable the plugin in the Unreal Engine plugin settings.
+
+![plugin_window](img/plugin_window.png)
+
+## Plugin configuration
+
+The plugin requires some initial configuration to behave correctly. You can access these settings in the Project Settings window:
+
+![plugin_settings](img/plugin_settings.png)
+
+The settings have the following parameters:
+
+| Property | Description |
+| --- | --- |
+| Game Id | Your mod.io-provided Game Id for the target environment |
+| API Key | Your mod.io-provided API key for the target environment |
+| Environment | Your target environment, `Live` or `Test` |
+| Log Level | The default logging level to use. Messages with a lower log level will be silently discarded. |
+| Portal | The default portal to use. This usually corresponds to the store your game will be distributed through. |
+| Use Background Thread | Enables or disables the use of a [background thread](#using-a-background-thread) for the plugin's work. |
+
+:::note
+The Test environment is available for usage in limited circumstances only. [All games should be set up on the Live environment](/unreal/installation#using-the-live-environment). Set your game to **hidden** to restrict access during the testing phase.
+:::
+
+## Using a background thread
+
+[`RunPendingHandlers`](/unreal/refdocs#run-pending-handlers) is responsible for running any pending plugin work, including invoking callbacks passed to asynchronous operations.  With `Use Background Thread`  set to `true`, the mod.io plugin will automatically spin up a background thread and continually call `RunPendingHandlers` for you. This decouples the frequency of the plugin’s work from your game's main thread, and improves performance of the plugin overall.
+
+Calling methods from the [`ModioSubsystem`](/unreal/refdocs#modiosubsystem) will marshall all callbacks back to the game thread.  All other plugin call guarantees remain the same.
+
+## Using the `Live` environment
+
+All games should be set up on the `Live` environment for full access to the mod.io REST API's capabilities. 
+
+If your game or its modding capabilities are not yet publicly available, set your game to **hidden** on the `Live` environment.  This allows you to restrict access to specific accounts and perform QA against the production environment without exposing your title to the public. 
+
+Once you are ready, change the state from **hidden** to **public** for a full release of your game’s modding capabilities.
+
+## Next steps
+
+Now you've installed and connected the plugin, it's time to get things running using our [Initialization](/unreal/initialization) guide. 

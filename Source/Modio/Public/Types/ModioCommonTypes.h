@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -18,6 +18,7 @@
 namespace Modio
 {
 	struct ModID;
+	struct ModCollectionID;
 	struct GameID;
 	struct FileMetadataID;
 	struct UserID;
@@ -236,7 +237,7 @@ struct MODIO_API FModioModID
 	/**
 	 * @docpublic
 	 * @brief Transform a ModID into its 32-bit integer representation
-	 * @param UserID String type for the ModID to read its hash from
+	 * @param ModioModId String type for the ModID to read its hash from
 	 * @return unsigned 32-bit integer that matches the hash of the ModID provided
 	 */
 	MODIO_API friend uint32 GetTypeHash(FModioModID ModioModId);
@@ -393,6 +394,157 @@ struct MODIO_API FModioOptionalUInt64
 	 * @brief Stored optional uint64
 	 */
 	TOptional<uint64> Internal;
+};
+
+/**
+ * @docpublic
+ * @brief Strong type struct to wrap a ModCollectionID to uniquely identify collections of user-generated content.
+ */
+USTRUCT(BlueprintType)
+struct MODIO_API FModioModCollectionID
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief Default constructor without parameters
+	 */
+	FModioModCollectionID();
+
+	/**
+	 * @docpublic
+	 * @brief Preferred constructor with ModCollectionID initialization parameter
+	 * @param ModioModCollectionId Base ModCollectionID to create this strong type
+	 */
+	constexpr explicit FModioModCollectionID(int64 ModioModCollectionId) : ModCollectionID(ModioModCollectionId) {}
+
+	/**
+	 * @docpublic
+	 * @brief Transform a ModCollectionID into its 32-bit integer representation
+	 * @param ModioModCollectionId String type for the ModCollectionID to read its hash from
+	 * @return unsigned 32-bit integer that matches the hash of the ModCollectionID provided
+	 */
+	MODIO_API friend uint32 GetTypeHash(FModioModCollectionID ModioModCollectionId);
+
+	/**
+	 * @docpublic
+	 * @brief Comparison operator between ModCollectionID elements
+	 */
+	MODIO_API friend bool operator==(FModioModCollectionID A, FModioModCollectionID B)
+	{
+		return A.ModCollectionID == B.ModCollectionID;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Comparison operator between ModCollectionID elements
+	 */
+	MODIO_API friend bool operator!=(FModioModCollectionID A, FModioModCollectionID B)
+	{
+		return A.ModCollectionID != B.ModCollectionID;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Less than operator between ModCollectionID elements
+	 */
+	friend bool operator<(FModioModCollectionID A, FModioModCollectionID B)
+	{
+		return A.ModCollectionID < B.ModCollectionID;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Greater than operator between ModCollectionID elements
+	 */
+	friend bool operator>(FModioModCollectionID A, FModioModCollectionID B)
+	{
+		return A.ModCollectionID > B.ModCollectionID;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Transform a ModCollectionID into its string representation
+	 * @return String value of the stored ModCollectionID
+	 */
+	FString ToString() const
+	{
+		return FString::Printf(TEXT("%lld"), ModCollectionID);
+	}
+
+	/**
+	 * @docinternal
+	 * @brief Compare the ModCollectionID to the invalid state
+	 * @return True if ModCollectionID is not invalid (INDEX_NONE)
+	 */
+	bool IsValid() const
+	{
+		return ModCollectionID != INDEX_NONE;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Stream forward operator to pass the ModCollectionID along
+	 * @param Ar The archive class that receives information
+	 * @param ID The ModCollectionID to pass along this operator
+	 * @return FArchive The updated archive with the ModCollectionID passed along
+	 */
+	MODIO_API friend FArchive& operator<<(FArchive& Ar, FModioModCollectionID& ID)
+	{
+		return Ar << ID.ModCollectionID;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Store this instance ModCollectionID into an archive
+	 * @param Ar The archive class that receives information
+	 * @return Always true when the ModCollectionID is forwarded to Ar
+	 */
+	bool Serialize(FArchive& Ar)
+	{
+		Ar << *this;
+		return true;
+	}
+
+	/**
+	 * @docpublic
+	 * @brief Store this instance ModCollectionID into an archive with reference flag as parameter
+	 * @param Ar The archive class that receives information
+	 * @param Map A dictionary from indices for network communication
+	 * @param bOutSuccess Flag to signal the result of this operation, True when stored
+	 * @return Always true when the ModCollectionID is forwarded to Ar
+	 */
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << *this;
+		bOutSuccess = true;
+		return true;
+	}
+
+private:
+	/**
+	 * @brief Function for retrieving the underlying value of an FModioModCollectionID for use in custom serialization. Not
+	 * recommended for any other use. FModioModCollectionIDs should be treated as opaque.
+	 * @param In The FModioModCollectionID to retrieve the value for
+	 * @return The underlying numeric ID
+	 */
+	MODIO_API friend int64 GetUnderlyingValue(const FModioModCollectionID& In)
+	{
+		return In.ModCollectionID;
+	}
+
+	friend struct Modio::ModCollectionID ToModio(const FModioModCollectionID& In);
+	int64 ModCollectionID;
+};
+
+template<>
+struct TStructOpsTypeTraits<FModioModCollectionID> : public TStructOpsTypeTraitsBase2<FModioModCollectionID>
+{
+	enum
+	{
+		WithIdenticalViaEquality = true,
+		WithSerializer = true,
+		WithNetSerializer = true
+	};
 };
 
 /**

@@ -1,0 +1,117 @@
+---
+id: ue-initialization
+title: Initialization
+slug: /unreal/initialization
+---
+
+# Initialization
+
+This guide describes the mod.io Unreal Engine plugin's basic event loop, initialization, and shutdown functions.  
+
+Ideally, you should wrap these functions in a separate subsystem (e.g. `ModioManagerSubsystem`) which is responsible for managing the full initialization and authentication flow for your game.  
+
+This guide covers:
+
+* [Calling RunPendingHandlers](#calling-runpendinghandlers)
+* [Initialization process](#initialization-process)
+* [Shutdown process](#shutdown-process)
+
+## Calling RunPendingHandlers
+Before initializing the plugin, ensure [`RunPendingHandlers`](/unreal/refdocs/#run-pending-handlers) is being continually called. You can do this yourself in your project’s main loop, or by setting [`Use Background Thread`](/unreal/installation/#using-a-background-thread) to true in the mod.io project settings.  For best performance, `RunPendingHandlers` should be called at least once per frame. See [Maintaining the plugin event loop](/unreal/plugin-structure/#maintaining-the-plugin-event-loop) for additional information.
+
+## Initialization process
+The mod.io Unreal Engine plugin is initialized by calling [`InitializeAsync`](/unreal/refdocs/#initializeasync), passing in a [`ModioInitializeOptions`](/unreal/refdocs/#modioinitializeoptions) with the relevant information for the current session, and a callback containing a [`ModioErrorCode`](/unreal/refdocs/#modioerrorcode) that will contain the result of the initialization on completion.  
+
+Use [`GetProjectInitializeOptionsForSessionId`](/unreal/refdocs/#get-project-initialize-options-for-session-id) to initialize the plugin using the information entered in the [mod.io project settings](/unreal/installation/#plugin-configuration).  You should use `FPlatformProcess::UserName()` to get a default username for the [Session ID](/unreal/plugin-structure/#user-sessions).  Some platforms also require additional parameters added to `ModioInitializeOptions.ExtendedInitializationParameters`.  Refer to the relevant [platform documentation](https://docs.mod.io/getting-started/#expand-with-cross-platform-functionality) for more information.
+
+The plugin also provides a set of helper functions in `UModioPlatformHelpersLibrary` to facilitate setting up platform and portal configurations. You can use [`GetDefaultPortalForCurrentPlatform`](/unreal/refdocs/#get-default-portal-for-current-platform) to get the appropriate default portal for the current platform, which you can then set in `ModioInitializeOptions.PortalInUse`.
+
+:::note
+`GetDefaultPortalForCurrentPlatform` will return `EModioPortal::Steam` as the default portal on PC platforms. If you are using a different portal, you should set this value explicitly.
+:::
+
+<Tabs groupId="languages">
+<TabItem value="blueprint" label="Blueprint">
+  	![run_pending_handlers](img/run_pending_handlers.png)
+
+	![initasync_getoptions](img/initasync_getoptions.png)
+  </TabItem>
+  <TabItem value="cpp" label="C++">
+
+ ```cpp
+void UModioManagerSubsystem::Init()
+{	
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		FModioInitializeOptions Options = UModioSDKLibrary::GetProjectInitializeOptionsForSessionId(FPlatformProcess::UserName())
+
+		Options.PortalInUse = UModioPlatformHelpersLibrary::GetDefaultPortalForCurrentPlatform();
+		Subsystem->InitializeAsync(Options, FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManagerSubsystem::OnInitCallback));
+	}
+	UE_LOG(LogModioGame, Log, TEXT("Initializing mod.io"));
+}
+
+void UModioManagerSubsystem::OnInitCallback(FModioErrorCode ErrorCode)
+{
+    UE_LOG(LogModioGame, Log, TEXT("mod.io initialization complete with result: %s"), *ErrorCode.GetErrorMessage());
+}
+
+void UModioManagerSubsystem::Tick(float DeltaTime)
+{
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		Subsystem->RunPendingHandlers();
+	}
+}
+```
+  </TabItem>
+</Tabs>
+
+
+:::note
+* The error-handling in this sample has been omitted. See our [Error handling](/unreal/plugin-structure/#error-handling) section in the Plugin Structure guide for more. 
+* `InitializeAsync` is an asynchronous function, therefore you must wait for the callback for confirmation that the initialization is complete.
+:::
+
+## Shutdown process
+
+The mod.io Unreal Engine plugin is shut down by calling [`ShutdownAsync`](/unreal/refdocs#shutdownasync) in a similar fashion.
+
+<Tabs groupId="languages">
+  <TabItem value="blueprint" label="Blueprint">
+![shutdownasync_runhandlers](img/shutdownasync_runhandlers.png)
+  </TabItem>
+  <TabItem value="cpp" label="C++">
+
+ ```cpp
+void UModioManagerSubsystem::Shutdown()
+{
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		Subsystem->ShutdownAsync(FOnErrorOnlyDelegateFast::CreateUObject(this, &UModioManagerSubsystem::OnShutdownComplete));
+	}
+}
+
+void UModioManagerSubsystem::OnShutdownComplete(FModioErrorCode ErrorCode)
+{
+	UE_LOG(LogModioGame, Log, TEXT("Shutdown complete with result: %s"), *ErrorCode.GetErrorMessage());
+}
+```
+
+  </TabItem>
+</Tabs>
+
+
+:::note
+* You must continue to call [**`RunPendingHandlers`**](/unreal/refdocs/#run-pending-handlers) while shutdown is in progress to allow intermediate handlers to complete.
+* Any in-flight mod.io async calls will complete with an error code indicating cancellation.
+* You *must not* call **`ShutdownAsync`** from within another completion handler/callback. This may cause the application to deadlock. 
+:::
+
+## Next steps
+
+Now that you have set up the Unreal Engine Plugin, you may want to learn more about the [Plugin Structure](/unreal/plugin-structure/) to get a better understanding of the plugin itself and processes such error handling and user sessions. 
+
+Or if you are eager to get things moving, you can skip directly to setting up [User Authentication](/unreal/user-authentication) or [Searching for UGC](/unreal/searching-ugc).
+
+All other core setup information can be found in the [Unreal Getting Started Guides](/unreal/#unreal-engine-core-plugin-guides), which are designed to teach you how to implement the fundamentals of the Unreal Engine Plugin.

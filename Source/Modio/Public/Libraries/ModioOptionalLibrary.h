@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -20,6 +20,7 @@
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioUnsigned64.h"
+#include "Types/ModioModCollection.h"
 
 #include "ModioOptionalLibrary.generated.h"
 
@@ -336,4 +337,54 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 		DisplayName = "GetValue (ModioOptionalModChangeMap)")
 	static bool GetValue_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap,
 	                                               struct FModioModChangeMap& ModChangeMap);
+
+	/**
+	 * @docpublic
+	 * @brief Check if the mod collection info has a valid value
+	 *
+	 * @param OptionalModCollectionInfo - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioOptionalModCollectionInfo)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalModCollectionInfo(const struct FModioOptionalModCollectionInfo& OptionalModCollectionInfo);
+
+	/**
+	 * @docpublic
+	 * @brief Get the mod collection info from the optional if it's set
+	 *
+	 * @param OptionalModCollectionInfo -
+	 * @param ModCollectionInfo - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalModCollectionInfo)")
+	static bool GetValue_ModioOptionalModCollectionInfo(
+		const struct FModioOptionalModCollectionInfo& OptionalModCollectionInfo,
+		struct FModioModCollectionInfo& ModCollectionInfo);
+
+	/**
+	 * @docpublic
+	 * @brief Check if the mod Collection info list has a valid value
+	 *
+	 * @param OptionalModCollectionInfoList - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioOptionalModCollectionInfoList)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalModCollectionInfoList(
+		const struct FModioOptionalModCollectionInfoList& OptionalModCollectionInfoList);
+
+	/**
+	 * @docpublic
+	 * @brief Get the mod Collection info list from the optional if it's set
+	 *
+	 * @param OptionalModCollectionInfoList -
+	 * @param ModCollectionInfoList - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalModCollectionInfoList)")
+	static bool GetValue_ModioOptionalModCollectionInfoList(
+		const struct FModioOptionalModCollectionInfoList& OptionalModCollectionInfoList,
+		struct FModioModCollectionInfoList& ModCollectionInfoList);
 };

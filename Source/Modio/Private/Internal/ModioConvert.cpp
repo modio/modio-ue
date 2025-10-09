@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -120,6 +120,11 @@ Modio::EmailAuthCode ToModio(const FModioEmailAuthCode& In)
 Modio::ModID ToModio(const FModioModID& In)
 {
 	return Modio::ModID(In.ModID);
+}
+
+Modio::ModCollectionID ToModio(const FModioModCollectionID& In)
+{
+	return Modio::ModCollectionID(In.ModCollectionID);
 }
 
 Modio::GameID ToModio(const FModioGameID& In)
@@ -371,6 +376,11 @@ Modio::Guid ToModio(const FModioGuid& In)
 FModioModID ToUnreal(Modio::ModID Value)
 {
 	return FModioModID(Value);
+}
+
+FModioModCollectionID ToUnreal(Modio::ModCollectionID Value)
+{
+	return FModioModCollectionID(Value);
 }
 
 FModioGameID ToUnreal(Modio::GameID Value)

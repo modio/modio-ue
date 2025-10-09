@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -34,6 +34,7 @@
 #include "Types/ModioImageWrapper.h"
 #include "Types/ModioInitializeOptions.h"
 #include "Types/ModioModChangeMap.h"
+#include "Types/ModioModCollection.h"
 #include "Types/ModioModCollectionEntry.h"
 #include "Types/ModioModCreationHandle.h"
 #include "Types/ModioModDependencyList.h"
@@ -58,6 +59,13 @@ DECLARE_DELEGATE_OneParam(FOnErrorOnlyDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_OneParam(FOnModManagementDelegateFast, FModioModManagementEvent);
 DECLARE_DELEGATE_OneParam(FOnUserProfileUpdatedDelegate, TOptional<FModioUser> UserProfile);
 DECLARE_DELEGATE_TwoParams(FOnListAllModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
+DECLARE_DELEGATE_TwoParams(FOnListModCollectionsDelegateFast, FModioErrorCode, TOptional<FModioModCollectionInfoList>);
+DECLARE_DELEGATE_TwoParams(FOnListFollowedModCollectionsDelegateFast, FModioErrorCode,
+                           TOptional<FModioModCollectionInfoList>);
+DECLARE_DELEGATE_TwoParams(FOnFollowModCollectionDelegateFast, FModioErrorCode, TOptional<FModioModCollectionInfo>);
+DECLARE_DELEGATE_TwoParams(FOnGetModCollectionInfoDelegateFast, FModioErrorCode, TOptional<FModioModCollectionInfo>);
+DECLARE_DELEGATE_TwoParams(FOnGetModCollectionMediaDelegateFast, FModioErrorCode, TOptional<FModioImageWrapper>);
+DECLARE_DELEGATE_TwoParams(FOnGetModCollectionModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnGetModInfoDelegateFast, FModioErrorCode, TOptional<FModioModInfo>);
 DECLARE_DELEGATE_TwoParams(FOnGetGameInfoDelegateFast, FModioErrorCode, TOptional<FModioGameInfo>);
 DECLARE_DELEGATE_TwoParams(FOnListUserGamesDelegateFast, FModioErrorCode, TOptional<FModioGameInfoList>);
@@ -75,7 +83,7 @@ DECLARE_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegateFast, FModioErrorCode,
 DECLARE_DELEGATE_OneParam(FOnFetchUserPurchasesDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegateFast, FModioErrorCode, FString);
 DECLARE_DELEGATE_TwoParams(FOnRefreshUserEntitlementsDelegateFast, FModioErrorCode,
-						   TOptional<FModioEntitlementConsumptionStatusList>);
+                           TOptional<FModioEntitlementConsumptionStatusList>);
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 
 // Blueprint version of delegates
@@ -85,51 +93,69 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FOnErrorOnlyDelegate, FModioErrorCode, ErrorCo
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnModManagementDelegate, FModioModManagementEvent, Event);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListAllModsDelegate, FModioErrorCode, ErrorCode, FModioOptionalModInfoList,
-								   Result);
+                                   Result);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModInfoDelegate, FModioErrorCode, ErrorCode, FModioOptionalModInfo, ModInfo);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetGameInfoDelegate, FModioErrorCode, ErrorCode, FModioOptionalGameInfo,
-								   GameInfo);
+                                   GameInfo);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserGamesDelegate, FModioErrorCode, ErrorCode, FModioOptionalGameInfoList,
-								   GameInfoList);
+                                   GameInfoList);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetMediaDelegate, FModioErrorCode, ErrorCode, FModioOptionalImage, Path);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModTagOptionsDelegate, FModioErrorCode, ErrorCode, FModioOptionalModTagOptions,
-								   ModTagOptions);
+                                   ModTagOptions);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetTermsOfUseDelegate, FModioErrorCode, ErrorCode, FModioOptionalTerms, Terms);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModDependenciesDelegate, FModioErrorCode, ErrorCode,
-								   FModioOptionalModDependencyList, Dependencies);
+                                   FModioOptionalModDependencyList, Dependencies);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnSubmitNewModDelegate, FModioErrorCode, ErrorCode, FModioOptionalModID, NewModID);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnMuteUsersDelegate, FModioErrorCode, ErrorCode, FModioOptionalUserList,
-								   NewUserList);
+                                   NewUserList);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListUserCreatedModsDelegate, FModioErrorCode, ErrorCode,
-								   FModioOptionalModInfoList, Result);
+                                   FModioOptionalModInfoList, Result);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErrorCode, ErrorCode,
-								   FModioOptionalModChangeMap, ModioPreviewMap);
+                                   FModioOptionalModChangeMap, ModioPreviewMap);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPurchaseModDelegate, FModioErrorCode, ErrorCode, FModioOptionalTransactionRecord,
-								   Transaction);
+                                   Transaction);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegate, FModioErrorCode, ErrorCode, FModioOptionalUInt64,
-								   WalletBalance);
+                                   WalletBalance);
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnFetchUserPurchasesDelegate, FModioErrorCode, ErrorCode);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegate, FModioErrorCode, ErrorCode, FString, Token);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnRefreshUserEntitlementsDelegate, FModioErrorCode, ErrorCode,
-								   FModioOptionalEntitlementConsumptionStatusList, Entitlements);
+                                   FModioOptionalEntitlementConsumptionStatusList, Entitlements);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPlatformCheckoutDelegate, bool, bSuccess, FString, Message);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListModCollectionsDelegate, FModioErrorCode, ErrorCode,
+                                   FModioOptionalModCollectionInfoList, Result);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnListFollowedModCollectionsDelegate, FModioErrorCode, ErrorCode,
+                                   FModioOptionalModCollectionInfoList, Result);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnFollowModCollectionDelegate, FModioErrorCode, ErrorCode,
+                                   FModioOptionalModCollectionInfo, CollectionInfo);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModCollectionInfoDelegate, FModioErrorCode, ErrorCode,
+                                   FModioOptionalModCollectionInfo, CollectionInfo);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModCollectionMediaDelegate, FModioErrorCode, ErrorCode, FModioOptionalImage,
+                                   Media);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModCollectionModsDelegate, FModioErrorCode, ErrorCode,
+                                   FModioOptionalModInfoList, Result);
 
 class UModioSubsystem;
 
@@ -137,7 +163,7 @@ class FModioBackgroundThread : public FRunnable
 {
 public:
 	FModioBackgroundThread(UModioSubsystem* ModioSubsystem);
-	virtual ~FModioBackgroundThread();
+	virtual ~FModioBackgroundThread() override;
 
 	/**
 	 * Safely kills the thread. This will wait for the thread to finish any pending work (in Run()) before exiting
@@ -171,17 +197,18 @@ protected:
 	TUniquePtr<FModioBackgroundThread> BackgroundThread;
 
 	friend class UModioUISubsystem;
+
 	EModioPortal GetCurrentPortal() const
 	{
 		return CachedInitializeOptions.PortalInUse;
 	}
 
-#if WITH_EDITOR
+	#if WITH_EDITOR
 	/// @brief Internal method used for emitting a warning during PIE if the Plugin was initialized during that PIE
 	/// session
 	void CheckShutdownBeforePIEClose(UWorld*);
 	bool bInitializedDuringPIE = false;
-#endif
+	#endif
 
 private:
 	bool bUseBackgroundThread = false;
@@ -232,7 +259,7 @@ public:
 	 * @errorcategory `SDKAlreadyInitialized`|SDK already initialized
 	 */
 	MODIO_API void InitializeAsync(const FModioInitializeOptions& InitializeOptions,
-								   FOnErrorOnlyDelegateFast OnInitComplete);
+	                               FOnErrorOnlyDelegateFast OnInitComplete);
 
 	/**
 	 * @docpublic
@@ -291,7 +318,7 @@ public:
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
 	 */
 	MODIO_API void SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies,
-									   FOnErrorOnlyDelegateFast OnSubscribeComplete);
+	                                   FOnErrorOnlyDelegateFast OnSubscribeComplete);
 
 	/**
 	 * @docpublic
@@ -310,7 +337,7 @@ public:
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
 	 */
 	MODIO_API void UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
-										   FOnErrorOnlyDelegateFast OnUnsubscribeComplete);
+	                                       FOnErrorOnlyDelegateFast OnUnsubscribeComplete);
 
 	/**
 	 * @docpublic
@@ -547,11 +574,11 @@ public:
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
 	 */
 	MODIO_API void GetModMediaAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
-									FOnGetMediaDelegateFast Callback);
+	                                FOnGetMediaDelegateFast Callback);
 
 private:
 	TMap<TTuple<FModioModID, EModioGallerySize, int32>, FOnGetMediaMulticastDelegateFast>
-		PendingModMediaGalleryRequests;
+	PendingModMediaGalleryRequests;
 
 public:
 	/**
@@ -605,7 +632,7 @@ public:
 	 * @experimental
 	 */
 	MODIO_API void GetModDependenciesAsync(FModioModID ModID, bool Recursive,
-										   FOnGetModDependenciesDelegateFast Callback);
+	                                       FOnGetModDependenciesDelegateFast Callback);
 
 	/**
 	 * @brief Adds dependencies to a specified mod, linking it with other mods that are required for it to function
@@ -623,7 +650,7 @@ public:
 	 * @error GenericError::BadParameter|The supplied mod ID is invalid
 	 */
 	MODIO_API void AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-										   FOnErrorOnlyDelegateFast Callback);
+	                                       FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @brief Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
@@ -641,7 +668,7 @@ public:
 	 * @error GenericError::BadParameter|The supplied mod ID is invalid
 	 */
 	MODIO_API void DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-											  FOnErrorOnlyDelegateFast Callback);
+	                                          FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -669,7 +696,7 @@ public:
 	 * @errorcategory `UserNotAuthenticatedError`|No authenticated user
 	 */
 	MODIO_API void SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
-									 FOnSubmitNewModDelegateFast Callback);
+	                                 FOnSubmitNewModDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -724,7 +751,7 @@ public:
 	 * @errorcategory `InvalidArgsError`|The supplied mod ID is invalid
 	 */
 	MODIO_API void SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
-										 FOnGetModInfoDelegateFast Callback);
+	                                     FOnGetModInfoDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -756,7 +783,7 @@ public:
 	 * [`ShutdownAsync`](#shutdownasync) followed by [`InitializeAsync`](#initializeasync).
 	 */
 	MODIO_API void AuthenticateUserEmailAsync(const FModioEmailAuthCode& AuthenticationCode,
-											  FOnErrorOnlyDelegateFast Callback);
+	                                          FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -777,8 +804,8 @@ public:
 	 * [`ShutdownAsync`](#shutdownasync) followed by [`InitializeAsync`](#initializeasync).
 	 */
 	MODIO_API void AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
-												 EModioAuthenticationProvider Provider,
-												 FOnErrorOnlyDelegateFast Callback);
+	                                             EModioAuthenticationProvider Provider,
+	                                             FOnErrorOnlyDelegateFast Callback);
 	/**
 	 * @docpublic
 	 * @brief Queries the server to verify the state of the currently authenticated user if there is one present.
@@ -1127,7 +1154,7 @@ public:
 	 * @requires no-rate-limiting
 	 */
 	MODIO_API void RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
-												FOnRefreshUserEntitlementsDelegateFast Callback);
+	                                            FOnRefreshUserEntitlementsDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -1144,7 +1171,7 @@ public:
 	 * @premiumfeature Metrics
 	 */
 	MODIO_API void MetricsSessionStartAsync(const FModioMetricsSessionParams& Params,
-											FOnErrorOnlyDelegateFast Callback);
+	                                        FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -1175,7 +1202,7 @@ public:
 	 * @premiumfeature Metrics
 	 */
 	MODIO_API void MetricsSessionSendHeartbeatAtIntervalAsync(FModioUnsigned64 IntervalSeconds,
-															  FOnErrorOnlyDelegateFast Callback);
+	                                                          FOnErrorOnlyDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -1192,12 +1219,200 @@ public:
 	 */
 	MODIO_API void MetricsSessionEndAsync(FOnErrorOnlyDelegateFast Callback);
 
+	/**
+	 * @docpublic
+	 * @brief Provides a list of mod collections for the current game, that match the parameters specified in the
+	 * filter.
+	 * @param Filter [`ModioFilterParams`](#modiofilterparams) object containing any filters that should be applied to
+	 * the query.
+	 * @param Callback Callback invoked with a status code and an optional `FModioModCollectionInfoList` providing mod
+	 * collection profiles.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
+	 * @errorcategory `SDKNotInitialized`|SDK not initialized
+	 */
+	MODIO_API void ListModCollectionsAsync(const FModioFilterParams& Filter,
+	                                       FOnListModCollectionsDelegateFast Callback);
+
+	/**
+	 * @docpublic
+     * @brief Fetches detailed information about the specified mod collection, including description and file metadata
+     * for the most recent release.
+     * @param ModCollectionId Mod Collection ID of the mod collection to fetch data.
+	 * @param Callback Callback providing a status code and an optional `FModioModCollectionInfo` object with the mod
+	 * collection's extended information.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	MODIO_API void GetModCollectionInfoAsync(FModioModCollectionID ModCollectionId,
+	                                         FOnGetModCollectionInfoDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Get a list of Mods contained within the specified mod collection.
+	 * @param ModCollectionId Mod Collection ID of the mod collection to fetch data.
+	 * @param Callback Callback providing a status code and an optional `FModioModCollectionInfoList` object with the
+	 * mod collection's extended information.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	MODIO_API void GetModCollectionModsAsync(FModioModCollectionID ModCollectionId,
+	                                         FOnGetModCollectionModsDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Submits a rating for a mod collection on behalf of the current user. Submit a neutral rating to effectively clear a
+	 * rating already submitted by a user. Submitting other values will overwrite any existing rating submitted by this
+	 * user.
+	 * @note To clear a rating for a mod collection, submit a rating of Rating::Neutral.
+	 * @param ModCollectionId The mod collection the user is rating
+	 * @param Rating The rating the user wishes to submit
+	 * @param Callback Callback providing a status code indicating success or failure of the rating submission
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	MODIO_API void SubmitModCollectionRatingAsync(FModioModCollectionID ModCollectionId, EModioRating Rating,
+	                                              FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to add the specified mod collection to the user's list of
+	 * subscriptions.
+	 * @note Unlike SubscribeToModAsync, SubscribeToModeCollectionAsync does not automatically trigger installation of
+	 * new subscriptions arising from a successful request. Call FetchExternalUpdatesAsync after this function succeeds
+	 * in order to initiate installation.
+	 * @param ModCollectionToSubscribeTo Mod Collection ID of the mod collection requiring a subscription.
+	 * @param Callback Callback providing a status code to indicate if the subscription was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @requires mod-not-pending-uninstall
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	MODIO_API void SubscribeToModCollectionAsync(FModioModCollectionID ModCollectionToSubscribeTo,
+	                                             FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to remove the specified mod collection to the user's list of
+	 * subscriptions.
+	 * @note If no other local users are subscribed to the mods in the specified collection, this function will also
+	 * mark the mods in the collection for uninstallation by the SDK.
+	 * @param ModCollectionToUnsubscribeFrom Mod Collection ID of the mod collection requiring unsubscription.
+	 * @param Callback Callback providing a status code to indicate if the unsubscription was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	MODIO_API void UnsubscribeFromModCollectionAsync(FModioModCollectionID ModCollectionToUnsubscribeFrom,
+	                                                 FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to add the specified mod collection to the user's list of followed
+	 * collections.
+	 * @param ModCollectionToFollow Mod Collection ID of the mod collection requiring a subscription.
+	 * @param Callback Callback invoked when the follow request is completed.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @requires mod-not-pending-uninstall
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	MODIO_API void FollowModCollectionAsync(FModioModCollectionID ModCollectionToFollow,
+	                                        FOnFollowModCollectionDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to remove the specified mod collection to the user's list of
+	 * followed collections.
+	 * @param ModCollectionToUnfollow Mod Collection ID of the mod collection to unfollow.
+	 * @param Callback Callback invoked when the unfollow request is completed.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @requires mod-not-pending-uninstall
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	MODIO_API void UnfollowModCollectionAsync(FModioModCollectionID ModCollectionToUnfollow,
+	                                          FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Provides a list of followed mod collections for the current game, that match the parameters specified in
+	 * the filter.
+	 * @param Filter `FModioFilterParams` object containing any filters that should be applied to the query.
+	 * @param Callback Callback providing a status code and an optional `FModioModCollectionInfoList` object with the
+	 * mod collection's extended information.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 */
+	MODIO_API void ListUserFollowedModCollectionsAsync(const FModioFilterParams& Filter,
+	                                                   FOnListFollowedModCollectionsDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Downloads the logo for the specified mod collection. Will use existing file if it is already present on
+	 * disk.
+	 * @param ModCollectionId Mod Collection ID for use in logo retrieval.
+	 * @param LogoSize Parameter indicating the size of logo that's required.
+	 * @param Callback Callback providing a status code and an optional path object pointing to the location of the
+	 * downloaded image
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection media does not exist or was deleted
+	 */
+	MODIO_API void GetModCollectionMediaAsync(FModioModCollectionID ModCollectionId, EModioLogoSize LogoSize,
+	                                          FOnGetModCollectionMediaDelegateFast Callback);
+
 private:
+	TMap<TTuple<FModioModCollectionID, EModioLogoSize>, FOnGetMediaMulticastDelegateFast>
+	PendingModCollectionMediaLogoRequests;
+
+public:
+	/**
+	 * @docpublic
+	 * @brief Downloads the creator avatar for a specified mod collection. Will use existing file if it is already
+	 * present on disk and not outdated.
+	 * @param ModCollectionId Mod Collection ID for use in creator avatar retrieval.
+	 * @param AvatarSize Parameter indicating the size of avatar image that's required.
+	 * @param Callback Callback providing a status code and an optional path object pointing to the location of the
+	 * downloaded image
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection media does not exist or was deleted
+	 */
+	MODIO_API void GetModCollectionMediaAsync(FModioModCollectionID ModCollectionId, EModioAvatarSize AvatarSize,
+	                                          FOnGetModCollectionMediaDelegateFast Callback);
+
+private:
+	TMap<TTuple<FModioModCollectionID, EModioAvatarSize>, FOnGetMediaMulticastDelegateFast>
+	PendingModCollectionMediaAvatarRequests;
+
 	TUniquePtr<struct FModioImageCache> ImageCache;
 
 	void InvalidateUserSubscriptionCache();
 
-private:
 	/** Maps two letter ISO 639-1 language codes to EModioLanguage values */
 	TMap<FString, EModioLanguage> LanguageMap;
 
@@ -1220,7 +1435,7 @@ private:
 	TOptional<FModioUser> CachedUserProfile;
 
 public:
-#pragma region Blueprint methods
+	#pragma region Blueprint methods
 
 	/**
 	 * @docpublic
@@ -1237,7 +1452,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "InitializeAsync", Category = "mod.io")
 	MODIO_API void K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions,
-									  FOnErrorOnlyDelegate OnInitComplete);
+	                                  FOnErrorOnlyDelegate OnInitComplete);
 
 	/**
 	 * @docpublic
@@ -1257,7 +1472,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubscribeToModAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_SubscribeToModAsync(FModioModID ModToSubscribeTo, bool IncludeDependencies,
-										  FOnErrorOnlyDelegate OnSubscribeComplete);
+	                                      FOnErrorOnlyDelegate OnSubscribeComplete);
 
 	/**
 	 * @docpublic
@@ -1287,7 +1502,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "UnsubscribeFromModAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_UnsubscribeFromModAsync(FModioModID ModToUnsubscribeFrom,
-											  FOnErrorOnlyDelegate OnUnsubscribeComplete);
+	                                          FOnErrorOnlyDelegate OnUnsubscribeComplete);
 
 	/**
 	 * @docpublic
@@ -1459,7 +1674,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Gallery Image)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaGalleryImageAsync(FModioModID ModId, EModioGallerySize GallerySize, int32 Index,
-												   FOnGetMediaDelegate Callback);
+	                                               FOnGetMediaDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1479,7 +1694,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModMediaAsync (Avatar)", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModMediaAvatarAsync(FModioModID ModId, EModioAvatarSize AvatarSize,
-											 FOnGetMediaDelegate Callback);
+	                                         FOnGetMediaDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1512,7 +1727,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetModDependenciesAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_GetModDependenciesAsync(FModioModID ModID, bool Recursive,
-											  FOnGetModDependenciesDelegate Callback);
+	                                          FOnGetModDependenciesDelegate Callback);
 
 	/**
 	 * @brief Adds dependencies to a specified mod, linking it with other mods that are required for it to function
@@ -1531,7 +1746,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "AddModDependenciesAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AddModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-											  FOnErrorOnlyDelegate Callback);
+	                                          FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @brief Deletes dependencies from a specified mod, unlinking it from other mods that are no longer required.
@@ -1550,7 +1765,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "DeleteModDependenciesAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_DeleteModDependenciesAsync(FModioModID ModID, const TArray<FModioModID>& Dependencies,
-												 FOnErrorOnlyDelegate Callback);
+	                                             FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1587,7 +1802,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "AuthenticateUserEmailAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AuthenticateUserEmailAsync(const FModioEmailAuthCode& AuthenticationCode,
-												 FOnErrorOnlyDelegate Callback);
+	                                             FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1609,8 +1824,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "AuthenticateUserExternalAsync", Category = "mod.io|Authentication")
 	MODIO_API void K2_AuthenticateUserExternalAsync(const FModioAuthenticationParams& User,
-													EModioAuthenticationProvider Provider,
-													FOnErrorOnlyDelegate Callback);
+	                                                EModioAuthenticationProvider Provider,
+	                                                FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1741,7 +1956,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitNewModAsync", Category = "mod.io|Mods|Submission")
 	MODIO_API void K2_SubmitNewModAsync(FModioModCreationHandle Handle, FModioCreateModParams Params,
-										FOnSubmitNewModDelegate Callback);
+	                                    FOnSubmitNewModDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1799,7 +2014,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModChangesAsync", Category = "mod.io|Mods|Editing")
 	MODIO_API void K2_SubmitModChangesAsync(FModioModID Mod, FModioEditModParams Params,
-											FOnGetModInfoDelegate Callback);
+	                                        FOnGetModInfoDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1895,7 +2110,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "ListUserCreatedModsAsync", Category = "mod.io|Mods")
 	MODIO_API void K2_ListUserCreatedModsAsync(const FModioFilterParams& Filter,
-											   FOnListUserCreatedModsDelegate Callback);
+	                                           FOnListUserCreatedModsDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -1989,7 +2204,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "PurchaseModAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_PurchaseModAsync(FModioModID ModID, FModioUnsigned64 ExpectedPrice,
-									   FOnPurchaseModDelegate Callback);
+	                                   FOnPurchaseModDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -2039,7 +2254,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "RefreshUserEntitlementsAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_RefreshUserEntitlementsAsync(const FModioEntitlementParams& Params,
-												   FOnRefreshUserEntitlementsDelegate Callback);
+	                                               FOnRefreshUserEntitlementsDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -2089,9 +2304,9 @@ public:
 	 * @olden Metrics
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "MetricsSessionSendHeartbeatAtIntervalAsync",
-			  Category = "mod.io|Metrics")
+		Category = "mod.io|Metrics")
 	MODIO_API void K2_MetricsSessionSendHeartbeatAtIntervalAsync(FModioUnsigned64 IntervalSeconds,
-																 FOnErrorOnlyDelegate Callback);
+	                                                             FOnErrorOnlyDelegate Callback);
 
 	/**
 	 * @docpublic
@@ -2111,6 +2326,198 @@ public:
 
 	/**
 	 * @docpublic
+	 * @brief Provides a list of mod collections for the current game, that match the parameters specified in the
+	 * filter.
+	 * @param Filter [`ModioFilterParams`](#modiofilterparams) object containing any filters that should be applied to
+	 * the query.
+	 * @param Callback Callback invoked with a status code and an optional `FModioModCollectionInfoList` providing mod
+	 * collection profiles.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory `NetworkError`|Couldn't connect to mod.io servers
+	 * @errorcategory `SDKNotInitialized`|SDK not initialized
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "ListModCollectionsAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_ListModCollectionsAsync(const FModioFilterParams& Filter,
+	                                          FOnListModCollectionsDelegate Callback);
+
+	/**
+	 * @docpublic
+     * @brief Fetches detailed information about the specified mod collection, including description and file metadata
+     * for the most recent release.
+     * @param ModCollectionId Mod Collection ID of the mod collection to fetch data.
+	 * @param Callback Callback providing a status code and an optional `FModioModCollectionInfo` object with the mod
+	 * collection's extended information.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetModCollectionInfoAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_GetModCollectionInfoAsync(FModioModCollectionID ModCollectionId,
+	                                            FOnGetModCollectionInfoDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Get a list of Mods contained within the specified mod collection.
+	 * @param ModCollectionId Mod Collection ID of the mod collection to fetch data.
+	 * @param Callback Callback providing a status code and an optional `FModioModCollectionInfoList` object with the
+	 * mod collection's extended information.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetModCollectionModsAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_GetModCollectionModsAsync(FModioModCollectionID ModCollectionId,
+	                                            FOnGetModCollectionModsDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Submits a rating for a mod collection on behalf of the current user. Submit a neutral rating to effectively
+	 * clear a rating already submitted by a user. Submitting other values will overwrite any existing rating submitted
+	 * by this user.
+	 * @note To clear a rating for a mod collection, submit a rating of Rating::Neutral.
+	 * @param ModCollectionId The mod collection the user is rating
+	 * @param Rating The rating the user wishes to submit
+	 * @param Callback Callback providing a status code indicating success or failure of the rating submission
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubmitModCollectionRatingAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_SubmitModCollectionRatingAsync(FModioModCollectionID ModCollectionId, EModioRating Rating,
+	                                                 FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to add the specified mod collection to the user's list of
+	 * subscriptions.
+	 * @note Unlike SubscribeToModAsync, SubscribeToModeCollectionAsync does not automatically trigger installation of
+	 * new subscriptions arising from a successful request. Call FetchExternalUpdatesAsync after this function succeeds
+	 * in order to initiate installation.
+	 * @param ModCollectionToSubscribeTo Mod Collection ID of the mod collection requiring a subscription.
+	 * @param Callback Callback providing a status code to indicate if the subscription was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @requires mod-not-pending-uninstall
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "SubscribeToModCollectionAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_SubscribeToModCollectionAsync(FModioModCollectionID ModCollectionToSubscribeTo,
+	                                                FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to remove the specified mod collection to the user's list of
+	 * subscriptions.
+	 * @note If no other local users are subscribed to the mods in the specified collection, this function will also
+	 * mark the mods in the collection for uninstallation by the SDK.
+	 * @param ModCollectionToUnsubscribeFrom Mod Collection ID of the mod collection requiring unsubscription.
+	 * @param Callback Callback providing a status code to indicate if the unsubscription was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "UnsubscribeFromModCollectionAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_UnsubscribeFromModCollectionAsync(FModioModCollectionID ModCollectionToUnsubscribeFrom,
+	                                                    FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to add the specified mod collection to the user's list of followed
+	 * collections.
+	 * @param ModCollectionToFollow Mod Collection ID of the mod collection requiring a subscription.
+	 * @param Callback Callback invoked when the follow request is completed.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @requires mod-not-pending-uninstall
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "FollowModCollectionAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_FollowModCollectionAsync(FModioModCollectionID ModCollectionToFollow,
+	                                           FOnFollowModCollectionDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Sends a request to the mod.io server to remove the specified mod collection to the user's list of
+	 * followed collections.
+	 * @param ModCollectionToUnfollow Mod Collection ID of the mod collection to unfollow.
+	 * @param Callback Callback invoked when the unfollow request is completed.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires authenticated-user
+	 * @requires management-enabled
+	 * @requires mod-not-pending-uninstall
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "UnfollowModCollectionAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_UnfollowModCollectionAsync(FModioModCollectionID ModCollectionToUnfollow,
+	                                             FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Provides a list of followed mod collections for the current game, that match the parameters specified in
+	 * the filter.
+	 * @param Filter `FModioFilterParams` object containing any filters that should be applied to the query.
+	 * @param Callback Callback providing a status code and an optional `FModioModCollectionInfoList` object with the
+	 * mod collection's extended information.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "ListUserFollowedModCollectionsAsync", Category = "mod.io|Collections")
+	MODIO_API void K2_ListUserFollowedModCollectionsAsync(const FModioFilterParams& Filter,
+	                                                      FOnListFollowedModCollectionsDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Downloads the logo for the specified mod collection. Will use existing file if it is already present on
+	 * disk.
+	 * @param ModCollectionId Mod Collection ID for use in logo retrieval.
+	 * @param LogoSize Parameter indicating the size of logo that's required.
+	 * @param Callback Callback providing a status code and an optional path object pointing to the location of the
+	 * downloaded image
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection media does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetModCollectionMediaAsync (Logo)", Category = "mod.io|Collections")
+	MODIO_API void K2_GetModCollectionLogoAsync(FModioModCollectionID ModCollectionId, EModioLogoSize LogoSize,
+	                                            FOnGetModCollectionMediaDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Downloads the creator avatar for a specified mod collection. Will use existing file if it is already
+	 * present on disk and not outdated.
+	 * @param ModCollectionId Mod Collection ID for use in creator avatar retrieval.
+	 * @param AvatarSize Parameter indicating the size of avatar image that's required.
+	 * @param Callback Callback providing a status code and an optional path object pointing to the location of the
+	 * downloaded image
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @errorcategory EntityNotFoundError|Specified mod collection media does not exist or was deleted
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetModCollectionMediaAsync (Avatar)", Category = "mod.io|Collections")
+	MODIO_API void K2_GetModCollectionAvatarAsync(FModioModCollectionID ModCollectionId, EModioAvatarSize AvatarSize,
+	                                              FOnGetModCollectionMediaDelegate Callback);
+
+	/**
+	 * @docpublic
 	 * @brief Fetches storage related information, including total availability and how much is being consumed by mod
 	 * installations.
 	 * @return An `FModioStorageInfo` structure containing storage information
@@ -2118,7 +2525,7 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "QueryStorageInfo", Category = "mod.io|Storage Info")
 	MODIO_API FModioStorageInfo K2_QueryStorageInfo();
 
-#pragma endregion
+	#pragma endregion
 
 	/*
 	 * @brief Converts a two letter ISO 639-1 language code to the corresponding EModioLanguage value.  Defaults to

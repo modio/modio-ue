@@ -1,0 +1,69 @@
+---
+id: ue-temporary-mods
+title: Temporary Mod Sets
+slug: /unreal/temporary-mods
+---
+
+# Temporary Mods for Unreal
+
+There are situations where you may want UGC to exist on a temporary basis. For instance, in [Multiplayer](https://docs.mod.io/multiplayer/) environments you may want users to see another player's UGC even if they don't own it.
+
+[Temporary Mod Sets](https://docs.mod.io/multiplayer/temporary-mods) allow management of these more transient pieces of content separately from subscriptions. Temporary Mod Sets do not require authentication to be used, however Mod Management must still be enabled to use temporary mods.
+
+This guide covers:
+
+* [How it works](#how-it-works)
+* [Installation](#installation)
+
+## How it works
+
+Temporary mods are downloaded in a folder separately from subscriptions, and are not updated or handled when you call `FetchExternalUpdatesAsync`. That means you can prioritize the download and installation of temporary mods outside of the regular subscription flow.
+
+To use Temporary Mod Sets, you can start a TempModSet by calling `InitTempModSet` and passing a list of Mod IDs to be downloaded and extracted. At anytime while a TempModSet is open, you can call [`AddToTempModSet`](/unreal/refdocs/#addtotempmodset) to add mods to the set (which will be instantly downloaded and extracted). 
+
+If you no longer need a mod, you can call [`RemoveFromTempModSet`](/unreal/refdocs/#removefromtempmodset) which will remove the file. 
+
+Once you have finished with a TempModSet, you can call [`CloseTempModSet`](/unreal/refdocs/#closetempmodset) which will delete all temporary mods. Temporary mods are also deleted the next time you re-initialize the SDK.
+
+Like regular UGC, Temp Mods can be queried using [`QueryTempModSet`](/unreal/refdocs/#querytempmodset) to get a ModCollectionEntry with an installation path.
+
+## Installation
+
+<Tabs group-id="languages">
+  <TabItem value="blueprint" label="Blueprint">
+
+![temp_mod_init](img/temp_mod_init.png)
+
+  </TabItem>
+  <TabItem value="c++" label="C++" default>
+ ```cpp
+Modio::EnableModManagement([](Modio::ModManagementEvent ModEvent)
+{
+    if (ModEvent.Status && ModEvent.Event == Modio::ModManagementEvent::EventType::Installed)
+    {
+        std::cout << "Mod with ID: " << ModEvent.ID << " is installed" << std::endl;
+    }
+    else 
+    {
+        std::cout << "Mod with ID: " << ModEvent.ID << " failed to install: " << ModEvent.Status.message() << std::endl;
+    }
+});
+
+std::vector<Modio::ModID> ModIds = {8, 4, 5};
+
+Modio::InitTempModSet(ModIds);
+
+while(Modio::IsModManagementBusy())
+{
+    Modio::RunPendingHandlers();
+}
+```
+
+</TabItem>
+</Tabs>
+
+This call will start a `TempModSet` and install mods with IDs 8, 4 and 5.
+
+:::note 
+If you add UGC to `TempModSet` that is already subscribed, it will not be downloaded; the player will already have that content. If you try to unsubscribe from it while it's in `TempModSet`, the plugin will wait for it to be removed from `TempModSet` before processing the unsubscribe.
+:::

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -25,6 +25,7 @@ UCLASS()
 class MODIO_API UModioCommonTypesLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
+
 public:
 	/**
 	 * @docpublic
@@ -42,8 +43,8 @@ public:
 	 * @return Empty if invalid
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToString (ModioGameId)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities|String")
+		meta = (DisplayName = "ToString (ModioGameId)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities|String")
 	static FString Conv_GameIDToString(FModioGameID GameId);
 
 	/**
@@ -57,7 +58,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
 	static FModioAuthenticationParams MakeAuthParams(const FString AuthToken, const FString EmailAddress,
-													 const bool bHasAcceptedTOS);
+	                                                 const bool bHasAcceptedTOS);
 
 	/**
 	 * @docpublic
@@ -75,8 +76,8 @@ public:
 	 * @return Empty if invalid
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToString (ModioApiKey)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities|String")
+		meta = (DisplayName = "ToString (ModioApiKey)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities|String")
 	static FString Conv_ApiKeyToString(FModioApiKey ApiKey);
 
 	/**
@@ -86,7 +87,7 @@ public:
 	 * @return Empty if invalid
 	 */
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToString (ModioModID)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities|String")
+		Category = "mod.io|Utilities|String")
 	static FString Conv_ModIDToString(FModioModID ModID);
 
 	/**
@@ -96,8 +97,8 @@ public:
 	 * @return Empty if invalid
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToString (FileMetadataID)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities|String")
+		meta = (DisplayName = "ToString (FileMetadataID)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities|String")
 	static FString Conv_FileMetadataIDToString(FModioFileMetadataID FileMetadataID);
 
 	/**
@@ -107,8 +108,8 @@ public:
 	 * @return Empty if invalid
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToString (ModioUserID)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities|String")
+		meta = (DisplayName = "ToString (ModioUserID)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities|String")
 	static FString Conv_UserIDToString(FModioUserID UserID);
 
 	/**
@@ -118,8 +119,8 @@ public:
 	 * @return Empty if invalid
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToString (ModioEmailAddress)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities|String")
+		meta = (DisplayName = "ToString (ModioEmailAddress)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities|String")
 	static FString Conv_EmailAddressToString(FModioEmailAddress EmailAddress);
 
 	/**
@@ -129,8 +130,8 @@ public:
 	 * @return Empty if invalid
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToString (ModioEmailAuthCode)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities|String")
+		meta = (DisplayName = "ToString (ModioEmailAuthCode)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities|String")
 	static FString Conv_EmailAuthCodeToString(FModioEmailAuthCode EmailAuthCode);
 
 	/**
@@ -140,8 +141,8 @@ public:
 	 * @return FModioEmailAddress object
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToEmailAddress (String)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities")
+		meta = (DisplayName = "ToEmailAddress (String)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities")
 	static FModioEmailAddress Conv_StringToEmailAddress(const FString& Email);
 
 	/**
@@ -151,8 +152,8 @@ public:
 	 * @return Auth code for submission
 	 */
 	UFUNCTION(BlueprintPure,
-			  meta = (DisplayName = "ToEmailAuthCode (String)", CompactNodeTitle = "->", BlueprintAutocast),
-			  Category = "mod.io|Utilities")
+		meta = (DisplayName = "ToEmailAuthCode (String)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities")
 	static FModioEmailAuthCode Conv_StringToEmailAuthCode(const FString& AuthCode);
 
 	/**
@@ -171,7 +172,8 @@ public:
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
 	static FModioInitializeOptions MakeInitializeOptions(int64 GameId, const FString& APIKey,
 	                                                     EModioEnvironment GameEnvironment,
-	                                                     EModioPortal PortalInUse = EModioPortal::None, bool bUseBackgroundThread = true);
+	                                                     EModioPortal PortalInUse = EModioPortal::None,
+	                                                     bool bUseBackgroundThread = true);
 
 	/**
 	 * @docpublic
@@ -203,7 +205,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
 	static FModioInitializeOptions SetGameEnvironment(const FModioInitializeOptions& Options,
-													  EModioEnvironment GameEnvironment);
+	                                                  EModioEnvironment GameEnvironment);
 
 	/**
 	 * @docpublic
@@ -224,7 +226,8 @@ public:
 	 * desired value
 	 */
 	UFUNCTION(BlueprintPure, category = "mod.io|Utilities")
-	static FModioInitializeOptions SetBackgroundThread(const FModioInitializeOptions& Options, bool bUseBackgroundThread);
+	static FModioInitializeOptions SetBackgroundThread(const FModioInitializeOptions& Options,
+	                                                   bool bUseBackgroundThread);
 
 	/**
 	 * @docpublic
@@ -236,7 +239,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
 	static FModioInitializeOptions SetSessionIdentifier(const FModioInitializeOptions& Options,
-														const FString& SessionIdentifier);
+	                                                    const FString& SessionIdentifier);
 
 	/**
 	 * @docpublic
@@ -260,21 +263,40 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities")
 	static int64 GetRawValueFromModID(const FModioModID& In);
-	
+
+	/**
+	 * @docpublic
+	 * @brief Retrieves the raw underlying value from an `ModioModCollectionID`. `ModioModCollectionID`s are intended as opaque types, so
+	 * use with care.
+	 * @param In The `ModioModCollectionID` to retrieve the value for
+	 * @return The underlying value
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities")
+	static int64 GetRawValueFromModCollectionID(const FModioModCollectionID& In);
+
 	/**
 	 * @docpublic
 	 * @brief Compares two mod IDs to check whether they're equal
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
-			  meta = (CompactNodeTitle = "==", Keywords = "== equal", DisplayName = "ModioModID == ModioModID"))
+		meta = (CompactNodeTitle = "==", Keywords = "== equal", DisplayName = "ModioModID == ModioModID"))
 	static bool EqualTo(const FModioModID& A, const FModioModID& B);
+
+	/**
+	 * @docpublic
+	 * @brief Compares two mod Collection IDs to check whether they're equal
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
+		meta = (CompactNodeTitle = "==", Keywords = "== equal", DisplayName =
+			"ModioModCollectionID == ModioModCollectionID"))
+	static bool EqualToModCollectionID(const FModioModCollectionID& A, const FModioModCollectionID& B);
 
 	/**
 	 * @docpublic
 	 * @brief Compares two mod IDs to check whether they're not equal
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "mod.io|Utilities",
-			  meta = (CompactNodeTitle = "!=", Keywords = "!= not equal", DisplayName = "ModioModID != ModioModID"))
+		meta = (CompactNodeTitle = "!=", Keywords = "!= not equal", DisplayName = "ModioModID != ModioModID"))
 	static bool NotEqualTo(const FModioModID& A, const FModioModID& B);
 
 	/**

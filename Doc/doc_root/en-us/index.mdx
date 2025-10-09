@@ -1,46 +1,80 @@
 ---
-id: ue-index
-title: Overview
-slug: /unreal/
+id: ue-overview
+title: Unreal Engine Plugin
+slug: /unreal
 custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/index.mdx
 ---
 
-The mod.io Unreal Engine suite of plugins enables game developers to easily integrate mods into their Unreal Engine 5 games. 
-There are four primary products that comprise mod.io's Unreal Engine support, offering targeted, simplified solutions for common modding requirements. Select a product below to learn more about it, or dive straight into the repository.
+Our Unreal Engine Plugin suite offers a variety of ways to integrate UGC into Unreal Engine 5 games. The plugin offers targeted, simplified solutions for common modding requirements.
 
-<div className="card-grid">
+<div className="simplecard-grid">
 
-  <Card
+  <SimpleCard
     shadow="tl"
     title="Core Plugin"
-    image="/img/icon_modio.svg"
-    text="Facilitates core mod.io service functionality, such as authentication, searching & filtering, and subscription management."
-    moreLink="/unreal/core-plugin/"
-    githubLink="https://github.com/modio/modio-ue"
+    image="/img/icon_ue.svg"
+    text="Facilitates core mod.io service functionality, such as authentication, filtering and subscription management."
+    moreLink="/unreal/installation"
   />
-    <Card
+    <SimpleCard
     shadow="tl"
     title="ModioUGC"
-    image="/img/icon_ue.svg"
-    text="An opinionated modding framework for Unreal Engine that supports cooking mods, loading PAK files, and content loading."
-    moreLink="/unreal/modio-ugc/overview/"
-    githubLink="https://github.com/modio/modio-ue-modiougc"
-  />
-  <Card
-    shadow="tl"
-    title="Component UI"
     image="/img/icon_cui.svg"
-    text="A set of interfaces and UI components that assist in integrating mod.io functionality into your own games user interface."
-    moreLink="/unreal/component-ui/overview/"
-    githubLink="https://github.com/modio/modio-ue-component-ui"
+    text="An opinionated modding framework that supports cooking UGC, loading PAK files, and content loading."
+    moreLink="/unreal/modio-ugc"
   />
-  <Card
+  <SimpleCard
     shadow="tl"
-    title="Template UI"
+    title="Features"
     image="/img/icon_tui.svg"
-    text="A generic standalone user interface that is built using Component UI and supports core mod.io functionality."
-    moreLink="/unreal/template-ui/ui-overview/"
-    githubLink="https://github.com/modio/modio-ue-component-ui"
+    text="Explore a variety of customizable offerings that work alongside the UE Plugin to enhance UGC in your game."
+    moreLink="/features"
   />
+    <SimpleCard
+    shadow="tl"
+    title="Legacy"
+    image="/img/icon_modio.svg"
+    text="For games operating on Unreal Engine 4, our Legacy Plugin supports core mod.io functionality for UGC."
+    moreLink="/unreal/ue4-quicklook"
+  />
+  </div>
 
-</div>
+You can download the [Unreal Engine Plugin from GitHub](https://github.com/modio/modio-ue). Once you have, follow the [Unreal Engine Getting Started Guides](/unreal/#unreal-engine-core-plugin-guides) below to set up your game or application to use the plugin. 
+
+### Engine compatibility
+
+The mod.io plugin is generally maintained to support the 3 most recent versions of Unreal Engine, in line with the engine support policy of Epic. If you are using an older version of the engine, you can access the last supported release of the engine from our [releases page](https://github.com/modio/modio-ue/releases) on GitHub.
+
+|Engine Version | Last Release |
+|---|---|
+|UE4.26 | 2023.11 |
+|UE4.27 | 2023.11 |
+|UE5.0 | 2023.11 |
+|UE5.1 | 2024.6 |
+|UE5.2 | 2025.2 |
+|UE5.3 | Current |
+|UE5.4 | Current |
+|UE5.5 | Current |
+
+## Unreal Engine Core Plugin Guides
+
+Below are a series of guides with code samples demonstrating the Unreal Engine Plugin's core functionality.
+
+### Getting started
+
+* [Installation](/unreal/installation/)
+* [Initialization](/unreal/initialization/)
+* [Structure & Error Handling](/unreal/plugin-structure/)
+* [User Authentication](/unreal/user-authentication/)
+* [Searching for UGC](/unreal/searching-ugc/)
+* [Subscribing to UGC](/unreal/subscribing/)
+* [Adding UGC](/unreal/adding-ugc/)
+* [UGC Best Practices](/unreal/ugc-best-practices)
+
+## Feature Guides
+
+The Unreal Plugin is compatitable with a variety of mod.io's features. These are additions to the core plugin that are designed to streamline and elevate your game's UGC. Check out the specific [Feature Guides for Unreal Engine](/unreal/feature-guides) 
+
+## Sample Project
+
+mod.io also provides a sample project, featuring a full integration of the Core Plugin, ModioUGC and our UI products including a custom UI build with ComponentUI and Template UI. This sample is based off Epic's Action RPG sample, and demonstrates best practice UGC loading functionality. You can find out more about the ActionRPG sample [here](/unreal/modio-action-rpg).

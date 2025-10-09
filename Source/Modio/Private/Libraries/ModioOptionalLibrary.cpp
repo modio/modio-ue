@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -187,4 +187,29 @@ bool UModioOptionalLibrary::IsSet_ModioOptionalModChangeMap(const struct FModioO
 bool UModioOptionalLibrary::GetValue_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap, struct FModioModChangeMap& ModChangeMap)
 {
 	return GetValueInternal(OptionalModChangeMap, ModChangeMap);
+}
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalModCollectionInfo(
+	const FModioOptionalModCollectionInfo& OptionalModCollectionInfo)
+{
+	return IsSetInternal(OptionalModCollectionInfo);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalModCollectionInfo(
+	const FModioOptionalModCollectionInfo& OptionalModCollectionInfo, FModioModCollectionInfo& ModCollectionInfo)
+{
+	return GetValueInternal(OptionalModCollectionInfo, ModCollectionInfo);
+}
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalModCollectionInfoList(
+	const FModioOptionalModCollectionInfoList& OptionalModCollectionInfoList)
+{
+	return IsSetInternal(OptionalModCollectionInfoList);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalModCollectionInfoList(
+	const FModioOptionalModCollectionInfoList& OptionalModCollectionInfoList,
+	FModioModCollectionInfoList& ModCollectionInfoList)
+{
+	return GetValueInternal(OptionalModCollectionInfoList, ModCollectionInfoList);
 }

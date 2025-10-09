@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -24,9 +24,9 @@ FString UModioCommonTypesLibrary::Conv_GameIDToString(FModioGameID GameId)
 }
 
 FModioAuthenticationParams UModioCommonTypesLibrary::MakeAuthParams(const FString AuthToken, const FString EmailAddress,
-																	const bool bHasAcceptedTOS)
+                                                                    const bool bHasAcceptedTOS)
 {
-	return FModioAuthenticationParams {AuthToken, EmailAddress, bHasAcceptedTOS};
+	return FModioAuthenticationParams{AuthToken, EmailAddress, bHasAcceptedTOS};
 }
 
 FModioApiKey UModioCommonTypesLibrary::MakeApiKey(const FString ApiKey)
@@ -75,8 +75,9 @@ FString UModioCommonTypesLibrary::Conv_UserIDToString(FModioUserID UserID)
 }
 
 FModioInitializeOptions UModioCommonTypesLibrary::MakeInitializeOptions(int64 GameId, const FString& APIKey,
-																		EModioEnvironment GameEnvironment,
-																		EModioPortal PortalInUse, bool bUseBackgroundThread)
+                                                                        EModioEnvironment GameEnvironment,
+                                                                        EModioPortal PortalInUse,
+                                                                        bool bUseBackgroundThread)
 {
 	FModioInitializeOptions Options;
 	Options.GameId = FModioGameID(GameId);
@@ -89,38 +90,39 @@ FModioInitializeOptions UModioCommonTypesLibrary::MakeInitializeOptions(int64 Ga
 
 FModioInitializeOptions UModioCommonTypesLibrary::SetGameId(const FModioInitializeOptions& Options, int64 GameId)
 {
-	FModioInitializeOptions DuplicateOptions {Options};
+	FModioInitializeOptions DuplicateOptions{Options};
 	DuplicateOptions.GameId = FModioGameID(GameId);
 	return DuplicateOptions;
 }
 
 FModioInitializeOptions UModioCommonTypesLibrary::SetAPIKey(const FModioInitializeOptions& Options,
-															const FString& APIKey)
+                                                            const FString& APIKey)
 {
-	FModioInitializeOptions DuplicateOptions {Options};
+	FModioInitializeOptions DuplicateOptions{Options};
 	DuplicateOptions.ApiKey = FModioApiKey(APIKey);
 	return DuplicateOptions;
 }
 
 FModioInitializeOptions UModioCommonTypesLibrary::SetGameEnvironment(const FModioInitializeOptions& Options,
-																	 EModioEnvironment GameEnvironment)
+                                                                     EModioEnvironment GameEnvironment)
 {
-	FModioInitializeOptions DuplicateOptions {Options};
+	FModioInitializeOptions DuplicateOptions{Options};
 	DuplicateOptions.GameEnvironment = GameEnvironment;
 	return DuplicateOptions;
 }
 
 FModioInitializeOptions UModioCommonTypesLibrary::SetPortal(const FModioInitializeOptions& Options,
-															EModioPortal PortalToUse)
+                                                            EModioPortal PortalToUse)
 {
-	FModioInitializeOptions DuplicateOptions {Options};
+	FModioInitializeOptions DuplicateOptions{Options};
 	DuplicateOptions.PortalInUse = PortalToUse;
 	return DuplicateOptions;
 }
 
-FModioInitializeOptions UModioCommonTypesLibrary::SetBackgroundThread(const FModioInitializeOptions& Options, bool bUseBackgroundThread)
+FModioInitializeOptions UModioCommonTypesLibrary::SetBackgroundThread(const FModioInitializeOptions& Options,
+                                                                      bool bUseBackgroundThread)
 {
-	FModioInitializeOptions DuplicateOptions {Options};
+	FModioInitializeOptions DuplicateOptions{Options};
 	DuplicateOptions.bUseBackgroundThread = bUseBackgroundThread;
 	return DuplicateOptions;
 }
@@ -128,7 +130,7 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetBackgroundThread(const FMod
 FModioInitializeOptions UModioCommonTypesLibrary::SetSessionIdentifier(const FModioInitializeOptions& Options,
                                                                        const FString& SessionIdentifier)
 {
-	FModioInitializeOptions DuplicateOptions {Options};
+	FModioInitializeOptions DuplicateOptions{Options};
 	DuplicateOptions.LocalSessionIdentifier = SessionIdentifier;
 	return DuplicateOptions;
 }
@@ -136,7 +138,7 @@ FModioInitializeOptions UModioCommonTypesLibrary::SetSessionIdentifier(const FMo
 FModioInitializeOptions UModioCommonTypesLibrary::SetExtendedInitializationParameters(
 	const FModioInitializeOptions& Options, const TMap<FString, FString>& ExtendedParameters)
 {
-	FModioInitializeOptions DuplicateOptions {Options};
+	FModioInitializeOptions DuplicateOptions{Options};
 	DuplicateOptions.ExtendedInitializationParameters = ExtendedParameters;
 	return DuplicateOptions;
 }
@@ -146,7 +148,17 @@ int64 UModioCommonTypesLibrary::GetRawValueFromModID(const FModioModID& In)
 	return GetUnderlyingValue(In);
 }
 
+int64 UModioCommonTypesLibrary::GetRawValueFromModCollectionID(const FModioModCollectionID& In)
+{
+	return GetUnderlyingValue(In);
+}
+
 bool UModioCommonTypesLibrary::EqualTo(const FModioModID& A, const FModioModID& B)
+{
+	return A == B;
+}
+
+bool UModioCommonTypesLibrary::EqualToModCollectionID(const FModioModCollectionID& A, const FModioModCollectionID& B)
 {
 	return A == B;
 }
@@ -168,9 +180,9 @@ FModioMetricsSessionParams UModioCommonTypesLibrary::MakeMetricsSessionParams(co
 }
 
 FModioMetricsSessionParams UModioCommonTypesLibrary::SetSessionId(const FModioMetricsSessionParams& Params,
-																  const FModioGuid& Id)
+                                                                  const FModioGuid& Id)
 {
-	FModioMetricsSessionParams DuplicateOptions {Params};
+	FModioMetricsSessionParams DuplicateOptions{Params};
 	DuplicateOptions.SessionId = FModioGuid(Id);
 	return DuplicateOptions;
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -19,6 +19,7 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioEntitlementConsumptionStatusList.h"
 #include "Types/ModioGameInfoList.h"
+#include "Types/ModioModCollection.h"
 #include "Types/ModioModCollectionEntry.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModProgressInfo.h"
@@ -41,6 +42,9 @@ FText ToUnrealText(const std::string& String);
 FString ToUnrealString(EModioLanguage Language);
 
 struct FModioModID ToUnreal(Modio::ModID Value);
+struct FModioModCollectionID ToUnreal(Modio::ModCollectionID Value);
+struct FModioModCollectionStats ToUnreal(const Modio::ModCollectionStats& Value);
+struct FModioModCollectionInfo ToUnreal(const Modio::ModCollectionInfo& Value);
 struct FModioFileMetadataID ToUnreal(Modio::FileMetadataID Value);
 struct FModioModTagInfo ToUnreal(const Modio::ModTagInfo& In);
 struct FModioMetadata ToUnreal(const Modio::Metadata& In);
@@ -70,6 +74,7 @@ EModioEntitlementType ToUnreal(const Modio::EntitlementType& In);
 FModioGameInfoList ToUnreal(const Modio::GameInfoList& In);
 FModioUser ToUnreal(const Modio::User& In);
 FModioModInfoList ToUnreal(const Modio::ModInfoList& In);
+FModioModCollectionInfoList ToUnreal(const Modio::ModCollectionInfoList& In);
 FModioModTagOptions ToUnreal(const Modio::ModTagOptions& In);
 FModioLink ToUnreal(const Modio::Terms::Link& In);
 FModioTerms ToUnreal(const Modio::Terms& In);
@@ -89,6 +94,7 @@ Modio::ApiKey ToModio(const FModioApiKey& In);
 Modio::EmailAddress ToModio(const FModioEmailAddress& In);
 Modio::EmailAuthCode ToModio(const FModioEmailAuthCode& In);
 Modio::ModID ToModio(const FModioModID& In);
+Modio::ModCollectionID ToModio(const FModioModCollectionID& In);
 Modio::GameID ToModio(const FModioGameID& In);
 Modio::FileMetadataID ToModio(const FModioFileMetadataID& In);
 Modio::UserID ToModio(const FModioUserID& In);

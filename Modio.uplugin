@@ -54,7 +54,8 @@
 	"LocalizationTargets": [
 		{
 			"Name": "Modio",
-			"LoadingPolicy": "Always"
+			"LoadingPolicy": "Always",
+			"ConfigGenerationPolicy": "Never"
 		}
 	],
 	"Plugins": [

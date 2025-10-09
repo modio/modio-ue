@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -87,6 +87,13 @@ public:
 	 */
 	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta=(DisplayName="Enable Mod Downvoting in UI"))
 	bool bEnableModDownvoteFeature;
+
+	/**
+	 * If enabled, widgets in mod.io UI templates will show mod collection relevant widgets and content.
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
+			  meta = (DisplayName = "Enable Mod Collections in UI"))
+	bool bEnableModCollectionsFeature;
 
 	/**
 	 * If you intend to sell Premium Currency through the relevant platform store, this Map is used to invoke the platform-native storefront on the given platform(s).
