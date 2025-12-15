@@ -2,15 +2,16 @@
 id: ue-marketplace
 title: Marketplace
 slug: /unreal/marketplace
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/feature-guides/ue-marketplace.mdx
 ---
 
 # Marketplace for Unreal
 
-The mod.io Unreal Engine Plugin supports a range of [Monetization](https://docs.mod.io/monetization/) features, allowing you to sell a per-game virtual currency to your players that they can use to purchase UGC, with a share of the revenue split between creators and your studio.
+The mod.io Unreal Engine Plugin supports a range of [Monetization](https://docs.mod.io/monetization) features, allowing you to sell a per-game virtual currency to your players that they can use to purchase UGC, with a share of the revenue split between creators and your studio.
 
 [Marketplace](https://docs.mod.io/monetization/marketplace) is one such feature, exposing the data and functions required to build a UGC store in-game.
 
-Every platform requires specific setup for monetization features to work, particularly with respect to the virtual currency configuration and API calls.  The following documentation is generically applicable within the Unreal Engine Plugin. Platform-specific information is available in the relevant [Platform Guides](https://docs.mod.io/getting-started/#expand-with-cross-platform-functionality).
+Every platform requires specific setup for monetization features to work, particularly with respect to the virtual currency configuration and API calls.  The following documentation is generically applicable within the Unreal Engine Plugin. Platform-specific information is available in the relevant [Platform Guides](https://docs.mod.io/getting-started#expand-with-cross-platform-functionality).
 
 This guide covers:
 
@@ -20,7 +21,7 @@ This guide covers:
 * [Purchasing UGC](#purchasing-ugc)
 * [Showing user purchases](#showing-user-purchases)
 * [Getting a user delegation token](#getting-a-user-delegation-token)
-* [Listing and purchasing premium currency](#listing-and-purchasing-premium-currency)
+* [Listing and purchasing premium currency](#listing-and-purchasing-virtual-currency)
 * [Consuming User Entitlements](#consuming-user-entitlements)
 
 ## Initialization
@@ -182,9 +183,9 @@ void UModioManagerSubsystem::OnGetUserDelegationTokenCallback(FModioErrorCode Er
 </Tabs>
 
 
-## Listing and purchasing premium currency
+## Listing and purchasing virtual currency
 
-The Monetization premium features mod.io includes the ability to show the relevant platform store (where possible), which allows the user to purchase virtual currency, top up their wallet, and purchase Premium UGC all without leaving the game.
+The Monetization features of mod.io includes the ability to show the relevant platform store (where possible). This allows the user to purchase virtual currency, top up their wallet, and purchase Premium UGC all without leaving the game.
 
 While Unreal provides built-in methods for accessing a given platform's storefront, not all platforms are fully supported, and as such the Component UI framework provides an alternative for unsupported platform, with the following logic:
 

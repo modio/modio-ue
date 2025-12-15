@@ -369,6 +369,10 @@ void SModioEditorEditModProfileWidget::UpdateWindowContent()
 				SNew(SButton)
 				.ContentPadding(ParentWindow->BottomButtonPadding)
 				.Text(LOCTEXT("CookSourceFile", "Cook Source File"))
+				.Visibility_Lambda([this]() 
+				{ 
+					return ParentWindow->ModioGameInfo->CloudCookingStatus != EModioGameCloudCookingStatus::Disabled ? EVisibility::Visible : EVisibility::Collapsed; 
+				})
 				.OnClicked_Lambda([this]() 
 				{ 
 					NavigationHandler.ExecuteIfBound(SModioEditorUploadAndManageUGCWidget::EUploadAndManageUIState::EditMod_AddNewSourceModFile );

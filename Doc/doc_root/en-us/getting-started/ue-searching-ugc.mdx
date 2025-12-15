@@ -2,6 +2,7 @@
 id: ue-searching-ugc
 title: Searching for UGC
 slug: /unreal/searching-ugc
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/getting-started/ue-searching-ugc.mdx
 ---
 
 # Searching for UGC
@@ -15,7 +16,7 @@ This guide covers:
 
 ## Browsing UGC
 
-After [initializing the plugin](/unreal/initialization) and [authenticating a user](/unreal/user-authentication), you can query the available mods using [`ListAllModsAsync`](/unreal/refdocs/#listallmodsasync). 
+After [initializing the plugin](/unreal/initialization) and [authenticating a user](/unreal/user-authentication), you can query the available mods using [`ListAllModsAsync`](/unreal/refdocs#listallmodsasync). 
 
 `ListAllModsAsync` supports filtering by name, tag, author, mature content, and more using [`ModioFilterParams`](/unreal/refdocs#modiofilterparams).  You can sort results as specified by `ModioSortFieldType`, and request paginated or indexed results. By default, `ModioFilterParams` asks for the first 100 results (the maximum number returnable in a query) sorted by `ModioModID`.
 
@@ -66,4 +67,4 @@ void UModioManagerSubsystem::OnListAllModsComplete(FModioErrorCode ErrorCode, TO
 
 Now your users can find UGC in your game, it's time to set up the ability to subscribe to and download UGC by implementing the [Subscribing to UGC](/unreal/subscribing) guide.
 
-If you've already done this, we recommend working your way through the [Unreal Getting Started Guides](/unreal/#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](/features/).
+If you've already done this, we recommend working your way through the [Unreal Getting Started Guides](/unreal#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](https://docs.mod.io/features).

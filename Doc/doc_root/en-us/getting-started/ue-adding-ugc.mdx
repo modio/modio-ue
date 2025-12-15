@@ -2,6 +2,7 @@
 id: ue-adding-ugc
 title: Adding UGC
 slug: /unreal/adding-ugc
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/getting-started/ue-adding-ugc.mdx
 ---
 
 # Adding UGC
@@ -24,7 +25,7 @@ These steps are outlined below. UGC can also be edited after submission, which y
 
 ### Submitting new UGC
 
-To submit a piece of UGC, you must first create a mod handle using [`GetModCreationHandle`](/unreal/refdocs/#getmodcreationhandle), and use that handle when calling [`SubmitNewModAsync`](/unreal/refdocs/#submitnewmodasync). Note that newly created UGC will remain hidden until a mod file is added in the next step.
+To submit a piece of UGC, you must first create a mod handle using [`GetModCreationHandle`](/unreal/refdocs#getmodcreationhandle), and use that handle when calling [`SubmitNewModAsync`](/unreal/refdocs#submitnewmodasync). Note that newly created UGC will remain hidden until a mod file is added in the next step.
 <Tabs group-id="languages">
 
   <TabItem value="blueprint" label="Blueprint">
@@ -62,7 +63,7 @@ void UModioManagerSubsystem::OnSubmitNewModComplete(FModioErrorCode ErrorCode, T
 
 ### Submitting the data for the UGC
 
-Once you have successfully submitted a piece of UGC, you can submit a mod file for that UGC using [`SubmitNewModFileForMod`](/unreal/refdocs/#submitnewmodfileformod). When you submit a mod file, you pass a [`ModioCreateModFileParams`](/unreal/refdocs/#modiocreatemodfileparams) containing the directory containing all the files that you want to submit. The plugin will compress this folder into a .zip file and upload it as the active version of the UGC. 
+Once you have successfully submitted a piece of UGC, you can submit a mod file for that UGC using [`SubmitNewModFileForMod`](/unreal/refdocs#submitnewmodfileformod). When you submit a mod file, you pass a [`ModioCreateModFileParams`](/unreal/refdocs#modiocreatemodfileparams) containing the directory containing all the files that you want to submit. The plugin will compress this folder into a .zip file and upload it as the active version of the UGC. 
 
 In the future, if the mod is updated and requires a new mod file, `SubmitNewModFileForMod` can be called again. The most recent mod file uploaded by `SubmitNewModFileForMod` will be set as the active version. 
 

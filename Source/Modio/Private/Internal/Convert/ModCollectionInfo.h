@@ -27,9 +27,9 @@ FORCEINLINE FModioModCollectionInfo ToUnreal(const Modio::ModCollectionInfo& In)
 	Out.Visibility = static_cast<EModioObjectVisibilityFlags>(In.Visibility);
 	Out.ProfileSubmittedBy = ToUnreal(In.ProfileSubmittedBy);
 	Out.Category = ToUnreal(In.Category);
-	Out.ProfileDateAdded = ToUnreal(In.ProfileDateAdded);
-	Out.ProfileDateUpdated = ToUnreal(In.ProfileDateUpdated);
-	Out.ProfileDateLive = ToUnreal(In.ProfileDateLive);
+	Out.ProfileDateAdded = ToUnrealDateTime(In.ProfileDateAdded);
+	Out.ProfileDateUpdated = ToUnrealDateTime(In.ProfileDateUpdated);
+	Out.ProfileDateLive = ToUnrealDateTime(In.ProfileDateLive);
 	Out.Incomplete = ToUnreal(In.Incomplete);
 	Out.ProfileMaturityOption = ToUnreal<EModioMaturityFlags, Modio::MaturityOption>(In.ProfileMaturityOption);
 	Out.FileSize = FModioUnsigned64(In.FileSize);
@@ -44,6 +44,7 @@ FORCEINLINE FModioModCollectionInfo ToUnreal(const Modio::ModCollectionInfo& In)
 	Out.ProfileNameId = ToUnreal(In.ProfileNameId);
 	Out.ProfileSummary = ToUnreal(In.ProfileSummary);
 	Out.ProfileDescription = ToUnreal(In.ProfileDescription);
+	Out.ProfileDescriptionPlaintext = ToUnreal(In.ProfileDescriptionPlaintext);
 
 	return Out;
 }

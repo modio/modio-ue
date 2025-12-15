@@ -2,6 +2,7 @@
 id: ue-cloud-cooking
 title: Cloud Cooking
 slug: /unreal/cloud-cooking
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/feature-guides/ue-cloud-cooking.mdx
 ---
 
 # Cloud Cooking for Unreal
@@ -26,6 +27,30 @@ We recommend that you produce an [Installed Build](https://dev.epicgames.com/doc
 :::note
 The Cloud Cooking process assumes that you are using "DLCs as UGC" for producing & loading UGC within Unreal Engine. The source files being submitted by content creators must be a plugin, containing a uplugin file and all associated assets.
 :::
+
+## Provisioning process
+
+Internally, Cloud Cooking runs a set of initialization scripts to prepare the build agent environment for cooking. The build that you upload needs to include these requirements in order for the provisioning process to complete successfully.
+
+:::note
+If you need this process customized to include additional configuration for your build, please contact your mod.io account manager.
+:::
+
+### Engine Prerequisites
+
+The initialization will install the engine prerequisites from the `Engine/Extras/Redist/en-us` folder. Ensure that this folder is included in your uploaded build.
+
+:::note
+This file has a different name depending on what version of Unreal you are on. In older versions of Unreal, this file is named `UEPrereqSetup_x64.exe`. More recent versions name this `vc_redist.x64.exe`. Cloud Cooking will run whichever file it finds in this folder.
+:::
+
+### Turnkey Configuration for AutoSDKs
+
+The initialization will also set up all of the AutoSDK configurations for all AutoSDKs that you have included in your build. This is done by running `RunUAT.bat turnkey -Command=InstallSdk -Platform=All -NeededOnly`.
+
+### Testing Your Build
+
+Before uploading your build to Cloud Cooking, we recommend that you test your build locally to ensure that it can successfully cook content for all of the platforms that you want to support. This is best done on a machine running a fresh installation of Windows 11 that does not have Unreal Engine or any AutoSDKs installed.
 
 ## Setting up AutoSDKs for all supported platforms
 
@@ -66,11 +91,27 @@ Below is an example of the CloudCooking BuildGraph script that you can use in yo
 
     <Agent Name="Default Agent" Type="Default">
         <Node Name="CookMod">
-            <Command Name="BuildCookRun" Arguments="-Project=$(UProjectPath) -Platform=$(UGCBuildPlatform) -nocompile -installed -utf8output  -nobuild -cook -CookCultures=en -unversionedcookedcontent -pak -stage -basedonreleaseversion=UGCReleaseV1_0 -stagebasereleasepaks -DLCName=$(DLCName) -stagingdirectory=$(UGCStagingDirectory)" />
+            <Command Name="BuildCookRun" Arguments="-Project=$(UProjectPath) -Platform=$(UGCBuildPlatform) -nocompile -installed -utf8output -nobuild -cook -neverpackage -CookCultures=en -unversionedcookedcontent -pak -stage -basedonreleaseversion=UGCReleaseV1_0 -stagebasereleasepaks -DLCName=$(DLCName) -stagingdirectory=$(UGCStagingDirectory)" />
         </Node>
     </Agent>
 </BuildGraph>
 ```
+
+## Preparing a DDC PAK file
+
+As part of your build process, you should prepare a DDC PAK file which will include all of the derived data required for loading the editor and performing the cooking process. Not including a DDC PAK file will likely result in significantly longer cook times as the build agent may need to re-build derived data every cook.
+Note that there are two DDC PAKs that you have to create: an Engine DDC PAK and a Game DDC PAK.
+
+You can create a DDC Game PAK file with the following commandline:
+`Engine\Binaries\Win64\UnrealEditor.exe ProjectName -run=DerivedDataCache -fill -DDC=CreatePak`
+
+This will create a .ddp file in the `DerivedDataCache` folder of your project. To create an Engine DDC PAK file, simply omit the `ProjectName` parameter.
+
+:::note
+If you are running your game as a foreign project (ie outside the Engine directory), you need to pass the path to the uproject file instead of the projet name.
+:::
+
+For more information, see Epic's documentation on [Creating a DDC PAK file](https://dev.epicgames.com/documentation/en-us/unreal-engine/using-derived-data-cache-in-unreal-engine).
 
 ## Cooking a Base Release for each platform
 
@@ -159,4 +200,4 @@ Part of the Cloud Cooking provisioning process is to create a Virtual Machine im
 
 ## Next steps
 
-Now Cloud Cooking has been enabled for your game, head over to the [Cloud Cooking Configuration](https://docs.mod.io/cloud-cooking/configuration/) guide to begin the onboarding process.
+Now Cloud Cooking has been enabled for your game, head over to the [Cloud Cooking Configuration](https://docs.mod.io/cloud-cooking/configuration) guide to begin the onboarding process.

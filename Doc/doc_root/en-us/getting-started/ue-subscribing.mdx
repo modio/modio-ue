@@ -2,6 +2,7 @@
 id: ue-subscribing
 title: Subscribing to UGC
 slug: /unreal/subscribing
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/getting-started/ue-subscribing.mdx
 ---
 
 # Subscribing to UGC
@@ -23,13 +24,13 @@ Users indicate they want to install UGC by **subscribing** to it. Subscriptions 
 Subscriptions are managed with calls to either [`SubscribeToModAsync`](/unreal/refdocs#subscribetomodasync) or [`UnsubscribeFromModAsync`](/unreal/refdocs#unsubscribefrommodasync) containing the desired `ModioModID` and a delegate to receive the status of the request.
 
 :::note
-To subscribe or unsubscribe from UGC, [**`EnableModManagement`**](/unreal/refdocs/#enablemodmanagement) *must* be called beforehand.
+To subscribe or unsubscribe from UGC, [`EnableModManagement`](/unreal/refdocs#enablemodmanagement) *must* be called beforehand.
 :::
 
 `SubscribeToModAsync` also takes a bool indicating whether or not to to subscribe to any and all dependencies for the given `ModioModID`. 
 
 :::note
-When dependencies are included in the `SubscribeToModAsync` call, they will *not* download automatically. **Only the primary UGC specified by `ModioModID` will download automatically.**  To download all subscribed content including dependencies, call [`FetchExternalUpdatesAsync`](/unreal/refdocs/#fetchexternalupdatesasync) after `SubscribeToModAsync` successfully completes.
+When dependencies are included in the `SubscribeToModAsync` call, they will *not* download automatically. **Only the primary UGC specified by `ModioModID` will download automatically.**  To download all subscribed content including dependencies, call [`FetchExternalUpdatesAsync`](/unreal/refdocs#fetchexternalupdatesasync) after `SubscribeToModAsync` successfully completes.
 :::
 
 <Tabs group-id="languages">
@@ -120,10 +121,10 @@ Call [`FetchExternalUpdatesAsync`](/unreal/refdocs#fetchexternalupdatesasync) sp
 
 ## Checking the user subscription list
 
-To see which UGC the user has subscribed to, call [`QueryUserSubscriptions`](/unreal/refdocs/#query-user-subscriptions).  This retrieves a `TMap` of [`ModioModCollectionEntry`](/unreal/refdocs/#modiomodcollectionentry) objects, one for each subscribed piece of UGC. Each `ModioModCollectionEntry` object contains the UGC's state, profile information, ID and more.
+To see which UGC the user has subscribed to, call [`QueryUserSubscriptions`](/unreal/refdocs#query-user-subscriptions).  This retrieves a `TMap` of [`ModioModCollectionEntry`](/unreal/refdocs#modiomodcollectionentry) objects, one for each subscribed piece of UGC. Each `ModioModCollectionEntry` object contains the UGC's state, profile information, ID and more.
 
 :::note
-This collection includes UGC that are still in the process of being installed! Make sure to check the result of [`GetModState`](/unreal/refdocs/#get-mod-state) before attempting to load files from the UGC in this collection.  Alternatively, use [`QueryUserInstallations`](/unreal/refdocs/#query-user-installations) as described in [**Retrieving UGC directory paths for loading**](#retrieving-ugc-directory-paths-for-loading).
+This collection includes UGC that are still in the process of being installed! Make sure to check the result of [`GetModState`](/unreal/refdocs#get-mod-state) before attempting to load files from the UGC in this collection.  Alternatively, use [`QueryUserInstallations`](/unreal/refdocs#query-user-installations) as described in [Retrieving UGC directory paths for loading](#retrieving-ugc-directory-paths-for-loading).
 :::
 
 <Tabs group-id="languages">
@@ -150,9 +151,9 @@ void UModioManagerSubsystem::QueryUserSubscriptions()
 
 ## Installation management
 
-So a subscription marks UGC as requiring installation, and an unsubscription indicates uninstallation, but how do you actually control when the plugin **does** those things? After all, you don’t want UGC to be uninstalled after your main program has loaded those files into memory, locking them from deletion. Likewise, you probably don’t want to be using networking or processor resources during gameplay for downloading mods. To give you control over when these processes occur without forcing you to shut down the plugin, you can call [`EnableModManagement`](/unreal/refdocs/#enablemodmanagement) and [`DisableModManagement`](/unreal/refdocs/#disable-mod-management).
+So a subscription marks UGC as requiring installation, and an unsubscription indicates uninstallation, but how do you actually control when the plugin **does** those things? After all, you don’t want UGC to be uninstalled after your main program has loaded those files into memory, locking them from deletion. Likewise, you probably don’t want to be using networking or processor resources during gameplay for downloading mods. To give you control over when these processes occur without forcing you to shut down the plugin, you can call [`EnableModManagement`](/unreal/refdocs#enablemodmanagement) and [`DisableModManagement`](/unreal/refdocs#disable-mod-management).
 
-To notify your users when UGC is finished installing or updating, [`EnableModManagement`](/unreal/refdocs/#enablemodmanagement) asks you to provide it with a callback. This callback will be invoked **every time** a [`ModioModManagementEvent`](/unreal/refdocs/#modiomodmanagementevent) occurs i.e. whenever UGC is installed, updated, uninstalled, or uploaded by the plugin’s internal event loop. This behavior persists until a corresponding call to [`DisableModManagement`](/unreal/refdocs/#disable-mod-management) or [`ShutdownAsync`](/unreal/refdocs/#shutdownasync) is made.
+To notify your users when UGC is finished installing or updating, [`EnableModManagement`](/unreal/refdocs#enablemodmanagement) asks you to provide it with a callback. This callback will be invoked **every time** a [`ModioModManagementEvent`](/unreal/refdocs#modiomodmanagementevent) occurs i.e. whenever UGC is installed, updated, uninstalled, or uploaded by the plugin’s internal event loop. This behavior persists until a corresponding call to [`DisableModManagement`](/unreal/refdocs#disable-mod-management) or [`ShutdownAsync`](/unreal/refdocs#shutdownasync) is made.
 
 :::note
 [`EnableModManagement`](/unreal/refdocs#enablemodmanagement) is not an async function.  It does not end with the `*Async` suffix. Its callback operates differently to asynchronous result callbacks used elsewhere in the mod.io plugin. 
@@ -206,11 +207,11 @@ void UModioManagerSubsystem::ModManagementCallback(FModioModManagementEvent ModM
   </TabItem>
 </Tabs>
 
-While UGC management is enabled, the plugin assumes that it has the ability to make changes to the filesystem, including deleting UGC that the user has no longer subscribed to. As a result you should make sure that you don’t have any open handles to files inside the UGC directories when you call [`EnableModManagement`](/unreal/refdocs/#enablemodmanagement).
+While UGC management is enabled, the plugin assumes that it has the ability to make changes to the filesystem, including deleting UGC that the user has no longer subscribed to. As a result you should make sure that you don’t have any open handles to files inside the UGC directories when you call [`EnableModManagement`](/unreal/refdocs#enablemodmanagement).
 
 When you want to be able to freely open files in the mod directories, call [`DisableModManagement`](/unreal/refdocs#disable-mod-management). The plugin will finish the current operation but will not continue any others. 
 
-Call [`IsModManagementBusy`](/unreal/refdocs/#is-mod-management-busy) to see if UGC management is currently processing UGC. 
+Call [`IsModManagementBusy`](/unreal/refdocs#is-mod-management-busy) to see if UGC management is currently processing UGC. 
 
 <Tabs group-id="languages">
   <TabItem value="blueprint" label="Blueprint">
@@ -237,7 +238,7 @@ void UModioManagerSubsystem::DisableModManagement()
 
 So now we have the user picking UGC and marking them for installation, we’re enabling mod management at a point where we don’t mind the plugin changing the filesystem, and UGC is being installed by the plugin. We now need to know where they are on disk, otherwise you can’t load them into your game!
 
-The easiest way to do this is by using [`QueryUserInstallations`](/unreal/refdocs/#query-user-installations). This function returns a `TMap` of [`ModioModCollectionEntry`](/unreal/refdocs/#modiomodcollectionentry) objects that can be queried for folder paths to use for loading a piece of UGC's files into your game. `QueryUserInstallations` also allows you to specify whether or not to include outdated UGC.
+The easiest way to do this is by using [`QueryUserInstallations`](/unreal/refdocs#query-user-installations). This function returns a `TMap` of [`ModioModCollectionEntry`](/unreal/refdocs#modiomodcollectionentry) objects that can be queried for folder paths to use for loading a piece of UGC's files into your game. `QueryUserInstallations` also allows you to specify whether or not to include outdated UGC.
 
 <Tabs group-id="languages">
   <TabItem value="blueprint" label="Blueprint">
@@ -263,4 +264,4 @@ void UModioManagerSubsystem::GetInstalledMods()
 
 Now your users can search for and subscribe to UGC, you might want to start exploring ways for users to [Add UGC](/unreal/adding-ugc) to your game.
 
-If you've already done this, we recommend working your way through the [Unreal Getting Started Guides](/unreal/#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](/features/).
+If you've already done this, we recommend working your way through the [Unreal Getting Started Guides](/unreal#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](https://docs.mod.io/features).

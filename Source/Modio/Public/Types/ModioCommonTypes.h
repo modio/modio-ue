@@ -183,6 +183,7 @@ enum class EModioLanguage : uint8
 	Italian,
 	Polish,
 	Portuguese,
+	PortugueseBrazilian,
 	Hungarian,
 	Japanese,
 	Korean,
@@ -194,6 +195,7 @@ enum class EModioLanguage : uint8
 	Turkish,
 	Ukrainian,
 	Arabic,
+	Czech,
 	Count UMETA(Hidden)
 };
 ENUM_RANGE_BY_COUNT(EModioLanguage, EModioLanguage::Count);
@@ -522,8 +524,8 @@ struct MODIO_API FModioModCollectionID
 
 private:
 	/**
-	 * @brief Function for retrieving the underlying value of an FModioModCollectionID for use in custom serialization. Not
-	 * recommended for any other use. FModioModCollectionIDs should be treated as opaque.
+	 * @brief Function for retrieving the underlying value of an FModioModCollectionID for use in custom serialization.
+	 * Not recommended for any other use. FModioModCollectionIDs should be treated as opaque.
 	 * @param In The FModioModCollectionID to retrieve the value for
 	 * @return The underlying numeric ID
 	 */

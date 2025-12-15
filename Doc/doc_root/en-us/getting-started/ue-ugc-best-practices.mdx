@@ -2,6 +2,7 @@
 id: ue-ugc-best-practices
 title: UGC Best Practices
 slug: /unreal/ugc-best-practices
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/getting-started/ue-ugc-best-practices.mdx
 ---
 
 # UGC Best Practices
@@ -56,7 +57,7 @@ The easiest way to package/cook a mod into a pak file is to create a plugin that
 This kind of mod can be loaded in through UE’s built-in file IO layer to directly load and access the data required. In cases of raw assets, UE exposes most editor tools for asset importing, which allows runtime importing of supported asset types. This includes textures, FBX, and datasmith, all of which can be imported at runtime using Interchange, though there are other modules available to achieve this as well.
 
 ### ModioUGC
-[ModioUGC](https://docs.mod.io/unreal/modio-ugc) is a module for our Unreal Plugin that facilitates .pak file loading and unloading for Unreal Engine projects and is our recommended method. It's a drop-in solution for Unreal Engine that allows you to easily integrate user-generated content into your game, enabling dynamic UGC management in the form of PAK files.
+[ModioUGC](/unreal/modio-ugc) is a module for our Unreal Plugin that facilitates .pak file loading and unloading for Unreal Engine projects and is our recommended method. It's a drop-in solution for Unreal Engine that allows you to easily integrate user-generated content into your game, enabling dynamic UGC management in the form of PAK files.
 
 ### PAK Files
 PAK files can also be loaded by mounting them at runtime, either statically in cases of standalone base game content/DLC, or dynamically in the case of mods.
@@ -93,7 +94,7 @@ Example game: **Homeworld 3** (Black Bird Interactive/Gearbox) modding is create
 Each PAK file should correspond to its respective platform, so if you intend to support multiple platforms, you must cook and package the plugin's content for each target platform.
 
 :::note
-You cannot distribute console tools to your creators, as these tools are under NDA. For console UGC, you must cook and package the content yourself, or use a cloud cooking solution such as [mod.io Cloud Cooking](/cloud-cooking).
+You cannot distribute console tools to your creators, as these tools are under NDA. For console UGC, you must cook and package the content yourself, or use a cloud cooking solution such as [mod.io Cloud Cooking](https://docs.mod.io/cloud-cooking).
 :::
 
 ### ‘Dos and Don’ts’
@@ -107,11 +108,11 @@ You cannot distribute console tools to your creators, as these tools are under N
 
 ### Continue setting up the fundamental functions
 
-If you haven't already, we recommend working your way through the [Unreal Getting Started Guides](/unreal/#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin such as content searching & filtering, subscription management and more.
+If you haven't already, we recommend working your way through the [Unreal Getting Started Guides](/unreal#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin such as content searching & filtering, subscription management and more.
 
 ### Explore features for Unreal Plugin
 
-Now you have a better understanding of UGC and mod.io's core functionality up and running, it's time to explore our variety of [Features](/features/) to achieve your UGC goals. Things like [Cloud Cooking](/cloud-cooking) can optimize your UGC flow for users, and our In-Game UI and [Embed Hub](https://docs.mod.io/embed-hub) options will help you create your desired user experience.
+Now you have a better understanding of UGC and mod.io's core functionality up and running, it's time to explore our variety of [Features](https://docs.mod.io/features) to achieve your UGC goals. Things like [Cloud Cooking](https://docs.mod.io/cloud-cooking) can optimize your UGC flow for users, and our In-Game UI and [Embed Hub](https://docs.mod.io/embed-hub) options will help you create your desired user experience.
 
 ## Contacts
 For any further enquiries, please contact developers@mod.io.

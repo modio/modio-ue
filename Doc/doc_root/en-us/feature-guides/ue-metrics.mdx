@@ -2,23 +2,24 @@
 id: ue-metrics
 title: Metrics
 slug: /unreal/metrics
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/feature-guides/ue-metrics.mdx
 ---
 
 # Metrics for Unreal
 
-The mod.io Unreal Engine Plugin supports all of our [Metrics](https://docs.mod.io/metrics/) features, allowing you to track play sessions as well as deliver more basic profiling and stats. This page will guide you through how to implement each into your dashboard.
+The mod.io Unreal Engine Plugin supports all of our [Metrics](https://docs.mod.io/metrics) features, allowing you to track play sessions as well as deliver more basic profiling and stats. This page will guide you through how to implement each into your dashboard.
 
 This guide covers:
 
-* [Playtime Metrics](#playtime-metrics)
+* [Play Sessions Metrics](#play-sessions-metrics)
 * [Profiling](#profiling)
 
-## Playtime Metrics
+## Play Sessions Metrics
 
-[Playtime Metrics](https://docs.mod.io/metrics/game#play-sessions) lets you track what UGC your players interact with most frequently. The process involves starting a Metrics play session, keeping that session alive via a heartbeat, and then ending that session.
+[Play Sessions Metrics](https://docs.mod.io/metrics/game#play-sessions) lets you track what UGC your players interact with most frequently, including concurrent players, sessions, playtime, and UGC usage per session. The process involves starting a Metrics play session, keeping that session alive via a heartbeat, and then ending that session.
 
 :::note[Premium Feature]
-[Playtime Metrics](https://docs.mod.io/metrics/game#play-sessions) is a premium feature. If you are interested in mod.io premium features, please contact developers@mod.io.
+Play Sessions is a premium feature. Sign up to one of our [advanced service tiers](https://mod.io/pricing) to activate detailed data analytics, or contact us at developers@mod.io for more information.
 :::
 
 The Metrics session functionality is all accessible through the `ModioSubsystem` class.
@@ -39,7 +40,7 @@ Failing to set up the Metrics Secret Key will result in a `SessionNotInitialized
 
 ### Starting a Metrics session
 
-You can call [`MetricsSessionStartAsync`](/unreal/refdocs/#metricssessionstartasync) to start a new session tracking the usage of UGC in the context of your game. You'll notice that `MetricsSessionStartAsync` takes a [`MetricsSessionParams`](/unreal/refdocs/#modiometricssessionparams) struct as its parameter. This contains an optional Session Id, as well as a required vector of UGC to track.
+You can call [`MetricsSessionStartAsync`](/unreal/refdocs#metricssessionstartasync) to start a new session tracking the usage of UGC in the context of your game. You'll notice that `MetricsSessionStartAsync` takes a [`MetricsSessionParams`](/unreal/refdocs#modiometricssessionparams) struct as its parameter. This contains an optional Session Id, as well as a required vector of UGC to track.
 
 :::note
 If a Session Id is not provided, a random one will be created for you.
@@ -78,7 +79,7 @@ The Metrics Session Params accepts an optional Session Id in the form of a `FMod
 
 To ensure that the session is kept alive, a heartbeat is required to be submitted at most every 5 minutes. We recommend doing this a bit earlier than the threshold to ensure you do not miss the window.
 
-There are two methods provided to control the behaviour of the heart beat, [`MetricsSessionSendHeartbeatOnceAsync`](/unreal/refdocs/#metricssessionsendheartbeatonceasync) which you can call at your desired precision, as well as a single call and forget [`MetricsSessionSendHeartbeatAtIntervalAsync`](/unreal/refdocs/#metricssessionsendheartbeatatintervalasync) with a desired interval.
+There are two methods provided to control the behaviour of the heart beat, [`MetricsSessionSendHeartbeatOnceAsync`](/unreal/refdocs#metricssessionsendheartbeatonceasync) which you can call at your desired precision, as well as a single call and forget [`MetricsSessionSendHeartbeatAtIntervalAsync`](/unreal/refdocs#metricssessionsendheartbeatatintervalasync) with a desired interval.
 
 Calling `MetricsSessionSendHeartbeatOnceAsync` will submit a single heartbeat, and return an error code if something went wrong. If no error has occurred, the heartbeat has been successfully sent.
 
@@ -129,7 +130,7 @@ void UModioManager::MetricsSessionHeartbeat(const FModioUnsigned64& IntervalSeco
 
 ### Ending a Metrics session
 
-To complete a session, for example when finishing a match, or quitting out of your game, you can call [`MetricsSessionEndAsync`](/unreal/refdocs/#metricssessionendasync).
+To complete a session, for example when finishing a match, or quitting out of your game, you can call [`MetricsSessionEndAsync`](/unreal/refdocs#metricssessionendasync).
 As with the other calls, you will receive an error if anything has gone wrong, otherwise the operation successfully completed.
 
 <Tabs group-id="languages">

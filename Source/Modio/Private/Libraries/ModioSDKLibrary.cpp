@@ -21,17 +21,23 @@
 
 FModioGameID UModioSDKLibrary::GetProjectGameId()
 {
-	return FModioGameID(GetDefault<UModioSettings>()->GameId);
+	return FModioGameID(GetDefault<UModioSettings>()->OverrideGameId.IsSet()
+		                    ? GetDefault<UModioSettings>()->OverrideGameId.GetValue()
+		                    : GetDefault<UModioSettings>()->GameId);
 }
 
 FModioApiKey UModioSDKLibrary::GetProjectApiKey()
 {
-	return FModioApiKey(GetDefault<UModioSettings>()->ApiKey);
+	return FModioApiKey(GetDefault<UModioSettings>()->OverrideApiKey.IsSet()
+		                    ? GetDefault<UModioSettings>()->OverrideApiKey.GetValue()
+		                    : GetDefault<UModioSettings>()->ApiKey);
 }
 
 EModioEnvironment UModioSDKLibrary::GetProjectEnvironment()
 {
-	return GetDefault<UModioSettings>()->Environment;
+	return GetDefault<UModioSettings>()->OverrideGameEnvironment.IsSet()
+		       ? GetDefault<UModioSettings>()->OverrideGameEnvironment.GetValue()
+		       : GetDefault<UModioSettings>()->Environment;
 }
 
 FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptions()
@@ -72,15 +78,15 @@ static FString ToString(EFileSizeUnit Unit)
 {
 	switch (Unit)
 	{
-		case EFileSizeUnit::B:
+		case B:
 			return TEXT("bytes");
-		case EFileSizeUnit::KB:
+		case KB:
 			return TEXT("KB");
-		case EFileSizeUnit::MB:
+		case MB:
 			return TEXT("MB");
-		case EFileSizeUnit::GB:
+		case GB:
 			return TEXT("GB");
-		case EFileSizeUnit::Largest:
+		case Largest:
 		default:
 			return TEXT("Unknown unit");
 	}
@@ -90,37 +96,37 @@ EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned
 {
 	if (FileSize.Underlying > GB)
 	{
-		return EFileSizeUnit::GB;
+		return GB;
 	}
 	if (FileSize.Underlying > MB)
 	{
-		return EFileSizeUnit::MB;
+		return MB;
 	}
 	if (FileSize.Underlying > KB)
 	{
-		return EFileSizeUnit::KB;
+		return KB;
 	}
-	return EFileSizeUnit::B;
+	return B;
 }
 
 EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit(int64 FileSize)
 {
-	return UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64(uint64(FileSize)));
+	return GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64(static_cast<uint64>(FileSize)));
 }
 
 FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, int32 MinDecimals, int32 MaxDecimals,
-													EFileSizeUnit Unit, bool bIncludeUnitName)
+                                                     EFileSizeUnit Unit, bool bIncludeUnitName)
 {
-	static const int32 KB = 1024;
-	static const int32 MB = 1024 * 1024;
-	static const int32 GB = 1024 * 1024 * 1024;
+	static constexpr int32 KB = 1024;
+	static constexpr int32 MB = 1024 * 1024;
+	static constexpr int32 GB = 1024 * 1024 * 1024;
 
-	if (Unit == EFileSizeUnit::Largest)
+	if (Unit == Largest)
 	{
-		Unit = GetDesiredFileSizeUnit(int64_t(FileSize.Underlying));
+		Unit = GetDesiredFileSizeUnit(static_cast<int64_t>(FileSize.Underlying));
 	}
 
-	const double InNewUnit = FileSize / static_cast<double>(Unit);
+	const double InNewUnit = FileSize / Unit;
 
 	FFormatNamedArguments Args;
 
@@ -132,22 +138,23 @@ FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, 
 	Args.Add("Number", FText::AsNumber(InNewUnit, &FormatRules));
 	Args.Add("Unit", bIncludeUnitName ? FText::FromString(ToString(Unit)) : FText::GetEmpty());
 	FText FormatString = FText::FromString(TEXT("{Number}{Unit}"));
-#if UE_VERSION_OLDER_THAN(5, 5, 0)
+	#if UE_VERSION_OLDER_THAN(5, 5, 0)
 	FText::FindText(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString);
-#else
+	#else
 	FText::FindTextInLiveTable_Advanced(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"),
 										FormatString);
-#endif
+	#endif
 
 	return FText::Format(FormatString, Args);
 }
 
 FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals /* = 0*/,
-										  int32 MaxDecimals /** = 2*/,
-										  EFileSizeUnit Unit /**= EFileSizeUnit::Largest*/, bool bIncludeUnitName /**= true*/)
+                                          int32 MaxDecimals /** = 2*/,
+                                          EFileSizeUnit Unit /**= EFileSizeUnit::Largest*/,
+                                          bool bIncludeUnitName /**= true*/)
 {
-	return UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64(uint64(FileSize)), MinDecimals, MaxDecimals,
-														  Unit, bIncludeUnitName);
+	return Filesize_ToString_Unsigned64(FModioUnsigned64(static_cast<uint64>(FileSize)), MinDecimals, MaxDecimals,
+	                                    Unit, bIncludeUnitName);
 }
 
 bool UModioSDKLibrary::IsValidEmailAddressFormat(const FString& String)
@@ -177,7 +184,7 @@ FString UModioSDKLibrary::Conv_Int64ToString(int64 InInt)
 }
 
 FText UModioSDKLibrary::Conv_Int64ToText(int64 Value, bool bAlwaysSign /* = false*/, bool bUseGrouping /* = true*/,
-										 int32 MinimumIntegralDigits /* = 1*/, int32 MaximumIntegralDigits /* = 324*/)
+                                         int32 MinimumIntegralDigits /* = 1*/, int32 MaximumIntegralDigits /* = 324*/)
 {
 	// Only update the values that need to be changed from the default FNumberFormattingOptions,
 	// as this lets us use the default formatter if possible (which is a performance win!)
@@ -192,7 +199,7 @@ FText UModioSDKLibrary::Conv_Int64ToText(int64 Value, bool bAlwaysSign /* = fals
 
 float UModioSDKLibrary::Pct_Int64Int64(int64 Part, int64 Whole)
 {
-	return float(double(Part) / static_cast<double>(Whole));
+	return static_cast<float>(static_cast<double>(Part) / static_cast<double>(Whole));
 }
 
 FText UModioSDKLibrary::RoundNumberString(FText inputText)
@@ -219,14 +226,22 @@ FText UModioSDKLibrary::RoundNumberString(FText inputText)
 		}
 
 		// Decimals:
-		if (i == (Parsed.Num() - 2) && i != 0) decimals = Parsed[i].Mid(0, 1);
+		if (i == (Parsed.Num() - 2) && i != 0)
+		{
+			decimals = Parsed[i].Mid(0, 1);
+		}
 
 		// Numbers:
-		if (i == 0) num = Parsed[i];
+		if (i == 0)
+		{
+			num = Parsed[i];
+		}
 	}
 
 	FString FinalString = "";
-	bNeedsDecimals ? FinalString.Append(num).Append(",").Append(decimals).Append(units) : FinalString.Append(num).Append(units);
+	bNeedsDecimals
+		? FinalString.Append(num).Append(",").Append(decimals).Append(units)
+		: FinalString.Append(num).Append(units);
 	FinalText = FText::FromString(FinalString);
 
 	return FinalText;
@@ -236,7 +251,7 @@ FString UModioSDKLibrary::GetTimeSpanAsString(FString PastDateString)
 {
 	FDateTime Present = FDateTime::Now();
 	FDateTime Past;
-	if (!FDateTime::Parse(PastDateString, Past)) 
+	if (!FDateTime::Parse(PastDateString, Past))
 	{
 		return PastDateString;
 	}
@@ -250,11 +265,11 @@ FString UModioSDKLibrary::GetTimeSpanAsString(FString PastDateString)
 	{
 		return FString::Printf(TEXT("%d year%s ago"), Years, *(Years == 1 ? FString("") : FString("s")));
 	}
-	else if (Months > 0)
+	if (Months > 0)
 	{
 		return FString::Printf(TEXT("%d month%s ago"), Months, *(Months == 1 ? FString("") : FString("s")));
 	}
-	else if (Days > 0)
+	if (Days > 0)
 	{
 		return FString::Printf(TEXT("%d day%s ago"), Days, *(Days == 1 ? FString("") : FString("s")));
 	}
@@ -273,15 +288,15 @@ FString UModioSDKLibrary::GetShortenedNumberAsString(int64 Number)
 	{
 		return FString::Printf(TEXT("%lld%s"), Trillions, *FString("T"));
 	}
-	else if (Billions > 0)
+	if (Billions > 0)
 	{
 		return FString::Printf(TEXT("%lld%s"), Billions, *FString("B"));
 	}
-	else if (Millions > 0)
+	if (Millions > 0)
 	{
 		return FString::Printf(TEXT("%lld%s"), Millions, *FString("M"));
 	}
-	else if (Thousands > 0)
+	if (Thousands > 0)
 	{
 		return FString::Printf(TEXT("%lld%s"), Thousands, *FString("K"));
 	}
@@ -291,11 +306,11 @@ FString UModioSDKLibrary::GetShortenedNumberAsString(int64 Number)
 
 FString UModioSDKLibrary::GetDefaultSessionIdWindows()
 {
-#if PLATFORM_WINDOWS
+	#if PLATFORM_WINDOWS
 	return FString(GetUserSidString().c_str());
-#else
+	#else
 	return FString(TEXT(""));
-#endif
+	#endif
 }
 
 FString UModioSDKLibrary::GetLanguageCodeString(EModioLanguage Language)
@@ -321,7 +336,8 @@ FString UModioSDKLibrary::GetMonetizationPurchaseCategory(EModioPortal Portal)
 
 	if (!Settings->PlatformIdentifiers.Contains(Portal))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Could not find current platform in Platform identifiers. Platform: %d"), (int)Portal);
+		UE_LOG(LogTemp, Warning, TEXT("Could not find current platform in Platform identifiers. Platform: %d"),
+		       (int)Portal);
 		return FString();
 	}
 

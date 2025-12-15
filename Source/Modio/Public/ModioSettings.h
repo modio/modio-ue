@@ -25,6 +25,7 @@ UCLASS(Config = Game, defaultconfig)
 class MODIO_API UModioSettings : public UObject
 {
 	GENERATED_BODY()
+
 public:
 	UModioSettings();
 
@@ -72,14 +73,16 @@ public:
 	/**
 	 * If enabled, default implementations of Monetization-related UI components will be visible and interactable in mod.io UI templates
 	 */
-	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta=(DisplayName="Enable Monetization widgets in UI"))
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
+		meta=(DisplayName="Enable Monetization widgets in UI"))
 	bool bEnableMonetizationFeature;
 
 	/**
 	 * If enabled, the UUGCSubsystem can manage mod enabled/disable state, if a valid IModEnabledStateProvider has been set via SetUGCEnabledStateProvider so you can persist the state appropriately
 	 * If this is disabled, enable/disable widgets in the UI will be hidden
 	 */
-	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta = (DisplayName = "Enable Mod Enable/Disable support"))
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
+		meta = (DisplayName = "Enable Mod Enable/Disable support"))
 	bool bEnableModEnableDisableFeature;
 
 	/**
@@ -92,19 +95,47 @@ public:
 	 * If enabled, widgets in mod.io UI templates will show mod collection relevant widgets and content.
 	 */
 	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
-			  meta = (DisplayName = "Enable Mod Collections in UI"))
+		meta = (DisplayName = "Enable Mod Collections in UI"))
 	bool bEnableModCollectionsFeature;
 
 	/**
 	 * If you intend to sell Premium Currency through the relevant platform store, this Map is used to invoke the platform-native storefront on the given platform(s).
 	 * See the monetization documentation for more info.
 	 */
-	UPROPERTY(EditDefaultsOnly, config, Category = "Monetization", meta = (EditCondition="bEnableMonetizationFeature", EditConditionHides="true"))
+	UPROPERTY(EditDefaultsOnly, config, Category = "Monetization",
+		meta = (EditCondition="bEnableMonetizationFeature", EditConditionHides="true"))
 	TMap<EModioPortal, FString> PlatformIdentifiers;
 
 
+	/** Override GameId. */
+	TOptional<int32> OverrideGameId;
+
+	/** Override API Key. */
+	TOptional<FString> OverrideApiKey;
+
+	/** Override Metrics Secret Key. */
+	TOptional<FString> OverrideMetricsSecretKey;
+
+	/** Override game environment. */
+	TOptional<EModioEnvironment> OverrideGameEnvironment;
+
+	/** Override portal. */
+	TOptional<EModioPortal> OverridePortal;
+
+	/** Override URL. */
+	TOptional<FString> OverrideUrl;
+
+	/** Override Session ID. */
+	TOptional<FString> OverrideSessionID;
+
+	/** Override for mod storage quota in megabytes (minimum 25 MB). */
+	TOptional<int32> OverrideModStorageQuotaMB;
+
+	/** Override for cache storage quota in megabytes (minimum 25 MB). */
+	TOptional<int32> OverrideCacheStorageQuotaMB;
+
 private:
-#if WITH_EDITOR
-	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
+	#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	#endif
 };

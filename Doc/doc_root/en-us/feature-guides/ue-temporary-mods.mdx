@@ -2,11 +2,12 @@
 id: ue-temporary-mods
 title: Temporary Mod Sets
 slug: /unreal/temporary-mods
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/feature-guides/ue-temporary-mods.mdx
 ---
 
 # Temporary Mods for Unreal
 
-There are situations where you may want UGC to exist on a temporary basis. For instance, in [Multiplayer](https://docs.mod.io/multiplayer/) environments you may want users to see another player's UGC even if they don't own it.
+There are situations where you may want UGC to exist on a temporary basis. For instance, in [Multiplayer](https://docs.mod.io/multiplayer) environments you may want users to see another player's UGC even if they don't own it.
 
 [Temporary Mod Sets](https://docs.mod.io/multiplayer/temporary-mods) allow management of these more transient pieces of content separately from subscriptions. Temporary Mod Sets do not require authentication to be used, however Mod Management must still be enabled to use temporary mods.
 
@@ -19,13 +20,13 @@ This guide covers:
 
 Temporary mods are downloaded in a folder separately from subscriptions, and are not updated or handled when you call `FetchExternalUpdatesAsync`. That means you can prioritize the download and installation of temporary mods outside of the regular subscription flow.
 
-To use Temporary Mod Sets, you can start a TempModSet by calling `InitTempModSet` and passing a list of Mod IDs to be downloaded and extracted. At anytime while a TempModSet is open, you can call [`AddToTempModSet`](/unreal/refdocs/#addtotempmodset) to add mods to the set (which will be instantly downloaded and extracted). 
+To use Temporary Mod Sets, you can start a TempModSet by calling `InitTempModSet` and passing a list of Mod IDs to be downloaded and extracted. At anytime while a TempModSet is open, you can call [`AddToTempModSet`](/unreal/refdocs#addtotempmodset) to add mods to the set (which will be instantly downloaded and extracted). 
 
-If you no longer need a mod, you can call [`RemoveFromTempModSet`](/unreal/refdocs/#removefromtempmodset) which will remove the file. 
+If you no longer need a mod, you can call [`RemoveFromTempModSet`](/unreal/refdocs#removefromtempmodset) which will remove the file. 
 
-Once you have finished with a TempModSet, you can call [`CloseTempModSet`](/unreal/refdocs/#closetempmodset) which will delete all temporary mods. Temporary mods are also deleted the next time you re-initialize the SDK.
+Once you have finished with a TempModSet, you can call [`CloseTempModSet`](/unreal/refdocs#closetempmodset) which will delete all temporary mods. Temporary mods are also deleted the next time you re-initialize the SDK.
 
-Like regular UGC, Temp Mods can be queried using [`QueryTempModSet`](/unreal/refdocs/#querytempmodset) to get a ModCollectionEntry with an installation path.
+Like regular UGC, Temp Mods can be queried using [`QueryTempModSet`](/unreal/refdocs#querytempmodset) to get a ModCollectionEntry with an installation path.
 
 ## Installation
 

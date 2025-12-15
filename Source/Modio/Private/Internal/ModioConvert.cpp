@@ -318,6 +318,8 @@ Modio::Language ToModio(EModioLanguage Language)
 			return Modio::Language::Polish;
 		case EModioLanguage::Portuguese:
 			return Modio::Language::Portuguese;
+		case EModioLanguage::PortugueseBrazilian:
+			return Modio::Language::PortugueseBrazilian;
 		case EModioLanguage::Hungarian:
 			return Modio::Language::Hungarian;
 		case EModioLanguage::Japanese:
@@ -340,6 +342,8 @@ Modio::Language ToModio(EModioLanguage Language)
 			return Modio::Language::Ukrainian;
 		case EModioLanguage::Arabic:
 			return Modio::Language::Arabic;
+		case EModioLanguage::Czech:
+			return Modio::Language::Czech;
 		case EModioLanguage::Count:
 			break;
 	}
@@ -463,6 +467,8 @@ EModioLanguage ToUnreal(const Modio::Language& In)
 			return EModioLanguage::Polish;
 		case Modio::Language::Portuguese:
 			return EModioLanguage::Portuguese;
+		case Modio::Language::PortugueseBrazilian:
+			return EModioLanguage::PortugueseBrazilian;
 		case Modio::Language::Hungarian:
 			return EModioLanguage::Hungarian;
 		case Modio::Language::Japanese:
@@ -479,6 +485,8 @@ EModioLanguage ToUnreal(const Modio::Language& In)
 			return EModioLanguage::ChineseSimplified;
 		case Modio::Language::ChineseTraditional:
 			return EModioLanguage::ChineseTraditional;
+		case Modio::Language::Czech:
+			return EModioLanguage::Czech;
 
 		case Modio::Language::SpanishLatinAmerican:
 		case Modio::Language::Turkish:
@@ -512,7 +520,7 @@ Modio::ModCommunityOptionsFlags ToModio(EModioModCommunityOptionsFlags In)
 {
 	// Workaround for Unreal's Enum flags limitation.
 	Modio::ModCommunityOptionsFlags Flags = Modio::ModCommunityOptions::None;
-    
+
 	if (EnumHasAnyFlags(In, EModioModCommunityOptionsFlags::EnableComments))
 		Flags.SetFlag(Modio::ModCommunityOptions::EnableComments);
 	if (EnumHasAnyFlags(In, EModioModCommunityOptionsFlags::EnablePreviews))
@@ -521,6 +529,52 @@ Modio::ModCommunityOptionsFlags ToModio(EModioModCommunityOptionsFlags In)
 		Flags.SetFlag(Modio::ModCommunityOptions::EnablePreviewURLs);
 	if (EnumHasAnyFlags(In, EModioModCommunityOptionsFlags::AllowDependencies))
 		Flags.SetFlag(Modio::ModCommunityOptions::AllowDependencies);
-    
+
 	return Flags;
+}
+
+Modio::GameCloudCookingStatus ToModio(EModioGameCloudCookingStatus In)
+{
+	switch (In)
+	{
+		case EModioGameCloudCookingStatus::Disabled:
+			return Modio::GameCloudCookingStatus::Disabled;
+		case EModioGameCloudCookingStatus::Initializing:
+			return Modio::GameCloudCookingStatus::Initializing;
+		case EModioGameCloudCookingStatus::Initialized:
+			return Modio::GameCloudCookingStatus::Initialized;
+		case EModioGameCloudCookingStatus::Finalizing:
+			return Modio::GameCloudCookingStatus::Finalizing;
+		case EModioGameCloudCookingStatus::Enabled:
+			return Modio::GameCloudCookingStatus::Enabled;
+		case EModioGameCloudCookingStatus::ActionRequired:
+			return Modio::GameCloudCookingStatus::ActionRequired;
+		case EModioGameCloudCookingStatus::TearingDown:
+			return Modio::GameCloudCookingStatus::TearingDown;
+	}
+	checkf(false, TEXT("Missed a case in ToModio(EModioGameCloudCookingStatus In)"));
+	return Modio::GameCloudCookingStatus::Disabled;
+}
+
+EModioGameCloudCookingStatus ToUnreal(const Modio::GameCloudCookingStatus& In)
+{
+	switch (In)
+	{
+		case Modio::GameCloudCookingStatus::Disabled:
+			return EModioGameCloudCookingStatus::Disabled;
+		case Modio::GameCloudCookingStatus::Initializing:
+			return EModioGameCloudCookingStatus::Initializing;
+		case Modio::GameCloudCookingStatus::Initialized:
+			return EModioGameCloudCookingStatus::Initialized;
+		case Modio::GameCloudCookingStatus::Finalizing:
+			return EModioGameCloudCookingStatus::Finalizing;
+		case Modio::GameCloudCookingStatus::Enabled:
+			return EModioGameCloudCookingStatus::Enabled;
+		case Modio::GameCloudCookingStatus::ActionRequired:
+			return EModioGameCloudCookingStatus::ActionRequired;
+		case Modio::GameCloudCookingStatus::TearingDown:
+			return EModioGameCloudCookingStatus::TearingDown;
+	}
+	checkf(false, TEXT("Missed a case in ToUnreal(const Modio::GameCloudCookingStatus& In)"));
+	return EModioGameCloudCookingStatus::Disabled;
 }

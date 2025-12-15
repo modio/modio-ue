@@ -49,7 +49,7 @@ public:
 	 * @return The project environment type (e.g., production, staging).
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities")
-	static MODIO_API EModioEnvironment GetProjectEnvironment();
+	static MODIO_API EModioEnvironment  GetProjectEnvironment();
 
 	/**
 	 * @docpublic

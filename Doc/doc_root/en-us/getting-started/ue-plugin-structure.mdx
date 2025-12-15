@@ -2,6 +2,7 @@
 id: ue-plugin-structure
 title: Structure & Error Handling
 slug: /unreal/plugin-structure
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/getting-started/ue-plugin-structure.mdx
 ---
 
 # Unreal Engine Plugin Structure
@@ -20,7 +21,7 @@ This guide covers:
 
 
 ## `ModioSubsystem`
-The mod.io Unreal Engine Plugin consumes our native [C++ SDK](https://docs.mod.io/cppsdk/) internally, and its public API is similar. The C++ SDK exposes a number of free functions within the `Modio` namespace, and this plugin wraps those functions in a [Subsystem](https://dev.epicgames.com/documentation/en-us/unreal-engine/programming-subsystems-in-unreal-engine).
+The mod.io Unreal Engine Plugin consumes our native [C++ SDK](https://docs.mod.io/cppsdk) internally, and its public API is similar. The C++ SDK exposes a number of free functions within the `Modio` namespace, and this plugin wraps those functions in a [Subsystem](https://dev.epicgames.com/documentation/en-us/unreal-engine/programming-subsystems-in-unreal-engine).
 
 The lifetime of the [`ModioSubsystem`](/unreal/refdocs#modiosubsystem) is automatically managed by the engine and provides a convenient way to access the plugin's functionality.  This is broadly grouped into the following categories:
 
@@ -76,7 +77,7 @@ Even if the plugin is shut down while asynchronous operations are in-flight, you
 
 In order to provide a non-blocking implementation, the plugin operates an internal event loop. This event loop will only ever run on the thread which calls [`RunPendingHandlers`](/unreal/refdocs#run-pending-handlers).  `RunPendingHandlers` is the function we provide to tick the internal event loop and process any pending work the plugin needs to perform.
 
-You should either enable the [configuration setting](/unreal/installation/#plugin-configuration) to allow the plugin to manage a background thread which automatically calls `RunPendingHandlers`, or invoke it on tick in the game thread yourself. 
+You should either enable the [configuration setting](/unreal/installation#plugin-configuration) to allow the plugin to manage a background thread which automatically calls `RunPendingHandlers`, or invoke it on tick in the game thread yourself. 
 
 :::note
 This means that if you stop calling `RunPendingHandlers`, any pending asynchronous API methods you have called will not complete and their associated callbacks will not be invoked, nor will the internal data allocated for those operations be freed.
@@ -127,7 +128,7 @@ In many cases, however, you will want to perform some degree of inspection on an
 
 In your application, there are many errors that will likely be handled the same way.  For example, you probably don’t need to handle different network errors in different ways. The semantics of networking errors are largely "try the function again later".
 
-This is where [`ErrorCodeMatches`](/unreal/refdocs/#error-code-matches) comes in. It allows you to query if the error satisfies a particular condition, such as "does this code represent some kind of networking error", without needing to explicitly check the code against all the individual errors in the category.
+This is where [`ErrorCodeMatches`](/unreal/refdocs#error-code-matches) comes in. It allows you to query if the error satisfies a particular condition, such as "does this code represent some kind of networking error", without needing to explicitly check the code against all the individual errors in the category.
 
 ![error_code_matches_network_error](img/error_code_matches_network_error.png)
 
@@ -183,19 +184,19 @@ However, this value can be overridden in one of two ways:
 
 ### Globally for a system account
 
-  On first run of a game using the plugin, `${FOLDERID_LocalAppData}/mod.io/globalsettings.json` will be created. 
+On first run of a game using the plugin, `${FOLDERID_LocalAppData}/mod.io/globalsettings.json` will be created. 
 
-  This JSON object contains a `RootLocalStoragePath` element - changing the string here to a valid path on disk will globally redirect the mod installation directory for **ALL** games using the mod.io Unreal Engine Plugin or Native SDK for the current system account. 
+This JSON object contains a `RootLocalStoragePath` element - changing the string here to a valid path on disk will globally redirect the mod installation directory for **ALL** games using the mod.io Unreal Engine Plugin or Native SDK for the current system account. 
 
-  :::warning
-  Changing this value while the SDK is initialized is not supported and behaviour is undefined.
-  :::
+:::warning
+Changing this value while the SDK is initialized is not supported and behaviour is undefined.
+:::
 
 ### Per-game for a system account   
 
-  Per-game settings are stored in `${FOLDERID_LocalAppData}/mod.io/${GameId}/${mod.io user string}/user.json`. 
+Per-game settings are stored in `${FOLDERID_LocalAppData}/mod.io/${GameId}/${mod.io user string}/user.json`. 
 
-  Adding a `RootLocalStoragePath` element to this file will redirect the mod installation directory for this specific game only for the current system account. Removing this value will cause the game to revert back to the global value in `globalsettings.json`.
+Adding a `RootLocalStoragePath` element to this file will redirect the mod installation directory for this specific game only for the current system account. Removing this value will cause the game to revert back to the global value in `globalsettings.json`.
 
 :::note 
 In Linux and macOS, mods and cached data binds to a single user. Other client have their own instance in their home directory.
@@ -205,5 +206,5 @@ In Linux and macOS, mods and cached data binds to a single user. Other client ha
 
 Now you know more about how the plugin works, it's time to set up [User Authentication](/unreal/user-authentication) or skip straight to [Searching for UGC](/unreal/searching-ugc).
 
-If you've already completed these steps, we recommend working your way through the [Unreal Getting Started Guides](/unreal/#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](/features/).
+If you've already completed these steps, we recommend working your way through the [Unreal Getting Started Guides](/unreal#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](https://docs.mod.io/features).
 

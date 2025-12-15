@@ -18,7 +18,7 @@
 #include "Internal/Convert/Theme.h"
 #include "Internal/ModioConvert.h"
 #include "ModioSDK.h"
-#include "Types/ModioGameInfo.h" 
+#include "Types/ModioGameInfo.h"
 #include "Types/ModioModTagOptions.h"
 
 FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
@@ -42,11 +42,13 @@ FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 	Out.Stats = ToUnreal(In.Stats);
 	Out.OtherUrls = ToUnreal<FModioOtherUrl>(In.OtherUrls);
 	Out.bAllowNegativeRatings = In.CommunityOptions.HasFlag(Modio::GameCommunityOptions::AllowNegativeRatings);
-	Out.GameMonetizationOptions = ToUnreal<EGameMonetizationFlags, Modio::GameMonetizationOptions>(In.GameMonetizationOptions);
+	Out.GameMonetizationOptions =
+		ToUnreal<EGameMonetizationFlags, Modio::GameMonetizationOptions>(In.GameMonetizationOptions);
 	Out.GameMaturityOptions = ToUnreal<EGameMaturityFlags, Modio::GameMaturityOptions>(In.MaturityOptions);
 	Out.VirtualTokenName = ToUnreal(In.VirtualTokenName);
 	Out.PlatformSupport = ToUnreal<FModioGamePlatform>(In.PlatformSupport);
 	Out.TagOptions = ToUnreal<FModioModTagInfo>(In.TagOptions);
+	Out.CloudCookingStatus = ToUnreal(In.CloudCookingStatus);
 
 	return Out;
 }

@@ -285,6 +285,13 @@ struct MODIO_API FModioModCollectionInfo
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModCollectionInfo")
 	FString ProfileDescription;
 
+	/**
+	 * @docpublic
+	 * @brief Detailed description in plaintext format
+	 */
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "ModCollectionInfo")
+	FString ProfileDescriptionPlaintext;
+
 	friend struct FModioModCollectionInfo ToUnreal(const struct Modio::ModCollectionInfo& In);
 
 	bool operator==(const FModioModCollectionInfo& Other) const

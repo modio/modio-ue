@@ -84,6 +84,7 @@ EModioModProgressState ToUnreal(const Modio::ModProgressInfo::EModProgressState&
 FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In);
 FModioStorageInfo ToUnreal(const Modio::StorageInfo& In);
 EModioModCommunityOptionsFlags ToUnreal(const Modio::ModCommunityOptionsFlags& In);
+EModioGameCloudCookingStatus ToUnreal(const Modio::GameCloudCookingStatus& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
@@ -110,6 +111,7 @@ Modio::EntitlementParams ToModio(const FModioEntitlementParams& InParams);
 Modio::StorageLocation ToModio(EModioStorageLocation Location);
 Modio::StorageUsage ToModio(EModioStorageUsage Usage);
 Modio::ModCommunityOptionsFlags ToModio(EModioModCommunityOptionsFlags In);
+Modio::GameCloudCookingStatus ToModio(EModioGameCloudCookingStatus In);
 
 #pragma region ToModio implementation
 

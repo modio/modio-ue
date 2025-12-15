@@ -40,8 +40,7 @@ void FModioSettingsDetails::CustomizeDetails(IDetailLayoutBuilder& DetailLayout)
 			 SVerticalBox::Slot()
 				 .Padding(FMargin(0, 5, 5, 5))
 				 .AutoHeight()[SNew(SBox).HAlign(
-					 HAlign_Center)[SNew(SHyperlinkLaunchURL, TEXT("https://docs.mod.io/unreal/core-plugin/"
-																   "installation-and-setup#plugin-configuration"))
+					 HAlign_Center)[SNew(SHyperlinkLaunchURL, TEXT("https://docs.mod.io/unreal/installation#plugin-configuration"))
 										.Text(LOCTEXT("ModioPluginSettingsDocumentation",
 													  "mod.io UE Plugin Configuration Documentation"))
 										.ToolTipText(LOCTEXT("ModioPluginSettingsDocumentationTooltip",

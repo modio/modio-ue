@@ -2,11 +2,12 @@
 id: ue-authentication
 title: User Authentication
 slug: /unreal/user-authentication
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/getting-started/ue-authentication.mdx
 ---
 
 # User Authentication for Unreal
 
-Authentication is required before users can interact with UGC, and this can take many forms. We recommend utilizing our [Single Sign-On (SSO)](#single-sign-on-authentication) features, as this is the quickest and most streamlined experience for your users. You can further explore these options in our overarching [Authentication](https://docs.mod.io/authentication/) guide.
+Authentication is required before users can interact with UGC, and this can take many forms. We recommend utilizing our [Single Sign-On (SSO)](#single-sign-on-authentication) features, as this is the quickest and most streamlined experience for your users. You can further explore these options in our overarching [Authentication](https://docs.mod.io/authentication) guide.
 
 This guide covers:
 
@@ -25,8 +26,8 @@ We recommend creating a new game-instance based subsystem (e.g. `ModioManagerSub
 	- Log in with the online identity provider.
 	- On success, get a linked account token for the current user.
 	- On success, get an authentication token from the linked account or from the online identity.
-- [Initialize](initialization) the mod.io plugin with the required environment parameters for the current platform.
-- Display the mod.io [Terms of Service](/terms).  Ensure they are accepted by the user.
+- [Initialize](/unreal/initialization) the mod.io plugin with the required environment parameters for the current platform.
+- Display the mod.io [Terms of Service](https://docs.mod.io/terms).  Ensure they are accepted by the user.
 - Authenticate the user using [SSO](#single-sign-on-authentication).
 
 :::note
@@ -37,7 +38,7 @@ If the Online Subsystem login fails at any point in the above process, fall back
 
 Users must accept the mod.io Terms of Service before using any mod.io services.  The Terms of Service can be fetched from mod.io using [`GetTermsOfUseAsync`](/unreal/refdocs#gettermsofuseasync).  Before attempting authentication, ensure these terms are displayed to and accepted by the user.  
 
-See our full [Terms & User Consent](/terms) documentation for further details.
+See our full [Terms & User Consent](https://docs.mod.io/terms) documentation for further details.
 
 When authenticating via SSO, the `bUserHasAcceptedTerms` parameter should be set to **false** by default. If the user has already accepted the latest terms, they will be authenticated automatically. If they haven't accepted the latest terms, an error `403 Forbidden (error_ref 11074)` will be returned. When you receive this error, you must display the terms dialog to the user, and if they accept, resubmit the authentication flow with `bUserHasAcceptedTerms` set to **true** for that specific request only. All subsequent authentication attempts should revert to using **false** for this parameter.
 
@@ -120,28 +121,29 @@ When your callback is invoked, inspect the `ModioErrorCode` for a successful res
 
 ## Single Sign-On authentication
 
-The mod.io Unreal Engine plugin features **Single Sign-On (SSO)** authentication from a number of [external providers](/unreal/refdocs/#EModioAuthenticationProvider). 
+The mod.io Unreal Engine plugin features **Single Sign-On (SSO)** authentication from a number of [external providers](/unreal/refdocs#EModioAuthenticationProvider). 
 
 There are two types of SSO to consider:
 
-1. [**Custom SSO**](https://docs.mod.io/authentication/openid/): Custom SSO harnesses your studio's authentication process as the single point of authentication. 
+1. [**Custom SSO**](https://docs.mod.io/authentication/openid): Custom SSO harnesses your studio's authentication process as the single point of authentication. 
 
-2. [**Platform SSO**](https://docs.mod.io/authentication/platform/): Platform SSO uses a given platform's authentication process as the single point of authentication. 
+2. [**Platform SSO**](https://docs.mod.io/authentication/platform): Platform SSO uses a given platform's authentication process as the single point of authentication. 
 
 	The platforms included in this process are:
 
-	* [Xbox Live](https://docs.mod.io/platforms/gdk/#authentication)
 	* [Steam](https://docs.mod.io/platforms/steam/authentication)
-	* [GOG Galaxy](https://docs.mod.io/platforms/gog/authentication)
-	* itch.io
-	* [Nintendo Switch](https://docs.mod.io/platforms/switch/#authentication)
-	* Discord
-	* [PlayStation™Network](https://docs.mod.io/platforms/playstation/#authentication)
-	* [Epic Online Services](https://docs.mod.io/platforms/epic/authentication)
+	* [PlayStation™Network](https://docs.mod.io/platforms/playstation#authentication)
+	* [Xbox Live](https://docs.mod.io/platforms/gdk#authentication)
+	* [Nintendo Switch](https://docs.mod.io/platforms/switch#authentication)
+	* [Apple (iOS)](https://docs.mod.io/platforms/apple/authentication)
+	* [Google Play (Android)](https://docs.mod.io/platforms/google/authentication)
 	* [Meta Quest](https://docs.mod.io/platforms/meta/authentication)
-	* [Google](https://docs.mod.io/platforms/google/authentication)
+	* [GOG Galaxy](https://docs.mod.io/platforms/gog/authentication)
+	* [Epic Games](https://docs.mod.io/platforms/epic/authentication)
+	* itch.io
+	* Discord
 
-Each platform has their own requirements and prerequisites for performing SSO.  Platform-specific authentication can be found in the respective [platform documentation](https://docs.mod.io/getting-started/#expand-with-cross-platform-functionality).  SSO is performed by calling [`AuthenticateUserExternalAsync`](/unreal/refdocs/#authenticateuserexternalasync).  This function takes a [`ModioAuthenticationParams`](/unreal/refdocs/#modioauthenticationparams) containing provider-specific parameters, and a [`ModioAuthenticationProvider`](/unreal/refdocs/#EModioAuthenticationProvider) indicating the provider you're using.   
+Each platform has their own requirements and prerequisites for performing SSO.  Platform-specific authentication can be found in the respective [platform documentation](https://docs.mod.io/getting-started#expand-with-cross-platform-functionality).  SSO is performed by calling [`AuthenticateUserExternalAsync`](/unreal/refdocs#authenticateuserexternalasync).  This function takes a [`ModioAuthenticationParams`](/unreal/refdocs#modioauthenticationparams) containing provider-specific parameters, and a [`ModioAuthenticationProvider`](/unreal/refdocs#EModioAuthenticationProvider) indicating the provider you're using.   
 
 [Unreal Engine's Online Subsystem](#using-the-unreal-online-subsystem) provides a convenient way to get a token for `ModioAuthenticationParams.AuthToken`. [`GetDefaultAuthProviderForCurrentPlatform`](/unreal/refdocs#get-default-auth-provider-for-current-platform) can be used to get the default provider for the current platform. 
 
@@ -252,4 +254,4 @@ If a user is not authenticated for any reason (e.g. their token has been invalid
 
 Now that you've set up the authentication process, the next step is to allow users to find UGC, which is outlined in the [Searching for UGC](/unreal/searching-ugc) guide.
 
-If you've already done this, we recommend working your way through the [Unreal Getting Started Guides](/unreal/#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](/features/).
+If you've already done this, we recommend working your way through the [Unreal Getting Started Guides](/unreal#unreal-engine-core-plugin-guides) as they will teach you how to implement the fundamentals of the Unreal Engine Plugin before moving onto exploring our [Features](https://docs.mod.io/features).
