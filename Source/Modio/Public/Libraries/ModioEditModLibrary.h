@@ -86,7 +86,12 @@ class MODIO_API UModioEditModLibrary : public UBlueprintFunctionLibrary
 	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Edit Mod Params")
 	static void SetMaturityFlags(UPARAM(ref) FModioEditModParams& In, EModioMaturityFlags MaturityFlags);
-	
+
+	/**
+	 * @brief Set the community options flags of the mod
+	 * @param In The edit mod parameters to modify
+	 * @param CommunityOptionsFlags The new community options flags of the mod
+	 */
 	UFUNCTION(BlueprintCallable, Category = "mod.io|Edit Mod Params")
 	static void SetCommunityOptionsFlags(UPARAM(ref) FModioEditModParams& In, EModioModCommunityOptionsFlags CommunityOptionsFlags);
 

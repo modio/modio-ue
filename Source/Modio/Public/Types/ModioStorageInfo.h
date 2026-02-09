@@ -21,7 +21,7 @@ namespace Modio
 }
 
 /**
- * Where the storage has been written to
+ * @brief Identifies the backing location used to store data.
  **/
 UENUM(BlueprintType)
 enum class EModioStorageLocation : uint8
@@ -34,8 +34,11 @@ enum class EModioStorageLocation : uint8
 ENUM_RANGE_BY_COUNT(EModioStorageLocation, EModioStorageLocation::Count);
 
 /**
- * The type of storage usage
- **/
+ * @brief Indicates how a storage amount should be interpreted when reporting disk usage.
+ *
+ * Use `Consumed` for space already used by mod.io data, and `Available` for free space that can be used
+ * for downloads/installs.
+ */
 UENUM(BlueprintType)
 enum class EModioStorageUsage : uint8
 {
@@ -47,8 +50,12 @@ enum class EModioStorageUsage : uint8
 ENUM_RANGE_BY_COUNT(EModioStorageUsage, EModioStorageUsage::Count);
 
 /**
- * A key used to query storage information by location and usage
- **/
+ * @brief Composite key for looking up storage metrics by location and usage type.
+ *
+ * Combines an `EModioStorageLocation` (where the data lives) with an `EModioStorageUsage`
+ * (whether reporting consumed vs. available space). Implements equality and hashing so it can be used
+ * as a key in hashed containers (e.g., `TMap`).
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FStorageInfoKey
 {
@@ -72,8 +79,11 @@ struct MODIO_API FStorageInfoKey
 };
 
 /**
- * Strong type struct containing storage usage information including availability and consumption
- **/
+ * @brief Strongly-typed container for storage space metrics (consumed/available) across storage locations.
+ *
+ * Stores storage values (in bytes) keyed by `EModioStorageLocation` and `EModioStorageUsage`, and provides
+ * convenience accessors via `GetSpace(...)` to query the recorded amount for a given key.
+ */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioStorageInfo
 {

@@ -427,7 +427,7 @@ public:
 	 * @docpublic
 	 * @brief Fetches the local view of the user's subscribed mods, including mods that are subscribed but not
 	 * yet installed
-	 * @return `TMap<FModioID, FModioModCollectionEntry>` providing information about the subscribed
+	 * @return `TMap<FModioModID, FModioModCollectionEntry>` providing information about the subscribed
 	 * mods
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|User")
@@ -438,7 +438,7 @@ public:
 	 * @brief Fetches the subset of the user's subscribed mods that are installed and ready for loading
 	 * @param bIncludeOutdatedMods Include subscribed mods that are installed but have an updated version on the server
 	 * that has not yet been installed
-	 * @return `TMap<FModioID, FModioModCollectionEntry>` providing information about the subscribed
+	 * @return `TMap<FModioModID, FModioModCollectionEntry>` providing information about the subscribed
 	 * mods
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|User")
@@ -1339,7 +1339,7 @@ public:
 
 	/**
 	 * @docpublic
-	 * @brief Sends a request to the mod.io server to remove the specified mod collection to the user's list of
+	 * @brief Sends a request to the mod.io server to remove the specified mod collection from the user's list of
 	 * followed collections.
 	 * @param ModCollectionToUnfollow Mod Collection ID of the mod collection to unfollow.
 	 * @param Callback Callback invoked when the unfollow request is completed.

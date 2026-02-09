@@ -29,7 +29,7 @@ public:
 	 * code for the upload.
 	 * @param Target The ModioSubsystem object
 	 * @param Mod The ID of the mod you are submitting a file for
-	 * @param Params Information about the mod file being created, including the memory that wiull be uploaded as a mod
+	 * @param Params Information about the mod file being created, including the memory that will be uploaded as a mod
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 */
@@ -42,7 +42,7 @@ public:
 	 * triggered with the result code for the upload.
 	 * @param Target The ModioSubsystem object
 	 * @param Mod The ID of the mod you are submitting a file for
-	 * @param Params Information about the mod file being created, including the memory that wiull be uploaded as a mod
+	 * @param Params Information about the mod file being created, including the memory that will be uploaded as a mod
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 */

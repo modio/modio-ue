@@ -26,7 +26,7 @@ class MODIO_API UModioStorageInfoLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 	/**
-	 * Returns the recorded storage space for a given storage location and usage type
+	 * @brief Returns the recorded storage space for a given storage location and usage type
 	 * @param Location Where the storage has been written to
 	 * @param Usage The type of storage usage recorded
 	 * @return Total storage space in bytes
@@ -39,7 +39,7 @@ public:
 	}
 
 	/**
-	 * Returns the recorded storage space for a given storage location and usage type
+	 * @brief Returns the recorded storage space for a given storage location and usage type
 	 * @param StorageKey Where the storage has been written to and what type of usage to query
 	 * @return Total storage space in bytes
 	 **/

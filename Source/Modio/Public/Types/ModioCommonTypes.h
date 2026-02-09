@@ -102,7 +102,7 @@ enum class EModioModfilePlatform : uint8
 ENUM_RANGE_BY_COUNT(EModioModfilePlatform, EModioModfilePlatform::Count);
 
 /**
- * Enum representing mod logo sizes
+ * @brief Enum representing mod logo sizes
  */
 UENUM(BlueprintType)
 enum class EModioLogoSize : uint8
@@ -118,7 +118,7 @@ enum class EModioLogoSize : uint8
 };
 
 /**
- * Enum representing avatar image sizes
+ * @brief Enum representing avatar image sizes
  */
 UENUM(BlueprintType)
 enum class EModioAvatarSize : uint8
@@ -132,7 +132,7 @@ enum class EModioAvatarSize : uint8
 };
 
 /**
- * Enumerator for the standard size a gallery image can use
+ * @brief Enum for the standard size a gallery image can use
  */
 UENUM(BlueprintType)
 enum class EModioGallerySize : uint8
@@ -148,7 +148,7 @@ enum class EModioGallerySize : uint8
 };
 
 /**
- * Degree of severity for the log output
+ * @brief Degree of severity for the log output
  */
 UENUM(BlueprintType)
 enum class EModioLogLevel : uint8

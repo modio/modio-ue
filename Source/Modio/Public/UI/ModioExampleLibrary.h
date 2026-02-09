@@ -25,15 +25,21 @@ class UModioExampleLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	/** Get the project specified avatar thumbnail size */
+	/**
+	 * @brief Get the project specified avatar thumbnail size
+	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Example|Project")
 	static EModioAvatarSize GetAvatarThumbnailSize();
 
-	/** Get the project specified logo thumbnail size */
+	/**
+	 * @brief Get the project specified logo thumbnail size
+	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Example|Project")
 	static EModioLogoSize GetLogoThumbnailSize();
 
-	/** Get the project specified logo full size */
+	/**
+	 * @brief Get the project specified logo full size
+	 **/
 	UFUNCTION(BlueprintPure, Category = "mod.io|Example|Project")
 	static EModioLogoSize GetLogoFullSize();
 

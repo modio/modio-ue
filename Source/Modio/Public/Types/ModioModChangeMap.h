@@ -34,7 +34,7 @@ struct MODIO_API FModioModChangeMap
 
 /**
  * @docpublic
- * @brief Strong type struct to wrap a ModDependencyList data as an optional value
+ * @brief Strong type struct to wrap a ModChangeMap as an optional value
  */
 USTRUCT(BlueprintType)
 struct MODIO_API FModioOptionalModChangeMap
