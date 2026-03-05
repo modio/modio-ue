@@ -13,6 +13,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Types/ModioGameInfo.h"
 #include "Types/ModioImageWrapper.h"
+#include "Types/ModioModCollection.h"
 #include "Types/ModioModDependencyList.h"
 #include "Types/ModioModInfo.h"
 #include "Types/ModioModInfoList.h"
@@ -20,7 +21,7 @@
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioUnsigned64.h"
-#include "Types/ModioModCollection.h"
+#include "Types/ModioUserModRating.h"
 
 #include "ModioOptionalLibrary.generated.h"
 
@@ -322,7 +323,7 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @return true if it has a value set
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
-		meta = (DisplayName = "IsSet (ModioOptionalModChangeMap)", CompactNodeTitle = "IsSet"))
+			  meta = (DisplayName = "IsSet (ModioOptionalModChangeMap)", CompactNodeTitle = "IsSet"))
 	static bool IsSet_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap);
 
 	/**
@@ -334,9 +335,9 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @return true if the optional has a value set
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
-		DisplayName = "GetValue (ModioOptionalModChangeMap)")
+			  DisplayName = "GetValue (ModioOptionalModChangeMap)")
 	static bool GetValue_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap,
-	                                               struct FModioModChangeMap& ModChangeMap);
+												   struct FModioModChangeMap& ModChangeMap);
 
 	/**
 	 * @docpublic
@@ -347,7 +348,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 */
 	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
 			  meta = (DisplayName = "IsSet (ModioOptionalModCollectionInfo)", CompactNodeTitle = "IsSet"))
-	static bool IsSet_ModioOptionalModCollectionInfo(const struct FModioOptionalModCollectionInfo& OptionalModCollectionInfo);
+	static bool IsSet_ModioOptionalModCollectionInfo(
+		const struct FModioOptionalModCollectionInfo& OptionalModCollectionInfo);
 
 	/**
 	 * @docpublic
@@ -357,7 +359,8 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	 * @param ModCollectionInfo - if this returned false, then this will be defaulted
 	 * @return true if the optional has a value set
 	 */
-	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional", DisplayName = "GetValue (ModioOptionalModCollectionInfo)")
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalModCollectionInfo)")
 	static bool GetValue_ModioOptionalModCollectionInfo(
 		const struct FModioOptionalModCollectionInfo& OptionalModCollectionInfo,
 		struct FModioModCollectionInfo& ModCollectionInfo);
@@ -387,4 +390,30 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalModCollectionInfoList(
 		const struct FModioOptionalModCollectionInfoList& OptionalModCollectionInfoList,
 		struct FModioModCollectionInfoList& ModCollectionInfoList);
+
+	/**
+	 * @docpublic
+	 * @brief Check if the user rating list has a valid value
+	 *
+	 * @param OptionalUserModRatingList - The optional to check
+	 * @return true if it has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  meta = (DisplayName = "IsSet (ModioOptionalUserModRatingList)", CompactNodeTitle = "IsSet"))
+	static bool IsSet_ModioOptionalUserModRatingList(
+		const struct FModioOptionalUserModRatingList& OptionalUserModRatingList);
+
+	/**
+	 * @docpublic
+	 * @brief Get the user rating list from the optional if it's set
+	 *
+	 * @param OptionalUserModRatingList -
+	 * @param UserModRatingList - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalUserModRatingList)")
+	static bool GetValue_ModioOptionalUserModRatingList(
+		const struct FModioOptionalUserModRatingList& OptionalUserModRatingList,
+		struct FModioUserModRatingList& UserModRatingList);
 };

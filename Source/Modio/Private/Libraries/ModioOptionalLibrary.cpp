@@ -11,11 +11,11 @@
 #include "Libraries/ModioOptionalLibrary.h"
 #include "Types/ModioGameInfo.h"
 #include "Types/ModioGameInfoList.h"
+#include "Types/ModioModChangeMap.h"
 #include "Types/ModioModDependencyList.h"
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioUser.h"
-#include "Types/ModioModChangeMap.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ModioOptionalLibrary)
 
@@ -179,12 +179,14 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalUInt64(const struct FModioOpti
 	return false;
 }
 
-bool UModioOptionalLibrary::IsSet_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap)
+bool UModioOptionalLibrary::IsSet_ModioOptionalModChangeMap(
+	const struct FModioOptionalModChangeMap& OptionalModChangeMap)
 {
 	return IsSetInternal(OptionalModChangeMap);
 }
 
-bool UModioOptionalLibrary::GetValue_ModioOptionalModChangeMap(const struct FModioOptionalModChangeMap& OptionalModChangeMap, struct FModioModChangeMap& ModChangeMap)
+bool UModioOptionalLibrary::GetValue_ModioOptionalModChangeMap(
+	const struct FModioOptionalModChangeMap& OptionalModChangeMap, struct FModioModChangeMap& ModChangeMap)
 {
 	return GetValueInternal(OptionalModChangeMap, ModChangeMap);
 }
@@ -212,4 +214,17 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalModCollectionInfoList(
 	FModioModCollectionInfoList& ModCollectionInfoList)
 {
 	return GetValueInternal(OptionalModCollectionInfoList, ModCollectionInfoList);
+}
+
+bool UModioOptionalLibrary::IsSet_ModioOptionalUserModRatingList(
+	const struct FModioOptionalUserModRatingList& OptionalUserModRatingList)
+{
+	return IsSetInternal(OptionalUserModRatingList);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalUserModRatingList(
+	const struct FModioOptionalUserModRatingList& OptionalUserModRatingList,
+	struct FModioUserModRatingList& UserModRatingList)
+{
+	return GetValueInternal(OptionalUserModRatingList, UserModRatingList);
 }

@@ -27,6 +27,7 @@
 #include "Types/ModioTerms.h"
 #include "Types/ModioTransactionRecord.h"
 #include "Types/ModioUser.h"
+#include "Types/ModioUserModRating.h"
 
 #include <chrono>
 #include <string>
@@ -85,6 +86,8 @@ FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In);
 FModioStorageInfo ToUnreal(const Modio::StorageInfo& In);
 EModioModCommunityOptionsFlags ToUnreal(const Modio::ModCommunityOptionsFlags& In);
 EModioGameCloudCookingStatus ToUnreal(const Modio::GameCloudCookingStatus& In);
+FModioUserModRating ToUnreal(const Modio::UserRating& In);
+FModioUserModRatingList ToUnreal(const Modio::UserRatingList& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);

@@ -13,20 +13,20 @@
 #include "Engine/Engine.h"
 #include "Internal/Convert/AuthParams.h"
 #include "Internal/Convert/CreateModFileParams.h"
-#include "Internal/Convert/CreateSourceFileParams.h"
 #include "Internal/Convert/CreateModParams.h"
+#include "Internal/Convert/CreateSourceFileParams.h"
 #include "Internal/Convert/EditModParams.h"
 #include "Internal/Convert/Entitlements.h"
 #include "Internal/Convert/ErrorCode.h"
 #include "Internal/Convert/FilterParams.h"
 #include "Internal/Convert/GameInfo.h"
 #include "Internal/Convert/GameInfoList.h"
-#include "Internal/Convert/ModCollectionInfo.h"
-#include "Internal/Convert/ModCollectionStats.h"
 #include "Internal/Convert/GamePlatform.h"
 #include "Internal/Convert/InitializeOptions.h"
 #include "Internal/Convert/List.h"
 #include "Internal/Convert/ModCollectionEntry.h"
+#include "Internal/Convert/ModCollectionInfo.h"
+#include "Internal/Convert/ModCollectionStats.h"
 #include "Internal/Convert/ModCreationHandle.h"
 #include "Internal/Convert/ModDependency.h"
 #include "Internal/Convert/ModInfo.h"
@@ -42,12 +42,13 @@
 #include "Internal/Convert/Terms.h"
 #include "Internal/Convert/TransactionRecord.h"
 #include "Internal/Convert/User.h"
+#include "Internal/Convert/UserRatingList.h"
 #include "Internal/ModioConvert.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Libraries/ModioErrorConditionLibrary.h"
 #include "Libraries/ModioSDKLibrary.h"
 #include "ModioSettings.h"
 #include "ProfilingDebugging/CpuProfilerTrace.h"
-#include "Libraries/ModioErrorConditionLibrary.h"
 #include <map>
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ModioSubsystem)
@@ -196,25 +197,26 @@ void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FO
 	}
 #endif
 
-	Modio::InitializeAsync(ToModio(Options), [WeakThis = MakeWeakObjectPtr(this), OnInitComplete, Options](Modio::ErrorCode ec) {
-		if (!WeakThis.IsValid())
-		{
-			return;
-		}
-		AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnInitComplete, ec, Options]() {
-					  if (WeakThis.IsValid())
-					  {
-						  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-						  if (!ec &&
-							  !UModioErrorConditionLibrary::ErrorCodeMatches(ec, EModioErrorCondition::SDKAlreadyInitialized))
-						  {
-							  WeakThis->CachedInitializeOptions = Options;
-						  }
-						  WeakThis->InvalidateUserSubscriptionCache();
-						  OnInitComplete.ExecuteIfBound(ToUnreal(ec));
-					  }
-				  }));
-	});
+	Modio::InitializeAsync(ToModio(Options),
+						   [WeakThis = MakeWeakObjectPtr(this), OnInitComplete, Options](Modio::ErrorCode ec) {
+							   if (!WeakThis.IsValid())
+							   {
+								   return;
+							   }
+							   AsyncTask(ENamedThreads::GameThread, ([WeakThis, OnInitComplete, ec, Options]() {
+											 if (WeakThis.IsValid())
+											 {
+												 TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
+												 if (!ec && !UModioErrorConditionLibrary::ErrorCodeMatches(
+																ec, EModioErrorCondition::SDKAlreadyInitialized))
+												 {
+													 WeakThis->CachedInitializeOptions = Options;
+												 }
+												 WeakThis->InvalidateUserSubscriptionCache();
+												 OnInitComplete.ExecuteIfBound(ToUnreal(ec));
+											 }
+										 }));
+						   });
 }
 
 void UModioSubsystem::K2_InitializeAsync(const FModioInitializeOptions& InitializeOptions,
@@ -917,6 +919,15 @@ void UModioSubsystem::InvalidateUserSubscriptionCache()
 	CachedUserSubscriptions.Reset();
 }
 
+void UModioSubsystem::GetUserRatingsAsync(FOnGetUserModRatingsDelegateFast Callback)
+{
+	Modio::GetUserRatingsAsync([Callback](Modio::ErrorCode ec, Modio::Optional<Modio::UserRatingList> Ratings) {
+		AsyncTask(ENamedThreads::GameThread, [Callback, ec, Ratings]() {
+			Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioUserModRatingList>(Ratings));
+		});
+	});
+}
+
 FModioImageCache& UModioSubsystem::GetImageCache() const
 {
 	return *ImageCache;
@@ -1346,40 +1357,45 @@ void UModioSubsystem::MetricsSessionEndAsync(FOnErrorOnlyDelegateFast Callback)
 	});
 }
 
-void UModioSubsystem::ListModCollectionsAsync(const FModioFilterParams& Filter, FOnListModCollectionsDelegateFast Callback)
+void UModioSubsystem::ListModCollectionsAsync(const FModioFilterParams& Filter,
+											  FOnListModCollectionsDelegateFast Callback)
 {
-	Modio::ListModCollectionsAsync(ToModio(Filter),
+	Modio::ListModCollectionsAsync(
+		ToModio(Filter),
 		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfoList> CollectionInfoList) {
-		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfoList]() {
-			Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioModCollectionInfoList>(CollectionInfoList));
-		}));
-	});
+			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfoList]() {
+						  Callback.ExecuteIfBound(ToUnreal(ec),
+												  ToUnrealOptional<FModioModCollectionInfoList>(CollectionInfoList));
+					  }));
+		});
 }
 
 void UModioSubsystem::GetModCollectionInfoAsync(FModioModCollectionID ModCollectionId,
-	FOnGetModCollectionInfoDelegateFast Callback)
+												FOnGetModCollectionInfoDelegateFast Callback)
 {
-	Modio::GetModCollectionInfoAsync(ToModio(ModCollectionId),
+	Modio::GetModCollectionInfoAsync(
+		ToModio(ModCollectionId),
 		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfo> CollectionInfo) {
-		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfo]() {
-			Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioModCollectionInfo>(CollectionInfo));
-		}));
-	});
+			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfo]() {
+						  Callback.ExecuteIfBound(ToUnreal(ec),
+												  ToUnrealOptional<FModioModCollectionInfo>(CollectionInfo));
+					  }));
+		});
 }
 
 void UModioSubsystem::GetModCollectionModsAsync(FModioModCollectionID ModCollectionId,
-	FOnGetModCollectionModsDelegateFast Callback)
+												FOnGetModCollectionModsDelegateFast Callback)
 {
-	Modio::GetModCollectionModsAsync(ToModio(ModCollectionId),
-		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModInfoList) {
-		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, ModInfoList]() {
-			Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioModInfoList>(ModInfoList));
-		}));
-	});
+	Modio::GetModCollectionModsAsync(
+		ToModio(ModCollectionId), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModInfoList> ModInfoList) {
+			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, ModInfoList]() {
+						  Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioModInfoList>(ModInfoList));
+					  }));
+		});
 }
 
 void UModioSubsystem::SubmitModCollectionRatingAsync(FModioModCollectionID ModCollectionId, EModioRating Rating,
-	FOnErrorOnlyDelegateFast Callback)
+													 FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::SubmitModCollectionRatingAsync(ToModio(ModCollectionId), ToModio(Rating), [Callback](Modio::ErrorCode ec) {
 		AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ToUnreal(ec)); }));
@@ -1387,7 +1403,7 @@ void UModioSubsystem::SubmitModCollectionRatingAsync(FModioModCollectionID ModCo
 }
 
 void UModioSubsystem::SubscribeToModCollectionAsync(FModioModCollectionID ModCollectionToSubscribeTo,
-	FOnErrorOnlyDelegateFast Callback)
+													FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::SubscribeToModCollectionAsync(ToModio(ModCollectionToSubscribeTo), [Callback](Modio::ErrorCode ec) {
 		AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ToUnreal(ec)); }));
@@ -1395,7 +1411,7 @@ void UModioSubsystem::SubscribeToModCollectionAsync(FModioModCollectionID ModCol
 }
 
 void UModioSubsystem::UnsubscribeFromModCollectionAsync(FModioModCollectionID ModCollectionToUnsubscribeFrom,
-	FOnErrorOnlyDelegateFast Callback)
+														FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::UnsubscribeFromModCollectionAsync(ToModio(ModCollectionToUnsubscribeFrom), [Callback](Modio::ErrorCode ec) {
 		AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ToUnreal(ec)); }));
@@ -1403,18 +1419,20 @@ void UModioSubsystem::UnsubscribeFromModCollectionAsync(FModioModCollectionID Mo
 }
 
 void UModioSubsystem::FollowModCollectionAsync(FModioModCollectionID ModCollectionToFollow,
-	FOnFollowModCollectionDelegateFast Callback)
+											   FOnFollowModCollectionDelegateFast Callback)
 {
-	Modio::FollowModCollectionAsync(ToModio(ModCollectionToFollow),
+	Modio::FollowModCollectionAsync(
+		ToModio(ModCollectionToFollow),
 		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfo> CollectionInfo) {
-		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfo]() {
-			Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioModCollectionInfo>(CollectionInfo));
-		}));
-	});
+			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfo]() {
+						  Callback.ExecuteIfBound(ToUnreal(ec),
+												  ToUnrealOptional<FModioModCollectionInfo>(CollectionInfo));
+					  }));
+		});
 }
 
 void UModioSubsystem::UnfollowModCollectionAsync(FModioModCollectionID ModCollectionToUnfollow,
-	FOnErrorOnlyDelegateFast Callback)
+												 FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::UnfollowModCollectionAsync(ToModio(ModCollectionToUnfollow), [Callback](Modio::ErrorCode ec) {
 		AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ToUnreal(ec)); }));
@@ -1422,21 +1440,25 @@ void UModioSubsystem::UnfollowModCollectionAsync(FModioModCollectionID ModCollec
 }
 
 void UModioSubsystem::ListUserFollowedModCollectionsAsync(const FModioFilterParams& Filter,
-	FOnListFollowedModCollectionsDelegateFast Callback)
+														  FOnListFollowedModCollectionsDelegateFast Callback)
 {
-	Modio::ListUserFollowedModCollectionsAsync(ToModio(Filter),
+	Modio::ListUserFollowedModCollectionsAsync(
+		ToModio(Filter),
 		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::ModCollectionInfoList> CollectionInfoList) {
-		AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfoList]() {
-			Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioModCollectionInfoList>(CollectionInfoList));
-		}));
-	});
+			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, CollectionInfoList]() {
+						  Callback.ExecuteIfBound(ToUnreal(ec),
+												  ToUnrealOptional<FModioModCollectionInfoList>(CollectionInfoList));
+					  }));
+		});
 }
 
 void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollectionId, EModioLogoSize LogoSize,
-	FOnGetModCollectionMediaDelegateFast Callback)
+												 FOnGetModCollectionMediaDelegateFast Callback)
 {
-	const TTuple<FModioModCollectionID, EModioLogoSize> ModCollectionIdAndSizePair = MakeTuple(ModCollectionId, LogoSize);
-	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingModCollectionMediaLogoRequests.Find(ModCollectionIdAndSizePair))
+	const TTuple<FModioModCollectionID, EModioLogoSize> ModCollectionIdAndSizePair =
+		MakeTuple(ModCollectionId, LogoSize);
+	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr =
+			PendingModCollectionMediaLogoRequests.Find(ModCollectionIdAndSizePair))
 	{
 		MulticastCallbackPtr->Add(Callback);
 		return;
@@ -1444,7 +1466,8 @@ void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollec
 	PendingModCollectionMediaLogoRequests.Add(ModCollectionIdAndSizePair).Add(Callback);
 	Modio::GetModCollectionMediaAsync(
 		ToModio(ModCollectionId), ToModio(LogoSize),
-		[WeakThis = MakeWeakObjectPtr(this), ModCollectionIdAndSizePair](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
+		[WeakThis = MakeWeakObjectPtr(this), ModCollectionIdAndSizePair](Modio::ErrorCode ec,
+																		 Modio::Optional<std::string> Path) {
 			if (!WeakThis.IsValid())
 			{
 				return;
@@ -1462,7 +1485,8 @@ void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollec
 							  if (WeakThis.IsValid())
 							  {
 								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-								  WeakThis->PendingModCollectionMediaLogoRequests.FindAndRemoveChecked(ModCollectionIdAndSizePair)
+								  WeakThis->PendingModCollectionMediaLogoRequests
+									  .FindAndRemoveChecked(ModCollectionIdAndSizePair)
 									  .Broadcast(ec, Out);
 							  }
 						  }));
@@ -1473,7 +1497,8 @@ void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollec
 							  if (WeakThis.IsValid())
 							  {
 								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-								  WeakThis->PendingModCollectionMediaLogoRequests.FindAndRemoveChecked(ModCollectionIdAndSizePair)
+								  WeakThis->PendingModCollectionMediaLogoRequests
+									  .FindAndRemoveChecked(ModCollectionIdAndSizePair)
 									  .Broadcast(ec, {});
 							  }
 						  }));
@@ -1482,10 +1507,12 @@ void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollec
 }
 
 void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollectionId, EModioAvatarSize AvatarSize,
-	FOnGetModCollectionMediaDelegateFast Callback)
+												 FOnGetModCollectionMediaDelegateFast Callback)
 {
-	const TTuple<FModioModCollectionID, EModioAvatarSize> ModCollectionIdAndSizePair = MakeTuple(ModCollectionId, AvatarSize);
-	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr = PendingModCollectionMediaAvatarRequests.Find(ModCollectionIdAndSizePair))
+	const TTuple<FModioModCollectionID, EModioAvatarSize> ModCollectionIdAndSizePair =
+		MakeTuple(ModCollectionId, AvatarSize);
+	if (FOnGetMediaMulticastDelegateFast* MulticastCallbackPtr =
+			PendingModCollectionMediaAvatarRequests.Find(ModCollectionIdAndSizePair))
 	{
 		MulticastCallbackPtr->Add(Callback);
 		return;
@@ -1493,7 +1520,8 @@ void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollec
 	PendingModCollectionMediaAvatarRequests.Add(ModCollectionIdAndSizePair).Add(Callback);
 	Modio::GetModCollectionMediaAsync(
 		ToModio(ModCollectionId), ToModio(AvatarSize),
-		[WeakThis = MakeWeakObjectPtr(this), ModCollectionIdAndSizePair](Modio::ErrorCode ec, Modio::Optional<std::string> Path) {
+		[WeakThis = MakeWeakObjectPtr(this), ModCollectionIdAndSizePair](Modio::ErrorCode ec,
+																		 Modio::Optional<std::string> Path) {
 			if (!WeakThis.IsValid())
 			{
 				return;
@@ -1511,7 +1539,8 @@ void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollec
 							  if (WeakThis.IsValid())
 							  {
 								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-								  WeakThis->PendingModCollectionMediaAvatarRequests.FindAndRemoveChecked(ModCollectionIdAndSizePair)
+								  WeakThis->PendingModCollectionMediaAvatarRequests
+									  .FindAndRemoveChecked(ModCollectionIdAndSizePair)
 									  .Broadcast(ec, Out);
 							  }
 						  }));
@@ -1522,7 +1551,8 @@ void UModioSubsystem::GetModCollectionMediaAsync(FModioModCollectionID ModCollec
 							  if (WeakThis.IsValid())
 							  {
 								  TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("Callback"));
-								  WeakThis->PendingModCollectionMediaAvatarRequests.FindAndRemoveChecked(ModCollectionIdAndSizePair)
+								  WeakThis->PendingModCollectionMediaAvatarRequests
+									  .FindAndRemoveChecked(ModCollectionIdAndSizePair)
 									  .Broadcast(ec, {});
 							  }
 						  }));
@@ -1611,34 +1641,37 @@ void UModioSubsystem::K2_MetricsSessionEndAsync(FOnErrorOnlyDelegate Callback)
 }
 
 void UModioSubsystem::K2_ListModCollectionsAsync(const FModioFilterParams& Filter,
-	FOnListModCollectionsDelegate Callback)
+												 FOnListModCollectionsDelegate Callback)
 {
-	ListModCollectionsAsync(Filter, FOnListModCollectionsDelegateFast::CreateLambda(
-		[Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfoList> ModCollectionInfoList) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModCollectionInfoList>(ModCollectionInfoList));
-		}));
+	ListModCollectionsAsync(
+		Filter, FOnListModCollectionsDelegateFast::CreateLambda(
+					[Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfoList> ModCollectionInfoList) {
+						Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModCollectionInfoList>(ModCollectionInfoList));
+					}));
 }
 
 void UModioSubsystem::K2_GetModCollectionInfoAsync(FModioModCollectionID ModCollectionId,
-	FOnGetModCollectionInfoDelegate Callback)
+												   FOnGetModCollectionInfoDelegate Callback)
 {
-	GetModCollectionInfoAsync(ModCollectionId, FOnGetModCollectionInfoDelegateFast::CreateLambda(
-		[Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfo> ModCollectionInfo) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModCollectionInfo>(ModCollectionInfo));
-		}));
+	GetModCollectionInfoAsync(
+		ModCollectionId, FOnGetModCollectionInfoDelegateFast::CreateLambda(
+							 [Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfo> ModCollectionInfo) {
+								 Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModCollectionInfo>(ModCollectionInfo));
+							 }));
 }
 
 void UModioSubsystem::K2_GetModCollectionModsAsync(FModioModCollectionID ModCollectionId,
-	FOnGetModCollectionModsDelegate Callback)
+												   FOnGetModCollectionModsDelegate Callback)
 {
-	GetModCollectionModsAsync(ModCollectionId, FOnGetModCollectionModsDelegateFast::CreateLambda(
-		[Callback](FModioErrorCode ec, TOptional<FModioModInfoList> ModInfoList) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModInfoList>(ModInfoList));
-		}));
+	GetModCollectionModsAsync(ModCollectionId,
+							  FOnGetModCollectionModsDelegateFast::CreateLambda(
+								  [Callback](FModioErrorCode ec, TOptional<FModioModInfoList> ModInfoList) {
+									  Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModInfoList>(ModInfoList));
+								  }));
 }
 
 void UModioSubsystem::K2_SubmitModCollectionRatingAsync(FModioModCollectionID ModCollectionId, EModioRating Rating,
-	FOnErrorOnlyDelegate Callback)
+														FOnErrorOnlyDelegate Callback)
 {
 	SubmitModCollectionRatingAsync(
 		ModCollectionId, Rating,
@@ -1646,69 +1679,68 @@ void UModioSubsystem::K2_SubmitModCollectionRatingAsync(FModioModCollectionID Mo
 }
 
 void UModioSubsystem::K2_SubscribeToModCollectionAsync(FModioModCollectionID ModCollectionToSubscribeTo,
-	FOnErrorOnlyDelegate Callback)
+													   FOnErrorOnlyDelegate Callback)
 {
 	SubscribeToModCollectionAsync(
 		ModCollectionToSubscribeTo,
-		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) {
-			Callback.ExecuteIfBound(ec);
-		}));
+		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 void UModioSubsystem::K2_UnsubscribeFromModCollectionAsync(FModioModCollectionID ModCollectionToUnsubscribeFrom,
-	FOnErrorOnlyDelegate Callback)
+														   FOnErrorOnlyDelegate Callback)
 {
 	UnsubscribeFromModCollectionAsync(
 		ModCollectionToUnsubscribeFrom,
-		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) {
-			Callback.ExecuteIfBound(ec);
-		}));
+		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 void UModioSubsystem::K2_FollowModCollectionAsync(FModioModCollectionID ModCollectionToFollow,
-	FOnFollowModCollectionDelegate Callback)
+												  FOnFollowModCollectionDelegate Callback)
 {
-	FollowModCollectionAsync(ModCollectionToFollow, FOnFollowModCollectionDelegateFast::CreateLambda(
-		[Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfo> ModCollectionInfo) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModCollectionInfo>(ModCollectionInfo));
-		}));
+	FollowModCollectionAsync(ModCollectionToFollow,
+							 FOnFollowModCollectionDelegateFast::CreateLambda(
+								 [Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfo> ModCollectionInfo) {
+									 Callback.ExecuteIfBound(ec,
+															 ToBP<FModioOptionalModCollectionInfo>(ModCollectionInfo));
+								 }));
 }
 
 void UModioSubsystem::K2_UnfollowModCollectionAsync(FModioModCollectionID ModCollectionToUnfollow,
-	FOnErrorOnlyDelegate Callback)
+													FOnErrorOnlyDelegate Callback)
 {
 	UnfollowModCollectionAsync(
 		ModCollectionToUnfollow,
-		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) {
-			Callback.ExecuteIfBound(ec);
-		}));
+		FOnErrorOnlyDelegateFast::CreateLambda([Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 void UModioSubsystem::K2_ListUserFollowedModCollectionsAsync(const FModioFilterParams& Filter,
-	FOnListFollowedModCollectionsDelegate Callback)
+															 FOnListFollowedModCollectionsDelegate Callback)
 {
-	ListUserFollowedModCollectionsAsync(Filter, FOnListFollowedModCollectionsDelegateFast::CreateLambda(
-		[Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfoList> ModCollectionInfoList) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModCollectionInfoList>(ModCollectionInfoList));
-		}));
+	ListUserFollowedModCollectionsAsync(
+		Filter, FOnListFollowedModCollectionsDelegateFast::CreateLambda(
+					[Callback](FModioErrorCode ec, TOptional<FModioModCollectionInfoList> ModCollectionInfoList) {
+						Callback.ExecuteIfBound(ec, ToBP<FModioOptionalModCollectionInfoList>(ModCollectionInfoList));
+					}));
 }
 
 void UModioSubsystem::K2_GetModCollectionLogoAsync(FModioModCollectionID ModCollectionId, EModioLogoSize LogoSize,
-	FOnGetModCollectionMediaDelegate Callback)
+												   FOnGetModCollectionMediaDelegate Callback)
 {
-	GetModCollectionMediaAsync(ModCollectionId, LogoSize, FOnGetModCollectionMediaDelegateFast::CreateLambda(
-		[Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> Media) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(Media));
-		}));
+	GetModCollectionMediaAsync(ModCollectionId, LogoSize,
+							   FOnGetModCollectionMediaDelegateFast::CreateLambda(
+								   [Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> Media) {
+									   Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(Media));
+								   }));
 }
 
 void UModioSubsystem::K2_GetModCollectionAvatarAsync(FModioModCollectionID ModCollectionId, EModioAvatarSize AvatarSize,
-	FOnGetModCollectionMediaDelegate Callback)
+													 FOnGetModCollectionMediaDelegate Callback)
 {
-	GetModCollectionMediaAsync(ModCollectionId, AvatarSize, FOnGetModCollectionMediaDelegateFast::CreateLambda(
-		[Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> Media) {
-			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(Media));
-		}));
+	GetModCollectionMediaAsync(ModCollectionId, AvatarSize,
+							   FOnGetModCollectionMediaDelegateFast::CreateLambda(
+								   [Callback](FModioErrorCode ec, TOptional<FModioImageWrapper> Media) {
+									   Callback.ExecuteIfBound(ec, ToBP<FModioOptionalImage>(Media));
+								   }));
 }
 
 void UModioSubsystem::GetUserWalletBalanceAsync(FOnGetUserWalletBalanceDelegateFast Callback)
@@ -1773,6 +1805,14 @@ void UModioSubsystem::K2_GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDe
 {
 	GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDelegateFast::CreateLambda(
 		[Callback](FModioErrorCode ec, FString Token) { Callback.ExecuteIfBound(ec, Token); }));
+}
+
+MODIO_API void UModioSubsystem::K2_GetUserRatingsAsync(FOnGetUserModRatingsDelegate Callback)
+{
+	GetUserRatingsAsync(FOnGetUserModRatingsDelegateFast::CreateLambda(
+		[Callback](FModioErrorCode ec, TOptional<FModioUserModRatingList> Ratings) {
+			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalUserModRatingList>(Ratings));
+		}));
 }
 
 /// File scope implementations
