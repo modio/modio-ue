@@ -43,8 +43,12 @@ EModioPlatformName UModioPlatformHelpersLibrary::GetCurrentPlatform()
 		return EModioPlatformName::XSX;
 	#endif
 
-	#if PLATFORM_SWITCH
+	#if defined(PLATFORM_SWITCH) && PLATFORM_SWITCH
 		return EModioPlatformName::Switch;
+	#endif
+
+	#if defined(PLATFORM_SWITCH2) && PLATFORM_SWITCH2
+		return EModioPlatformName::Switch2;
 	#endif
 
 	#if PLATFORM_ANDROID
@@ -68,6 +72,7 @@ EModioPortal UModioPlatformHelpersLibrary::GetDefaultPortalForCurrentPlatform()
 		case EModioPlatformName::XSX:
 			return EModioPortal::XboxLive;
 		case EModioPlatformName::Switch:
+		case EModioPlatformName::Switch2:
 			return EModioPortal::Nintendo;
 		case EModioPlatformName::Android:
 			return EModioPortal::Google;
@@ -107,6 +112,8 @@ EModioAuthenticationProvider UModioPlatformHelpersLibrary::GetDefaultAuthProvide
 			return EModioAuthenticationProvider::XboxLive;
 		case EModioPlatformName::Switch:
 			return EModioAuthenticationProvider::Switch;
+		case EModioPlatformName::Switch2:
+			return EModioAuthenticationProvider::Switch2;
 		case EModioPlatformName::Android:
 			// By default, we use the ServerSideToken for Google Auth as opposed to an ID Token
 			return EModioAuthenticationProvider::GoogleServerSideToken;

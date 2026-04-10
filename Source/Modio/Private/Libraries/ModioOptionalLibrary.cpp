@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -227,4 +227,10 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalUserModRatingList(
 	struct FModioUserModRatingList& UserModRatingList)
 {
 	return GetValueInternal(OptionalUserModRatingList, UserModRatingList);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalUserList(const FModioOptionalUserList& OptionalUserList,
+														   FModioUserList& UserList)
+{
+	return GetValueInternal(OptionalUserList, UserList);
 }

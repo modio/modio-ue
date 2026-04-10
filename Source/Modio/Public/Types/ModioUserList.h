@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -16,11 +16,38 @@
 
 #include "ModioUserList.generated.h"
 
+namespace Modio
+{
+	class UserList;
+}
+
+#if CPP
+struct MODIO_API FModioUserList : public FModioPagedResult, public FModioList<TArray, FModioUser>
+{
+	/**
+	 * @docpublic
+	 * @brief Default constructor without parameters
+	 */
+	FModioUserList() = default;
+
+	/**
+	 * @docpublic
+	 * @brief Constructor that takes an array of users and a index of paged results
+	 */
+	FModioUserList(const FModioPagedResult& PagedResult, TArray<FModioUser>&& UserList);
+
+	/**
+	 * @docpublic
+	 * @brief Constructor that takes a user list to store in this struct
+	 */
+	FModioUserList(const class Modio::UserList& UserList);
+};
+#else
 /**
  * @docpublic
  * @brief Strong type struct to wrap multiple Users indexed by a paged result
  */
-USTRUCT(BlueprintType)
+USTRUCT(NoExport, BlueprintType)
 struct MODIO_API FModioUserList
 {
 	GENERATED_BODY()
@@ -30,16 +57,17 @@ struct MODIO_API FModioUserList
 	 * @docpublic
 	 * @brief A paged result property
 	 */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io|UserList")
+	UPROPERTY()
 	FModioPagedResult PagedResult;
 
 	/** 
 	 * @docpublic
 	 * @brief Internal array of users
 	 */
-	UPROPERTY(BlueprintReadOnly, Category = "mod.io|UserList")
+	UPROPERTY()
 	TArray<FModioUser> InternalList;
 };
+#endif
 
 /**
  * @docpublic

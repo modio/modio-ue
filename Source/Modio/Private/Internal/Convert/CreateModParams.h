@@ -34,5 +34,9 @@ FORCEINLINE Modio::CreateModParams ToModio(const FModioCreateModParams& In)
 		                       : Modio::Optional<Modio::ModCommunityOptionsFlags>{};
 	Out.MetadataBlob = ToModioOptional<std::string>(In.MetadataBlob);
 	Out.Tags = ToModioOptional<std::vector<std::string>>(In.Tags);
+
+	Out.MetadataKvp = In.MetadataKvp.IsSet() ? ToModio(In.MetadataKvp.GetValue())
+											 : Modio::Optional<std::vector<Modio::Metadata>> {};
+
 	return Out;
 }

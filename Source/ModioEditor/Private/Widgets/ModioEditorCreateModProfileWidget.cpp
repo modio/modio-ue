@@ -113,6 +113,11 @@ void SModioEditorCreateModProfileWidget::Construct(const FArguments& InArgs, UMo
 					bIsLoading = true;
 					UpdateWindowContent();
 
+					if (MetadataKvpEntries.Num() > 0)
+					{
+						CreateModParams.MetadataKvp = MetadataKvpEntries;
+					}
+
 					FModioModCreationHandle Handle = ModioSubsystem->GetModCreationHandle();
 					
 					ModioSubsystem->SubmitNewModAsync(
@@ -450,12 +455,63 @@ void SModioEditorCreateModProfileWidget::UpdateWindowContent()
 					]
 				]
 			]
+
+			+ SVerticalBox::Slot()
+			.Padding(ParentWindow->PanelPadding)
+			.VAlign(VAlign_Center)
+			.AutoHeight()
+			[
+				SNew(SOverlay)
+				+ SOverlay::Slot()
+				[
+					SNew(SImage).Image(ParentWindow->PanelBackgroundBrush)
+				]
+				+ SOverlay::Slot()
+				.Padding(8.f)
+				[
+					SNew(SHorizontalBox)
+					+ SHorizontalBox::Slot()
+					.HAlign(HAlign_Left)
+					.VAlign(VAlign_Top)
+					.FillWidth(1)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("ModMetadataKvpLabel", "Metadata KVP"))
+					]
+
+					+ SHorizontalBox::Slot()
+					.FillWidth(2)
+					[
+						SNew(SVerticalBox)
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						[
+							SAssignNew(MetadataKvpBox, SVerticalBox)
+						]
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						.Padding(2.f)
+						[
+							SNew(SButton)
+							.Text(LOCTEXT("ModioAddMetadataKvp", "Add Entry"))
+							.OnClicked_Lambda([this]()
+							{
+								FModioMetadata NewEntry;
+								MetadataKvpEntries.Add(NewEntry);
+								RebuildMetadataKvpUI();
+								return FReply::Handled();
+							})
+						]
+					]
+				]
+			]
 		]
 		// clang-format on
 	);
 
 	PopulateModMaturityOptions(MaturityGridPanel);
 	PopulateModTagCheckboxes(TagsGridPanel);
+	RebuildMetadataKvpUI();
 }
 
 void SModioEditorCreateModProfileWidget::OnModVisibilityChanged(TSharedPtr<FString> ModVisibility,
@@ -519,6 +575,96 @@ void SModioEditorCreateModProfileWidget::PopulateModTagCheckboxes(TSharedPtr<SGr
 		Checkbox = CreateLabeledTagCheckbox(Tags[i]);
 
 		Grid->AddSlot(i % 4, i / 4).AttachWidget(Checkbox.ToSharedRef());
+	}
+}
+
+void SModioEditorCreateModProfileWidget::RebuildMetadataKvpUI()
+{
+	MetadataKvpBox->ClearChildren();
+
+	for (int32 i = 0; i < MetadataKvpEntries.Num(); ++i)
+	{
+		// clang-format off
+		MetadataKvpBox->AddSlot()
+		.AutoHeight()
+		.Padding(2.f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.FillWidth(1)
+			.Padding(2.f)
+			[
+				SNew(SEditableTextBox)
+					.HintText(LOCTEXT("ModioMetadataKeyHint", "Key"))
+					.Text(FText::FromString(MetadataKvpEntries[i].Key))
+					.OnVerifyTextChanged_Lambda([](const FText& InText, FText& OutErrorMessage) -> bool
+					{
+						const FString TextStr = InText.ToString();
+						if (TextStr.Len() > 255)
+						{
+							OutErrorMessage = LOCTEXT("MetadataKeyTooLong", "Key cannot exceed 255 characters");
+							return false;
+						}
+						for (TCHAR Ch : TextStr)
+						{
+							if (!FChar::IsAlnum(Ch) && Ch != TEXT('-') && Ch != TEXT('_'))
+							{
+								OutErrorMessage = LOCTEXT("MetadataKeyInvalidChar", "Key can only contain alphanumeric characters, '-' and '_'");
+								return false;
+							}
+						}
+						return true;
+					})
+					.OnTextChanged_Lambda([this, Index = i](const FText& Updated)
+					{
+						if (MetadataKvpEntries.IsValidIndex(Index))
+						{
+							MetadataKvpEntries[Index].Key = Updated.ToString();
+						}
+					})
+				]
+				+ SHorizontalBox::Slot()
+				.FillWidth(1)
+				.Padding(2.f)
+				[
+					SNew(SEditableTextBox)
+					.HintText(LOCTEXT("ModioMetadataValueHint", "Value"))
+					.Text(FText::FromString(MetadataKvpEntries[i].Value))
+					.OnVerifyTextChanged_Lambda([](const FText& InText, FText& OutErrorMessage) -> bool
+					{
+						if (InText.ToString().Len() > 255)
+						{
+							OutErrorMessage = LOCTEXT("MetadataValueTooLong", "Value cannot exceed 255 characters");
+							return false;
+						}
+						return true;
+					})
+					.OnTextChanged_Lambda([this, Index = i](const FText& Updated)
+					{
+						if (MetadataKvpEntries.IsValidIndex(Index))
+						{
+							MetadataKvpEntries[Index].Value = Updated.ToString();
+						}
+					})
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(2.f)
+			[
+				SNew(SButton)
+				.Text(LOCTEXT("ModioRemoveMetadataKvp", "X"))
+				.OnClicked_Lambda([this, Index = i]()
+				{
+					if (MetadataKvpEntries.IsValidIndex(Index))
+					{
+						MetadataKvpEntries.RemoveAt(Index);
+						RebuildMetadataKvpUI();
+					}
+					return FReply::Handled();
+				})
+			]
+		];
+		// clang-format on
 	}
 }
 

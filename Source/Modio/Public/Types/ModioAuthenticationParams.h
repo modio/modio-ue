@@ -26,6 +26,7 @@ enum class EModioAuthenticationProvider : uint8
 	GoG,
 	Itch,
 	Switch,
+	Switch2,
 	Discord,
 	PSN, 
 	Epic,

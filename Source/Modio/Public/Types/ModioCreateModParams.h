@@ -105,4 +105,10 @@ struct MODIO_API FModioCreateModParams
 	 * @brief List of metadata tags that reference the mod to create. They help to search and filter content
 	 */
 	TOptional<TArray<FString>> Tags;
+
+	/**
+	 * @docpublic
+	 * @brief List of metadata key-value pairs for the mod to create. They help to provide additional information about the mod.
+	 */
+	TOptional<TArray<FModioMetadata>> MetadataKvp;
 };

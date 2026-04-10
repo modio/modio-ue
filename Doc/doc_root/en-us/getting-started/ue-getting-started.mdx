@@ -1,0 +1,46 @@
+---
+id: ue-getting-started
+title: Getting Started
+slug: /unreal/getting-started
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/getting-started/ue-getting-started.mdx
+---
+
+# Getting Started
+
+This page introduces the Unreal Engine Core Plugin getting started guides and how they’re organized.
+It highlights the main concepts each guide covers and suggests an order if you’d like to read them linearly.
+
+These guides cover:
+
+- How to install and enable the plugin (including any platform-specific configuration)
+- How initialization, the event loop, and shutdown fit together in Unreal Engine
+- How the public API is structured and how errors are reported
+- How authentication and user sessions work in practice
+- How to browse, subscribe to, and manage UGC from within your project
+
+To get set up first, start with the [installation guide](/unreal/installation).
+Each guide focuses on one area and includes concrete examples, and you can jump to the section you need.
+
+## Guides in this series
+
+* [Installation](/unreal/installation)
+* [Initialization](/unreal/initialization)
+* [Structure & Error Handling](/unreal/plugin-structure)
+* [User Authentication](/unreal/user-authentication)
+* [Searching for UGC](/unreal/searching-ugc)
+* [Subscribing to UGC](/unreal/subscribing)
+* [Adding UGC](/unreal/adding-ugc)
+* [UGC Best Practices](/unreal/ugc-best-practices)
+
+## The plugin flow
+
+This is the typical Unreal Engine plugin flow:
+
+1. Install and configure the plugin in your project. This typically includes setting your game credentials from the mod.io dashboard and confirming platform requirements.
+2. Set up the plugin event loop so asynchronous work can complete (either by enabling the background thread option or calling `RunPendingHandlers` consistently).
+3. Initialize the plugin with your game configuration (Game ID, API key, environment, and portal).
+4. Authenticate a user and establish a local session.
+5. Perform core operations such as searching, subscribing, and managing local UGC.
+6. Shut down cleanly when your session ends or your application exits.
+
+If you want a complete function reference while working through these guides, see the [Reference Docs](/unreal/refdocs).

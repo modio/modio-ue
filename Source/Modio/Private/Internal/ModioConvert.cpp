@@ -50,6 +50,25 @@ std::map<std::string, std::string> ToModio(const TMap<FString, FString>& StringM
 	return Result;
 }
 
+Modio::Metadata ToModio(const FModioMetadata& In)
+{
+	Modio::Metadata Out;
+	Out.Key = ToModio(In.Key);
+	Out.Value = ToModio(In.Value);
+	return Out;
+}
+
+std::vector<Modio::Metadata> ToModio(const TArray<FModioMetadata>& In) 
+{
+	std::vector<Modio::Metadata> Result;
+	Result.reserve(size_t(In.Num()));
+	for (const FModioMetadata& It : In)
+	{
+		Result.emplace_back(ToModio(It));
+	}
+	return Result;
+}
+
 std::chrono::system_clock::time_point ToModioDateTime(FDateTime Time)
 {
 	std::chrono::seconds DurationSinceEpoch(Time.ToUnixTimestamp());

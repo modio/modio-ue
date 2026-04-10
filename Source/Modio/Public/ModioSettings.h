@@ -67,7 +67,7 @@ public:
 	/**
 	 * The string table asset which stores localization data for the plugin (user-facing strings for enums, etc)
 	 */
-	UPROPERTY(EditDefaultsOnly, config, Category = "Localization", meta = (MetaClass = StringTable))
+	UPROPERTY(EditDefaultsOnly, config, Category = "Localization", meta = (MetaClass = "/Script/Engine.StringTable"))
 	FSoftObjectPath LocalizationStringTable;
 
 	/**

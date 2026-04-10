@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -22,6 +22,7 @@
 #include "Types/ModioTerms.h"
 #include "Types/ModioUnsigned64.h"
 #include "Types/ModioUserModRating.h"
+#include "Types/ModioUserList.h"
 
 #include "ModioOptionalLibrary.generated.h"
 
@@ -416,4 +417,18 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalUserModRatingList(
 		const struct FModioOptionalUserModRatingList& OptionalUserModRatingList,
 		struct FModioUserModRatingList& UserModRatingList);
+
+	/**
+	 * @docpublic
+	 * @brief Get the user list from the optional if it's set
+	 *
+	 * @param OptionalUserList -
+	 * @param UserList - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalUserList)")
+	static bool GetValue_ModioOptionalUserList(
+		const struct FModioOptionalUserList& OptionalUserList,
+		struct FModioUserList& UserList);
 };

@@ -1,20 +1,20 @@
-/* 
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
- *  
+/*
+ *  Copyright (C) 2026 mod.io Pty Ltd. <https://mod.io>
+ *
  *  This file is part of the mod.io UE Plugin.
- *  
- *  Distributed under the MIT License. (See accompanying file LICENSE or 
+ *
+ *  Distributed under the MIT License. (See accompanying file LICENSE or
  *   view online at <https://github.com/modio/modio-ue/blob/main/LICENSE>)
- *   
+ *
  */
 
 #pragma once
 
+#include "Internal/ModioConvert.h"
 #include "ModioSDK.h"
 #include "Types/ModioTerms.h"
-#include "Internal/ModioConvert.h"
 
-FORCEINLINE FModioLink ToUnreal(const Modio::Terms::Link& In) 
+FORCEINLINE FModioLink ToUnreal(const Modio::Terms::Link& In)
 {
 	FModioLink Out;
 	Out.Text = ToUnreal(In.Text);
@@ -23,7 +23,7 @@ FORCEINLINE FModioLink ToUnreal(const Modio::Terms::Link& In)
 	return Out;
 }
 
-FORCEINLINE FModioTerms ToUnreal(const Modio::Terms& In) 
+FORCEINLINE FModioTerms ToUnreal(const Modio::Terms& In)
 {
 	FModioTerms Out;
 	Out.AgreeButtonText = ToUnreal(In.Buttons.AgreeText);
@@ -33,6 +33,7 @@ FORCEINLINE FModioTerms ToUnreal(const Modio::Terms& In)
 	Out.PrivacyLink = ToUnreal(In.Links.Privacy);
 	Out.RefundLink = ToUnreal(In.Links.Refund);
 	Out.ManageLink = ToUnreal(In.Links.Manage);
+	Out.MonetizationLink = ToUnreal(In.Links.Monetization);
 	Out.TermsText = ToUnreal(In.TermsText);
 	return Out;
 }

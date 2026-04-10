@@ -46,8 +46,10 @@ private:
 	TSharedPtr<SGridPanel> TagsGridPanel;
 	TSharedPtr<SBox> ContentBox;
 	TSharedPtr<STextComboBox> VisibilityComboBox;
+	TSharedPtr<SVerticalBox> MetadataKvpBox;
 
 	TArray<TSharedPtr<FString>> ModVisibilityOptions;
+	TArray<FModioMetadata> MetadataKvpEntries;
 
 	void OnModVisibilityChanged(TSharedPtr<FString>, ESelectInfo::Type SelectInfo);
 	void OnThumbnailPathPicked(const FString& PickedPath);
@@ -59,4 +61,6 @@ private:
 
 	TSharedPtr<SWidget> CreateLabeledTagCheckbox(const FString& Label);
 	TSharedPtr<SWidget> CreateLabeledMaturityCheckbox(const FText& Label, EModioMaturityFlags Flag);
+
+	void RebuildMetadataKvpUI();
 };

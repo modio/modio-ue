@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "Types/ModioCommonTypes.h"
 #include "Types/ModioList.h"
 #include "Types/ModioPagedResult.h"
 #include "Types/ModioRating.h"

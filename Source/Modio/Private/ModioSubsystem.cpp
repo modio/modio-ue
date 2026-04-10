@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -42,6 +42,7 @@
 #include "Internal/Convert/Terms.h"
 #include "Internal/Convert/TransactionRecord.h"
 #include "Internal/Convert/User.h"
+#include "Internal/Convert/UserList.h"
 #include "Internal/Convert/UserRatingList.h"
 #include "Internal/ModioConvert.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
@@ -928,6 +929,35 @@ void UModioSubsystem::GetUserRatingsAsync(FOnGetUserModRatingsDelegateFast Callb
 	});
 }
 
+MODIO_API void UModioSubsystem::GetUserFollowersAsync(FModioUserID UserId, FOnGetFollowsDelegateFast Callback)
+{
+	Modio::GetUserFollowersAsync(ToModio(UserId), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::UserList> Followers) {
+		Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioUserList>(Followers));
+	});
+}
+
+MODIO_API void UModioSubsystem::GetUserFollowingAsync(FModioUserID UserId, FOnGetFollowsDelegateFast Callback)
+{
+	Modio::GetUserFollowingAsync(ToModio(UserId),
+								 [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::UserList> Followers) {
+									 Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioUserList>(Followers));
+								 });
+}
+
+MODIO_API void UModioSubsystem::FollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::FollowUserAsync(ToModio(UserId), [Callback](Modio::ErrorCode ec) {
+		Callback.ExecuteIfBound(ToUnreal(ec));
+	});
+}
+
+MODIO_API void UModioSubsystem::UnfollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegateFast Callback)
+{
+	Modio::UnfollowUserAsync(ToModio(UserId), [Callback](Modio::ErrorCode ec) {
+		Callback.ExecuteIfBound(ToUnreal(ec));
+	});
+}
+
 FModioImageCache& UModioSubsystem::GetImageCache() const
 {
 	return *ImageCache;
@@ -1239,9 +1269,7 @@ void UModioSubsystem::GetMutedUsersAsync(FOnMuteUsersDelegateFast Callback)
 	Modio::GetMutedUsersAsync([Callback](Modio::ErrorCode ec, Modio::Optional<Modio::UserList> Dependencies) {
 		if (Dependencies)
 		{
-			FModioUserList Out;
-			Out.InternalList = ToUnreal<FModioUser>(Dependencies->GetRawList());
-			Out.PagedResult = FModioPagedResult(Dependencies.value());
+			FModioUserList Out = ToUnreal(Dependencies.value());
 
 			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, Out]() { Callback.ExecuteIfBound(ec, Out); }));
 		}
@@ -1813,6 +1841,36 @@ MODIO_API void UModioSubsystem::K2_GetUserRatingsAsync(FOnGetUserModRatingsDeleg
 		[Callback](FModioErrorCode ec, TOptional<FModioUserModRatingList> Ratings) {
 			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalUserModRatingList>(Ratings));
 		}));
+}
+
+MODIO_API void UModioSubsystem::K2_GetUserFollowersAsync(FModioUserID UserId, FOnGetFollowsDelegate Callback)
+{
+	GetUserFollowersAsync(UserId,
+		FOnGetFollowsDelegateFast::CreateLambda([Callback](FModioErrorCode ec, TOptional<FModioUserList> Followers) {
+			Callback.ExecuteIfBound(ec, ToBP<FModioOptionalUserList>(Followers));
+		}));
+}
+
+MODIO_API void UModioSubsystem::K2_GetUserFollowingAsync(FModioUserID UserId, FOnGetFollowsDelegate Callback)
+{
+	GetUserFollowingAsync(UserId, FOnGetFollowsDelegateFast::CreateLambda(
+									  [Callback](FModioErrorCode ec, TOptional<FModioUserList> Followers) {
+										  Callback.ExecuteIfBound(ec, ToBP<FModioOptionalUserList>(Followers));
+									  }));
+}
+
+MODIO_API void UModioSubsystem::K2_FollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegate Callback)
+{
+	FollowUserAsync(UserId, FOnErrorOnlyDelegateFast::CreateLambda(
+									  [Callback](FModioErrorCode ec) {
+										  Callback.ExecuteIfBound(ec);
+									  }));
+}
+
+MODIO_API void UModioSubsystem::K2_UnfollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegate Callback)
+{
+	UnfollowUserAsync(UserId, FOnErrorOnlyDelegateFast::CreateLambda(
+								[Callback](FModioErrorCode ec) { Callback.ExecuteIfBound(ec); }));
 }
 
 /// File scope implementations

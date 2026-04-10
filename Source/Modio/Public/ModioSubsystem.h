@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -87,6 +87,7 @@ DECLARE_DELEGATE_TwoParams(FOnRefreshUserEntitlementsDelegateFast, FModioErrorCo
 						   TOptional<FModioEntitlementConsumptionStatusList>);
 DECLARE_DELEGATE_RetVal(EModioLanguage, FGetCurrentLanguageDelegate);
 DECLARE_DELEGATE_TwoParams(FOnGetUserModRatingsDelegateFast, FModioErrorCode, TOptional<FModioUserModRatingList>);
+DECLARE_DELEGATE_TwoParams(FOnGetFollowsDelegateFast, FModioErrorCode, TOptional<FModioUserList>);
 
 // Blueprint version of delegates
 
@@ -161,6 +162,9 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetModCollectionModsDelegate, FModioErrorC
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserModRatingsDelegate, FModioErrorCode, ErrorCode,
 								   FModioOptionalUserModRatingList, Ratings);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetFollowsDelegate, FModioErrorCode, ErrorCode, FModioOptionalUserList,
+								   FollowsList);
 
 class UModioSubsystem;
 
@@ -1426,6 +1430,66 @@ public:
 	 */
 	MODIO_API void GetUserRatingsAsync(FOnGetUserModRatingsDelegateFast Callback);
 
+	/**
+	 * @docpublic
+	 * @brief Gets the list of followers for the given user.
+	 * @param UserId the UserID of the user who's followers you are getting
+	 * @param Callback a Callback invoked with a status code and optional User List containing the list of followers
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	MODIO_API void GetUserFollowersAsync(FModioUserID UserId, FOnGetFollowsDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Gets a list of users that the given user is following
+	 * @param UserId the UserID of the user you are querying.
+	 * @param Callback a Callback invoked with a status code and optional User List containing the list of followers
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	MODIO_API void GetUserFollowingAsync(FModioUserID UserId, FOnGetFollowsDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Follows the given user for the currently authenticated user.
+	 * @param UserId The UserID of the user that should be followed.
+	 * @param Callback a callback invoked upon completion, indicating if the request was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	MODIO_API void FollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Unfollows the given user for the currently authenticated user.
+	 * @param UserId The UserID of the user that should be unfollowed.
+	 * @param Callback a callback invoked upon completion, indicating if the request was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	MODIO_API void UnfollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegateFast Callback);
+
 private:
 	TMap<TTuple<FModioModCollectionID, EModioAvatarSize>, FOnGetMediaMulticastDelegateFast>
 		PendingModCollectionMediaAvatarRequests;
@@ -2560,6 +2624,70 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetUserRatingsAsync", Category = "mod.io|User Ratings")
 	MODIO_API void K2_GetUserRatingsAsync(FOnGetUserModRatingsDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Gets the list of followers for the given user.
+	 * @param UserId the UserID of the user who's followers you are getting
+	 * @param Callback a Callback invoked with a status code and optional User List containing the list of followers
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetUserFollowersAsync", Category = "mod.io|User Following")
+	MODIO_API void K2_GetUserFollowersAsync(FModioUserID UserId, FOnGetFollowsDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Gets a list of users that the given user is following
+	 * @param UserId the UserID of the user you are querying.
+	 * @param Callback a Callback invoked with a status code and optional User List containing the list of followers
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetUserFollowingAsync", Category = "mod.io|User Following")
+	MODIO_API void K2_GetUserFollowingAsync(FModioUserID UserId, FOnGetFollowsDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Follows the given user for the currently authenticated user.
+	 * @param UserId The UserID of the user that should be followed.
+	 * @param Callback a callback invoked upon completion, indicating if the request was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "FollowUserAsync", Category = "mod.io|User Following")
+	MODIO_API void K2_FollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Unfollows the given user for the currently authenticated user.
+	 * @param UserId The UserID of the user that should be unfollowed.
+	 * @param Callback a callback invoked upon completion, indicating if the request was successful.
+	 * @requires initialized-sdk
+	 * @requires no-rate-limiting
+	 * @requires user-authenticated
+	 * @errorcategory NetworkError|Couldn't connect to mod.io servers
+	 * @error GenericError::SDKNotInitialized|SDK not initialized
+	 * @error UserDataError::InvalidUser|User not authenticated
+	 * @error HttpError::RateLimited|Too many frequent calls to the API. Wait some time and try again.
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "UnfollowUserAsync", Category = "mod.io|User Following")
+	MODIO_API void K2_UnfollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegate Callback);
 
 #pragma endregion
 

@@ -72,6 +72,7 @@ enum class EModioPlatformName : uint8
 	XBoxOne,
 	XSX,
 	Switch,
+	Switch2,
 	Unknown,
 	Android,
 	iOS
@@ -93,6 +94,7 @@ enum class EModioModfilePlatform : uint8
 	PS4 UMETA(DisplayName = "PS4"),
 	PS5 UMETA(DisplayName = "PS5"),
 	Switch UMETA(DisplayName = "Switch"),
+	Switch2 UMETA(DisplayName = "Switch 2"),
 	Oculus UMETA(DisplayName = "Oculus"),
 	Source UMETA(DisplayName = "Source"),
 	WindowsServer UMETA(DisplayName = "Windows Server"),

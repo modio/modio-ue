@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -27,6 +27,7 @@
 #include "Types/ModioTerms.h"
 #include "Types/ModioTransactionRecord.h"
 #include "Types/ModioUser.h"
+#include "Types/ModioUserList.h"
 #include "Types/ModioUserModRating.h"
 
 #include <chrono>
@@ -88,6 +89,7 @@ EModioModCommunityOptionsFlags ToUnreal(const Modio::ModCommunityOptionsFlags& I
 EModioGameCloudCookingStatus ToUnreal(const Modio::GameCloudCookingStatus& In);
 FModioUserModRating ToUnreal(const Modio::UserRating& In);
 FModioUserModRatingList ToUnreal(const Modio::UserRatingList& In);
+FModioUserList ToUnreal(const Modio::UserList& In);
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
@@ -115,6 +117,8 @@ Modio::StorageLocation ToModio(EModioStorageLocation Location);
 Modio::StorageUsage ToModio(EModioStorageUsage Usage);
 Modio::ModCommunityOptionsFlags ToModio(EModioModCommunityOptionsFlags In);
 Modio::GameCloudCookingStatus ToModio(EModioGameCloudCookingStatus In);
+Modio::Metadata ToModio(const FModioMetadata& In);
+std::vector<Modio::Metadata> ToModio(const TArray<FModioMetadata>& In);
 
 #pragma region ToModio implementation
 
