@@ -1,0 +1,36 @@
+---
+id: ue-multiplayer
+title: Multiplayer
+slug: /unreal/multiplayer/
+custom_edit_url: https://github.com/modio/modio-ue4-internal/blob/develop/Plugins/Modio/Doc/doc_root/en-us/multiplayer.mdx
+---
+
+## Overview
+
+:::warning[Experimental Feature]
+This is an experimental feature and is subject to change. 
+:::
+
+The mod.io Unreal Engine Plugin supports multiplayer environments through providing a framework of features to enable initialization and authentication for headless environments as required by dedicated servers.
+
+From a conceptual standpoint, the mod.io framework provides a simple management system that handles initialization and UGC acquisition for your server, as well as the tracking of UGC that is registered with the server/manager by joining clients.
+
+This framework provides no functionality with regards to the actual hosting, advertising, joining or replication of information. It does not take the place of any online subsystem, and is platform agnostic. It merely provides a context of initialization and UGC management for headless dedicated servers to operate in, allowing servers and players to handle the syncing of their UGC lists and download required content as painlessly as possible, allowing for you game to be as seamless as possible with regards to multiplayer UGC.
+
+With regards to clients (non-hosts, non-servers) this framework provides no functionality at this time; their initialization and UGC acquisition methods are unchanged, outside of the use of [Temporary Mod Sets](/getting-started/temporary-mods/).
+
+## Listen Servers
+
+For Listen/P2P multiplayer environments the initialization, authentication, and UGC acquisition process is the same for the Server/Host as it is in any normal context. Once the Host session is operational, you must then replicate the list of UGC required to each Client, initializing them as [Temporary Mod Sets](/cppsdk/getting-started/#temporary-mod-set) for each player, including the host for the acquisition of client UGC.
+
+## Dedicated Servers
+
+In the case of Dedicated Servers, the process of authentication and initialization requires an OAuth token to be created on the mod.io website which will provide the Server the same access and entitlements as the user (generally the Server owner) creating it, within the scope of the game in question.
+
+This OAuth token, along with a list of UGC intended to be used on the Server, need to be passed to `UModioMultiplayerSubsystem::InitializeServerAsync` to perform headless authentication. Once the server is online, initialized, and has players join, there are some helper functions for registering client UGC with the server to facilitate easier replication of UGC lists with all clients.
+
+## References
+
+* [Multiplayer Introduction](/getting-started/multiplayer-servers/)
+* [Temporary Mod Sets](/getting-started/temporary-mods/)
+* [SDK Multiplayer Guide](/cppsdk/getting-started/#multiplayer)

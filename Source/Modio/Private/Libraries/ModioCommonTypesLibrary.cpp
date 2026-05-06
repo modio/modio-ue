@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -85,6 +85,19 @@ FModioInitializeOptions UModioCommonTypesLibrary::MakeInitializeOptions(int64 Ga
 	Options.GameEnvironment = GameEnvironment;
 	Options.PortalInUse = PortalInUse;
 	Options.bUseBackgroundThread = bUseBackgroundThread;
+	return Options;
+}
+
+FModioServerInitializeOptions UModioCommonTypesLibrary::MakeServerInitializeOptions(const FModioInitializeOptions& BaseOptions,
+																					const FString& ModsDirectory,
+																					const FString& Token,
+																					const TArray<FModioModID>& Mods)
+{
+	FModioServerInitializeOptions Options;
+	Options.BaseOptions = BaseOptions;
+	Options.ModsDirectory = ModsDirectory;
+	Options.Token = Token;
+	Options.Mods = Mods;
 	return Options;
 }
 

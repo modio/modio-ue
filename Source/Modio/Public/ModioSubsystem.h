@@ -202,6 +202,8 @@ class UModioSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 
+	friend class UModioMultiplayerSubsystem;
+
 protected:
 	TUniquePtr<FModioBackgroundThread> BackgroundThread;
 

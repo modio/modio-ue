@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -14,6 +14,7 @@
 #include "Types/ModioAuthenticationParams.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioInitializeOptions.h"
+#include "Types/ModioServerInitializeOptions.h"
 
 #include "ModioCommonTypesLibrary.generated.h"
 
@@ -174,6 +175,28 @@ public:
 	                                                     EModioEnvironment GameEnvironment,
 	                                                     EModioPortal PortalInUse = EModioPortal::None,
 	                                                     bool bUseBackgroundThread = true);
+
+	/**
+	 * @docpublic
+	 * @brief Make [`ModioServerInitializeOptions`](#modioserverinitializeoptions). Should only be used in conjunction with
+	 * [`InitializeServerAsync`](#initializeserverasync).
+	 * @param GameId - A positive integer that maps to your game.  This can be found in the admin section of your game's
+	 * page at https://mod.io/
+	 * @param APIKey - The API key for your game.  This can be found in the admin section of your game's page at
+	 * https://mod.io/
+	 * @param GameEnvironment - The environment your game has been set up on: test or live.
+	 * @param PortalInUse The [`EModioPortal`](#EModioPortal) representing the store or service your game is being
+	 * @param bUseBackgroundThread - Whether to run the mod.io SDK on a background thread. Defaults to `true`.
+	 * distributed through.  Defaults to `EModioPortal::None`.
+	 * @param ModsDirectory - The directory to store modfiles on this server.
+	 * @param Token - The S2S token for this Server. @TODO point this at docs/S2S token creation
+	 * @param Mods - The mods this server should load and use.
+	 * @param bUpdateModsOnInit - Whether this server should  update its mods to the latest version on init.
+	 */
+	UFUNCTION(BlueprintPure, category = "mod.io|Utilities", meta = (NativeMakeFunc))
+	static FModioServerInitializeOptions MakeServerInitializeOptions(const FModioInitializeOptions& BaseOptions,
+																	 const FString& ModsDirectory, const FString& Token,
+																	 const TArray<FModioModID>& Mods);
 
 	/**
 	 * @docpublic
