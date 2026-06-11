@@ -29,13 +29,13 @@ struct MODIO_API FModioUserModRating
 	GENERATED_BODY();
 
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|User Mod Rating");
-	FModioGameID GameId;
+	FModioGameID GameId {};
 
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|User Mod Rating");
-	FModioModID ModId;
+	FModioModID ModId {};
 
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|User Mod Rating");
-	EModioRating Rating;
+	EModioRating Rating = EModioRating::Neutral;
 };
 
 #if CPP

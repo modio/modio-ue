@@ -73,7 +73,7 @@ TSharedPtr<FModioImageWrapper::FTextureCreationData> FModioImageWrapper::LoadTex
 			if (TOptional<TArray<uint8>> RawData = GetImageData(ImageWrapper, GetDesiredErgbFormat()))
 			{
 				TSharedPtr<FTextureCreationData> data
-					(new FTextureCreationData(RawData.GetValue(), ImageWrapper->GetWidth(), ImageWrapper->GetHeight()));
+					(new FTextureCreationData(RawData.GetValue(), static_cast<int32>(ImageWrapper->GetWidth()), static_cast<int32>(ImageWrapper->GetHeight())));
 				return data;
 			}
 		}

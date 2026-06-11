@@ -20,7 +20,7 @@ FORCEINLINE FModioModDependency ToUnreal(const Modio::ModDependency& In)
 	Out.DateAdded = ToUnrealDateTime(In.DateAdded);
 	Out.DateUpdated = ToUnrealDateTime(In.DateUpdated);
 	Out.DependencyDepth = In.DependencyDepth;
-	Modio::Detail::Logo Logo;
+	Modio::Logo Logo;
 	if (In.FileInfo.has_value())
 	{
 		Out.FileInfo = ToUnreal(In.FileInfo.value());

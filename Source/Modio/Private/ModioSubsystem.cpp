@@ -166,6 +166,12 @@ void UModioSubsystem::CheckShutdownBeforePIEClose(UWorld*)
 }
 #endif
 
+void UModioSubsystem::SetPortalInterface(TScriptInterface<IModioPortalInterface> PortalInterface) 
+{
+	check(PortalInterface.GetObject());
+	CachedPortalInterface = PortalInterface;
+}
+
 void UModioSubsystem::InitializeAsync(const FModioInitializeOptions& Options, FOnErrorOnlyDelegateFast OnInitComplete)
 {
 	bUseBackgroundThread = Options.bUseBackgroundThread;
@@ -939,23 +945,35 @@ MODIO_API void UModioSubsystem::GetUserFollowersAsync(FModioUserID UserId, FOnGe
 MODIO_API void UModioSubsystem::GetUserFollowingAsync(FModioUserID UserId, FOnGetFollowsDelegateFast Callback)
 {
 	Modio::GetUserFollowingAsync(ToModio(UserId),
-								 [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::UserList> Followers) {
-									 Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioUserList>(Followers));
-								 });
+								 [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::UserList> Followers)
+		{
+			AsyncTask(ENamedThreads::GameThread, [Callback, ec, Followers]()
+				{
+					Callback.ExecuteIfBound(ToUnreal(ec), ToUnrealOptional<FModioUserList>(Followers));
+				});
+		});
 }
 
 MODIO_API void UModioSubsystem::FollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegateFast Callback)
 {
-	Modio::FollowUserAsync(ToModio(UserId), [Callback](Modio::ErrorCode ec) {
-		Callback.ExecuteIfBound(ToUnreal(ec));
-	});
+	Modio::FollowUserAsync(ToModio(UserId), [Callback](Modio::ErrorCode ec)
+		{
+			AsyncTask(ENamedThreads::GameThread, [Callback, ec]()
+				{
+					Callback.ExecuteIfBound(ToUnreal(ec));
+				});
+		});
 }
 
 MODIO_API void UModioSubsystem::UnfollowUserAsync(FModioUserID UserId, FOnErrorOnlyDelegateFast Callback)
 {
-	Modio::UnfollowUserAsync(ToModio(UserId), [Callback](Modio::ErrorCode ec) {
-		Callback.ExecuteIfBound(ToUnreal(ec));
-	});
+	Modio::UnfollowUserAsync(ToModio(UserId), [Callback](Modio::ErrorCode ec)
+		{
+			AsyncTask(ENamedThreads::GameThread, [Callback, ec]()
+				{
+					Callback.ExecuteIfBound(ToUnreal(ec));
+				});
+		});
 }
 
 FModioImageCache& UModioSubsystem::GetImageCache() const
@@ -1373,7 +1391,7 @@ void UModioSubsystem::MetricsSessionSendHeartbeatAtIntervalAsync(FModioUnsigned6
 																 FOnErrorOnlyDelegateFast Callback)
 {
 	Modio::MetricsSessionSendHeartbeatAtIntervalAsync(
-		ToModio(IntervalSeconds.Underlying), [Callback](Modio::ErrorCode ec) {
+		static_cast<uint32_t>(IntervalSeconds.Underlying), [Callback](Modio::ErrorCode ec) {
 			AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ToUnreal(ec)); }));
 		});
 }

@@ -9,6 +9,7 @@
  */
 
 #include "Widgets/ModioEditorUploadAndManageUGCWidget.h"
+#include "Engine/Engine.h"
 #include "ModioSubsystem.h"
 #include "SlateOptMacros.h"
 #include "Widgets/ModioEditorAddModFileWidget.h"
@@ -16,6 +17,7 @@
 #include "Widgets/ModioEditorBrowseModsWidget.h"
 #include "Widgets/ModioEditorCreateModProfileWidget.h"
 #include "Widgets/ModioEditorEditModProfileWidget.h"
+#include "Widgets/Layout/SBox.h"
 
 struct FModioFilterParams;
 
@@ -32,8 +34,8 @@ void SModioEditorUploadAndManageUGCWidget::Construct(const FArguments& InArgs)
 	ChildSlot
 	[
 		SAssignNew(WidgetContent, SBox)
-		.MinDesiredWidth(900)
-		.MinDesiredHeight(500)
+		.MinDesiredWidth(900.0f)
+		.MinDesiredHeight(500.0f)
 	];
 	// clang-format on
 

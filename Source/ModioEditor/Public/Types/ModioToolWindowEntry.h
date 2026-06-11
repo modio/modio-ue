@@ -11,6 +11,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Delegates/Delegate.h"
+#include "Widgets/SWidget.h"
 #include "ModioToolWindowEntry.generated.h"
 
 /**

@@ -14,6 +14,7 @@
 #include "ModioSubsystem.h"
 #include "Widgets/ModioEditorUploadAndManageUGCWidget.h"
 #include "Widgets/SCompoundWidget.h"
+#include "Widgets/Views/SListView.h"
 #include "types/ModioModInfo.h"
 
 /**

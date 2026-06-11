@@ -58,7 +58,7 @@ Modio::Metadata ToModio(const FModioMetadata& In)
 	return Out;
 }
 
-std::vector<Modio::Metadata> ToModio(const TArray<FModioMetadata>& In) 
+std::vector<Modio::Metadata> ToModio(const TArray<FModioMetadata>& In)
 {
 	std::vector<Modio::Metadata> Result;
 	Result.reserve(size_t(In.Num()));
@@ -440,6 +440,8 @@ EModioModfilePlatform ToUnreal(const Modio::ModfilePlatform& PlatformIn)
 			return EModioModfilePlatform::PS5;
 		case Modio::ModfilePlatform::Switch:
 			return EModioModfilePlatform::Switch;
+		case Modio::ModfilePlatform::Switch2:
+			return EModioModfilePlatform::Switch2;
 		case Modio::ModfilePlatform::Oculus:
 			return EModioModfilePlatform::Oculus;
 		case Modio::ModfilePlatform::Source:

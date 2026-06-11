@@ -14,7 +14,7 @@
 #include "ModioSDK.h"
 #include "Types/ModioIcon.h"
 
-FORCEINLINE FModioIcon ToUnreal(const Modio::Detail::Icon& In)
+FORCEINLINE FModioIcon ToUnreal(const Modio::Icon& In)
 {
 	FModioIcon Out;
 

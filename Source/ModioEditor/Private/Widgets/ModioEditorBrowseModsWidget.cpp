@@ -15,6 +15,8 @@
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioModInfo.h"
 #include "Widgets/Input/SSearchBox.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Views/SListView.h"
 
 #define LOCTEXT_NAMESPACE "BrowseModsWidget"
@@ -60,7 +62,7 @@ void SModioEditorBrowseModsWidget::Construct(const FArguments& InArgs, UModioSub
 			.AutoHeight()
 			[
 				SAssignNew(ModListBox, SBox)
-				.MaxDesiredHeight(325)
+				.MaxDesiredHeight(325.0f)
 			]
 
 			+ SVerticalBox::Slot()

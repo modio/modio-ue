@@ -21,6 +21,7 @@
 #include "SHyperlinkLaunchURL.h"
 #include "Widgets/Images/SThrobber.h"
 #include "Widgets/Input/SButton.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/Text/SRichTextBlock.h"
 
 #define LOCTEXT_NAMESPACE "ModioSettingsDetails"
@@ -159,7 +160,7 @@ void FModioSettingsDetails::DrawConfigGuide()
 						  .AutoWidth()[SAssignNew(GameIdInput, SEditableTextBox)
 										   .MinDesiredWidth(256.f)
 										   .Text(FText::FromString(
-											   FString::FromInt(GetDefault<UModioSettings>()->GameId)))
+											   FString::FromInt(static_cast<int32>(GetDefault<UModioSettings>()->GameId))))
 										   .HintText(LOCTEXT("GameIDGint", "00000"))]];
 	ConfigContentBox->AddSlot()
 		.Padding(FMargin(5.f, 5.f, 5.f, 5.f))

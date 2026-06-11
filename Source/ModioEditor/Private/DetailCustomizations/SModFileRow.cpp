@@ -18,7 +18,7 @@ void SModFileRow::Construct(const FArguments& InArgs, const TSharedRef<STableVie
 {
 	Item = InArgs._Item;
 
-	FSuperRowType::Construct(FSuperRowType::FArguments().Padding(0), InOwnerTableView);
+	FSuperRowType::Construct(FSuperRowType::FArguments().Padding(0.0f), InOwnerTableView);
 }
 
 TSharedRef<SWidget> SModFileRow::GenerateWidgetForColumn(const FName& ColumnName)

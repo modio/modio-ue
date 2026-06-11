@@ -33,6 +33,8 @@ FORCEINLINE Modio::AuthenticationProvider ToModio(EModioAuthenticationProvider P
 			return Modio::AuthenticationProvider::Itch;
 		case EModioAuthenticationProvider::Switch:
 			return Modio::AuthenticationProvider::Switch;
+		case EModioAuthenticationProvider::Switch2:
+			return Modio::AuthenticationProvider::Switch;
 		case EModioAuthenticationProvider::Discord:
 			return Modio::AuthenticationProvider::Discord;
 		case EModioAuthenticationProvider::PSN:

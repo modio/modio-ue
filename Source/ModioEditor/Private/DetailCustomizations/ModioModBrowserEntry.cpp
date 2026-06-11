@@ -13,8 +13,12 @@
 #include "SlateOptMacros.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioImageWrapper.h"
+#include "Widgets/Images/SImage.h"
 #include "Widgets/Images/SThrobber.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
+#include "Widgets/SOverlay.h"
+#include "Widgets/Text/STextBlock.h"
 
 #define LOCTEXT_NAMESPACE "ModBrowserEntry"
 
@@ -36,10 +40,10 @@ void SModioModBrowserEntry::Construct(const FArguments& InArgs, TSharedPtr<FModi
 			.FillWidth(1)
 			[
 				SAssignNew(ImageBox, SBox)
-				.MinDesiredWidth(68)
-				.MinDesiredHeight(38)
-				.MaxDesiredWidth(68)
-				.MaxDesiredHeight(38)
+				.MinDesiredWidth(68.0f)
+				.MinDesiredHeight(38.0f)
+				.MaxDesiredWidth(68.0f)
+				.MaxDesiredHeight(38.0f)
 				.MinAspectRatio(320.f/180.f)
 				.MaxAspectRatio(320.f/180.f)
 			] 

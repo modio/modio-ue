@@ -16,6 +16,8 @@
 #include "Widgets/Images/SThrobber.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SHyperlink.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Text/SRichTextBlock.h"
 #include "Widgets/Text/STextBlock.h"
 #include "WindowManager.h"
@@ -31,8 +33,8 @@ void SModioEditorUserAuthWidget::Construct(const FArguments& InArgs)
 	ChildSlot
 	[
 		SNew(SBox)
-		.MinDesiredWidth(900)
-		.MinDesiredHeight(500)
+		.MinDesiredWidth(900.0f)
+		.MinDesiredHeight(500.0f)
 		[
 			SNew(SVerticalBox)
 			+ SVerticalBox::Slot()
@@ -217,7 +219,7 @@ void SModioEditorUserAuthWidget::DrawLoginWidget()
 		[
 			SNew(SBox)
 			.VAlign(VAlign_Center)
-			.MinDesiredWidth(700)
+			.MinDesiredWidth(700.0f)
 			[
 				SNew(SHorizontalBox)
 				+ SHorizontalBox::Slot()
@@ -245,8 +247,8 @@ void SModioEditorUserAuthWidget::DrawLoginWidget()
 		.Padding(0, 0, 0, 16)
 		[
 			SNew(SBox)
-			.MinDesiredWidth(500)
-			.MinDesiredHeight(100)
+			.MinDesiredWidth(500.0f)
+			.MinDesiredHeight(100.0f)
 			[
 				SNew(SButton)
 					.HAlign(HAlign_Center)
@@ -262,7 +264,7 @@ void SModioEditorUserAuthWidget::DrawLoginWidget()
 			SNew(SButton)
 			.HAlign(HAlign_Center)
 			.VAlign(VAlign_Center)
-			.ContentPadding(8)
+			.ContentPadding(8.0f)
 			.OnClicked(this, &SModioEditorUserAuthWidget::OnAlreadyHaveCodeClicked)
 			.Text(LOCTEXT("AlreadyHaveCode", "I already have a code"))
 
@@ -359,8 +361,8 @@ void SModioEditorUserAuthWidget::DrawAuthenticateWidget()
 		.Padding(0, 0, 0, 0)
 		[
 			SNew(SBox)
-			.MinDesiredWidth(300)
-			.MinDesiredHeight(80)
+			.MinDesiredWidth(300.0f)
+			.MinDesiredHeight(80.0f)
 			[
 				SAssignNew(ModioAuthenticationCodeEditableTextBox, SEditableTextBox)
 				.Font(CodeFont)
@@ -372,17 +374,17 @@ void SModioEditorUserAuthWidget::DrawAuthenticateWidget()
 		+ SVerticalBox::Slot()
 		.HAlign(HAlign_Center)
 		.VAlign(VAlign_Center)
-		.Padding(24)
+		.Padding(24.0f)
 		.AutoHeight()
 		[
 			SNew(SBox)		
-			.MinDesiredWidth(500)
-			.MinDesiredHeight(50)
+			.MinDesiredWidth(500.0f)
+			.MinDesiredHeight(50.0f)
 			[
 				SNew(SButton)
 				.HAlign(HAlign_Center)
 				.VAlign(VAlign_Center)
-				.ContentPadding(12)
+				.ContentPadding(12.0f)
 				.OnClicked(this, &SModioEditorUserAuthWidget::OnAuthenticateButtonClicked)
 				.Text(LOCTEXT("SubmitCode", "Submit Code"))
 			]
@@ -390,16 +392,16 @@ void SModioEditorUserAuthWidget::DrawAuthenticateWidget()
 		+ SVerticalBox::Slot()
 		.HAlign(HAlign_Center)
 		.VAlign(VAlign_Center)
-		.Padding(24)
+		.Padding(24.0f)
 		[
 			SNew(SBox)		
-			.MinDesiredWidth(300)
-			.MinDesiredHeight(50)
+			.MinDesiredWidth(300.0f)
+			.MinDesiredHeight(50.0f)
 			[
 				SNew(SButton)
 				.HAlign(HAlign_Center)
 				.VAlign(VAlign_Center)
-				.ContentPadding(8)
+				.ContentPadding(8.0f)
 				.OnClicked(this, &SModioEditorUserAuthWidget::OnUseDifferentEmailClicked)
 				.Text(LOCTEXT("DifferentEmail", "Enter a different email"))
 			]

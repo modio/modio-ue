@@ -14,7 +14,7 @@
 #include "ModioSDK.h"
 #include "Types/ModioLogo.h"
 
-FORCEINLINE FModioLogo ToUnreal(const Modio::Detail::Logo& In)
+FORCEINLINE FModioLogo ToUnreal(const Modio::Logo& In)
 {
 	FModioLogo Out;
 

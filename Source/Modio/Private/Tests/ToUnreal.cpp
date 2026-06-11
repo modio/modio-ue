@@ -27,7 +27,7 @@ bool FModioConvertDataToUnrealFormatTest::RunTest(const FString& Parameters)
 	TestEqual("PopularityRankPosition", (int32)OutObj.PopularityRankPosition, (int32)InObj.PopularityRankPosition);
 	TestEqual("PopularityRankTotalMods", (int32)OutObj.PopularityRankTotalMods, (int32)InObj.PopularityRankTotalMods);
 	TestEqual("DownloadsTotal", (int32)OutObj.DownloadsTotal, (int32)InObj.DownloadsTotal);
-	TestEqual("SubscribersTotal", (int32)OutObj.SubscribersTotal, InObj.SubscribersTotal);
+	TestEqual("SubscribersTotal", (int32)OutObj.SubscribersTotal, (int32)InObj.SubscribersTotal);
 	TestEqual("RatingTotal", (int32)OutObj.RatingTotal, (int32)InObj.RatingTotal);
 	TestEqual("RatingPositive", (int32)OutObj.RatingPositive, (int32)InObj.RatingPositive);
 	TestEqual("RatingNegative", (int32)OutObj.RatingNegative, (int32)InObj.RatingNegative);

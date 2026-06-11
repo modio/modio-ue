@@ -25,7 +25,7 @@ FORCEINLINE FModioModStats ToUnreal(const Modio::ModStats& In)
 	Out.RatingPositive = ToUnreal(In.RatingPositive);
 	Out.RatingNegative = ToUnreal(In.RatingNegative);
 	Out.RatingPercentagePositive = ToUnreal(In.RatingPercentagePositive);
-	Out.RatingWeightedAggregate = ToUnreal(In.RatingWeightedAggregate);
+	Out.RatingWeightedAggregate = static_cast<float>(ToUnreal(In.RatingWeightedAggregate));
 	Out.RatingDisplayText = ToUnreal(In.RatingDisplayText);
 	return Out;
 }

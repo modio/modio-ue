@@ -17,6 +17,8 @@
 
 #include "ModioFilterParams.generated.h"
 
+class UWidget;
+
 /// Forward declaration of SDK type for declaration of conversion function below
 namespace Modio
 {
@@ -339,6 +341,20 @@ struct MODIO_API FModioPresetFilterParams
 
 	/**
 	 * @docpublic
+	 * @brief Field to use for revenue (default is FreeAndPaid)
+	 */
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	EModioRevenueFilterType RevenueField = EModioRevenueFilterType::FreeAndPaid;
+
+	/**
+	 * @docpublic
+	 * @brief Field to use for the widget class (default is nullptr)
+	 */
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
+	TSoftClassPtr<UWidget> TileWidgetClass = nullptr;
+
+	/**
+	 * @docpublic
 	 * @brief Number of results to return
 	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
@@ -355,7 +371,8 @@ struct MODIO_API FModioPresetFilterParams
 			.WithTags(Tags)
 			.WithoutTags(ExcludedTags)
 			.SortBy(SortField, Direction)
-			.IndexedResults(0, uint64_t(Count));
+			.IndexedResults(0, uint64_t(Count))
+			.RevenueType(RevenueField);
 	}
 };
 

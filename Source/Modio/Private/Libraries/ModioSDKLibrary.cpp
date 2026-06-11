@@ -301,7 +301,7 @@ FString UModioSDKLibrary::GetShortenedNumberAsString(int64 Number)
 		return FString::Printf(TEXT("%lld%s"), Thousands, *FString("K"));
 	}
 
-	return FString::FromInt(Number);
+	return FString::FromInt(static_cast<int32>(Number));
 }
 
 FString UModioSDKLibrary::GetDefaultSessionIdWindows()

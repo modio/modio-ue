@@ -11,9 +11,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Brushes/SlateImageBrush.h"
 #include "Engine/Texture2DDynamic.h"
 #include "ModioSubsystem.h"
 #include "Types/ModioModInfo.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/SCompoundWidget.h"
 
 /**

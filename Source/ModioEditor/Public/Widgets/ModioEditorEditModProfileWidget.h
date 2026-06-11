@@ -14,6 +14,8 @@
 #include "ModioSubsystem.h"
 #include "Types/ModioEditModParams.h"
 #include "Types/ModioModInfo.h"
+#include "Widgets/Input/STextComboBox.h"
+#include "Widgets/Layout/SGridPanel.h"
 #include "Widgets/ModioEditorUploadAndManageUGCWidget.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/SModioEditorWindowCompoundWidget.h"

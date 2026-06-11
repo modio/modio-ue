@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Brushes/SlateDynamicImageBrush.h"
+#include "Brushes/SlateImageBrush.h"
 #include "CoreMinimal.h"
 #include "Types/ModioGameInfo.h"
 #include "Types/ModioUser.h"

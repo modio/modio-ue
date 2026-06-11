@@ -39,10 +39,12 @@
 #include "Objects/ModioEditModParamsObject.h"
 #include "SHyperlinkLaunchURL.h"
 #include "Styling/SlateBrush.h"
+#include "Brushes/SlateBorderBrush.h"
 #include "Types/ModioCommonTypes.h"
 #include "Types/ModioModInfo.h"
 #include "Widgets/Input/SFilePathPicker.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SHeader.h"
 #include "Widgets/Layout/SWrapBox.h"
 #include "Widgets/SOverlay.h"
@@ -106,8 +108,8 @@ void SModioEditorWindowCompoundWidget::Construct(const FArguments& InArgs)
 		[
 			SAssignNew(ProgressBarBox, SBox)
 			.Visibility(EVisibility::Collapsed)
-			.WidthOverride(300)
-			.HeightOverride(300)
+			.WidthOverride(300.0f)
+			.HeightOverride(300.0f)
 			.HAlign(HAlign_Center)
 			.VAlign(VAlign_Center)
 			[
@@ -125,10 +127,10 @@ void SModioEditorWindowCompoundWidget::Construct(const FArguments& InArgs)
 				.VAlign(VAlign_Center)
 				[
 					SNew(SBox)
-					.MinDesiredWidth(300)
-					.MinDesiredHeight(50)
-					.MaxDesiredWidth(300)
-					.MaxDesiredHeight(50)
+					.MinDesiredWidth(300.0f)
+					.MinDesiredHeight(50.0f)
+					.MaxDesiredWidth(300.0f)
+					.MaxDesiredHeight(50.0f)
 					[
 						SAssignNew(ProgressBar, SProgressBar)
 						.Percent(Percentage)
@@ -343,8 +345,8 @@ void SModioEditorWindowCompoundWidget::DrawToolLanding()
 	VerticalBoxList->AddSlot()
 	[
 		SNew(SBox)
-		.MinDesiredWidth(900)
-		.MinDesiredHeight(500)
+		.MinDesiredWidth(900.0f)
+		.MinDesiredHeight(500.0f)
 		[
 			SAssignNew(VBoxContent, SVerticalBox)
 		]
@@ -375,8 +377,8 @@ void SModioEditorWindowCompoundWidget::DrawToolLanding()
 		VBoxContent->AddSlot()
 		[
 			SNew(SBox)
-				.WidthOverride(350)
-				.HeightOverride(60)
+				.WidthOverride(350.0f)
+				.HeightOverride(60.0f)
 				.HAlign(HAlign_Center)
 				.VAlign(VAlign_Center)
 				[
@@ -394,8 +396,8 @@ void SModioEditorWindowCompoundWidget::DrawToolLanding()
 						.VAlign(VAlign_Center)
 						[
 							SNew(SBox)
-							.WidthOverride(32)
-							.HeightOverride(32)
+							.WidthOverride(32.0f)
+							.HeightOverride(32.0f)
 							[
 								SNew(SImage)
 								.Image(LoginButtonBrush)
@@ -465,7 +467,7 @@ void SModioEditorWindowCompoundWidget::DrawToolLanding()
 				.Padding(4, 0)
 				[
 					SNew(SButton)
-					.ContentPadding(6)
+					.ContentPadding(6.0f)
 					.OnClicked_Lambda([this]()
 					{
 						Logout(false);
@@ -766,7 +768,7 @@ FText SModioEditorWindowCompoundWidget::Localize(FString Key, FString Text)
 FSlateFontInfo SModioEditorWindowCompoundWidget::GetTextStyle(FName PropertyName, FName FaceName, int32 Size)
 {
 	FSlateFontInfo FontInfo = FCoreStyle::Get().GetFontStyle(PropertyName);
-	FontInfo.Size = Size;
+	FontInfo.Size = static_cast<float>(Size);
 	FontInfo.TypefaceFontName = FaceName;
 	return FontInfo;
 }
@@ -880,7 +882,7 @@ TSharedPtr<SWidget> SModioEditorWindowCompoundWidget::CreateToolEntryWidget(FMod
 		[
 			SNew(SButton)
 			.OnClicked(OnClicked)
-			.ContentPadding(12)
+			.ContentPadding(12.0f)
 			.ButtonStyle(&MyHoverBorderStyle)
 			[
 				SNew(SHorizontalBox)

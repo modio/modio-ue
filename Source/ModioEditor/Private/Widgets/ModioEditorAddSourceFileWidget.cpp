@@ -13,6 +13,9 @@
 #include "SlateOptMacros.h"
 #include "Widgets/Input/SDirectoryPicker.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
+#include "Widgets/Input/SCheckBox.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SSeparator.h"
 
 #define LOCTEXT_NAMESPACE "ModioEditorCookSourceFileWidget"
 
@@ -202,8 +205,8 @@ void SModioEditorAddSourceFileWidget::UpdateWindowContent()
 				.FillWidth(2)
 				[
 					SNew(SBox)
-					.MinDesiredHeight(50)
-					.MaxDesiredHeight(50)
+					.MinDesiredHeight(50.0f)
+					.MaxDesiredHeight(50.0f)
 					[
 						SNew(SMultiLineEditableTextBox)
 						.OnTextChanged_Lambda([this](const FText& Text) 

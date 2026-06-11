@@ -10,13 +10,18 @@
 
 #include "Widgets/ModioEditorCreateModProfileWidget.h"
 #include "EditorDirectories.h"
+#include "Misc/MessageDialog.h"
 #include "SListViewSelectorDropdownMenu.h"
 #include "SlateOptMacros.h"
 #include "Widgets/Images/SThrobber.h"
+#include "Widgets/Input/SCheckBox.h"
 #include "Widgets/Input/SFilePathPicker.h"
 #include "Widgets/Input/SMultiLineEditableTextBox.h"
 #include "Widgets/Input/STextComboBox.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SGridPanel.h"
 #include "Widgets/Layout/SScrollBox.h"
+#include "Widgets/Layout/SSeparator.h"
 
 #define LOCTEXT_NAMESPACE "CreateModProfileWidget"
 
@@ -62,7 +67,7 @@ void SModioEditorCreateModProfileWidget::Construct(const FArguments& InArgs, UMo
 		.AutoHeight()
 		[
 			SAssignNew(ContentBox, SBox)
-			.MaxDesiredHeight(365)
+			.MaxDesiredHeight(365.0f)
 		]
 
 		+ SVerticalBox::Slot()
@@ -338,8 +343,8 @@ void SModioEditorCreateModProfileWidget::UpdateWindowContent()
 					.FillWidth(2)
 					[
 						SNew(SBox)
-						.MinDesiredHeight(50)
-						.MaxDesiredHeight(50)
+						.MinDesiredHeight(50.0f)
+						.MaxDesiredHeight(50.0f)
 						[
 							SNew(SMultiLineEditableTextBox)
 								.OnTextChanged_Lambda([this](const FText& Updated) 

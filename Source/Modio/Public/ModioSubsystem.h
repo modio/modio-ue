@@ -17,6 +17,7 @@
 #endif
 #include "HAL/Runnable.h"
 #include "HAL/RunnableThread.h"
+#include "Interfaces/IModioPortalInterface.h"
 #include "ModioImageCache.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "Templates/UniquePtr.h"
@@ -271,6 +272,23 @@ public:
 	 */
 	MODIO_API void InitializeAsync(const FModioInitializeOptions& InitializeOptions,
 								   FOnErrorOnlyDelegateFast OnInitComplete);
+
+	MODIO_API void SetPortalInterface(TScriptInterface<IModioPortalInterface> PortalInterface);
+
+	UPROPERTY()
+	TScriptInterface<IModioPortalInterface> CachedPortalInterface;
+
+	UFUNCTION(BlueprintCallable, Category = "mod.io")
+	TScriptInterface<IModioPortalInterface> GetPortalInterface()
+	{
+		return CachedPortalInterface;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "mod.io")
+	UObject* GetPortalInterfaceObject()
+	{
+		return CachedPortalInterface.GetObject();
+	}
 
 	/**
 	 * @docpublic
