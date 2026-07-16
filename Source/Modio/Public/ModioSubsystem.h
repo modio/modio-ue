@@ -28,6 +28,7 @@
 #include "Types/ModioCreateSourceFileParams.h"
 #include "Types/ModioEditModParams.h"
 #include "Types/ModioEntitlementConsumptionStatusList.h"
+#include "Types/ModioEntitlementList.h"
 #include "Types/ModioErrorCode.h"
 #include "Types/ModioFilterParams.h"
 #include "Types/ModioGameInfo.h"
@@ -81,6 +82,8 @@ DECLARE_DELEGATE_TwoParams(FOnMuteUsersDelegateFast, FModioErrorCode, TOptional<
 DECLARE_DELEGATE_TwoParams(FOnListUserCreatedModsDelegateFast, FModioErrorCode, TOptional<FModioModInfoList>);
 DECLARE_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegateFast, FModioErrorCode, TOptional<FModioModChangeMap>);
 DECLARE_DELEGATE_TwoParams(FOnPurchaseModDelegateFast, FModioErrorCode, TOptional<FModioTransactionRecord>);
+DECLARE_DELEGATE_TwoParams(FOnGetAvailableUserEntitlementsDelegateFast, FModioErrorCode,
+						   TOptional<FModioEntitlementList>);
 DECLARE_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegateFast, FModioErrorCode, TOptional<uint64>);
 DECLARE_DELEGATE_OneParam(FOnFetchUserPurchasesDelegateFast, FModioErrorCode);
 DECLARE_DELEGATE_TwoParams(FOnGetUserDelegationTokenDelegateFast, FModioErrorCode, FString);
@@ -130,6 +133,9 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPreviewExternalUpdatesDelegate, FModioErro
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPurchaseModDelegate, FModioErrorCode, ErrorCode, FModioOptionalTransactionRecord,
 								   Transaction);
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetAvailableUserEntitlementsDelegate, FModioErrorCode, ErrorCode,
+								   FModioOptionalEntitlementList, Entitlements);
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnGetUserWalletBalanceDelegate, FModioErrorCode, ErrorCode, FModioOptionalUInt64,
 								   WalletBalance);
@@ -210,11 +216,13 @@ protected:
 
 	friend class UModioUISubsystem;
 
+public:
 	EModioPortal GetCurrentPortal() const
 	{
 		return CachedInitializeOptions.PortalInUse;
 	}
 
+protected:
 #if WITH_EDITOR
 	/// @brief Internal method used for emitting a warning during PIE if the Plugin was initialized during that PIE
 	/// session
@@ -916,6 +924,33 @@ public:
 
 	/**
 	 * @docpublic
+	 * @brief Attempts to purchase a specified mod by consuming an existing, un-consumed entitlement that the user has
+	 * from the current portal. Purchasing a mod will add a subscription to it. If the user does not have an existing
+	 * entitlement, the purchase will fail. It is recommended to call GetAvailableUserEntitlementsAsync to query if the
+	 * current user has an available entitlement prior to this call.
+	 * @param ModID ID of the mod to purchase
+	 * @param EntitlementParams Portal-specific additional parameters
+	 * @param Callback Callback invoked with purchase information once the purchase is completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 */
+	MODIO_API void PurchaseModWithEntitlementAsync(FModioModID ModID, const FModioEntitlementParams& EntitlementParams,
+												   FOnPurchaseModDelegateFast Callback);
+
+	/**
+	 * @docpublic
+	 * Retrieves a list of the unconsumed entitlements that the mod.io user has available via the current
+	 * portal. Will not consume entitlements.
+	 * @param Callback Callback providing an error code indicating success or failure of the retrieval operation
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 */
+	MODIO_API void GetAvailableUserEntitlementsAsync(FOnGetAvailableUserEntitlementsDelegateFast Callback);
+
+	/**
+	 * @docpublic
 	 * @brief Gets the users current wallet balance. This will also create a wallet for a user if one does not exist.
 	 * You should ensure this is called prior to calling [`PurchaseModAsync`](#purchasemodasync)
 	 * purchase will fail.
@@ -1439,7 +1474,8 @@ public:
 	/**
 	 * @docpublic
 	 * @brief Provides a list of mod ratings for the current user
-	 * @param Callback Callback invoked with a status code and an optional UserModRatingList providing ratings for each mod
+	 * @param Callback Callback invoked with a status code and an optional UserModRatingList providing ratings for each
+	 * mod
 	 * @requires initialized-sdk
 	 * @requires no-rate-limiting
 	 * @requires user-authenticated
@@ -2311,6 +2347,36 @@ public:
 	UFUNCTION(BlueprintCallable, DisplayName = "PurchaseModAsync", Category = "mod.io|Monetization")
 	MODIO_API void K2_PurchaseModAsync(FModioModID ModID, FModioUnsigned64 ExpectedPrice,
 									   FOnPurchaseModDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * @brief Attempts to purchase a specified mod by consuming an existing, un-consumed entitlement that the user has
+	 * from the current portal. Purchasing a mod will add a subscription to it. If the user does not have an existing
+	 * entitlement, the purchase will fail. It is recommended to call GetAvailableUserEntitlementsAsync to query if the
+	 * current user has an available entitlement prior to this call.
+	 * @param ModID ID of the mod to purchase
+	 * @param EntitlementParams Portal-specific additional parameters
+	 * @param Callback Callback invoked with purchase information once the purchase is completed.
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "PurchaseModWithEntitlementAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_PurchaseModWithEntitlementAsync(FModioModID ModID,
+													  const FModioEntitlementParams& EntitlementParams,
+													  FOnPurchaseModDelegate Callback);
+
+	/**
+	 * @docpublic
+	 * Retrieves a list of the unconsumed entitlements that the mod.io user has available via the current
+	 * portal. Will not consume entitlements.
+	 * @param Callback Callback providing an error code indicating success or failure of the retrieval operation
+	 * @requires initialized-sdk
+	 * @requires authenticated-user
+	 * @requires no-rate-limiting
+	 */
+	UFUNCTION(BlueprintCallable, DisplayName = "GetAvailableUserEntitlementsAsync", Category = "mod.io|Monetization")
+	MODIO_API void K2_GetAvailableUserEntitlementsAsync(FOnGetAvailableUserEntitlementsDelegate Callback);
 
 	/**
 	 * @docpublic

@@ -12,6 +12,7 @@
 
 #include "Types/ModioFileMetadata.h"
 #include "Types/ModioMetadata.h"
+#include "Types/ModioModMonetizationSKU.h"
 #include "Types/ModioModStats.h"
 #include "Types/ModioModTag.h"
 #include "Types/ModioURLList.h"
@@ -279,6 +280,9 @@ struct MODIO_API FModioModInfo
 	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Monetization")
 	FModioUnsigned64 Price = FModioUnsigned64(0);
+
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Monetization")
+	TArray<FModioModMonetizationSKU> SKUMappings {}; 
 
 	friend struct FModioModInfo ToUnreal(const struct Modio::ModInfo& In);
 };

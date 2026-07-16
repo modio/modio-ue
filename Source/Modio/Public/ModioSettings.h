@@ -71,24 +71,37 @@ public:
 	FSoftObjectPath LocalizationStringTable;
 
 	/**
-	 * If enabled, default implementations of Monetization-related UI components will be visible and interactable in mod.io UI templates
+	 * If enabled, default implementations of Monetization-related UI components will be visible and interactable in
+	 * mod.io UI templates
 	 */
 	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
-		meta=(DisplayName="Enable Monetization widgets in UI"))
+			  meta = (DisplayName = "Enable Monetization widgets in UI"))
 	bool bEnableMonetizationFeature;
 
 	/**
-	 * If enabled, the UUGCSubsystem can manage mod enabled/disable state, if a valid IModEnabledStateProvider has been set via SetUGCEnabledStateProvider so you can persist the state appropriately
-	 * If this is disabled, enable/disable widgets in the UI will be hidden
+	 * If enabled, default implementations of Monetization-related UI components will display prices in fiat currency
+	 * instead of virtual currencies
 	 */
 	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
-		meta = (DisplayName = "Enable Mod Enable/Disable support"))
+			  meta = (DisplayName = "Display fiat pricing in UI", EditCondition = "bEnableMonetizationFeature",
+					  EditConditionHides = "true"))
+	bool bEnableFiatCurrencyFeature;
+
+	/**
+	 * If enabled, the UUGCSubsystem can manage mod enabled/disable state, if a valid IModEnabledStateProvider has been
+	 * set via SetUGCEnabledStateProvider so you can persist the state appropriately If this is disabled, enable/disable
+	 * widgets in the UI will be hidden
+	 */
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
+			  meta = (DisplayName = "Enable Mod Enable/Disable support"))
 	bool bEnableModEnableDisableFeature;
 
 	/**
-	 * If enabled, widgets in mod.io UI templates will allow users to attempt to downvote mods. If downvoting is not enabled on the mod.io dashboards such votes will not be recorded
+	 * If enabled, widgets in mod.io UI templates will allow users to attempt to downvote mods. If downvoting is not
+	 * enabled on the mod.io dashboards such votes will not be recorded
 	 */
-	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags", meta=(DisplayName="Enable Mod Downvoting in UI"))
+	UPROPERTY(EditDefaultsOnly, config, Category = "Feature Flags",
+			  meta = (DisplayName = "Enable Mod Downvoting in UI"))
 	bool bEnableModDownvoteFeature;
 
 	/**
@@ -103,7 +116,7 @@ public:
 	 * See the monetization documentation for more info.
 	 */
 	UPROPERTY(EditDefaultsOnly, config, Category = "Monetization",
-		meta = (EditCondition="bEnableMonetizationFeature", EditConditionHides="true"))
+			  meta = (EditCondition = "bEnableMonetizationFeature", EditConditionHides = "true"))
 	TMap<EModioPortal, FString> PlatformIdentifiers;
 
 

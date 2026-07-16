@@ -9,6 +9,7 @@
  */
 
 #include "Libraries/ModioOptionalLibrary.h"
+#include "Types/ModioEntitlementConsumptionStatusList.h"
 #include "Types/ModioGameInfo.h"
 #include "Types/ModioGameInfoList.h"
 #include "Types/ModioModChangeMap.h"
@@ -233,4 +234,18 @@ bool UModioOptionalLibrary::GetValue_ModioOptionalUserList(const FModioOptionalU
 														   FModioUserList& UserList)
 {
 	return GetValueInternal(OptionalUserList, UserList);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalEntitlementConsumptionStatusList(
+	const FModioOptionalEntitlementConsumptionStatusList& OptionalEntitlementConsumptionStatusList,
+	FModioEntitlementConsumptionStatusList& EntitlementConsumptionStatusList)
+{
+	return GetValueInternal(OptionalEntitlementConsumptionStatusList, EntitlementConsumptionStatusList);
+}
+
+bool UModioOptionalLibrary::GetValue_ModioOptionalEntitlementList(
+	const FModioOptionalEntitlementList& OptionalEntitlementList,
+	FModioEntitlementList& EntitlementList)
+{
+	return GetValueInternal(OptionalEntitlementList, EntitlementList);
 }

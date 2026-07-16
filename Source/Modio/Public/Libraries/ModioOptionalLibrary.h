@@ -11,6 +11,8 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Types/ModioEntitlement.h"
+#include "Types/ModioEntitlementList.h"
 #include "Types/ModioGameInfo.h"
 #include "Types/ModioImageWrapper.h"
 #include "Types/ModioModCollection.h"
@@ -21,8 +23,8 @@
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioUnsigned64.h"
-#include "Types/ModioUserModRating.h"
 #include "Types/ModioUserList.h"
+#include "Types/ModioUserModRating.h"
 
 #include "ModioOptionalLibrary.generated.h"
 
@@ -431,4 +433,32 @@ class MODIO_API UModioOptionalLibrary : public UBlueprintFunctionLibrary
 	static bool GetValue_ModioOptionalUserList(
 		const struct FModioOptionalUserList& OptionalUserList,
 		struct FModioUserList& UserList);
+
+	/**
+	 * @docpublic
+	 * @brief Get the entitlement consumptions status list from the optional if it's set
+	 *
+	 * @param OptionalEntitlementConsumptionStatusList -
+	 * @param EntitlementConsumptionStatusList - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalEntitlementConsumptionStatusList)")
+	static bool GetValue_ModioOptionalEntitlementConsumptionStatusList(
+		const struct FModioOptionalEntitlementConsumptionStatusList& OptionalEntitlementConsumptionStatusList,
+		struct FModioEntitlementConsumptionStatusList& EntitlementConsumptionStatusList);
+
+	/**
+	 * @docpublic
+	 * @brief Get the entitlement list from the optional if it's set
+	 *
+	 * @param OptionalEntitlementList -
+	 * @param EntitlementList - if this returned false, then this will be defaulted
+	 * @return true if the optional has a value set
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities|Optional",
+			  DisplayName = "GetValue (ModioOptionalEntitlementList)")
+	static bool GetValue_ModioOptionalEntitlementList(
+		const struct FModioOptionalEntitlementList& OptionalEntitlementList,
+		struct FModioEntitlementList& EntitlementList);
 };

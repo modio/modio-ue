@@ -50,16 +50,6 @@ enum class EModioEntitlementConsumptionState : uint8
 
 /**
  * @docpublic
- * @brief Type of entitlement that was consumed
- */
-UENUM(BlueprintType)
-enum class EModioEntitlementType : uint8
-{
-	VirtualCurrency = 0
-};
-
-/**
- * @docpublic
  * @brief Optional updated wallet balance from the sync entitlements call
  */
 USTRUCT(BlueprintType)

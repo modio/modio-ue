@@ -1839,6 +1839,60 @@ void UModioSubsystem::K2_PurchaseModAsync(FModioModID ModID, FModioUnsigned64 Ex
 						 }));
 }
 
+void UModioSubsystem::PurchaseModWithEntitlementAsync(FModioModID ModID,
+													  const FModioEntitlementParams& EntitlementParams,
+													  FOnPurchaseModDelegateFast Callback)
+{
+	Modio::PurchaseModWithEntitlementAsync(
+		ToModio(ModID), ToModio(EntitlementParams),
+		[Callback](Modio::ErrorCode ec, Modio::Optional<Modio::TransactionRecord> TransactionRecord) {
+			AsyncTask(ENamedThreads::GameThread, ([Callback, ec, TransactionRecord]() {
+						  Callback.ExecuteIfBound(ec, ToUnrealOptional<FModioTransactionRecord>(TransactionRecord));
+					  }));
+		});
+}
+
+void UModioSubsystem::K2_PurchaseModWithEntitlementAsync(FModioModID ModID,
+	const FModioEntitlementParams& EntitlementParams,
+	FOnPurchaseModDelegate Callback)
+{
+	PurchaseModWithEntitlementAsync(
+		ModID, EntitlementParams,
+		FOnPurchaseModDelegateFast::CreateLambda(
+			[Callback](FModioErrorCode ec, TOptional<FModioTransactionRecord> TransactionRecord) {
+				Callback.ExecuteIfBound(ec, ToBP<FModioOptionalTransactionRecord>(TransactionRecord));
+			}));
+}
+
+void UModioSubsystem::GetAvailableUserEntitlementsAsync(FOnGetAvailableUserEntitlementsDelegateFast Callback)
+{
+	FEntitlementParamsRequestedDelegate Handler = UEntitlementParamsRequestedProxy::CreateProxyDelegate(
+		FEntitlementParamsRequestedDelegateFast::CreateLambda([Callback](const FModioEntitlementParams& Params) {
+			Modio::GetAvailableUserEntitlementsAsync(
+				ToModio(Params), [Callback](Modio::ErrorCode ec, Modio::Optional<Modio::EntitlementList> Entitlements) {
+					if (Entitlements)
+					{
+						FModioEntitlementList Out = FModioEntitlementList(Entitlements.value());
+						AsyncTask(ENamedThreads::GameThread,
+								  ([Callback, ec, Out]() { Callback.ExecuteIfBound(ec, Out); }));
+					}
+					else
+					{
+						AsyncTask(ENamedThreads::GameThread, ([Callback, ec]() { Callback.ExecuteIfBound(ec, {}); }));
+					}
+				});
+		}));
+	IModioPortalInterface::Execute_RequestEntitlementParams(GetPortalInterfaceObject(), {}, Handler);
+}
+
+void UModioSubsystem::K2_GetAvailableUserEntitlementsAsync(FOnGetAvailableUserEntitlementsDelegate Callback)
+{
+	GetAvailableUserEntitlementsAsync(FOnGetAvailableUserEntitlementsDelegateFast::CreateLambda(
+					[Callback](FModioErrorCode ec, TOptional<FModioEntitlementList> Entitlements) {
+						Callback.ExecuteIfBound(ec, ToBP<FModioOptionalEntitlementList>(Entitlements));
+					}));
+}
+
 void UModioSubsystem::GetUserDelegationTokenAsync(FOnGetUserDelegationTokenDelegateFast Callback)
 {
 	Modio::GetUserDelegationTokenAsync([Callback](Modio::ErrorCode ec, std::string Token) {

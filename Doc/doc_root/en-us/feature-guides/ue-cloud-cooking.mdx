@@ -173,10 +173,13 @@ An example directory structure can be found below:
 │       ├── GDK
 │       ├── PS4
 │       └── ...
-└── cloudcooking.config
+└── CloudCooking.config
 ```
 
-The `cloudcooking.config` file is used to indicate to the build agent where it can locate RunUAT and your project file, relative to the root of this directory. It should be formatted as json.
+The `CloudCooking.config` file is used to indicate to the build agent where it can locate RunUAT and your project file, relative to the root of this directory. It should be formatted as json.
+:::note
+This filename (`CloudCooking.config`) is case sensitive and must be supplied as shown here.
+:::
 
 ### CloudCooking.config file
 
@@ -186,7 +189,7 @@ The `cloudcooking.config` file is used to indicate to the build agent where it c
 | GameProjectDirectory | /UnrealEngine/Engine/MyGame | Path to the directory of your game  |
 | GameProjectName | MyGame.uproject | Filename of the uproject file for your game.  |
 
-An example of the cloudcooking.config file for the above folder structure:
+An example of the CloudCooking.config file for the above folder structure:
 
 ```json
 {

@@ -219,6 +219,17 @@ enum class EModioModChangeType : uint8
 
 /**
  * @docpublic
+ * @brief Type of entitlement that was consumed
+ */
+UENUM(BlueprintType)
+enum class EModioEntitlementType : uint8
+{
+	VirtualCurrency = 0,
+	SKU = 1
+};
+
+/**
+ * @docpublic
  * @brief Strong type struct to wrap a ModID to uniquely identify user-generated content
  */
 USTRUCT(BlueprintType)

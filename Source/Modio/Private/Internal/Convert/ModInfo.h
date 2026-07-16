@@ -11,6 +11,7 @@
 #pragma once
 #include "Internal/Convert/FileMetadata.h"
 #include "Internal/Convert/Metadata.h"
+#include "Internal/Convert/ModMonetizationSKU.h"
 #include "Internal/Convert/ModStats.h"
 #include "Internal/Convert/ModTag.h"
 #include "Internal/Convert/URLList.h"
@@ -53,5 +54,6 @@ FORCEINLINE FModioModInfo ToUnreal(const Modio::ModInfo& In)
 	Out.Stats = ToUnreal(In.Stats);
 	Out.ModStatus = (EModioModServerSideStatus) In.ModStatus;
 	Out.Price = FModioUnsigned64(In.Price);
+	Out.SKUMappings = ToUnreal<FModioModMonetizationSKU>(In.SKUMappings);
 	return Out;
 }

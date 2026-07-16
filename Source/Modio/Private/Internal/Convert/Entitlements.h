@@ -61,7 +61,17 @@ FORCEINLINE EModioEntitlementType ToUnreal(const Modio::EntitlementType& In)
 	{
 		case Modio::EntitlementType::VirtualCurrency:
 			return EModioEntitlementType::VirtualCurrency;
+		case Modio::EntitlementType::SKU:
+			return EModioEntitlementType::SKU;
 		default:
 			return EModioEntitlementType::VirtualCurrency;
 	}
+}
+
+FORCEINLINE FModioEntitlement ToUnreal(const Modio::Entitlement& In)
+{
+	FModioEntitlement Out;
+	Out.SkuId = ToUnreal(In.SkuId);
+	Out.EntitlementType = ToUnreal(In.Type);
+	return Out;
 }

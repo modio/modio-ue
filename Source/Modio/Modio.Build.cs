@@ -475,11 +475,11 @@ public class Modio : ModuleRules
     private void AddCommonDependencyModules()
     {
         PublicDependencyModuleNames.AddRange(new string[] {
-            "Core", "Engine", "UMG", "Slate"
+            "Core", "Engine", "UMG", "Slate", "OnlineSubsystem"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
-            "Projects", "CoreUObject", "RHI", "RenderCore", "HTTP", "OnlineSubsystem"
+            "Projects", "CoreUObject", "RHI", "RenderCore", "HTTP"
         });
 
         if (Target.bBuildEditor)

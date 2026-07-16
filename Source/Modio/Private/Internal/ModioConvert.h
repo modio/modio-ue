@@ -17,11 +17,14 @@
 #include "ModioSDK.h"
 #include "Templates/UnrealTypeTraits.h"
 #include "Types/ModioCommonTypes.h"
+#include "Types/ModioEntitlement.h"
 #include "Types/ModioEntitlementConsumptionStatusList.h"
+#include "Types/ModioEntitlementList.h"
 #include "Types/ModioGameInfoList.h"
 #include "Types/ModioModCollection.h"
 #include "Types/ModioModCollectionEntry.h"
 #include "Types/ModioModInfoList.h"
+#include "Types/ModioModMonetizationSKU.h"
 #include "Types/ModioModProgressInfo.h"
 #include "Types/ModioStorageInfo.h"
 #include "Types/ModioTerms.h"
@@ -53,6 +56,7 @@ struct FModioMetadata ToUnreal(const Modio::Metadata& In);
 struct FModioModTag ToUnreal(const Modio::ModTag& In);
 struct FModioModTagLocalizationData ToUnreal(const Modio::ModTagLocalizationData& In);
 struct FModioModInfo ToUnreal(const Modio::ModInfo& In);
+struct FModioEntitlement ToUnreal(const Modio::Entitlement& In);
 struct FModioModDependency ToUnreal(const Modio::ModDependency& In);
 struct FModioUnsigned64 ToUnreal(const Modio::FileSize& In);
 struct FModioOtherUrl ToUnreal(const Modio::OtherUrl& In);
@@ -86,6 +90,7 @@ EModioModProgressState ToUnreal(const Modio::ModProgressInfo::EModProgressState&
 FModioModCollectionEntry ToUnreal(const Modio::ModCollectionEntry& In);
 FModioStorageInfo ToUnreal(const Modio::StorageInfo& In);
 EModioModCommunityOptionsFlags ToUnreal(const Modio::ModCommunityOptionsFlags& In);
+FModioModMonetizationSKU ToUnreal(const Modio::ModMonetizationSKU& In);
 EModioGameCloudCookingStatus ToUnreal(const Modio::GameCloudCookingStatus& In);
 FModioUserModRating ToUnreal(const Modio::UserRating& In);
 FModioUserModRatingList ToUnreal(const Modio::UserRatingList& In);
