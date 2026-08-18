@@ -23,3 +23,5 @@ private:
 	void RegisterSettings();
 	void UnregisterSettings();
 };
+
+DECLARE_LOG_CATEGORY_EXTERN(LogModioTests, Log, All);

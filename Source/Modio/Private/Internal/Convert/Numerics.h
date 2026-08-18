@@ -11,12 +11,12 @@
 #pragma once
 #include <cstdint>
 
-FORCEINLINE std::uint8_t ToModio(const uint8& In)
+FORCEINLINE uint8_t ToModio(const uint8& In)
 {
-	return static_cast<std::uint8_t>(In);
+	return static_cast<uint8_t>(In);
 }
 
-FORCEINLINE uint8 ToUnreal(const std::uint8_t& In)
+FORCEINLINE uint8 ToUnreal(const uint8_t& In)
 {
     return static_cast<uint8>(In); 
 }

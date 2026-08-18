@@ -40,7 +40,7 @@ struct MODIO_API FModioEntitlement
 	 * @brief The type of the entitlement
 	 */
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Entitlement")
-	EModioEntitlementType EntitlementType;
+	EModioEntitlementType EntitlementType = EModioEntitlementType::VirtualCurrency;
 
 	friend struct FModioEntitlement ToUnreal(const struct Modio::Entitlement& In);
 };

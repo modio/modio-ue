@@ -397,6 +397,17 @@ public class Modio : ModuleRules
                     string DestinationPath = Path.Combine(PlatformGeneratedSourcePath, Path.ChangeExtension(Path.GetFileName(IPPFile), ".cpp"));
                     File.Copy(IPPFile, DestinationPath, true);
                 }
+
+                //copy all the mm files to the generated source directory too
+                List<string> MMFiles = new List<string>(Directory.GetFiles(PlatformDirectory, "*.mm", SearchOption.AllDirectories));
+
+                foreach (string MMFile in MMFiles)
+                {
+                    //Add the original file in our upstream repository as a dependency, so if a user edits it we will copy it over
+                    ExternalDependencies.Add(MMFile);
+                    string DestinationPath = Path.Combine(PlatformGeneratedSourcePath, Path.GetFileName(MMFile));
+                    File.Copy(MMFile, DestinationPath, true);
+                }
             }
         }
     }
@@ -659,6 +670,7 @@ public class Modio : ModuleRules
 #endif
 		//bUseUnity = false;
 		bAllowConfidentialPlatformDefines = true;
+
 
         if (IsDevelopmentMode())
         {

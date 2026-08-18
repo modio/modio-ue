@@ -19,7 +19,7 @@ struct MODIO_API FModioModMonetizationSKU
     GENERATED_BODY()
 
     UPROPERTY(BlueprintReadOnly, Category = "mod.io|Monetization")
-    int64 Id;
+    int64 Id = 0;
 
     UPROPERTY(BlueprintReadOnly, Category = "mod.io|Monetization")
     FString SKUName;

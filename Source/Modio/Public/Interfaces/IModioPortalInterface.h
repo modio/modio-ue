@@ -30,6 +30,9 @@ DECLARE_DELEGATE_OneParam(FSKUMappingsRequestedDelegateFast, const TArray<FModio
 DECLARE_DYNAMIC_DELEGATE_OneParam(FStoreClosedDelegate, bool, bResult);
 DECLARE_DELEGATE_OneParam(FStoreClosedDelegateFast, bool);
 
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FStorePurchaseDelegate, bool, bResult, const FString&, ErrorMessage);
+DECLARE_DELEGATE_TwoParams(FStorePurchaseDelegateFast, bool, const FString&);
+
 // Delegate proxy objects are useful to wrap a native delegate inside a dynamic delegate. They allow the caller to bind
 // additional arguments or use a lambda in their callback. The proxy object can be created and bound to a dynamic
 // delegate with `CreateProxyDelegate` and will be added to the root set to prevent garbage collection. When the
@@ -123,6 +126,23 @@ public:
 	DELEGATE_PROXY_FUNCTIONS(StoreClosed);
 };
 
+UCLASS()
+class MODIO_API UStorePurchaseProxy : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION()
+	void RequestComplete(bool bResult, const FString& ErrorMessage)
+	{
+		Callback.ExecuteIfBound(bResult, ErrorMessage);
+		RemoveFromRoot();
+		ConditionalBeginDestroy();
+	}
+
+	DELEGATE_PROXY_FUNCTIONS(StorePurchase);
+};
+
 UINTERFACE(BlueprintType, Category = "mod.io|PortalInterface",
 		   Meta = (DocGroup = "Portal Interfaces",
 				   Comment = "@brief Interface for objects that provide portal/platform specific implementations"))
@@ -136,17 +156,16 @@ class MODIO_API IModioPortalInterface : public IInterface
 	GENERATED_BODY()
 
 protected:
-
 	virtual void InitializePlatform_Implementation() {}
 
 	virtual void RequestAuthToken_Implementation(const TMap<FString, FString>& Params,
-										 const FAuthTokenRequestedDelegate& Callback)
+												 const FAuthTokenRequestedDelegate& Callback)
 	{
 		Callback.ExecuteIfBound(TEXT(""));
 	}
 
 	virtual void RequestEntitlementParams_Implementation(const TMap<FString, FString>& Params,
-												 const FEntitlementParamsRequestedDelegate& Callback)
+														 const FEntitlementParamsRequestedDelegate& Callback)
 	{
 		Callback.ExecuteIfBound(FModioEntitlementParams());
 	}
@@ -176,11 +195,17 @@ protected:
 		Callback.ExecuteIfBound({});
 	}
 
-	virtual EModioOpenStoreResult RequestOpenStore_Implementation(const FStoreClosedDelegate& Callback,
-																  const FString& SKU)
+	virtual EModioOpenStoreResult RequestOpenStore_Implementation(const FString& SKU,
+																  const FStoreClosedDelegate& Callback)
 	{
 		Callback.ExecuteIfBound(false);
 		return EModioOpenStoreResult::FailedUnknown;
+	}
+
+	virtual bool RequestStorePurchase_Implementation(const FString& SKU, const FStorePurchaseDelegate& Callback)
+	{
+		Callback.ExecuteIfBound(false, TEXT("Not Implemented"));
+		return false;
 	}
 
 public:
@@ -224,5 +249,8 @@ public:
 	void RequestSKUMappings(const FSKUMappingsRequestedDelegate& Callback);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "mod.io|PlatformInterface")
-	EModioOpenStoreResult RequestOpenStore(const FStoreClosedDelegate& Callback, const FString& SKU);
+	EModioOpenStoreResult RequestOpenStore(const FString& SKU, const FStoreClosedDelegate& Callback);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "mod.io|PlatformInterface")
+	bool RequestStorePurchase(const FString& SKU, const FStorePurchaseDelegate& Callback);
 };

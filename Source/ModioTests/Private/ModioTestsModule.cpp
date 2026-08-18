@@ -19,6 +19,8 @@
 
 #define LOCTEXT_NAMESPACE "FModioTestsModule"
 
+DEFINE_LOG_CATEGORY(LogModioTests);
+
 void FModioTestsModule::StartupModule()
 {
 	RegisterSettings();

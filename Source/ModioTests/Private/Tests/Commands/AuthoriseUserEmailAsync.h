@@ -19,7 +19,7 @@ class FModioAuthoriseUserEmailAsync : public FModioTestLatentCommandBaseExpected
 
 public:
 	FModioAuthoriseUserEmailAsync(FAutomationTestBase* AssociatedTest, FModioEmailAuthCode AuthCode,
-								  ModioTestExpectedResult ExpectedResult)
+								  EModioErrorCondition ExpectedResult)
 		: FModioTestLatentCommandBaseExpectedResult(AssociatedTest, ExpectedResult),
 		  AuthCode(AuthCode)
 	{}

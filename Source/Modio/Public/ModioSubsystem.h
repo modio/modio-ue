@@ -17,7 +17,6 @@
 #endif
 #include "HAL/Runnable.h"
 #include "HAL/RunnableThread.h"
-#include "Interfaces/IModioPortalInterface.h"
 #include "ModioImageCache.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "Templates/UniquePtr.h"
@@ -280,23 +279,6 @@ public:
 	 */
 	MODIO_API void InitializeAsync(const FModioInitializeOptions& InitializeOptions,
 								   FOnErrorOnlyDelegateFast OnInitComplete);
-
-	MODIO_API void SetPortalInterface(TScriptInterface<IModioPortalInterface> PortalInterface);
-
-	UPROPERTY()
-	TScriptInterface<IModioPortalInterface> CachedPortalInterface;
-
-	UFUNCTION(BlueprintCallable, Category = "mod.io")
-	TScriptInterface<IModioPortalInterface> GetPortalInterface()
-	{
-		return CachedPortalInterface;
-	}
-
-	UFUNCTION(BlueprintCallable, Category = "mod.io")
-	UObject* GetPortalInterfaceObject()
-	{
-		return CachedPortalInterface.GetObject();
-	}
 
 	/**
 	 * @docpublic
@@ -942,12 +924,14 @@ public:
 	 * @docpublic
 	 * Retrieves a list of the unconsumed entitlements that the mod.io user has available via the current
 	 * portal. Will not consume entitlements.
+	 * @param EntitlementParams Portal-specific additional parameters
 	 * @param Callback Callback providing an error code indicating success or failure of the retrieval operation
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 */
-	MODIO_API void GetAvailableUserEntitlementsAsync(FOnGetAvailableUserEntitlementsDelegateFast Callback);
+	MODIO_API void GetAvailableUserEntitlementsAsync(const FModioEntitlementParams& Params,
+													 FOnGetAvailableUserEntitlementsDelegateFast Callback);
 
 	/**
 	 * @docpublic
@@ -2370,13 +2354,15 @@ public:
 	 * @docpublic
 	 * Retrieves a list of the unconsumed entitlements that the mod.io user has available via the current
 	 * portal. Will not consume entitlements.
+	 * @param EntitlementParams Portal-specific additional parameters
 	 * @param Callback Callback providing an error code indicating success or failure of the retrieval operation
 	 * @requires initialized-sdk
 	 * @requires authenticated-user
 	 * @requires no-rate-limiting
 	 */
 	UFUNCTION(BlueprintCallable, DisplayName = "GetAvailableUserEntitlementsAsync", Category = "mod.io|Monetization")
-	MODIO_API void K2_GetAvailableUserEntitlementsAsync(FOnGetAvailableUserEntitlementsDelegate Callback);
+	MODIO_API void K2_GetAvailableUserEntitlementsAsync(
+		const FModioEntitlementParams& Params, FOnGetAvailableUserEntitlementsDelegate Callback);
 
 	/**
 	 * @docpublic
