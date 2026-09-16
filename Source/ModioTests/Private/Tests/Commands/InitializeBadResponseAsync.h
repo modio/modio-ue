@@ -12,6 +12,7 @@
 
 #include "ModioSubsystem.h"
 #include "Tests/Commands/ModioTestCommandBase.h"
+#include "Libraries/ModioSDKLibrary.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
 class FModioInitializeBadResponseAsyncCommand : public FModioTestLatentCommandBase

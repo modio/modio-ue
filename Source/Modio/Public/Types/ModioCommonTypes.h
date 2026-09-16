@@ -12,6 +12,8 @@
 #include "Misc/Crc.h"
 #include "Misc/EnumRange.h"
 
+#include "Types/ModioUnsigned64.h"
+
 #include "ModioCommonTypes.generated.h"
 
 // Forward decls
@@ -53,7 +55,8 @@ enum class EModioPortal : uint8
 	Google,
 	Itchio,
 	Nintendo,
-	PSN,
+	PSN UMETA(Hidden), // Deprecated as of 2026.9 release. Please use PS
+	PS,
 	Steam,
 	XboxLive,
 };
@@ -1221,18 +1224,18 @@ public:
  * @brief Enumerator with the possible memory measurement units
  */
 UENUM(BlueprintType)
-enum EFileSizeUnit
+enum class EFileSizeUnit : uint8
 {
 	/** Will take the largest one that becomes a number larger than 1 (i.e, 1300mb becomes 1.3gb) */
-	Largest = 0,
+	Largest,
 	/** A single byte */
-	B = 1,
+	B,
 	/** Kilobytes */
-	KB = 1024,
+	KB,
 	/** Megabytes */
-	MB = 1024 * 1024,
+	MB,
 	/** Gigabytes */
-	GB = 1024 * 1024 * 1024
+	GB
 };
 
 /**

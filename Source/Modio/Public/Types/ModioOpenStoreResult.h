@@ -28,6 +28,12 @@ enum class EModioOpenStoreResult : uint8
 	/** The current platform does not support a native store **/
 	FailedUnsupportedPlatform,
 
+	/** The current platform has not loaded the store skus yet **/
+	FailedStoreNotLoaded,
+
+	/** The current platform has no products in the store **/
+	FailedStoreEmpty,
+
 	/** Failed to open for an unknown reason **/
 	FailedUnknown
 };

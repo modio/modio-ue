@@ -15,6 +15,7 @@
 #include "Internal/Convert/Icon.h"
 #include "Internal/Convert/Logo.h"
 #include "Internal/Convert/OtherUrl.h"
+#include "Internal/Convert/Placements.h"
 #include "Internal/Convert/Theme.h"
 #include "Internal/ModioConvert.h"
 #include "ModioSDK.h"
@@ -48,6 +49,7 @@ FORCEINLINE FModioGameInfo ToUnreal(const Modio::GameInfo& In)
 	Out.VirtualTokenName = ToUnreal(In.VirtualTokenName);
 	Out.PlatformSupport = ToUnreal<FModioGamePlatform>(In.PlatformSupport);
 	Out.TagOptions = ToUnreal<FModioModTagInfo>(In.TagOptions);
+	Out.Placements = ToUnreal<FModioPlacement>(In.Placements);
 	Out.CloudCookingStatus = ToUnreal(In.CloudCookingStatus);
 
 	return Out;

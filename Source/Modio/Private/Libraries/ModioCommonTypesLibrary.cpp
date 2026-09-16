@@ -69,6 +69,11 @@ FString UModioCommonTypesLibrary::Conv_ModIDToString(FModioModID ModID)
 	return ModID.ToString();
 }
 
+FString UModioCommonTypesLibrary::Conv_TokenPackIDToString(FModioTokenPackID TokenPackID)
+{
+	return TokenPackID.ToString();
+}
+
 FString UModioCommonTypesLibrary::Conv_UserIDToString(FModioUserID UserID)
 {
 	return UserID.ToString();

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ModioSDK.h"
+#include "Modio.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
 #include "Internal/ModioConvert.h"
 #include "Internal/ModioPrivateDefines.h"
@@ -38,7 +39,9 @@ FORCEINLINE Modio::AuthenticationProvider ToModio(EModioAuthenticationProvider P
 		case EModioAuthenticationProvider::Discord:
 			return Modio::AuthenticationProvider::Discord;
 		case EModioAuthenticationProvider::PSN:
-			return Modio::AuthenticationProvider::PSN;
+			UE_LOG(LogModio, Warning, TEXT("Deprecated as of 2026.9 release. Please use PS"));	
+		case EModioAuthenticationProvider::PS:
+			return Modio::AuthenticationProvider::PS;
 		case EModioAuthenticationProvider::Epic:
 			return Modio::AuthenticationProvider::Epic;
 		case EModioAuthenticationProvider::Oculus:

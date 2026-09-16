@@ -16,18 +16,119 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnrealBuildTool;
-#if UE_5_0_OR_LATER
 using EpicGames.Core;
 using Microsoft.Extensions.Logging;
-#else
-using Tools.DotNETCommon;
-#endif
 using System.Linq;
 
+#if UE_5_8_OR_LATER
+using System.Threading;
+using System.IO.Compression;
+using UnrealBuildTool.Rules;
+#endif
 
 public class Modio : ModuleRules
 {
     private bool bDevelopmentModeOverride = false;
+
+    public Modio(ReadOnlyTargetRules Target) : base(Target)
+    {
+        ApplyProjectDefinitions(Target);
+        PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
+        PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
+        CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
+        
+        IWYUSupport = IWYUSupport.None;
+        CppStandard = CppStandardVersion.EngineDefault;
+
+        //bUseUnity = false;
+        bAllowConfidentialPlatformDefines = true;
+
+
+        if (IsDevelopmentMode())
+        {
+            InternalLog("Enabling development mode, NativeSDK source files will be regenerated");
+        }
+
+        string GeneratedSourcePath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedSource");
+        string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedHeader");
+
+        if (!Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK")))
+        {
+            Directory.CreateDirectory(Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK"));
+        }
+
+        if (!Directory.Exists(GeneratedSourcePath))
+        {
+            Directory.CreateDirectory(GeneratedSourcePath);
+        }
+
+        if (!Directory.Exists(GeneratedHeaderPath))
+        {
+            Directory.CreateDirectory(GeneratedHeaderPath);
+        }
+
+        // This should be moved into UEPlatform.json handling
+        if (Target.Platform == UnrealTargetPlatform.Linux)
+        {
+            // Currently required because Clang is picky and MSVC not, and tl::optional doesn't have a nothrow implementation
+            bEnableExceptions = true;
+        }
+
+
+
+        ModioPlatformConfigFile.PlatformConfig PlatformConfig = LoadNativePlatformConfig();
+
+        if (PlatformConfig == null)
+        {
+            throw new BuildException("Could not locate native platform configuration file. If you are using a confidential platform, please ensure you have placed the platform code into the correct directory.");
+        }
+
+#if ENABLE_TRACE_LOG
+        DumpNativePlatformConfig(PlatformConfig);
+#endif
+
+        // When using the native SDK as a submodule, transform the SDK source into paths and files that UBT understands
+        // These are all no-ops in marketplace builds or anywhere with 'baked' source files
+
+#if UE_5_8_OR_LATER
+        bool bThreadInFlight;
+        Mutex mutex = new Mutex(true, "UBAThreadLock", out bThreadInFlight);
+
+        if (bThreadInFlight)
+        {
+            InternalLog("Copies initialized on thread " + Thread.CurrentThread.ManagedThreadId.ToString());
+#endif
+
+        CopyCommonGeneratedSource(GeneratedSourcePath);
+        CopyPlatformGeneratedSource(GeneratedSourcePath);
+        CopyCommonGeneratedHeaders(GeneratedHeaderPath);
+
+        //// Apply internal testing config
+        ApplyTestConfig(GeneratedHeaderPath, GeneratedSourcePath);
+
+#if UE_5_8_OR_LATER
+        }
+        else
+        {
+            InternalLog("Copies already in progress, this thread (" + Thread.CurrentThread.ManagedThreadId.ToString() + ") will await completion before continuing.");
+            mutex.WaitOne();
+            InternalLog("Copies Completed! Continuing thread " + Thread.CurrentThread.ManagedThreadId.ToString());
+
+            //// Apply internal testing config
+            ApplyTestConfig(GeneratedHeaderPath, GeneratedSourcePath);
+        }
+        mutex.ReleaseMutex();
+#endif
+        // Configure the module with the common headers, modules and compiler defines
+        AddCommonHeaderPaths(GeneratedHeaderPath);
+        AddCommonGeneratedSource(GeneratedSourcePath);
+        AddCommonDependencyModules();
+        AddCommonDefinitions();
+
+        // Apply all platform-specific includes, source, modules, defines, etc
+        ApplyNativePlatformConfig(PlatformConfig, GeneratedHeaderPath, GeneratedSourcePath);
+    }
+
     private bool IsDevelopmentMode()
     {
         return bDevelopmentModeOverride || File.Exists(Path.Combine(PluginDirectory, "../../.modio_development_mode"));
@@ -167,11 +268,7 @@ public class Modio : ModuleRules
 
     private void InternalLog(string message)
     {
-#if UE_5_3_OR_LATER
 	    Logger.LogInformation(message);
-        #else
-        Log.TraceInformation(message);
-#endif
     }
 
 	private void DumpNativePlatformConfig(ModioPlatformConfigFile.PlatformConfig Config)
@@ -644,93 +741,5 @@ public class Modio : ModuleRules
         }
 
         return false;
-    }
-
-    public Modio(ReadOnlyTargetRules Target) : base(Target)
-    {
-        ApplyProjectDefinitions(Target);
-        PCHUsage = ModuleRules.PCHUsageMode.NoSharedPCHs;
-        PrivatePCHHeaderFile = "Private/ModioPrivatePCH.h";
-#if UE_5_6_OR_LATER
-        CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Off;
-#elif UE_5_5_OR_LATER
-        UndefinedIdentifierWarningLevel = WarningLevel.Off;
-#else
-        bEnableUndefinedIdentifierWarnings = false;
-#endif
-
-#if UE_5_6_OR_LATER
-        IWYUSupport = IWYUSupport.Full;
-        CppStandard = CppStandardVersion.EngineDefault;
-#elif UE_5_3_OR_LATER
-        IWYUSupport = IWYUSupport.Full;
-        CppStandard = CppStandardVersion.Cpp17;
-#else
-		bEnforceIWYU = true;
-#endif
-		//bUseUnity = false;
-		bAllowConfidentialPlatformDefines = true;
-
-
-        if (IsDevelopmentMode())
-        {
-            InternalLog("Enabling development mode, NativeSDK source files will be regenerated");
-        }
-
-        string GeneratedSourcePath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedSource");
-        string GeneratedHeaderPath = Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK", "GeneratedHeader");
-
-        if (!Directory.Exists(Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK")))
-        {
-            Directory.CreateDirectory(Path.Combine(ModuleDirectory, "../ThirdParty/GeneratedNativeSDK"));
-        }
-
-        if (!Directory.Exists(GeneratedSourcePath))
-        {
-            Directory.CreateDirectory(GeneratedSourcePath);
-        }
-
-        if (!Directory.Exists(GeneratedHeaderPath))
-        {
-            Directory.CreateDirectory(GeneratedHeaderPath);
-        }
-
-        // This should be moved into UEPlatform.json handling
-        if (Target.Platform == UnrealTargetPlatform.Linux)
-        {
-            // Currently required because Clang is picky and MSVC not, and tl::optional doesn't have a nothrow implementation
-            bEnableExceptions = true;
-        }
-
-
-
-        ModioPlatformConfigFile.PlatformConfig PlatformConfig = LoadNativePlatformConfig();
-
-        if (PlatformConfig == null)
-        {
-            throw new BuildException("Could not locate native platform configuration file. If you are using a confidential platform, please ensure you have placed the platform code into the correct directory.");
-        }
-
-#if ENABLE_TRACE_LOG
-        DumpNativePlatformConfig(PlatformConfig);
-#endif
-
-        // When using the native SDK as a submodule, transform the SDK source into paths and files that UBT understands
-        // These are all no-ops in marketplace builds or anywhere with 'baked' source files
-        CopyCommonGeneratedSource(GeneratedSourcePath);
-        CopyPlatformGeneratedSource(GeneratedSourcePath);
-        CopyCommonGeneratedHeaders(GeneratedHeaderPath);
-
-        // Configure the module with the common headers, modules and compiler defines
-        AddCommonHeaderPaths(GeneratedHeaderPath);
-        AddCommonGeneratedSource(GeneratedSourcePath);
-        AddCommonDependencyModules();
-        AddCommonDefinitions();
-
-        // Apply all platform-specific includes, source, modules, defines, etc
-        ApplyNativePlatformConfig(PlatformConfig, GeneratedHeaderPath, GeneratedSourcePath);
-
-        // Apply internal testing config
-        ApplyTestConfig(GeneratedHeaderPath, GeneratedSourcePath);
     }
 }

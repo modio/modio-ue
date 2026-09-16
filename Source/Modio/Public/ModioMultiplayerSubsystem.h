@@ -67,7 +67,7 @@ public:
 	/**
 	 * @docpublic
 	 * @brief Gets and/or updates all of the indicated mods for this server, assuming you have provided a valid S2S
-	 * token. Is called automatically by InitialalizeModioServerAsync() depending on UpdateModsOnInit state.
+	 * token. Is called automatically by InitializeModioServerAsync() depending on UpdateModsOnInit state.
 	 * @param Mods the mods to get or update
 	 * @param Callback callback executed upon completion of all mods
 	 * @experimental

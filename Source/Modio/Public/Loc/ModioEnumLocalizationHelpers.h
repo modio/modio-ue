@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Internationalization/StringTable.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "Internationalization/StringTableCore.h"
 #include "Internationalization/StringTableRegistry.h"
 #include "Internationalization/Text.h"
@@ -9,6 +10,10 @@
 #include "Types/ModioUnsigned64.h"
 #include "UObject/Class.h"
 #include "UObject/NameTypes.h"
+
+#if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 8
+#include "Concepts/UEnum.h"
+#endif
 
 #include "ModioEnumLocalizationHelpers.generated.h"
 
@@ -20,12 +25,17 @@ namespace ModioUI
 		UEnum* EnumReflectionData = StaticEnum<EnumType>();
 
 		int32 NumEnumEntries = EnumReflectionData->NumEnums() - 1; // Don't count the automatically added _MAX entry
+
 		for (int32 CurrentEntryIndex = 0; CurrentEntryIndex < NumEnumEntries; CurrentEntryIndex++)
 		{
 			FName NameStr = EnumReflectionData->GetNameByIndex(CurrentEntryIndex);
 
 			FText DisplayString = EnumReflectionData->GetDisplayNameTextByIndex(CurrentEntryIndex);
+#if WITH_EDITORONLY_DATA && ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 8
+			TargetTable->SetSourceString(NameStr.ToString(), DisplayString.ToString(), {});
+#else
 			TargetTable->SetSourceString(NameStr.ToString(), DisplayString.ToString());
+#endif
 		}
 	}
 	template<typename EnumType>
@@ -34,7 +44,12 @@ namespace ModioUI
 		UEnum* EnumReflectionData = StaticEnum<EnumType>();
 
 		FName EnumEntryNameStr = EnumReflectionData->GetNameByValue(static_cast<int64>(EnumValue));
+
+#if WITH_EDITORONLY_DATA && ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 8
+		TargetTable->SetSourceString(EnumEntryNameStr.ToString(), SourceString, {});
+#else
 		TargetTable->SetSourceString(EnumEntryNameStr.ToString(), SourceString);
+#endif
 	}
 } // namespace ModioUI
 
@@ -123,9 +138,8 @@ public:
 		FormatRules.MinimumIntegralDigits = 1;
 
 		Args.Add(TEXT("FileSize"), FText::AsNumber(InNewUnit, &FormatRules));
-		Args.Add(TEXT("UnitName"),
-				 bIncludeUnitName ? GetLocalizedTextForEnumByName(StaticEnum<EFileSizeUnit>()->GetNameByValue(Unit))
-								  : FText::GetEmpty());
+		Args.Add(TEXT("UnitName"), bIncludeUnitName ? GetLocalizedTextForEnumByName(UEnum::GetValueAsName(Unit))
+			: FText::GetEmpty());
 
 		return FText::Format(FTextFormat::FromString(TEXT("{FileSize}{UnitName}")), Args);
 	}

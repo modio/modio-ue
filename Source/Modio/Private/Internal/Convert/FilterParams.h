@@ -30,7 +30,7 @@ FORCEINLINE Modio::FilterParams::SortDirection ToModio(EModioSortDirection SortD
 
 FORCEINLINE Modio::FilterParams::RevenueFilterType ToModio(EModioRevenueFilterType Revenue)
 {
-	switch(Revenue)
+	switch (Revenue)
 	{
 		case EModioRevenueFilterType::Free:
 			return Modio::FilterParams::RevenueFilterType::Free;
@@ -119,4 +119,158 @@ FORCEINLINE Modio::FilterParams ToModio(const FModioFilterParams& In)
 		.ExcludingIDs(ToModio<Modio::ModID>(In.ExcludedIDs))
 		.WithTags(ToModio(In.Tags))
 		.WithoutTags(ToModio(In.ExcludedTags));
+}
+
+inline EModioSortDirection ToUnreal(const Modio::FilterParams::SortDirection& In)
+{
+	switch (In)
+	{
+		case Modio::FilterParams::SortDirection::Ascending:
+			return EModioSortDirection::Ascending;
+			break;
+		case Modio::FilterParams::SortDirection::Descending:
+			return EModioSortDirection::Descending;
+			break;
+		default:
+			return EModioSortDirection::Descending;
+			break;
+	}
+}
+inline EModioMaturityFlags ToUnreal(const Modio::MaturityOption& In)
+{
+	// flag enum, so static_cast it is
+	return static_cast<EModioMaturityFlags>(In);
+}
+inline EModioRevenueFilterType ToUnreal(const Modio::FilterParams::RevenueFilterType& In)
+{
+	switch (In)
+	{
+		case Modio::FilterParams::RevenueFilterType::Free:
+			return EModioRevenueFilterType::Free;
+			break;
+		case Modio::FilterParams::RevenueFilterType::Paid:
+			return EModioRevenueFilterType::Paid;
+			break;
+		case Modio::FilterParams::RevenueFilterType::FreeAndPaid:
+			return EModioRevenueFilterType::FreeAndPaid;
+			break;
+		case Modio::FilterParams::RevenueFilterType::FreeAndPaidWeighted:
+			return EModioRevenueFilterType::FreeAndPaidWeighted;
+			break;
+		default:
+			return EModioRevenueFilterType::FreeAndPaid;
+			break;
+	}
+}
+inline EModioSortFieldType ToUnreal(const Modio::FilterParams::SortFieldType& In)
+{
+	switch (In)
+	{
+		case Modio::FilterParams::SortFieldType::ID:
+			return EModioSortFieldType::ID;
+			break;
+		case Modio::FilterParams::SortFieldType::DownloadsToday:
+			return EModioSortFieldType::DownloadsToday;
+			break;
+		case Modio::FilterParams::SortFieldType::SubscriberCount:
+			return EModioSortFieldType::SubscriberCount;
+			break;
+		case Modio::FilterParams::SortFieldType::Rating:
+			return EModioSortFieldType::Rating;
+			break;
+		case Modio::FilterParams::SortFieldType::DateMarkedLive:
+			return EModioSortFieldType::DateMarkedLive;
+			break;
+		case Modio::FilterParams::SortFieldType::DateUpdated:
+			return EModioSortFieldType::DateUpdated;
+			break;
+		case Modio::FilterParams::SortFieldType::DownloadsTotal:
+			return EModioSortFieldType::DownloadsTotal;
+			break;
+		case Modio::FilterParams::SortFieldType::Alphabetical:
+			return EModioSortFieldType::Alphabetical;
+			break;
+		default:
+			return EModioSortFieldType::Alphabetical;
+			break;
+	}
+}
+
+inline EModioFilterTimespan ToUnreal(const Modio::FilterParams::Timespan& In)
+{
+	switch (In)
+	{
+		case Modio::FilterParams::Timespan::Today:
+			return EModioFilterTimespan::Today;
+			break;
+		case Modio::FilterParams::Timespan::Week:
+			return EModioFilterTimespan::Week;
+			break;
+		case Modio::FilterParams::Timespan::Month:
+			return EModioFilterTimespan::Month;
+			break;
+		case Modio::FilterParams::Timespan::ThreeMonths:
+			return EModioFilterTimespan::ThreeMonths;
+			break;
+		case Modio::FilterParams::Timespan::Year:
+			return EModioFilterTimespan::Year;
+			break;
+		case Modio::FilterParams::Timespan::AllTime:
+			return EModioFilterTimespan::AllTime;
+			break;
+		default:
+			return EModioFilterTimespan::AllTime;
+			break;
+	}
+}
+
+struct FilterParamsDetailsAccessor : protected Modio::FilterParams
+{
+	FilterParamsDetailsAccessor(const Modio::FilterParams& In) : FilterParams(In) {};
+
+	FModioFilterParams GetUnrealFilterParams()
+	{
+		FModioFilterParams Out;
+		Out.AuthorUserIds = ToUnreal<FModioUserID>(FilterParams::IncludedAuthorUserIds);
+		Out.Count = ToUnreal(FilterParams::Count);
+		if (FilterParams::DateRangeBegin)
+		{
+			Out.DateRangeBegin = ToUnrealDateTime(*FilterParams::DateRangeBegin);
+		}
+		if (FilterParams::DateRangeEnd)
+		{
+			Out.DateRangeEnd = ToUnrealDateTime(*FilterParams::DateRangeEnd);
+		}
+		Out.Direction = ToUnreal(FilterParams::Direction);
+		Out.ExcludedIDs = ToUnreal<FModioModID>(FilterParams::ExcludedIDs);
+		Out.ExcludedTags = ToUnreal<FString>(FilterParams::ExcludedTags);
+		Out.IncludedIDs = ToUnreal<FModioModID>(FilterParams::IncludedIDs);
+		Out.Index = ToUnreal(FilterParams::Index);
+		Out.isPaged = ToUnreal(FilterParams::IsPaged);
+		if (FilterParams::Maturity)
+		{
+			Out.Maturity = ToUnreal(*FilterParams::Maturity);
+		}
+		if (FilterParams::MetadataBlobSearchString)
+		{
+			Out.MetadataBlobSearchString = ToUnreal(*FilterParams::MetadataBlobSearchString);
+		}
+		if (FilterParams::Revenue)
+		{
+			Out.Revenue = ToUnreal(*FilterParams::Revenue);
+		}
+		Out.SearchKeywords = ToUnreal<FString>(FilterParams::SearchKeywords);
+		Out.SortField = ToUnreal(FilterParams::SortField);
+		if (FilterParams::SpecifiedTimespan)
+		{
+			Out.Timespan = ToUnreal(*FilterParams::SpecifiedTimespan);
+		}
+		return Out;
+	}
+};
+
+inline FModioFilterParams ToUnreal(const Modio::FilterParams& In)
+{
+	FilterParamsDetailsAccessor Access {In};
+	return Access.GetUnrealFilterParams();
 }

@@ -67,7 +67,7 @@ EModioPortal UModioPlatformHelpersLibrary::GetDefaultPortalForCurrentPlatform()
 			return EModioPortal::Steam;
 		case EModioPlatformName::PS4:
 		case EModioPlatformName::PS5:
-			return EModioPortal::PSN;
+			return EModioPortal::PS;
 		case EModioPlatformName::XBoxOne:
 		case EModioPlatformName::XSX:
 			return EModioPortal::XboxLive;
@@ -106,7 +106,7 @@ EModioAuthenticationProvider UModioPlatformHelpersLibrary::GetDefaultAuthProvide
 		}
 		case EModioPlatformName::PS4:
 		case EModioPlatformName::PS5:
-			return EModioAuthenticationProvider::PSN;
+			return EModioAuthenticationProvider::PS;
 		case EModioPlatformName::XBoxOne:
 		case EModioPlatformName::XSX:
 			return EModioAuthenticationProvider::XboxLive;

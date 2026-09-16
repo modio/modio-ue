@@ -116,7 +116,7 @@ FString FModioFilterParams::ToString() const
 {
 	FString FilterParamString;
 
-	for (auto& FilterParam : ToModio(*this).ToQueryParamaters())
+	for (auto& FilterParam : ToModio(*this).ToQueryParameters())
 	{
 		FilterParamString += FString::Printf(TEXT("%s=%s&"), UTF8_TO_TCHAR(FilterParam.first.c_str()), UTF8_TO_TCHAR(FilterParam.second.c_str()));
 

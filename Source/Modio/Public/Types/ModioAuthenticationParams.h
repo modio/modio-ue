@@ -28,7 +28,8 @@ enum class EModioAuthenticationProvider : uint8
 	Switch,
 	Switch2,
 	Discord,
-	PSN, 
+	PSN UMETA(Hidden), // Deprecated as of 2026.9 release. Please use PS
+	PS, 
 	Epic,
 	Oculus,
 	OpenID,

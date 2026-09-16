@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -20,6 +20,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Serialization/BufferArchive.h"
 #include "Engine/Engine.h"
+#include "GenericPlatform/GenericPlatformMisc.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(ModioSubmissionExtensionLibrary)
 

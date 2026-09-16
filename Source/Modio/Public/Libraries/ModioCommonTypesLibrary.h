@@ -93,6 +93,17 @@ public:
 
 	/**
 	 * @docpublic
+	 * @brief Converts a `ModioTokenPackID` to a string for debugging purposes
+	 * @param TokenPackID Input Token Pack ID
+	 * @return Empty if invalid
+	 */
+	UFUNCTION(BlueprintPure,
+		meta = (DisplayName = "ToString (ModioTokenPackID)", CompactNodeTitle = "->", BlueprintAutocast),
+		Category = "mod.io|Utilities|String")
+	static FString Conv_TokenPackIDToString(FModioTokenPackID TokenPackID);
+
+	/**
+	 * @docpublic
 	 * @brief Converts an `FileMetadataID` to a string for debugging purposes
 	 * @param FileMetadataID Input File metadata ID
 	 * @return Empty if invalid

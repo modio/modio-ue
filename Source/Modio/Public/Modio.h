@@ -13,4 +13,4 @@
 #pragma once
 #include "Logging/LogMacros.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogModio, Log, All);
+MODIO_API DECLARE_LOG_CATEGORY_EXTERN(LogModio, Log, All);

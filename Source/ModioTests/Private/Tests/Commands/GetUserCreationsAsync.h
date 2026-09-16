@@ -24,7 +24,7 @@ public:
 	using FModioTestLatentCommandBase::Update;
 	virtual void Start() override
 	{
-		Modio->ListUserCreatedModsAsync(FOnListUserCreatedModsDelegateFast::CreateSP(this, &FModioGetUserCreationsAsyncCommand::Callback));
+		Modio->ListUserCreatedModsAsync(FModioFilterParams(), FOnListUserCreatedModsDelegateFast::CreateSP(this, &FModioGetUserCreationsAsyncCommand::Callback));
 	}
 	void Callback(FModioErrorCode ec, TOptional<FModioModInfoList> CreatedMods)
 	{

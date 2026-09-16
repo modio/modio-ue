@@ -12,6 +12,7 @@ When setting up UGC in your game, you'll want users to be able to search for UGC
 This guide covers:
 
 * [Browsing UGC](#browsing-ugc)
+* [Featuring Content](#featuring-content)
 * [Next steps](#next-steps)
 
 ## Browsing UGC
@@ -59,6 +60,78 @@ void UModioManagerSubsystem::OnListAllModsComplete(FModioErrorCode ErrorCode, TO
 	}
 }
 
+ ```
+  </TabItem>
+</Tabs>
+
+## Featuring Content
+
+Game admins can configure Featured Content on their game's Dashboard on the mod.io website. Featured Content lets you curate specific groups of UGC, such as "Trending this week", "Staff Picks", or themed event content such as "Top Halloween Content", that you can use to feature specific content in your game's UI, for example as carousels on a home or discovery screen. These curated groups (called Placements) are represented by [`ModioPlacement`](/unreal/refdocs#modioplacement), which contains a [`ModioFilterParams`](/unreal/refdocs#modiofilterparams) object you can pass directly to [`ListAllModsAsync`](/unreal/refdocs#listallmodsasync).
+
+Each `ModioPlacement` carries everything you need to build and render one of these curated sections:
+
+* `Name` (and localized variant `NameLocalized`), to use as a heading
+* `DisplayPosition`, indicating the order Placements should be displayed in relative to each other
+* `Size` (`Small`, `Medium`, or `Large`), a hint for how prominently the Placement can be displayed
+* `Total`, the number of results the Placement should show
+* `bEnabled` - disabled Placements should not be displayed
+* `Filters`, a [`ModioFilterParams`](/unreal/refdocs#modiofilterparams) object describing which mods should populate the Placement
+
+Placements are returned as part of [`GetGameInfoAsync`](/unreal/refdocs#getgameinfoasync), on the `Placements` field of the returned [`ModioGameInfo`](/unreal/refdocs#modiogameinfo).
+
+<Tabs group-id="languages">
+  <TabItem value="blueprint" label="Blueprint">
+The primary way this is done is through [K2_GetGameInfoAsync](/unreal/refdocs#getgameinfoasync). Break the returned `ModioGameInfo` to access its `Placements` array, then for each enabled `ModioPlacement` you want to display, break out its `Filters` and pass that directly into [K2_ListAllModsAsync](/unreal/refdocs#listallmodsasync) to fetch the mods for that Placement.
+
+![using-placements](img/using-placements.png)
+
+  </TabItem>
+  <TabItem value="c++" label="C++" default>
+ ```cpp
+void UModioManagerSubsystem::GetFeaturedContent()
+{
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		Subsystem->GetGameInfoAsync(UModioSDKLibrary::GetProjectGameId(),
+			FOnGetGameInfoDelegateFast::CreateUObject(this, &UModioManagerSubsystem::OnGetGameInfoComplete));
+	}
+}
+
+void UModioManagerSubsystem::OnGetGameInfoComplete(FModioErrorCode ErrorCode, TOptional<FModioGameInfo> GameInfo)
+{
+	// Ensure GetGameInfoAsync was successful
+	if (!ErrorCode && GameInfo.IsSet())
+	{
+		CurrentPlacements = GameInfo->Placements;
+	}
+}
+ ```
+
+For each enabled Placement you want to display, pass its `Filters` to `ListAllModsAsync` to fetch the mods to show:
+
+ ```cpp
+for (const FModioPlacement& Placement : CurrentPlacements)
+{
+	if (!Placement.bEnabled)
+	{
+		continue;
+	}
+
+	if (UModioSubsystem* Subsystem = GEngine->GetEngineSubsystem<UModioSubsystem>())
+	{
+		Subsystem->ListAllModsAsync(Placement.Filters,
+			FOnListAllModsDelegateFast::CreateLambda([Placement](FModioErrorCode ErrorCode, TOptional<FModioModInfoList> OptionalModList)
+		{
+			if (!ErrorCode)
+			{
+				TArray<FModioModInfo> ModInfoArray = OptionalModList.GetValue().GetRawList();
+
+				// Use Placement.Name/NameLocalized as a heading and Placement.Size to size the section,
+				// then populate it with ModInfoArray
+			}
+		}));
+	}
+}
  ```
   </TabItem>
 </Tabs>

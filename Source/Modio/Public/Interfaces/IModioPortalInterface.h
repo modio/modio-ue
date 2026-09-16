@@ -208,6 +208,13 @@ protected:
 		return false;
 	}
 
+	virtual void NotifyStoreBrowsing_Implementation(bool bEnabled) {}
+
+	virtual bool ShouldShowSKUInformation_Implementation()
+	{
+		return false;
+	}
+
 public:
 	/**
 	 * For performing basic platform initialization, such as preparing the filesystem or
@@ -253,4 +260,18 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "mod.io|PlatformInterface")
 	bool RequestStorePurchase(const FString& SKU, const FStorePurchaseDelegate& Callback);
+
+	/**
+	 * Notifies the platform that the store is being browsed, so it can show or hide any relevant UI elements
+	 * @param bEnabled whether the store is being browsed or not
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "mod.io|PlatformInterface")
+	void NotifyStoreBrowsing(bool bEnabled);
+
+	/**
+	 * Check if the UI should display SKU information when checking out a purchase for a mod.
+	 * @return true if the UI should show SKU information, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "mod.io|PlatformInterface")
+	bool ShouldShowSKUInformation();
 };

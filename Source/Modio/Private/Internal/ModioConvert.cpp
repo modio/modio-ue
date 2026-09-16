@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2024-2025 mod.io Pty Ltd. <https://mod.io>
+ *  Copyright (C) 2024-2026 mod.io Pty Ltd. <https://mod.io>
  *
  *  This file is part of the mod.io UE Plugin.
  *
@@ -9,6 +9,7 @@
  */
 
 #include "Internal/ModioConvert.h"
+#include "Modio.h"
 
 #include "Convert/Optional.h"
 #include "Types/ModioUnsigned64.h"
@@ -69,6 +70,32 @@ std::vector<Modio::Metadata> ToModio(const TArray<FModioMetadata>& In)
 	return Result;
 }
 
+Modio::Placement::PlacementType ToModio(const EModioPlacementType& In)
+{
+	switch (In)
+	{
+		case EModioPlacementType::Filters:
+			return Modio::Placement::PlacementType::Filters;
+		default:
+			return Modio::Placement::PlacementType::Filters;
+	}
+}
+
+Modio::Placement::PlacementSize ToModio(const EModioPlacementSize& In)
+{
+	switch (In)
+	{
+		case EModioPlacementSize::Small:
+			return Modio::Placement::PlacementSize::Small;
+		case EModioPlacementSize::Medium:
+			return Modio::Placement::PlacementSize::Medium;
+		case EModioPlacementSize::Large:
+			return Modio::Placement::PlacementSize::Large;
+		default:
+			return Modio::Placement::PlacementSize::Small;
+	}
+}
+
 std::chrono::system_clock::time_point ToModioDateTime(FDateTime Time)
 {
 	std::chrono::seconds DurationSinceEpoch(Time.ToUnixTimestamp());
@@ -110,7 +137,10 @@ FDateTime ToUnrealDateTime(std::int64_t UnixTimestamp)
 {
 	return FDateTime::FromUnixTimestamp(UnixTimestamp);
 }
-
+FDateTime ToUnrealDateTime(std::chrono::system_clock::time_point Time)
+{
+	return ToUnrealDateTime(std::chrono::duration_cast<std::chrono::seconds>(Time.time_since_epoch()).count());
+}
 FText ToUnrealText(const std::string& String)
 {
 	return FText::FromString(UTF8_TO_TCHAR(String.c_str()));
@@ -263,6 +293,8 @@ Modio::ModfilePlatform ToModio(EModioModfilePlatform Platform)
 			return Modio::ModfilePlatform::PS5;
 		case EModioModfilePlatform::Switch:
 			return Modio::ModfilePlatform::Switch;
+		case EModioModfilePlatform::Switch2:
+			return Modio::ModfilePlatform::Switch2;
 		case EModioModfilePlatform::Windows:
 			return Modio::ModfilePlatform::Windows;
 		case EModioModfilePlatform::XboxOne:
@@ -286,34 +318,26 @@ Modio::Portal ToModio(EModioPortal Portal)
 	{
 		case EModioPortal::None:
 			return Modio::Portal::None;
-			break;
 		case EModioPortal::Apple:
 			return Modio::Portal::Apple;
-			break;
 		case EModioPortal::EpicGamesStore:
 			return Modio::Portal::EpicGamesStore;
-			break;
 		case EModioPortal::GOG:
 			return Modio::Portal::GOG;
-			break;
 		case EModioPortal::Google:
 			return Modio::Portal::Google;
-			break;
 		case EModioPortal::Itchio:
 			return Modio::Portal::Itchio;
-			break;
 		case EModioPortal::Nintendo:
 			return Modio::Portal::Nintendo;
-			break;
 		case EModioPortal::PSN:
-			return Modio::Portal::PSN;
-			break;
+			UE_LOG(LogModio, Warning, TEXT("Deprecated as of 2026.9 release. Please use PS"));
+		case EModioPortal::PS:
+			return Modio::Portal::PS;
 		case EModioPortal::Steam:
 			return Modio::Portal::Steam;
-			break;
 		case EModioPortal::XboxLive:
 			return Modio::Portal::XboxLive;
-			break;
 	}
 	checkf(false, TEXT("Missed a case in ToModio(EModioPortal)"));
 	return Modio::Portal::None;

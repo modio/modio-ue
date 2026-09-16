@@ -75,8 +75,24 @@ enum class EModioRevenueFilterType : uint8
 	/** Return only paid mods */
 	Paid = 1,
 	/** Return both free and paid mods */
-	FreeAndPaid = 2
+	FreeAndPaid = 2,
+	/** Return both free and paid mods at game specified weighting */
+	FreeAndPaidWeighted = 3
 };
+
+/// @docpublic
+/// @brief Enum indicating the duration from which results should be included
+UENUM(BlueprintType)
+enum class EModioFilterTimespan : uint8
+{
+	Today, /** (default) */
+	Week,
+	Month,
+	ThreeMonths,
+	Year,
+	AllTime
+};
+
 
 /**
  * @docpublic
@@ -290,6 +306,7 @@ public:
 	TOptional<FString> MetadataBlobSearchString;
 	TOptional<EModioRevenueFilterType> Revenue;
 	TOptional<EModioMaturityFlags> Maturity;
+	TOptional<EModioFilterTimespan> Timespan;
 	bool isPaged = false;
 	int64 Index = 0;
 	int64 Count = 100;
@@ -346,9 +363,11 @@ struct MODIO_API FModioPresetFilterParams
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	EModioRevenueFilterType RevenueField = EModioRevenueFilterType::FreeAndPaid;
 
+
 	/**
 	 * @docpublic
 	 * @brief Field to use for the widget class (default is nullptr)
+	 * @deprecated Use Display Size instead
 	 */
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "FModioPresetFilterParams")
 	TSoftClassPtr<UWidget> TileWidgetClass = nullptr;

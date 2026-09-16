@@ -74,19 +74,19 @@ FModioInitializeOptions UModioSDKLibrary::GetProjectInitializeOptionsForSessionI
 }
 
 
-static FString ToString(EFileSizeUnit Unit)
+FString UModioSDKLibrary::FileSizeUnit_ToString(EFileSizeUnit Unit)
 {
 	switch (Unit)
 	{
-		case B:
+		case EFileSizeUnit::B:
 			return TEXT("bytes");
-		case KB:
+		case EFileSizeUnit::KB:
 			return TEXT("KB");
-		case MB:
+		case EFileSizeUnit::MB:
 			return TEXT("MB");
-		case GB:
+		case EFileSizeUnit::GB:
 			return TEXT("GB");
-		case Largest:
+		case EFileSizeUnit::Largest:
 		default:
 			return TEXT("Unknown unit");
 	}
@@ -94,24 +94,87 @@ static FString ToString(EFileSizeUnit Unit)
 
 EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64 FileSize)
 {
-	if (FileSize.Underlying > GB)
+	if (UModioSDKLibrary::IsFilesizeGreaterThanUnit(FileSize, EFileSizeUnit::GB))
 	{
-		return GB;
+		return EFileSizeUnit::GB;
 	}
-	if (FileSize.Underlying > MB)
+	if (UModioSDKLibrary::IsFilesizeGreaterThanUnit(FileSize, EFileSizeUnit::MB))
 	{
-		return MB;
+		return EFileSizeUnit::MB;
 	}
-	if (FileSize.Underlying > KB)
+	if (UModioSDKLibrary::IsFilesizeGreaterThanUnit(FileSize, EFileSizeUnit::KB))
 	{
-		return KB;
+		return EFileSizeUnit::KB;
 	}
-	return B;
+	return EFileSizeUnit::B;
 }
 
 EFileSizeUnit UModioSDKLibrary::GetDesiredFileSizeUnit(int64 FileSize)
 {
 	return GetDesiredFileSizeUnit_Unsigned64(FModioUnsigned64(static_cast<uint64>(FileSize)));
+}
+
+EFileSizeUnit UModioSDKLibrary::GetPreviousSize(EFileSizeUnit Unit, bool WrapAround /*= false*/)
+{
+	switch (Unit)
+	{
+		case EFileSizeUnit::B:
+			if (WrapAround)
+			{
+				return EFileSizeUnit::Largest;
+			}
+			else
+			{
+				return EFileSizeUnit::B;
+			}
+		case EFileSizeUnit::KB:
+			return EFileSizeUnit::B;
+		case EFileSizeUnit::MB:
+			return EFileSizeUnit::KB;
+		case EFileSizeUnit::GB:
+			return EFileSizeUnit::MB;
+		case EFileSizeUnit::Largest:
+		{
+			if (WrapAround)
+			{
+				return EFileSizeUnit::GB;
+			}
+			else
+			{
+				return EFileSizeUnit::Largest;
+			}
+		}
+		default:
+			return EFileSizeUnit::B;
+	}
+}
+
+EFileSizeUnit UModioSDKLibrary::GetNextSize(EFileSizeUnit Unit, bool WrapAround /*= false*/)
+{
+	switch (Unit)
+	{
+		case EFileSizeUnit::B:
+			return EFileSizeUnit::KB;
+		case EFileSizeUnit::KB:
+			return EFileSizeUnit::MB;
+		case EFileSizeUnit::MB:
+			return EFileSizeUnit::GB;
+		case EFileSizeUnit::GB:
+			return EFileSizeUnit::Largest;
+		case EFileSizeUnit::Largest:
+		{
+			if (WrapAround)
+			{
+				return EFileSizeUnit::B;
+			}
+			else
+			{
+				return EFileSizeUnit::Largest;
+			}
+		}
+		default:
+			return EFileSizeUnit::B;
+	}
 }
 
 FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, int32 MinDecimals, int32 MaxDecimals,
@@ -121,12 +184,12 @@ FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, 
 	static constexpr int32 MB = 1024 * 1024;
 	static constexpr int32 GB = 1024 * 1024 * 1024;
 
-	if (Unit == Largest)
+	if (Unit == EFileSizeUnit::Largest)
 	{
 		Unit = GetDesiredFileSizeUnit(static_cast<int64_t>(FileSize.Underlying));
 	}
 
-	const double InNewUnit = FileSize / Unit;
+	const double InNewUnit = FileSize / UModioSDKLibrary::Filesize_ToBytes(Unit).Underlying;
 
 	FFormatNamedArguments Args;
 
@@ -136,7 +199,7 @@ FText UModioSDKLibrary::Filesize_ToString_Unsigned64(FModioUnsigned64 FileSize, 
 	FormatRules.MinimumIntegralDigits = 1;
 
 	Args.Add("Number", FText::AsNumber(InNewUnit, &FormatRules));
-	Args.Add("Unit", bIncludeUnitName ? FText::FromString(ToString(Unit)) : FText::GetEmpty());
+	Args.Add("Unit", bIncludeUnitName ? FText::FromString(FileSizeUnit_ToString(Unit)) : FText::GetEmpty());
 	FText FormatString = FText::FromString(TEXT("{Number}{Unit}"));
 	#if UE_VERSION_OLDER_THAN(5, 5, 0)
 	FText::FindText(FTextKey("Internationalization"), FTextKey("ComputerMemoryFormatting"), FormatString);
@@ -155,6 +218,30 @@ FText UModioSDKLibrary::Filesize_ToString(int64 FileSize, int32 MinDecimals /* =
 {
 	return Filesize_ToString_Unsigned64(FModioUnsigned64(static_cast<uint64>(FileSize)), MinDecimals, MaxDecimals,
 	                                    Unit, bIncludeUnitName);
+}
+
+FModioUnsigned64 UModioSDKLibrary::Filesize_ToBytes(const EFileSizeUnit FileSizeUnit)
+{
+	switch (FileSizeUnit)
+	{
+		case EFileSizeUnit::Largest:
+			return FModioUnsigned64(0);
+		case EFileSizeUnit::B:
+			return FModioUnsigned64(1);
+		case EFileSizeUnit::KB:
+			return FModioUnsigned64(1024);
+		case EFileSizeUnit::MB:
+			return FModioUnsigned64(1024 * 1024);
+		case EFileSizeUnit::GB:
+			return FModioUnsigned64(1024 * 1024 * 1024);
+		default:
+			return FModioUnsigned64(0);
+	}
+}
+
+bool UModioSDKLibrary::IsFilesizeGreaterThanUnit(FModioUnsigned64 FileSize, EFileSizeUnit Unit)
+{
+	return FileSize.Underlying > Filesize_ToBytes(Unit).Underlying;
 }
 
 bool UModioSDKLibrary::IsValidEmailAddressFormat(const FString& String)

@@ -26,6 +26,7 @@
 #include "Types/ModioModInfoList.h"
 #include "Types/ModioModMonetizationSKU.h"
 #include "Types/ModioModProgressInfo.h"
+#include "Types/ModioPlacement.h"
 #include "Types/ModioStorageInfo.h"
 #include "Types/ModioTerms.h"
 #include "Types/ModioTransactionRecord.h"
@@ -95,12 +96,17 @@ EModioGameCloudCookingStatus ToUnreal(const Modio::GameCloudCookingStatus& In);
 FModioUserModRating ToUnreal(const Modio::UserRating& In);
 FModioUserModRatingList ToUnreal(const Modio::UserRatingList& In);
 FModioUserList ToUnreal(const Modio::UserList& In);
+FModioPlacement ToUnreal(const Modio::Placement& In);
+EModioPlacementType ToUnreal(const Modio::Placement::PlacementType& In);
+EModioPlacementSize ToUnreal(const Modio::Placement::PlacementSize& In);
+
 
 std::string ToModio(const FString& String);
 std::vector<std::string> ToModio(const TArray<FString>& StringArray);
 std::vector<Modio::ModID> ToModio(const TArray<FModioModID>& ModIDArray);
 std::map<std::string, std::string> ToModio(const TMap<FString, FString>& StringMap);
 std::chrono::system_clock::time_point ToModioDateTime(FDateTime Time);
+FDateTime ToUnrealDateTime(std::chrono::system_clock::time_point Time);
 Modio::ApiKey ToModio(const FModioApiKey& In);
 Modio::EmailAddress ToModio(const FModioEmailAddress& In);
 Modio::EmailAuthCode ToModio(const FModioEmailAuthCode& In);
@@ -124,6 +130,10 @@ Modio::ModCommunityOptionsFlags ToModio(EModioModCommunityOptionsFlags In);
 Modio::GameCloudCookingStatus ToModio(EModioGameCloudCookingStatus In);
 Modio::Metadata ToModio(const FModioMetadata& In);
 std::vector<Modio::Metadata> ToModio(const TArray<FModioMetadata>& In);
+Modio::Placement::PlacementType ToModio(const EModioPlacementType& In);
+Modio::Placement::PlacementSize ToModio(const EModioPlacementSize& In);
+
+
 
 #pragma region ToModio implementation
 

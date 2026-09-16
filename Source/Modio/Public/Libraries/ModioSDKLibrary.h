@@ -110,6 +110,38 @@ public:
 
 	/**
 	 * @docpublic
+	 * @brief Get the previous file size unit from the current unit.
+	 * @param Unit The current file size unit.
+	 * @param WrapAround Whether to wrap around to the largest unit if the current unit is the smallest.
+	 * @return The previous file size unit.
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities",
+			  meta = (DisplayName = "GetPreviousSize", CompactNodeTitle = "GetPreviousSize"))
+	static MODIO_API EFileSizeUnit GetPreviousSize(EFileSizeUnit Unit, bool WrapAround = false);
+
+	/**
+	 * @docpublic
+	 * @brief Get the next file size unit from the current unit.
+	 * @param Unit The current file size unit.
+	 * @param WrapAround Whether to wrap around to the smallest unit if the current unit is the largest.
+	 * @return The next file size unit.
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities",
+			  meta = (DisplayName = "GetNextSize", CompactNodeTitle = "GetNextSize"))
+	static MODIO_API EFileSizeUnit GetNextSize(EFileSizeUnit Unit, bool WrapAround = false);
+
+	/**
+	 * @docpublic
+	 * @brief Convert a file size unit to a human-readable string.
+	 * @param Unit The file size unit to convert.
+	 * @return A formatted string representing the file size unit.
+	 */
+	UFUNCTION(BlueprintPure, Category = "mod.io|String",
+			  meta = (DisplayName = "ToString (EFileSizeUnit)", CompactNodeTitle = "FilesizeUnit"))
+	static MODIO_API FString FileSizeUnit_ToString(EFileSizeUnit Unit);
+
+	/**
+	 * @docpublic
 	 * @brief Convert a file size to a human-readable string with the appropriate unit.
 	 * @param FileSize The file size in bytes as a FModioUnsigned64.
 	 * @param MinDecimals Minimum number of decimal places to show.
@@ -139,6 +171,24 @@ public:
 					  DeprecationMessage = "The int64 version of this function is deprecated and will be removed in a future release. Please use the FModioUnsigned64 version."))
 	static MODIO_API FText Filesize_ToString(int64 FileSize, int32 MinDecimals = 0, int32 MaxDecimals = 2,
 	                                         EFileSizeUnit Unit = EFileSizeUnit::Largest, bool bIncludeUnitName = true);
+
+	/**
+	* @docpublic
+	* @brief Returns the byte size of the given FilesizeUnit (e.g EFileSizeUnit::KB returns 1024)
+	* @param FileSizeUnit The unit to convert to a byte value
+	* @return The byte value of the given unit.
+	*/
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities",
+			  meta = (DisplayName = "ToBytes (Filesize)", CompactNodeTitle = "Bytes"))
+	static MODIO_API FModioUnsigned64 Filesize_ToBytes(const EFileSizeUnit FileSizeUnit);
+
+	/**
+	* @docpublic
+	* @brief
+	*/
+	UFUNCTION(BlueprintPure, Category = "mod.io|Utilities",
+			  meta = (DisplayName = "BytesGreaterThan (Filesize)", CompactNodeTitle = ">"))
+	static MODIO_API bool IsFilesizeGreaterThanUnit(FModioUnsigned64 FileSize, EFileSizeUnit Unit);
 
 	/**
 	 * @docpublic

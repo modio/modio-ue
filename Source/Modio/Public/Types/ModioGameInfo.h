@@ -19,6 +19,7 @@
 #include "Types/ModioLogo.h"
 #include "Types/ModioModTagOptions.h"
 #include "Types/ModioOtherUrl.h"
+#include "Types/ModioPlacement.h"
 #include "Types/ModioTheme.h"
 
 #include "ModioGameInfo.generated.h"
@@ -249,6 +250,14 @@ struct MODIO_API FModioGameInfo
 	 */
 	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
 	TArray<FModioModTagInfo> TagOptions;
+
+	/**
+	 * @docpublic
+	 * @brief Placements available for this game
+	 */
+	UPROPERTY(BlueprintReadOnly, Category = "mod.io|GameInfo")
+	TArray<FModioPlacement> Placements;
+
 	/**
 	 * @docpublic
 	 * @brief Cloud Cooking status for this game

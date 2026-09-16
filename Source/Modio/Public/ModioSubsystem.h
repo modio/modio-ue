@@ -216,9 +216,14 @@ protected:
 	friend class UModioUISubsystem;
 
 public:
+	UFUNCTION(BlueprintPure, Category = "mod.io")
 	EModioPortal GetCurrentPortal() const
 	{
 		return CachedInitializeOptions.PortalInUse;
+	}
+	FModioInitializeOptions GetCachedInitializationOptions() const
+	{
+		return CachedInitializeOptions;
 	}
 
 protected:

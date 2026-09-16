@@ -191,7 +191,7 @@ void SModioEditorWindowCompoundWidget::LoadResources()
 	PanelBackgroundBrush->TintColor = FLinearColor(0.015f, 0.015f, 0.015f, 1.f);
 
 	BoldSeperatorBrush = new FSlateBrush();
-	BoldSeperatorBrush->TintColor = FLinearColor(0.05, 0.05, 0.05, 1.0f);
+	BoldSeperatorBrush->TintColor = FLinearColor(0.05f, 0.05f, 0.05f, 1.0f);
 
 	BackgroundBrush = new FSlateBrush();
 #if ENGINE_MAJOR_VERSION >= 5
